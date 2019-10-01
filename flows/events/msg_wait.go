@@ -3,9 +3,9 @@ package events
 import (
 	"encoding/json"
 
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/routers/waits/hints"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/pkg/errors"
 )

@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nyaruka/goflow/excellent"
-	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/nyaruka/goflow/flows/routers/cases"
-	"github.com/nyaruka/goflow/test"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/excellent"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/flows/routers/cases"
+	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

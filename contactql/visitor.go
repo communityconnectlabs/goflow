@@ -3,7 +3,7 @@ package contactql
 import (
 	"strings"
 
-	"github.com/nyaruka/goflow/contactql/gen"
+	"github.com/greatnonprofits-nfp/goflow/contactql/gen"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )

@@ -3,12 +3,12 @@ package waits
 import (
 	"encoding/json"
 
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/events"
-	"github.com/nyaruka/goflow/flows/resumes"
-	"github.com/nyaruka/goflow/flows/routers/waits/hints"
-	"github.com/nyaruka/goflow/flows/triggers"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/events"
+	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
+	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
+	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/pkg/errors"
 )

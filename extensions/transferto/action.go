@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/goflow/extensions/transferto/client"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/actions"
-	"github.com/nyaruka/goflow/flows/events"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/extensions/transferto/client"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/actions"
+	"github.com/greatnonprofits-nfp/goflow/flows/events"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"

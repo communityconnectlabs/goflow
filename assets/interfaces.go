@@ -3,7 +3,7 @@ package assets
 import (
 	"encoding/json"
 
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // ChannelUUID is the UUID of a channel

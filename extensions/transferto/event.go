@@ -1,8 +1,8 @@
 package transferto
 
 import (
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/events"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/events"
 
 	"github.com/shopspring/decimal"
 )

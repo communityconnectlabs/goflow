@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // Result describes a value captured during a run's execution. It might have been implicitly created by a router, or explicitly

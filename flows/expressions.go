@@ -1,8 +1,8 @@
 package flows
 
 import (
-	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // Contextable is an object that can accessed in expressions as a object with properties

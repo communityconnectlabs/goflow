@@ -2,7 +2,7 @@ package types
 
 import (
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets"
 )
 
 // Channel is a JSON serializable implementation of a channel asset

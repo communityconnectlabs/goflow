@@ -1,11 +1,11 @@
 package main_test
 
 import (
-	"github.com/nyaruka/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets"
 	"strings"
 	"testing"
 
-	main "github.com/nyaruka/goflow/cmd/flowrunner"
+	main "github.com/greatnonprofits-nfp/goflow/cmd/flowrunner"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

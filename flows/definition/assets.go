@@ -3,8 +3,8 @@ package definition
 import (
 	"sync"
 
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 // implemention of FlowAssets which provides lazy loading and validation of flows

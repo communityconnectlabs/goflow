@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 const serializeDefaultAs = "__default__"

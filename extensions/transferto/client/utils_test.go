@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/nyaruka/goflow/extensions/transferto/client"
+	"github.com/greatnonprofits-nfp/goflow/extensions/transferto/client"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

@@ -3,8 +3,8 @@ package legacy_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/legacy"
-	"github.com/nyaruka/goflow/test"
+	"github.com/greatnonprofits-nfp/goflow/legacy"
+	"github.com/greatnonprofits-nfp/goflow/test"
 
 	"github.com/stretchr/testify/assert"
 )

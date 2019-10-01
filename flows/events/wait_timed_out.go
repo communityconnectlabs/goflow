@@ -1,7 +1,7 @@
 package events
 
 import (
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 func init() {

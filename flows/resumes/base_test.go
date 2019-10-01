@@ -3,10 +3,10 @@ package resumes_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/assets/static"
-	"github.com/nyaruka/goflow/flows/engine"
-	"github.com/nyaruka/goflow/flows/resumes"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/flows/engine"
+	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

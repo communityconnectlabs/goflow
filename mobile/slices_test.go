@@ -3,7 +3,7 @@ package mobile_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/mobile"
+	"github.com/greatnonprofits-nfp/goflow/mobile"
 
 	"github.com/stretchr/testify/assert"
 )

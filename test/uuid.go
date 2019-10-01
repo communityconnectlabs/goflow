@@ -3,7 +3,7 @@ package test
 import (
 	"math/rand"
 
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/gofrs/uuid"
 )

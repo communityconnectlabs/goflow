@@ -3,7 +3,7 @@ package types
 import (
 	"encoding/json"
 
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // XFunction is a callable function.

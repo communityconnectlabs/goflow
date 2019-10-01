@@ -3,7 +3,7 @@ package tools_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/excellent/tools"
+	"github.com/greatnonprofits-nfp/goflow/excellent/tools"
 
 	"github.com/stretchr/testify/assert"
 )

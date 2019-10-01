@@ -3,7 +3,7 @@ package types
 import (
 	"encoding/json"
 
-	"github.com/nyaruka/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets"
 )
 
 // Flow is a JSON serializable implementation of a flow asset

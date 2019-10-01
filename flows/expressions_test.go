@@ -3,8 +3,8 @@ package flows_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

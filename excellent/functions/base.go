@@ -3,8 +3,8 @@ package functions
 import (
 	"strings"
 
-	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // XFUNCTIONS is our map of functions available in Excellent which aren't tests

@@ -3,9 +3,9 @@ package tools
 import (
 	"strconv"
 
-	"github.com/nyaruka/goflow/excellent"
-	"github.com/nyaruka/goflow/excellent/functions"
-	"github.com/nyaruka/goflow/excellent/gen"
+	"github.com/greatnonprofits-nfp/goflow/excellent"
+	"github.com/greatnonprofits-nfp/goflow/excellent/functions"
+	"github.com/greatnonprofits-nfp/goflow/excellent/gen"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )

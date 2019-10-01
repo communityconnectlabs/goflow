@@ -3,8 +3,8 @@ package types
 import (
 	"encoding/json"
 
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // Template is a JSON serializable implementation of a template asset

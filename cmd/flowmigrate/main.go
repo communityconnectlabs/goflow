@@ -1,6 +1,6 @@
 package main
 
-// go install github.com/nyaruka/goflow/cmd/flowmigrate
+// go install github.com/greatnonprofits-nfp/goflow/cmd/flowmigrate
 // cat legacy_flow.json | flowmigrate
 // cat legacy_export.json | jq '.flows[0]' | flowmigrate
 
@@ -12,8 +12,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/nyaruka/goflow/legacy"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/legacy"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 func main() {

@@ -2,33 +2,33 @@ package mobile
 
 // To build an Android Archive:
 //
-// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/nyaruka/goflow/mobile
+// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/greatnonprofits-nfp/goflow/mobile
 //
 // ... except gomobile doesn't yet support gomodules (https://github.com/golang/go/issues/27234). So you need to recreate
 // this as a non-module go project first, i.e.
 //
-// mkdir -p $GOPATH/src/github.com/nyaruka/goflow
-// rsync -a . $GOPATH/src/github.com/nyaruka/goflow
-// cd $GOPATH/src/github.com/nyaruka/goflow
+// mkdir -p $GOPATH/src/github.com/greatnonprofits-nfp/goflow
+// rsync -a . $GOPATH/src/github.com/greatnonprofits-nfp/goflow
+// cd $GOPATH/src/github.com/greatnonprofits-nfp/goflow
 // GO111MODULE=on go mod vendor
 // GO111MODULE=off go get golang.org/x/mobile/cmd/gomobile
 // $GOPATH/bin/gomobile init
-// GO111MODULE=off gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/nyaruka/goflow/mobile
+// GO111MODULE=off gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/greatnonprofits-nfp/goflow/mobile
 
 import (
 	"encoding/json"
 	"time"
 
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/assets/static"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/definition"
-	"github.com/nyaruka/goflow/flows/engine"
-	"github.com/nyaruka/goflow/flows/resumes"
-	"github.com/nyaruka/goflow/flows/routers/waits"
-	"github.com/nyaruka/goflow/flows/triggers"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition"
+	"github.com/greatnonprofits-nfp/goflow/flows/engine"
+	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
+	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits"
+	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/Masterminds/semver"
 )

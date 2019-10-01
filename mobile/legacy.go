@@ -1,7 +1,7 @@
 package mobile
 
 import (
-	"github.com/nyaruka/goflow/legacy"
+	"github.com/greatnonprofits-nfp/goflow/legacy"
 )
 
 // IsLegacyDefinition peeks at the given flow definition to determine if it is in legacy format

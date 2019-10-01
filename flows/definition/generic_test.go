@@ -3,7 +3,7 @@ package definition_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"

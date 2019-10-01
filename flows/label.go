@@ -3,7 +3,7 @@ package flows
 import (
 	"strings"
 
-	"github.com/nyaruka/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets"
 )
 
 // Label represents a message label

@@ -1,8 +1,8 @@
 package functions
 
 import (
-	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // ArgCountCheck wraps an XFunction and checks the number of args

@@ -5,7 +5,7 @@ import (
 
 	validator "gopkg.in/go-playground/validator.v9"
 
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 func init() {

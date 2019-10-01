@@ -2,7 +2,7 @@ package main
 
 // generate full docs with:
 //
-// go install github.com/nyaruka/goflow/cmd/docgen; docgen
+// go install github.com/greatnonprofits-nfp/goflow/cmd/docgen; docgen
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/pkg/errors"
 )

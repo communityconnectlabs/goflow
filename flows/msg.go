@@ -2,8 +2,8 @@ package flows
 
 import (
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // BaseMsg represents a incoming or outgoing message with the session contact

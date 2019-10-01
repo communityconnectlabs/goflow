@@ -1,4 +1,4 @@
-module github.com/nyaruka/goflow
+module github.com/greatnonprofits-nfp/goflow
 
 require (
 	github.com/Masterminds/semver v1.4.2
