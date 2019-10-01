@@ -29,6 +29,7 @@ _testmain.go
 debug
 .DS_Store
 dist/
+.idea/
 
 fabfile.*
 fabconfig.*

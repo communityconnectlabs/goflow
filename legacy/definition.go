@@ -182,13 +182,15 @@ func (f *FlowReference) Migrate() *assets.FlowReference {
 
 // RulesetConfig holds the config dictionary for a legacy ruleset
 type RulesetConfig struct {
-	Flow           *assets.FlowReference `json:"flow"`
-	FieldDelimiter string                `json:"field_delimiter"`
-	FieldIndex     int                   `json:"field_index"`
-	Webhook        string                `json:"webhook"`
-	WebhookAction  string                `json:"webhook_action"`
-	WebhookHeaders []WebhookHeader       `json:"webhook_headers"`
-	Resthook       string                `json:"resthook"`
+	Flow             *assets.FlowReference `json:"flow"`
+	FieldDelimiter   string                `json:"field_delimiter"`
+	FieldIndex       int                   `json:"field_index"`
+	Webhook          string                `json:"webhook"`
+	WebhookAction    string                `json:"webhook_action"`
+	WebhookHeaders   []WebhookHeader       `json:"webhook_headers"`
+	Resthook         string                `json:"resthook"`
+	LookupCollection string                `json:"lookup_collection"`
+	LookupRules      []actions.LookupRule  `json:"lookup_rules"`
 }
 
 type WebhookHeader struct {
@@ -632,6 +634,16 @@ func migrateRuleSet(lang utils.Language, r RuleSet, validDests map[flows.NodeUUI
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
 		router = routers.NewSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
 		uiType = UINodeTypeSplitByWebhook
+
+	case "lookup":
+		newActions = []flows.Action{
+			actions.NewCallLookupAction(flows.ActionUUID(utils.NewUUID()), config.LookupCollection, config.LookupRules, resultName),
+		}
+
+		// lookup rulesets operate on the webhook status, saved as category
+		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
+		router = routers.NewSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		uiType = UINodeTypeSplitByLookup
 
 	case "resthook":
 		newActions = []flows.Action{
