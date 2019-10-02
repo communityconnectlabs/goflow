@@ -8,23 +8,23 @@ func init() {
 	RegisterType(TypeCallLookup, func() flows.Action { return &CallLookupAction{} })
 }
 
-// TypeCallLookup is the type for the call webhook action
+// TypeCallLookup is the type for the call lookup action
 const TypeCallLookup string = "call_lookup"
 
 // CallLookupAction can be used to call an external service. The body, header and url fields may be
 // templates and will be evaluated at runtime. A [event:lookup_called] event will be created based on
 // the results of the HTTP call. If this action has a `result_name`, then addtionally it will create
-// a new result with that name. If the webhook returned valid JSON, that will be accessible
+// a new result with that name. If the lookup returned valid JSON, that will be accessible
 // through `extra` on the result.
 //
 //   {
 //     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
 //     "type": "call_lookup",
-//     "collection": "test_lookup",
-//     "rules": [{
-//       "field": "name",
-//       "rule": "equals_to",
-//       "value": "Marcus",
+//     "lookup_db": {"id": "demo_test_lookup", "text": "Test Lookup"},
+//     "lookup_queries": [{
+//     		"field": {"id": "name", "text": "name", "type": "String"},
+//     		"rule": {"type": "equals", "verbose_name": "equals"},
+//     		"value": "Marcus"
 //     }],
 //     "result_name": "lookup"
 //   }
@@ -34,23 +34,23 @@ type CallLookupAction struct {
 	BaseAction
 	onlineAction
 
-	Collection string       `json:"collection" validate:"required"`
-	Rules      []LookupRule `json:"rules,omitempty" validate:"required"`
-	ResultName string       `json:"result_name,omitempty"`
+	DB         map[string]string `json:"lookup_db"`
+	Queries    []LookupQuery     `json:"lookup_queries,omitempty"`
+	ResultName string            `json:"result_name,omitempty"`
 }
 
-type LookupRule struct {
-	Field string `json:"field"`
-	Rule  string `json:"rule"`
-	Value string `json:"value"`
+type LookupQuery struct {
+	Field map[string]string `json:"field"`
+	Rule  map[string]string `json:"rule"`
+	Value string            `json:"value"`
 }
 
 // NewCallLookupAction creates a new call lookup action
-func NewCallLookupAction(uuid flows.ActionUUID, collection string, rules []LookupRule, resultName string) *CallLookupAction {
+func NewCallLookupAction(uuid flows.ActionUUID, lookupDb map[string]string, lookupQueries []LookupQuery, resultName string) *CallLookupAction {
 	return &CallLookupAction{
-		BaseAction: NewBaseAction(TypeCallWebhook, uuid),
-		Collection: collection,
-		Rules:      rules,
+		BaseAction: NewBaseAction(TypeCallLookup, uuid),
+		DB:         lookupDb,
+		Queries:    lookupQueries,
 		ResultName: resultName,
 	}
 }

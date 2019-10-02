@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/extensions/transferto"
 	"github.com/greatnonprofits-nfp/goflow/flows"
@@ -19,6 +18,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
 	"github.com/greatnonprofits-nfp/goflow/legacy/expressions"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/gocommon/urns"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -182,15 +182,15 @@ func (f *FlowReference) Migrate() *assets.FlowReference {
 
 // RulesetConfig holds the config dictionary for a legacy ruleset
 type RulesetConfig struct {
-	Flow             *assets.FlowReference `json:"flow"`
-	FieldDelimiter   string                `json:"field_delimiter"`
-	FieldIndex       int                   `json:"field_index"`
-	Webhook          string                `json:"webhook"`
-	WebhookAction    string                `json:"webhook_action"`
-	WebhookHeaders   []WebhookHeader       `json:"webhook_headers"`
-	Resthook         string                `json:"resthook"`
-	LookupCollection string                `json:"lookup_collection"`
-	LookupRules      []actions.LookupRule  `json:"lookup_rules"`
+	Flow           *assets.FlowReference `json:"flow"`
+	FieldDelimiter string                `json:"field_delimiter"`
+	FieldIndex     int                   `json:"field_index"`
+	Webhook        string                `json:"webhook"`
+	WebhookAction  string                `json:"webhook_action"`
+	WebhookHeaders []WebhookHeader       `json:"webhook_headers"`
+	Resthook       string                `json:"resthook"`
+	LookupDb       map[string]string     `json:"lookup_db"`
+	LookupQueries  []actions.LookupQuery `json:"lookup_rules"`
 }
 
 type WebhookHeader struct {
@@ -637,7 +637,7 @@ func migrateRuleSet(lang utils.Language, r RuleSet, validDests map[flows.NodeUUI
 
 	case "lookup":
 		newActions = []flows.Action{
-			actions.NewCallLookupAction(flows.ActionUUID(utils.NewUUID()), config.LookupCollection, config.LookupRules, resultName),
+			actions.NewCallLookupAction(flows.ActionUUID(utils.NewUUID()), config.LookupDb, config.LookupQueries, resultName),
 		}
 
 		// lookup rulesets operate on the webhook status, saved as category
