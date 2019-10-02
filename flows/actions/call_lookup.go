@@ -1,8 +1,8 @@
 package actions
 
 import (
+	"fmt"
 	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
 )
 
 func init() {
@@ -63,7 +63,7 @@ func (a *CallLookupAction) Validate() error {
 
 // Execute runs this action
 func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
-	logEvent(events.NewErrorEventf("Just testing route"))
+	fmt.Println("Test")
 	return nil
 }
 
