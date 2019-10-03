@@ -3,6 +3,10 @@ package actions
 import (
 	"fmt"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/events"
+	"net/http"
+	"os"
+	"strings"
 )
 
 func init() {
@@ -46,6 +50,14 @@ type LookupQuery struct {
 	Value string            `json:"value"`
 }
 
+const (
+	xParseApplicationId = "X-Parse-Application-Id"
+	xParseMasterKey = "X-Parse-Master-Key"
+	envVarAppId = "MAILROOM_PARSE_SERVER_APP_ID"
+	envVarMasterKey = "MAILROOM_PARSE_SERVER_MASTER_KEY"
+	envVarServerUrl = "MAILROOM_PARSE_SERVER_URL"
+)
+
 // NewCallLookupAction creates a new call lookup action
 func NewCallLookupAction(uuid flows.ActionUUID, lookupDb map[string]string, lookupQueries []LookupQuery, resultName string) *CallLookupAction {
 	return &CallLookupAction{
@@ -63,7 +75,52 @@ func (a *CallLookupAction) Validate() error {
 
 // Execute runs this action
 func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
-	fmt.Println("Test")
+	method := "POST"
+
+	// substitute any variables in our url
+	url := getEnv(envVarServerUrl, "http://localhost:9090/parse")
+	fmt.Println(url)
+
+	if url == "" {
+		logEvent(events.NewErrorEventf("call_lookup URL is an empty string, skipping"))
+		return nil
+	}
+
+	body := ""
+
+	// substitute any body variables
+	//if body != "" {
+	//	body, err = run.EvaluateTemplate(body)
+	//	if err != nil {
+	//		logEvent(events.NewErrorEvent(err))
+	//	}
+	//}
+
+	// build our request
+	req, err := http.NewRequest(method, url, strings.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	appId := getEnv(envVarAppId, "myAppId")
+	masterKey := getEnv(envVarMasterKey, "myMasterKey")
+
+	// add the custom headers, substituting any template vars
+	req.Header.Add(xParseApplicationId, appId)
+	req.Header.Add(xParseMasterKey, masterKey)
+	req.Header.Add("Content-Type", "application/json")
+
+	webhook, err := flows.MakeWebhookCall(run.Session(), req, "")
+
+	if err != nil {
+		logEvent(events.NewErrorEvent(err))
+	} else {
+		logEvent(events.NewLookupCalledEvent(webhook))
+		if a.ResultName != "" {
+			a.saveWebhookResult(run, step, a.ResultName, webhook, logEvent)
+		}
+	}
+
 	return nil
 }
 
@@ -77,4 +134,11 @@ func (a *CallLookupAction) EnumerateResults(node flows.Node, include func(*flows
 	if a.ResultName != "" {
 		include(flows.NewResultInfo(a.ResultName, webhookCategories, node))
 	}
+}
+
+func getEnv(key string, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
 }
