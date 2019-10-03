@@ -2,7 +2,6 @@ package actions
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"net/http"
@@ -114,10 +113,6 @@ func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifi
 
 	b, _ := json.Marshal(body)
 
-	// TODO Remove those lines
-	fmt.Println(a.Queries)
-	fmt.Println(queries)
-
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(string(b)))
 	if err != nil {
@@ -149,6 +144,13 @@ func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifi
 // Inspect inspects this object and any children
 func (a *CallLookupAction) Inspect(inspect func(flows.Inspectable)) {
 	inspect(a)
+}
+
+// EnumerateTemplates enumerates all expressions on this object and its children
+func (a *CallLookupAction) EnumerateTemplates(include flows.TemplateIncluder) {
+	for item := range a.Queries {
+		include.String(&a.Queries[item].Value)
+	}
 }
 
 // EnumerateResults enumerates all potential results on this object
