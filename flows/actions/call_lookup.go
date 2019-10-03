@@ -2,6 +2,7 @@ package actions
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"net/http"
@@ -101,12 +102,20 @@ func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifi
 		queries = append(queries, newQuery)
 	}
 
+	if a.DB["id"] == "" {
+		logEvent(events.NewErrorEventf("Parse Server DB is required, skipping"))
+		return nil
+	}
+
 	body := make(map[string]interface{})
 	body["queries"] = queries
-	body["db"] = a.DB
+	body["db"] = a.DB["id"]
 	body["flow_step"] = true
 
 	b, _ := json.Marshal(body)
+
+	// TODO Remove this line
+	fmt.Println(queries)
 
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(string(b)))
