@@ -190,7 +190,7 @@ type RulesetConfig struct {
 	WebhookHeaders []WebhookHeader       `json:"webhook_headers"`
 	Resthook       string                `json:"resthook"`
 	LookupDb       map[string]string     `json:"lookup_db"`
-	LookupQueries  []actions.LookupQuery `json:"lookup_rules"`
+	LookupQueries  []actions.LookupQuery `json:"lookup_queries"`
 }
 
 type WebhookHeader struct {

@@ -41,7 +41,7 @@ type CallLookupAction struct {
 	onlineAction
 
 	DB         map[string]string `json:"lookup_db"`
-	Queries    []LookupQuery     `json:"lookup_queries,omitempty"`
+	Queries    []LookupQuery     `json:"lookup_queries"`
 	ResultName string            `json:"result_name,omitempty"`
 }
 
@@ -114,8 +114,9 @@ func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifi
 
 	b, _ := json.Marshal(body)
 
-	// TODO Remove this line
+	// TODO Remove those lines
 	fmt.Println(a.Queries)
+	fmt.Println(queries)
 
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(string(b)))
