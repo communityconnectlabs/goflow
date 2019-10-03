@@ -1,7 +1,7 @@
 package actions
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"net/http"
@@ -52,10 +52,10 @@ type LookupQuery struct {
 
 const (
 	xParseApplicationId = "X-Parse-Application-Id"
-	xParseMasterKey = "X-Parse-Master-Key"
-	envVarAppId = "MAILROOM_PARSE_SERVER_APP_ID"
-	envVarMasterKey = "MAILROOM_PARSE_SERVER_MASTER_KEY"
-	envVarServerUrl = "MAILROOM_PARSE_SERVER_URL"
+	xParseMasterKey     = "X-Parse-Master-Key"
+	envVarAppId         = "MAILROOM_PARSE_SERVER_APP_ID"
+	envVarMasterKey     = "MAILROOM_PARSE_SERVER_MASTER_KEY"
+	envVarServerUrl     = "MAILROOM_PARSE_SERVER_URL"
 )
 
 // NewCallLookupAction creates a new call lookup action
@@ -78,26 +78,38 @@ func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifi
 	method := "POST"
 
 	// substitute any variables in our url
-	url := getEnv(envVarServerUrl, "http://localhost:9090/parse")
-	fmt.Println(url)
+	parseUrl := getEnv(envVarServerUrl, "http://localhost:9090/parse")
+	url := parseUrl + "/functions/lookup"
 
-	if url == "" {
-		logEvent(events.NewErrorEventf("call_lookup URL is an empty string, skipping"))
+	if parseUrl == "" {
+		logEvent(events.NewErrorEventf("Parse Server URL is an empty string, skipping"))
 		return nil
 	}
 
-	body := ""
+	queries := make([]map[string]interface{}, 0, 0)
 
-	// substitute any body variables
-	//if body != "" {
-	//	body, err = run.EvaluateTemplate(body)
-	//	if err != nil {
-	//		logEvent(events.NewErrorEvent(err))
-	//	}
-	//}
+	// substitute any value variables
+	for item := range a.Queries {
+		queryValue, err := run.EvaluateTemplate(a.Queries[item].Value)
+		if err != nil {
+			logEvent(events.NewErrorEvent(err))
+		}
+		var newQuery = make(map[string]interface{})
+		newQuery["field"] = a.Queries[item].Field
+		newQuery["rule"] = a.Queries[item].Rule
+		newQuery["value"] = queryValue
+		queries = append(queries, newQuery)
+	}
+
+	body := make(map[string]interface{})
+	body["queries"] = queries
+	body["db"] = a.DB
+	body["flow_step"] = true
+
+	b, _ := json.Marshal(body)
 
 	// build our request
-	req, err := http.NewRequest(method, url, strings.NewReader(body))
+	req, err := http.NewRequest(method, url, strings.NewReader(string(b)))
 	if err != nil {
 		return err
 	}
