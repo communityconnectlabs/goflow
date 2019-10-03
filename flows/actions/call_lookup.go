@@ -115,7 +115,7 @@ func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifi
 	b, _ := json.Marshal(body)
 
 	// TODO Remove this line
-	fmt.Println(queries)
+	fmt.Println(a.Queries)
 
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(string(b)))
