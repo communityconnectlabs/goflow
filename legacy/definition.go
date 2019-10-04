@@ -636,7 +636,7 @@ func migrateRuleSet(lang utils.Language, r RuleSet, validDests map[flows.NodeUUI
 		uiType = UINodeTypeSplitByWebhook
 
 	case "lookup":
-		lookupQueries := make([]actions.LookupQuery, 0, 0)
+		lookupQueries := make([]actions.LookupQuery, len(config.LookupQueries))
 		for i := range config.LookupQueries {
 			// ignore empty values sometimes left in flow definitions
 			if config.LookupQueries[i].Value != "" {
