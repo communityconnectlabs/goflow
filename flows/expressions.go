@@ -40,4 +40,5 @@ var RunContextTopLevels = []string{
 	"trigger",
 	"urns",
 	"webhook",
+	"flow",
 }
