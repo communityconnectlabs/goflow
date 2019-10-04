@@ -636,6 +636,13 @@ func migrateRuleSet(lang utils.Language, r RuleSet, validDests map[flows.NodeUUI
 		uiType = UINodeTypeSplitByWebhook
 
 	case "lookup":
+		for i := range config.LookupQueries {
+			// ignore empty values sometimes left in flow definitions
+			if config.LookupQueries[i].Value != "" {
+				config.LookupQueries[i].Value, _ = expressions.MigrateTemplate(config.LookupQueries[i].Value, nil)
+			}
+		}
+
 		newActions = []flows.Action{
 			actions.NewCallLookupAction(flows.ActionUUID(utils.NewUUID()), config.LookupDb, config.LookupQueries, resultName),
 		}
