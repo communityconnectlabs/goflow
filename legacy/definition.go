@@ -636,15 +636,18 @@ func migrateRuleSet(lang utils.Language, r RuleSet, validDests map[flows.NodeUUI
 		uiType = UINodeTypeSplitByWebhook
 
 	case "lookup":
+		lookupQueries := make([]actions.LookupQuery, 0, 0)
 		for i := range config.LookupQueries {
 			// ignore empty values sometimes left in flow definitions
 			if config.LookupQueries[i].Value != "" {
-				config.LookupQueries[i].Value, _ = expressions.MigrateTemplate(config.LookupQueries[i].Value, nil)
+				lookupQueries[i].Field = config.LookupQueries[i].Field
+				lookupQueries[i].Rule = config.LookupQueries[i].Rule
+				lookupQueries[i].Value, _ = expressions.MigrateTemplate(config.LookupQueries[i].Value, nil)
 			}
 		}
 
 		newActions = []flows.Action{
-			actions.NewCallLookupAction(flows.ActionUUID(utils.NewUUID()), config.LookupDb, config.LookupQueries, resultName),
+			actions.NewCallLookupAction(flows.ActionUUID(utils.NewUUID()), config.LookupDb, lookupQueries, resultName),
 		}
 
 		// lookup rulesets operate on the webhook status, saved as category
