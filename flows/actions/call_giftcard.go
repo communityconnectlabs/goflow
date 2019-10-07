@@ -82,11 +82,11 @@ func (a *CallGiftcardAction) Execute(run flows.FlowRun, step flows.Step, logModi
 		return nil
 	}
 
-	contact := run.Contact().PreferredURN()
+	contact_urn := run.Contact().PreferredURN()
 
 	body := make(map[string]interface{})
 	body["db"] = a.DB["id"]
-	body["urn"] = contact.String()
+	body["urn"] = contact_urn.URN().Path()
 
 	b, _ := json.Marshal(body)
 
