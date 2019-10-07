@@ -191,6 +191,8 @@ type RulesetConfig struct {
 	Resthook       string                `json:"resthook"`
 	LookupDb       map[string]string     `json:"lookup_db"`
 	LookupQueries  []actions.LookupQuery `json:"lookup_queries"`
+	GiftcardDb     map[string]string     `json:"giftcard_db"`
+	GiftcardType   string                `json:"giftcard_type"`
 }
 
 type WebhookHeader struct {
@@ -651,6 +653,16 @@ func migrateRuleSet(lang utils.Language, r RuleSet, validDests map[flows.NodeUUI
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
 		router = routers.NewSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
 		uiType = UINodeTypeSplitByLookup
+
+	case "giftcard":
+		newActions = []flows.Action{
+			actions.NewCallGiftcardAction(flows.ActionUUID(utils.NewUUID()), config.GiftcardDb, config.GiftcardType, resultName),
+		}
+
+		// lookup rulesets operate on the webhook status, saved as category
+		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
+		router = routers.NewSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		uiType = UINodeTypeSplitByGiftcard
 
 	case "resthook":
 		newActions = []flows.Action{

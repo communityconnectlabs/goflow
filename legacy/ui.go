@@ -19,6 +19,7 @@ const (
 	UINodeTypeSplitByWebhook            UINodeType = "split_by_webhook"
 	UINodeTypeSplitByResthook           UINodeType = "split_by_resthook"
 	UINodeTypeSplitByLookup             UINodeType = "split_by_lookup"
+	UINodeTypeSplitByGiftcard           UINodeType = "split_by_giftcard"
 	UINodeTypeSplitByGroups             UINodeType = "split_by_groups"
 	UINodeTypeSplitByExpression         UINodeType = "split_by_expression"
 	UINodeTypeSplitByContactField       UINodeType = "split_by_contact_field"

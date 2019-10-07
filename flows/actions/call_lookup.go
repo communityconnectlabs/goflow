@@ -5,7 +5,6 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -49,14 +48,6 @@ type LookupQuery struct {
 	Rule  map[string]string `json:"rule"`
 	Value string            `json:"value"`
 }
-
-const (
-	xParseApplicationId = "X-Parse-Application-Id"
-	xParseMasterKey     = "X-Parse-Master-Key"
-	envVarAppId         = "MAILROOM_PARSE_SERVER_APP_ID"
-	envVarMasterKey     = "MAILROOM_PARSE_SERVER_MASTER_KEY"
-	envVarServerUrl     = "MAILROOM_PARSE_SERVER_URL"
-)
 
 // NewCallLookupAction creates a new call lookup action
 func NewCallLookupAction(uuid flows.ActionUUID, lookupDb map[string]string, lookupQueries []LookupQuery, resultName string) *CallLookupAction {
@@ -158,11 +149,4 @@ func (a *CallLookupAction) EnumerateResults(node flows.Node, include func(*flows
 	if a.ResultName != "" {
 		include(flows.NewResultInfo(a.ResultName, webhookCategories, node))
 	}
-}
-
-func getEnv(key string, defaultValue string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return defaultValue
 }
