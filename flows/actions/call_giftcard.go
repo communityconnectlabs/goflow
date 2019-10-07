@@ -65,10 +65,10 @@ func (a *CallGiftcardAction) Execute(run flows.FlowRun, step flows.Step, logModi
 	// substitute any variables in our url
 	parseUrl := getEnv(envVarServerUrl, "http://localhost:9090/parse")
 	var giftcardType string
-	if a.GiftcardType == giftcardAssignType {
-		giftcardType = "giftcard"
-	} else {
+	if a.GiftcardType == giftcardCheckType {
 		giftcardType = "giftcards_remaining"
+	} else {
+		giftcardType = "giftcard"
 	}
 	url := parseUrl + "/functions/" + giftcardType
 
