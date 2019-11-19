@@ -72,6 +72,9 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 		return nil
 	}
 
+	println("GoFlow")
+	println(a.Text)
+
 	evaluatedText, evaluatedAttachments, evaluatedQuickReplies := a.evaluateMessage(run, nil, a.Text, a.Attachments, a.QuickReplies, logEvent)
 
 	destinations := run.Contact().ResolveDestinations(a.AllURNs)
