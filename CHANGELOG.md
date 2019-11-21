@@ -1,3 +1,11 @@
+v0.41.14.20
+----------
+ * Add Trackable Links
+
+v0.41.14.19
+----------
+ * Add Gift card and Lookup
+
 v0.41.14
 ----------
  * Fix start_session when create_contact is true
