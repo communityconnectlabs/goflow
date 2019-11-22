@@ -268,7 +268,7 @@ type betweenTest struct {
 }
 
 type timeoutTest struct {
-	Minutes int `json:"minutes"`
+	Minutes float64 `json:"minutes"`
 }
 
 type groupTest struct {
@@ -667,13 +667,14 @@ func migrateRuleSet(lang utils.Language, r RuleSet, validDests map[flows.NodeUUI
 	case "wait_message", "wait_audio", "wait_video", "wait_photo", "wait_gps", "wait_recording", "wait_digit", "wait_digits":
 		// look for timeout test on the legacy ruleset
 		timeoutSeconds := 0
+		var secs float64 = 60
 		for _, rule := range r.Rules {
 			if rule.Test.Type == "timeout" {
 				test := timeoutTest{}
 				if err := json.Unmarshal(rule.Test.Data, &test); err != nil {
 					return nil, "", nil, err
 				}
-				timeoutSeconds = 60 * test.Minutes
+				timeoutSeconds = int(secs * test.Minutes)
 				break
 			}
 		}
