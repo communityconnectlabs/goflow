@@ -2,6 +2,9 @@ package actions
 
 import (
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/events"
+	"net/http"
+	"strings"
 )
 
 func init() {
@@ -49,6 +52,28 @@ func (a *CallShortenURLAction) Validate() error {
 
 // Execute runs this action
 func (a *CallShortenURLAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+	// fake parameters
+	method := "GET"
+	url := getEnv(envMailroomDomain, "https://www.communityconnectlabs.com")
+	body := ""
+
+	// build our fake request
+	req, err := http.NewRequest(method, url, strings.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	webhook, err := flows.MakeWebhookCall(run.Session(), req, "")
+
+	if err != nil {
+		logEvent(events.NewErrorEvent(err))
+	} else {
+		logEvent(events.NewShortenURLCalledEvent(webhook))
+		if a.ResultName != "" {
+			a.saveWebhookResult(run, step, a.ResultName, webhook, logEvent)
+		}
+	}
+
 	return nil
 }
 

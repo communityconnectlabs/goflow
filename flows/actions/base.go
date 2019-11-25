@@ -23,6 +23,7 @@ const (
 	envVarMasterKey     = "MAILROOM_PARSE_SERVER_MASTER_KEY"
 	envVarServerUrl     = "MAILROOM_PARSE_SERVER_URL"
 	giftcardCheckType   = "GIFTCARD_CHECK"
+	envMailroomDomain   = "MAILROOM_DOMAIN"
 )
 
 // Get environment variables passing a default value
