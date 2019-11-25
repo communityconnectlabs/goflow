@@ -17,13 +17,13 @@ import (
 )
 
 const (
-	xParseApplicationId = "X-Parse-Application-Id"
-	xParseMasterKey     = "X-Parse-Master-Key"
-	envVarAppId         = "MAILROOM_PARSE_SERVER_APP_ID"
-	envVarMasterKey     = "MAILROOM_PARSE_SERVER_MASTER_KEY"
-	envVarServerUrl     = "MAILROOM_PARSE_SERVER_URL"
-	giftcardCheckType   = "GIFTCARD_CHECK"
-	envMailroomDomain   = "MAILROOM_DOMAIN"
+	xParseApplicationId  = "X-Parse-Application-Id"
+	xParseMasterKey      = "X-Parse-Master-Key"
+	envVarAppId          = "MAILROOM_PARSE_SERVER_APP_ID"
+	envVarMasterKey      = "MAILROOM_PARSE_SERVER_MASTER_KEY"
+	envVarServerUrl      = "MAILROOM_PARSE_SERVER_URL"
+	giftcardCheckType    = "GIFTCARD_CHECK"
+	envVarShortenURLPing = "MAILROOM_SHORTEN_URL_PING"
 )
 
 // Get environment variables passing a default value
