@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"net/http"
@@ -54,7 +55,8 @@ func (a *CallShortenURLAction) Validate() error {
 func (a *CallShortenURLAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	// fake parameters
 	method := "GET"
-	url := getEnv(envMailroomDomain, "https://www.communityconnectlabs.com")
+	envDomain := getEnv(envMailroomDomain, "www.communityconnectlabs.com")
+	url := fmt.Sprintf("https://%s", envDomain)
 	body := ""
 
 	// build our fake request
