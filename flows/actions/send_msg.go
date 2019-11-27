@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/flows"
@@ -71,6 +72,8 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 		logEvent(events.NewErrorEventf("can't execute action in session without a contact"))
 		return nil
 	}
+
+	fmt.Printf("\n Text: %s \n", a.Text)
 
 	evaluatedText, evaluatedAttachments, evaluatedQuickReplies := a.evaluateMessage(run, nil, a.Text, a.Attachments, a.QuickReplies, logEvent)
 
