@@ -1,12 +1,11 @@
 package actions
 
 import (
-	"fmt"
-	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/gocommon/urns"
 )
 
 func init() {
@@ -73,13 +72,9 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 		return nil
 	}
 
-	fmt.Printf("\n Text: %s \n", a.Text)
-
 	evaluatedText, evaluatedAttachments, evaluatedQuickReplies := a.evaluateMessage(run, nil, a.Text, a.Attachments, a.QuickReplies, logEvent)
 
 	destinations := run.Contact().ResolveDestinations(a.AllURNs)
-
-	fmt.Printf("\n Dest: %v \n", destinations)
 
 	sa := run.Session().Assets()
 
