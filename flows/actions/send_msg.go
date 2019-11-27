@@ -79,6 +79,8 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 	destinations := run.Contact().ResolveDestinations(a.AllURNs)
 
+	fmt.Printf("\n Dest: %v \n", destinations)
+
 	sa := run.Session().Assets()
 
 	// create a new message for each URN+channel destination
