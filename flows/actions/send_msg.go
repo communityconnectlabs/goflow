@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
@@ -83,6 +84,13 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 		var channelRef *assets.ChannelReference
 		if dest.Channel != nil {
 			channelRef = assets.NewChannelReference(dest.Channel.UUID(), dest.Channel.Name())
+		}
+
+		// channel uuid defined on RapidPro to be used on simulator
+		simulatorChannelUUID := getEnv("MAILROOM_SIMULATOR_CHANNEL_UUID", "440099cf-200c-4d45-a8e7-4a564f4a0e8b")
+		channelUUID := dest.Channel.UUID()
+		if string(channelUUID) == simulatorChannelUUID {
+			fmt.Printf("\n %s: %s \n", simulatorChannelUUID, evaluatedText)
 		}
 
 		var templating *flows.MsgTemplating
