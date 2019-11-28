@@ -96,7 +96,7 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 			textSplitted := re.FindAllString(evaluatedText, -1)
 			for i := range textSplitted {
 				link := textSplitted[i]
-				evaluatedText = strings.Replace(evaluatedText, link, "https://trackable.link", -1)
+				evaluatedText = strings.Replace(evaluatedText, link, "https://ccl.trackable.link", -1)
 			}
 		}
 
