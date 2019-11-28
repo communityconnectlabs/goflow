@@ -1,12 +1,13 @@
 package actions
 
 import (
-	"fmt"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 	"github.com/nyaruka/gocommon/urns"
+	"regexp"
+	"strings"
 )
 
 func init() {
@@ -88,9 +89,15 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 		// channel uuid defined on RapidPro to be used on simulator
 		simulatorChannelUUID := getEnv("MAILROOM_SIMULATOR_CHANNEL_UUID", "440099cf-200c-4d45-a8e7-4a564f4a0e8b")
-		channelUUID := dest.Channel.UUID()
-		if string(channelUUID) == simulatorChannelUUID {
-			fmt.Printf("\n %s: %s \n", simulatorChannelUUID, evaluatedText)
+
+		// making the replacing process for fake links if it is from the simulador
+		if string(dest.Channel.UUID()) == simulatorChannelUUID {
+			re := regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)`)
+			textSplitted := re.FindAllString(evaluatedText, -1)
+			for i := range textSplitted {
+				link := textSplitted[i]
+				evaluatedText = strings.Replace(evaluatedText, link, "https://trackable.link", -1)
+			}
 		}
 
 		var templating *flows.MsgTemplating
