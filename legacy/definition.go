@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/extensions/transferto"
 	"github.com/greatnonprofits-nfp/goflow/flows"
@@ -19,6 +18,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
 	"github.com/greatnonprofits-nfp/goflow/legacy/expressions"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/gocommon/urns"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -189,6 +189,11 @@ type RulesetConfig struct {
 	WebhookAction  string                `json:"webhook_action"`
 	WebhookHeaders []WebhookHeader       `json:"webhook_headers"`
 	Resthook       string                `json:"resthook"`
+	LookupDb       map[string]string     `json:"lookup_db"`
+	LookupQueries  []actions.LookupQuery `json:"lookup_queries"`
+	GiftcardDb     map[string]string     `json:"giftcard_db"`
+	GiftcardType   string                `json:"giftcard_type"`
+	ShortenURL     map[string]string     `json:"shorten_url"`
 }
 
 type WebhookHeader struct {
@@ -633,6 +638,33 @@ func migrateRuleSet(lang utils.Language, r RuleSet, validDests map[flows.NodeUUI
 		router = routers.NewSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
 		uiType = UINodeTypeSplitByWebhook
 
+	case "lookup":
+		for i := range config.LookupQueries {
+			// ignore empty values sometimes left in flow definitions
+			if config.LookupQueries[i].Value != "" {
+				config.LookupQueries[i].Value, _ = expressions.MigrateTemplate(config.LookupQueries[i].Value, nil)
+			}
+		}
+
+		newActions = []flows.Action{
+			actions.NewCallLookupAction(flows.ActionUUID(utils.NewUUID()), config.LookupDb, config.LookupQueries, resultName),
+		}
+
+		// lookup rulesets operate on the webhook status, saved as category
+		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
+		router = routers.NewSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		uiType = UINodeTypeSplitByLookup
+
+	case "giftcard":
+		newActions = []flows.Action{
+			actions.NewCallGiftcardAction(flows.ActionUUID(utils.NewUUID()), config.GiftcardDb, config.GiftcardType, resultName),
+		}
+
+		// lookup rulesets operate on the webhook status, saved as category
+		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
+		router = routers.NewSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		uiType = UINodeTypeSplitByGiftcard
+
 	case "resthook":
 		newActions = []flows.Action{
 			actions.NewCallResthookAction(flows.ActionUUID(utils.NewUUID()), config.Resthook, resultName),
@@ -642,6 +674,16 @@ func migrateRuleSet(lang utils.Language, r RuleSet, validDests map[flows.NodeUUI
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
 		router = routers.NewSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
 		uiType = UINodeTypeSplitByResthook
+
+	case "shorten_url":
+		newActions = []flows.Action{
+			actions.NewCallShortenURLAction(flows.ActionUUID(utils.NewUUID()), config.ShortenURL, resultName),
+		}
+
+		// lookup rulesets operate on the webhook status, saved as category
+		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
+		router = routers.NewSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		uiType = UINodeTypeSplitByShortenURL
 
 	case "form_field":
 		operand, _ := expressions.MigrateTemplate(r.Operand, nil)

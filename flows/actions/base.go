@@ -3,17 +3,36 @@ package actions
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"regexp"
 	"strconv"
 
-	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/gocommon/urns"
 
 	"github.com/pkg/errors"
 )
+
+const (
+	xParseApplicationId  = "X-Parse-Application-Id"
+	xParseMasterKey      = "X-Parse-Master-Key"
+	envVarAppId          = "MAILROOM_PARSE_SERVER_APP_ID"
+	envVarMasterKey      = "MAILROOM_PARSE_SERVER_MASTER_KEY"
+	envVarServerUrl      = "MAILROOM_PARSE_SERVER_URL"
+	giftcardCheckType    = "GIFTCARD_CHECK"
+	envVarShortenURLPing = "MAILROOM_SHORTEN_URL_PING"
+)
+
+// Get environment variables passing a default value
+func getEnv(key string, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
+}
 
 var webhookCategories = []string{"Success", "Failure"}
 var webhookStatusCategories = map[flows.WebhookStatus]string{
