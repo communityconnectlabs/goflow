@@ -92,7 +92,7 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 		// making the replacing process for fake links if it is from the simulador
 		if string(dest.Channel.UUID()) == simulatorChannelUUID {
-			re := regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)`)
+			re := regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?!&//=]*)`)
 			textSplitted := re.FindAllString(evaluatedText, -1)
 			for i := range textSplitted {
 				link := textSplitted[i]
