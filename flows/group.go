@@ -30,12 +30,8 @@ func (g *Group) Asset() assets.Group { return g.Group }
 // the parsed query of a dynamic group (cached)
 func (g *Group) parsedQuery(env envs.Environment, fields *FieldAssets) (*contactql.ContactQuery, error) {
 	if g.Query() != "" && g.cachedQuery == nil {
-		fieldResolver := func(key string) assets.Field {
-			return fields.Get(key)
-		}
-
 		var err error
-		if g.cachedQuery, err = contactql.ParseQuery(g.Query(), env.RedactionPolicy(), fieldResolver); err != nil {
+		if g.cachedQuery, err = contactql.ParseQuery(g.Query(), env.RedactionPolicy(), fields.Resolve); err != nil {
 			return nil, err
 		}
 	}

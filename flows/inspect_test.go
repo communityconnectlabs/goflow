@@ -15,14 +15,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type unknownAssetType struct{}
+
+func (t *unknownAssetType) String() string   { return "x" }
+func (t *unknownAssetType) Type() string     { return "unknown" }
+func (t *unknownAssetType) Identity() string { return "unknown[]" }
+func (t *unknownAssetType) Variable() bool   { return false }
+
 func TestDependencies(t *testing.T) {
 	assert.Equal(t, &flows.Dependencies{}, flows.NewDependencies([]assets.Reference{}))
 
 	deps := flows.NewDependencies([]assets.Reference{
 		assets.NewChannelReference("8286545d-d1a1-4eff-a3ad-a11ddf4bb20a", "Android"),
+		assets.NewClassifierReference("2138cddc-118a-49ae-b290-98e03ad0573b", "Booking"),
 		flows.NewContactReference("0b099519-0889-4c74-b744-9122272f346a", "Bob"),
 		assets.NewFieldReference("gender", "Gender"),
 		assets.NewFlowReference("4f932672-7995-47f0-96e6-faf5abd2d81d", "Registration"),
+		assets.NewGlobalReference("org_name", "Org Name"),
 		assets.NewGroupReference("46057a92-6580-4e93-af36-2bb9c9d61e51", "Testers"),
 		assets.NewGroupReference("377c3101-a7fc-47b1-9136-980348e362c0", "Customers"),
 		assets.NewLabelReference("31c06b7c-010d-4f91-9590-d3fbdc2fb7ac", "Spam"),
@@ -33,6 +42,9 @@ func TestDependencies(t *testing.T) {
 		Channels: []*assets.ChannelReference{
 			assets.NewChannelReference("8286545d-d1a1-4eff-a3ad-a11ddf4bb20a", "Android"),
 		},
+		Classifiers: []*assets.ClassifierReference{
+			assets.NewClassifierReference("2138cddc-118a-49ae-b290-98e03ad0573b", "Booking"),
+		},
 		Contacts: []*flows.ContactReference{
 			flows.NewContactReference("0b099519-0889-4c74-b744-9122272f346a", "Bob"),
 		},
@@ -41,6 +53,9 @@ func TestDependencies(t *testing.T) {
 		},
 		Flows: []*assets.FlowReference{
 			assets.NewFlowReference("4f932672-7995-47f0-96e6-faf5abd2d81d", "Registration"),
+		},
+		Globals: []*assets.GlobalReference{
+			assets.NewGlobalReference("org_name", "Org Name"),
 		},
 		Groups: []*assets.GroupReference{
 			assets.NewGroupReference("46057a92-6580-4e93-af36-2bb9c9d61e51", "Testers"),
@@ -65,7 +80,7 @@ func TestDependencies(t *testing.T) {
 	}`))
 	require.NoError(t, err)
 
-	sa, err := engine.NewSessionAssets(source)
+	sa, err := engine.NewSessionAssets(source, nil)
 	require.NoError(t, err)
 
 	missing := make([]assets.Reference, 0)
@@ -76,12 +91,19 @@ func TestDependencies(t *testing.T) {
 	// check the contact reference is not included, and the group which does exist in the assets
 	assert.Equal(t, []assets.Reference{
 		assets.NewChannelReference("8286545d-d1a1-4eff-a3ad-a11ddf4bb20a", "Android"),
+		assets.NewClassifierReference("2138cddc-118a-49ae-b290-98e03ad0573b", "Booking"),
 		assets.NewFieldReference("gender", "Gender"),
 		assets.NewFlowReference("4f932672-7995-47f0-96e6-faf5abd2d81d", "Registration"),
+		assets.NewGlobalReference("org_name", "Org Name"),
 		assets.NewGroupReference("46057a92-6580-4e93-af36-2bb9c9d61e51", "Testers"),
 		assets.NewLabelReference("31c06b7c-010d-4f91-9590-d3fbdc2fb7ac", "Spam"),
 		assets.NewTemplateReference("ff958d30-f50e-48ab-a524-37ed1e9620d9", "Welcome"),
 	}, missing)
+
+	// panic if we get a dependency type we don't recognize
+	assert.Panics(t, func() {
+		flows.NewDependencies([]assets.Reference{&unknownAssetType{}})
+	})
 }
 
 func TestResultInfos(t *testing.T) {
@@ -144,6 +166,7 @@ func TestFlowInfo(t *testing.T) {
 			"9d098aea-ccc4-4723-8222-9971b64223e4",
 			"8c50f16e-35d0-4e08-a725-33ca1c03ef62",
 		},
+		ParentRefs: []string{"state", "response_2"},
 	}
 
 	// test marshaling
@@ -190,6 +213,10 @@ func TestFlowInfo(t *testing.T) {
 		"waiting_exits": [
 			"9d098aea-ccc4-4723-8222-9971b64223e4",
 			"8c50f16e-35d0-4e08-a725-33ca1c03ef62"
+		],
+		"parent_refs": [
+			"state",
+			"response_2"
 		]
 	}`), marshaled, "marshal mismatch")
 }

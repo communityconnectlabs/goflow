@@ -3,15 +3,11 @@
         {
             "uuid": "bead76f5-dac4-4c9d-996c-c62b326e8c0a",
             "name": "Action Tester",
-            "spec_version": "13.0",
+            "spec_version": "13.2",
             "language": "eng",
             "type": "messaging",
             "revision": 123,
-            "localization": {
-                "spa": {
-                    "ad154980-7bf7-4ab8-8728-545fd6378912": {}
-                }
-            },
+            "localization": {},
             "nodes": [
                 {
                     "uuid": "72a1f5df-49f9-45df-94c9-d86f7ea064e5",
@@ -27,15 +23,11 @@
         {
             "uuid": "7a84463d-d209-4d3e-a0ff-79f977cd7bd0",
             "name": "Voice Action Tester",
-            "spec_version": "13.0",
+            "spec_version": "13.2",
             "language": "eng",
             "type": "voice",
             "revision": 123,
-            "localization": {
-                "spa": {
-                    "ad154980-7bf7-4ab8-8728-545fd6378912": {}
-                }
-            },
+            "localization": {},
             "nodes": [
                 {
                     "uuid": "6cc35e54-fd49-4ae7-af6e-47facd95f3da",
@@ -51,7 +43,7 @@
         {
             "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
             "name": "Collect Age",
-            "spec_version": "13.0",
+            "spec_version": "13.2",
             "language": "eng",
             "type": "messaging",
             "nodes": [
@@ -122,6 +114,17 @@
             ]
         }
     ],
+    "classifiers": [
+        {
+            "uuid": "1c06c884-39dd-4ce4-ad9f-9a01cbe6c000",
+            "name": "Booking",
+            "type": "wit",
+            "intents": [
+                "book_flight",
+                "book_hotel"
+            ]
+        }
+    ],
     "fields": [
         {
             "uuid": "d66a7823-eada-40e5-9a3a-57239d4690bf",
@@ -134,6 +137,18 @@
             "key": "age",
             "name": "Age",
             "type": "number"
+        }
+    ],
+    "globals": [
+        {
+            "key": "org_name",
+            "name": "Org Name",
+            "value": "U-Report"
+        },
+        {
+            "key": "password",
+            "name": "Password",
+            "value": "Chef"
         }
     ],
     "groups": [
@@ -176,15 +191,15 @@
         {
             "slug": "new-registration",
             "subscribers": [
-                "http://localhost:49996/?cmd=success",
-                "http://localhost:49996/?cmd=unavailable"
+                "http://temba.io/",
+                "http://unavailable.com/"
             ]
         },
         {
             "slug": "registration-complete",
             "subscribers": [
-                "http://localhost:49996/?cmd=success",
-                "http://localhost:49996/?cmd=gone"
+                "http://temba.io/",
+                "http://subscribergone.com/"
             ]
         },
         {
@@ -204,6 +219,14 @@
                     },
                     "language": "eng",
                     "content": "Hi {{1}}, who's an excellent {{2}}?"
+                },
+                {
+                    "channel": {
+                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
+                        "name": "My Android Phone"
+                    },
+                    "language": "spa",
+                    "content": "Hola {{1}}, quien es un {{2}} excelente?"
                 }
             ]
         },

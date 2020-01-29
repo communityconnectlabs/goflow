@@ -8,6 +8,7 @@ import (
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/contactql"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows"
@@ -33,12 +34,12 @@ func TestContact(t *testing.T) {
 	}`))
 	require.NoError(t, err)
 
-	sa, err := engine.NewSessionAssets(source)
+	sa, err := engine.NewSessionAssets(source, nil)
 	require.NoError(t, err)
 
 	android := sa.Channels().Get("294a14d4-c998-41e5-a314-5941b97b89d7")
 
-	env := envs.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	uuids.SetGenerator(uuids.NewSeededGenerator(1234))
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
@@ -110,8 +111,8 @@ func TestContact(t *testing.T) {
 }
 
 func TestContactFormat(t *testing.T) {
-	env := envs.NewEnvironmentBuilder().Build()
-	sa, _ := engine.NewSessionAssets(static.NewEmptySource())
+	env := envs.NewBuilder().Build()
+	sa, _ := engine.NewSessionAssets(static.NewEmptySource(), nil)
 
 	// name takes precedence if set
 	contact := flows.NewEmptyContact(sa, "Joe", envs.NilLanguage, nil)
@@ -126,7 +127,7 @@ func TestContactFormat(t *testing.T) {
 	contact.AddURN(flows.NewContactURN(urns.URN("twitter:joey"), nil))
 	assert.Equal(t, "joey", contact.Format(env))
 
-	anonEnv := envs.NewEnvironmentBuilder().WithRedactionPolicy(envs.RedactionPolicyURNs).Build()
+	anonEnv := envs.NewBuilder().WithRedactionPolicy(envs.RedactionPolicyURNs).Build()
 
 	// unless URNs are redacted
 	assert.Equal(t, "1234", contact.Format(anonEnv))
@@ -137,7 +138,7 @@ func TestContactFormat(t *testing.T) {
 }
 
 func TestContactSetPreferredChannel(t *testing.T) {
-	sa, _ := engine.NewSessionAssets(static.NewEmptySource())
+	sa, _ := engine.NewSessionAssets(static.NewEmptySource(), nil)
 	roles := []assets.ChannelRole{assets.ChannelRoleSend}
 
 	android := test.NewTelChannel("Android", "+250961111111", roles, nil, "RW", nil)
@@ -175,7 +176,7 @@ func TestContactSetPreferredChannel(t *testing.T) {
 }
 
 func TestReevaluateDynamicGroups(t *testing.T) {
-	session, _, err := test.CreateTestSession("http://localhost", nil, envs.RedactionPolicyNone)
+	session, _, err := test.CreateTestSession("http://localhost", envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	env := session.Runs()[0].Environment()
@@ -192,14 +193,15 @@ func TestReevaluateDynamicGroups(t *testing.T) {
 	lastYear := test.NewGroup("Old", `created_on <= 2017-12-31`)
 	tel1800 := test.NewGroup("Tel with 1800", `tel ~ 1800`)
 	twitterCrazies := test.NewGroup("Twitter Crazies", `twitter ~ crazy`)
-	groups := []*flows.Group{males, old, english, spanish, lastYear, tel1800, twitterCrazies}
+	broken := test.NewGroup("Broken", `xyz="X"`) // no such field
+	groups := []*flows.Group{males, old, english, spanish, lastYear, tel1800, twitterCrazies, broken}
 
 	contact := flows.NewEmptyContact(session.Assets(), "Joe", "eng", nil)
 	contact.AddURN(flows.NewContactURN(urns.URN("tel:+12345678999"), nil))
 
 	memberships, errors := evaluateGroups(t, env, contact, groups, fieldSet)
 	assert.Equal(t, []*flows.Group{english}, memberships)
-	assert.Equal(t, []*flows.Group{}, errors)
+	assert.Equal(t, []*flows.Group{broken}, errors)
 
 	contact.SetLanguage(envs.Language("spa"))
 	contact.AddURN(flows.NewContactURN(urns.URN("twitter:crazy_joe"), nil))
@@ -215,11 +217,11 @@ func TestReevaluateDynamicGroups(t *testing.T) {
 
 	memberships, errors = evaluateGroups(t, env, contact, groups, fieldSet)
 	assert.Equal(t, []*flows.Group{males, old, spanish, lastYear, tel1800, twitterCrazies}, memberships)
-	assert.Equal(t, []*flows.Group{}, errors)
+	assert.Equal(t, []*flows.Group{broken}, errors)
 }
 
 func TestReevaluateDynamicGroupsWithURNRedaction(t *testing.T) {
-	session, _, err := test.CreateTestSession("http://localhost", nil, envs.RedactionPolicyURNs)
+	session, _, err := test.CreateTestSession("http://localhost", envs.RedactionPolicyURNs)
 	require.NoError(t, err)
 
 	env := session.Runs()[0].Environment()
@@ -268,7 +270,7 @@ func evaluateGroups(t *testing.T, env envs.Environment, contact *flows.Contact, 
 }
 
 func TestContactEqual(t *testing.T) {
-	session, _, err := test.CreateTestSession("http://localhost", nil, envs.RedactionPolicyNone)
+	session, _, err := test.CreateTestSession("http://localhost", envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	contact1JSON := []byte(`{
@@ -304,4 +306,78 @@ func TestContactEqual(t *testing.T) {
 
 	contact2.SetLanguage(envs.NilLanguage)
 	assert.False(t, contact1.Equal(contact2))
+}
+
+func TestContactQuery(t *testing.T) {
+	session, _, err := test.CreateTestSession("", envs.RedactionPolicyNone)
+	require.NoError(t, err)
+
+	contactJSON := []byte(`{
+		"uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
+		"id": 1234567,
+		"name": "Ben Haggerty",
+		"fields": {
+			"gender": {"text": "Male"}
+		},
+		"language": "eng",
+		"timezone": "America/Guayaquil",
+		"urns": ["tel:+12065551212", "twitter:ewok"],
+		"created_on": "2020-01-24T13:24:30.000000000-00:00"
+	}`)
+
+	contact, err := flows.ReadContact(session.Assets(), contactJSON, assets.PanicOnMissing)
+	require.NoError(t, err)
+
+	testCases := []struct {
+		query  string
+		result bool
+	}{
+		{`name = "Ben Haggerty"`, true},
+		{`name = "Joe X"`, false},
+		{`name != "Joe X"`, true},
+		{`name != ""`, true},
+		{`name = ""`, false},
+		{`name ~ Ben`, true},
+		{`name ~ Joe`, false},
+
+		{`id = 1234567`, true},
+		{`id = 5678889`, false},
+
+		{`language = ENG`, true},
+		{`language = FRA`, false},
+		{`language = ""`, false},
+		{`language != ""`, true},
+
+		{`created_on = 24-01-2020`, true},
+		{`created_on = 25-01-2020`, false},
+		{`created_on > 22-01-2020`, true},
+		{`created_on > 26-01-2020`, false},
+
+		{`tel = +12065551212`, true},
+		{`tel = +13065551212`, false},
+		{`tel ~ 555`, true},
+		{`tel ~ 666`, false},
+
+		{`twitter = ewok`, true},
+		{`twitter = nicp`, false},
+		{`twitter ~ wok`, true},
+		{`twitter ~ EWO`, true},
+		{`twitter ~ ijk`, false},
+
+		{`urn = +12065551212`, true},
+		{`urn = ewok`, true},
+		{`urn = +13065551212`, false},
+		{`urn ~ 555`, true},
+		{`urn ~ 666`, false},
+	}
+
+	for _, tc := range testCases {
+		query, err := contactql.ParseQuery(tc.query, envs.RedactionPolicyNone, session.Assets().Fields().Resolve)
+		require.NoError(t, err, "unexpected error parsing '%s'", tc.query)
+
+		result, err := contactql.EvaluateQuery(session.Environment(), query, contact)
+		require.NoError(t, err, "unexpected error evaluating '%s'", tc.query)
+
+		assert.Equal(t, tc.result, result, "unexpected result for '%s' ('%s')", tc.query, query.String())
+	}
 }

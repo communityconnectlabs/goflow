@@ -2,6 +2,7 @@ package actions
 
 import (
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/nyaruka/goflow/flows"
@@ -10,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/net/http/httpguts"
 )
+
+func isValidURL(u string) bool { _, err := url.Parse(u); return err == nil }
 
 func init() {
 	registerType(TypeCallWebhook, func() flows.Action { return &CallWebhookAction{} })
@@ -28,7 +31,7 @@ const TypeCallWebhook string = "call_webhook"
 //     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
 //     "type": "call_webhook",
 //     "method": "GET",
-//     "url": "http://localhost/?cmd=success",
+//     "url": "http://localhost:49998/?cmd=success",
 //     "headers": {
 //       "Authorization": "Token AAFFZZHH"
 //     },
@@ -61,10 +64,6 @@ func NewCallWebhook(uuid flows.ActionUUID, method string, url string, headers ma
 
 // Validate validates our action is valid
 func (a *CallWebhookAction) Validate() error {
-	if a.Body != "" && a.Method == "GET" {
-		return errors.Errorf("can't specify body if method is GET")
-	}
-
 	for key := range a.Headers {
 		if !httpguts.ValidHeaderFieldName(key) {
 			return errors.Errorf("header '%s' is not a valid HTTP header", key)
@@ -83,7 +82,11 @@ func (a *CallWebhookAction) Execute(run flows.FlowRun, step flows.Step, logModif
 		logEvent(events.NewError(err))
 	}
 	if url == "" {
-		logEvent(events.NewErrorf("call_webhook URL evaluated to empty string, skipping"))
+		logEvent(events.NewErrorf("webhook URL evaluated to empty string"))
+		return nil
+	}
+	if !isValidURL(url) {
+		logEvent(events.NewErrorf("webhook URL evaluated to an invalid URL: '%s'", url))
 		return nil
 	}
 
@@ -92,12 +95,18 @@ func (a *CallWebhookAction) Execute(run flows.FlowRun, step flows.Step, logModif
 
 	// substitute any body variables
 	if body != "" {
-		body, err = run.EvaluateTemplate(body)
+		// webhook bodies aren't truncated like other templates
+		body, err = run.EvaluateTemplateText(body, nil, false)
 		if err != nil {
 			logEvent(events.NewError(err))
 		}
 	}
 
+	return a.call(run, step, url, method, body, logEvent)
+}
+
+// Execute runs this action
+func (a *CallWebhookAction) call(run flows.FlowRun, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
@@ -114,21 +123,26 @@ func (a *CallWebhookAction) Execute(run flows.FlowRun, step flows.Step, logModif
 		req.Header.Add(key, headerValue)
 	}
 
-	webhookSvc := run.Session().Engine().Services().Webhook(run.Session())
-	if webhookSvc == nil {
-		logEvent(events.NewError(errors.Errorf("no webhook provider available")))
+	svc, err := run.Session().Engine().Services().Webhook(run.Session())
+	if err != nil {
+		logEvent(events.NewError(err))
 		return nil
 	}
 
-	call, err := webhookSvc.Call(run.Session(), req, "")
+	call, err := svc.Call(run.Session(), req)
 
 	if err != nil {
 		logEvent(events.NewError(err))
 	}
 	if call != nil {
-		logEvent(events.NewWebhookCalled(call))
+		a.updateWebhook(run, call)
+
+		status := callStatus(call, false)
+
+		logEvent(events.NewWebhookCalled(call, status, ""))
+
 		if a.ResultName != "" {
-			a.saveWebhookResult(run, step, a.ResultName, call, logEvent)
+			a.saveWebhookResult(run, step, a.ResultName, call, status, logEvent)
 		}
 	}
 
@@ -140,4 +154,19 @@ func (a *CallWebhookAction) Results(node flows.Node, include func(*flows.ResultI
 	if a.ResultName != "" {
 		include(flows.NewResultInfo(a.ResultName, webhookCategories, node))
 	}
+}
+
+// determines the webhook status from the HTTP status code
+func callStatus(call *flows.WebhookCall, isResthook bool) flows.CallStatus {
+	if call.StatusCode == 0 {
+		return flows.CallStatusConnectionError
+	}
+	if isResthook && call.StatusCode == 410 {
+		// https://zapier.com/developer/documentation/v2/rest-hooks/
+		return flows.CallStatusSubscriberGone
+	}
+	if call.StatusCode/100 == 2 {
+		return flows.CallStatusSuccess
+	}
+	return flows.CallStatusResponseError
 }

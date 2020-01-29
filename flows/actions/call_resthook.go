@@ -11,8 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// LegacyWebhookPayload is a template that matches the JSON payload sent by legacy webhooks
-var LegacyWebhookPayload = `@(json(object(
+// ResthookPayload is the POST payload used by resthooks
+const ResthookPayload = `@(json(object(
   "contact", object("uuid", contact.uuid, "name", contact.name, "urn", contact.urn),
   "flow", run.flow,
   "path", run.path,
@@ -88,8 +88,8 @@ func (a *CallResthookAction) Execute(run flows.FlowRun, step flows.Step, logModi
 		return nil
 	}
 
-	// build our payload
-	payload, err := run.EvaluateTemplate(LegacyWebhookPayload)
+	// build our payload (not truncated)
+	payload, err := run.EvaluateTemplateText(ResthookPayload, nil, false)
 	if err != nil {
 		// if we got an error then our payload is likely not valid JSON
 		return errors.Wrapf(err, "error evaluating resthook payload")
@@ -115,27 +115,31 @@ func (a *CallResthookAction) Execute(run flows.FlowRun, step flows.Step, logModi
 
 		req.Header.Add("Content-Type", "application/json")
 
-		webhookSvc := run.Session().Engine().Services().Webhook(run.Session())
-		if webhookSvc == nil {
-			logEvent(events.NewError(errors.Errorf("no webhook provider available")))
+		svc, err := run.Session().Engine().Services().Webhook(run.Session())
+		if err != nil {
+			logEvent(events.NewError(err))
 			return nil
 		}
 
-		call, err := webhookSvc.Call(run.Session(), req, a.Resthook)
+		call, err := svc.Call(run.Session(), req)
 
 		if err != nil {
 			logEvent(events.NewError(err))
 		}
 		if call != nil {
 			calls = append(calls, call)
-			logEvent(events.NewWebhookCalled(call))
+			logEvent(events.NewWebhookCalled(call, callStatus(call, true), a.Resthook))
 		}
 	}
 
 	asResult := a.pickResultCall(calls)
+	if asResult != nil {
+		a.updateWebhook(run, asResult)
+	}
+
 	if a.ResultName != "" {
 		if asResult != nil {
-			a.saveWebhookResult(run, step, a.ResultName, asResult, logEvent)
+			a.saveWebhookResult(run, step, a.ResultName, asResult, callStatus(asResult, true), logEvent)
 		} else {
 			a.saveResult(run, step, a.ResultName, "no subscribers", "Failure", "", "", nil, logEvent)
 		}
@@ -149,12 +153,11 @@ func (a *CallResthookAction) pickResultCall(calls []*flows.WebhookCall) *flows.W
 	var lastSuccess, last410, lastFailure *flows.WebhookCall
 
 	for _, call := range calls {
-		switch call.Status {
-		case flows.WebhookStatusSuccess:
+		if call.StatusCode/100 == 2 {
 			lastSuccess = call
-		case flows.WebhookStatusSubscriberGone:
+		} else if call.StatusCode == 410 {
 			last410 = call
-		default:
+		} else {
 			lastFailure = call
 		}
 	}

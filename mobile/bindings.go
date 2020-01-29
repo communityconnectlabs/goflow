@@ -12,7 +12,7 @@ package mobile
 // cd $GOPATH/src/github.com/nyaruka/goflow
 // GO111MODULE=on go mod vendor
 // GO111MODULE=off go get golang.org/x/mobile/cmd/gomobile
-// $GOPATH/bin/gomobile init
+// GO111MODULE=off $GOPATH/bin/gomobile init
 // GO111MODULE=off gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/nyaruka/goflow/mobile
 
 import (
@@ -39,14 +39,14 @@ func CurrentSpecVersion() string {
 	return definition.CurrentSpecVersion.String()
 }
 
-// IsSpecVersionSupported returns whether the given flow spec version is supported
-func IsSpecVersionSupported(ver string) bool {
-	v, err := semver.NewVersion(ver)
+// IsVersionSupported returns whether the given spec version is supported
+func IsVersionSupported(version string) bool {
+	v, err := semver.NewVersion(version)
 	if err != nil {
 		return false
 	}
 
-	return definition.IsSpecVersionSupported(v)
+	return definition.IsVersionSupported(v)
 }
 
 // Environment defines the environment for expression evaluation etc
@@ -67,7 +67,7 @@ func NewEnvironment(dateFormat string, timeFormat string, timezone string, defau
 	}
 
 	return &Environment{
-		target: envs.NewEnvironmentBuilder().
+		target: envs.NewBuilder().
 			WithDateFormat(envs.DateFormat(dateFormat)).
 			WithTimeFormat(envs.TimeFormat(timeFormat)).
 			WithTimezone(tz).
@@ -100,7 +100,7 @@ type SessionAssets struct {
 
 // NewSessionAssets creates a new session assets
 func NewSessionAssets(source *AssetsSource) (*SessionAssets, error) {
-	s, err := engine.NewSessionAssets(source.target)
+	s, err := engine.NewSessionAssets(source.target, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +167,8 @@ type Trigger struct {
 	target flows.Trigger
 }
 
-// NewManual creates a new manual trigger
-func NewManual(environment *Environment, contact *Contact, flow *FlowReference) *Trigger {
+// NewManualTrigger creates a new manual trigger
+func NewManualTrigger(environment *Environment, contact *Contact, flow *FlowReference) *Trigger {
 	flowRef := assets.NewFlowReference(assets.FlowUUID(flow.uuid), flow.name)
 	return &Trigger{
 		target: triggers.NewManual(environment.target, flowRef, contact.target, nil),
@@ -180,8 +180,8 @@ type Resume struct {
 	target flows.Resume
 }
 
-// NewMsg creates a new message resume
-func NewMsg(environment *Environment, contact *Contact, msg *MsgIn) *Resume {
+// NewMsgResume creates a new message resume
+func NewMsgResume(environment *Environment, contact *Contact, msg *MsgIn) *Resume {
 	var e envs.Environment
 	if environment != nil {
 		e = environment.target

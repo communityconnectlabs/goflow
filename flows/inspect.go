@@ -8,40 +8,52 @@ import (
 	"github.com/nyaruka/goflow/utils"
 )
 
+// FlowInfo contains the results of flow inspection
 type FlowInfo struct {
 	Dependencies *Dependencies `json:"dependencies"`
 	Results      []*ResultInfo `json:"results"`
 	WaitingExits []ExitUUID    `json:"waiting_exits"`
+	ParentRefs   []string      `json:"parent_refs"`
 }
 
+// Dependencies contains a flows dependencies grouped by type
 type Dependencies struct {
-	Channels  []*assets.ChannelReference  `json:"channels,omitempty"`
-	Contacts  []*ContactReference         `json:"contacts,omitempty"`
-	Fields    []*assets.FieldReference    `json:"fields,omitempty"`
-	Flows     []*assets.FlowReference     `json:"flows,omitempty"`
-	Groups    []*assets.GroupReference    `json:"groups,omitempty"`
-	Labels    []*assets.LabelReference    `json:"labels,omitempty"`
-	Templates []*assets.TemplateReference `json:"templates,omitempty"`
+	Classifiers []*assets.ClassifierReference `json:"classifiers,omitempty"`
+	Channels    []*assets.ChannelReference    `json:"channels,omitempty"`
+	Contacts    []*ContactReference           `json:"contacts,omitempty"`
+	Fields      []*assets.FieldReference      `json:"fields,omitempty"`
+	Flows       []*assets.FlowReference       `json:"flows,omitempty"`
+	Globals     []*assets.GlobalReference     `json:"globals,omitempty"`
+	Groups      []*assets.GroupReference      `json:"groups,omitempty"`
+	Labels      []*assets.LabelReference      `json:"labels,omitempty"`
+	Templates   []*assets.TemplateReference   `json:"templates,omitempty"`
 }
 
+// NewDependencies creates a new dependency listing from the slice of references
 func NewDependencies(refs []assets.Reference) *Dependencies {
 	d := &Dependencies{}
 	for _, r := range refs {
 		switch typed := r.(type) {
 		case *assets.ChannelReference:
 			d.Channels = append(d.Channels, typed)
+		case *assets.ClassifierReference:
+			d.Classifiers = append(d.Classifiers, typed)
 		case *ContactReference:
 			d.Contacts = append(d.Contacts, typed)
 		case *assets.FieldReference:
 			d.Fields = append(d.Fields, typed)
 		case *assets.FlowReference:
 			d.Flows = append(d.Flows, typed)
+		case *assets.GlobalReference:
+			d.Globals = append(d.Globals, typed)
 		case *assets.GroupReference:
 			d.Groups = append(d.Groups, typed)
 		case *assets.LabelReference:
 			d.Labels = append(d.Labels, typed)
 		case *assets.TemplateReference:
 			d.Templates = append(d.Templates, typed)
+		default:
+			panic(fmt.Sprintf("unknown dependency type reference: %v", r))
 		}
 	}
 	return d
@@ -54,6 +66,11 @@ func (d *Dependencies) Check(sa SessionAssets, missing assets.MissingCallback) e
 			missing(ref, nil)
 		}
 	}
+	for _, ref := range d.Classifiers {
+		if sa.Classifiers().Get(ref.UUID) == nil {
+			missing(ref, nil)
+		}
+	}
 	for _, ref := range d.Fields {
 		if sa.Fields().Get(ref.Key) == nil {
 			missing(ref, nil)
@@ -63,6 +80,11 @@ func (d *Dependencies) Check(sa SessionAssets, missing assets.MissingCallback) e
 		_, err := sa.Flows().Get(ref.UUID)
 		if err != nil {
 			missing(ref, err)
+		}
+	}
+	for _, ref := range d.Globals {
+		if sa.Globals().Get(ref.Key) == nil {
+			missing(ref, nil)
 		}
 	}
 	for _, ref := range d.Groups {

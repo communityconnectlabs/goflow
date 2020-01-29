@@ -15,14 +15,16 @@ import (
 // StaticSource is an asset source which loads assets from a static JSON file
 type StaticSource struct {
 	s struct {
-		Channels  []*types.Channel           `json:"channels" validate:"omitempty,dive"`
-		Fields    []*types.Field             `json:"fields" validate:"omitempty,dive"`
-		Flows     []*types.Flow              `json:"flows" validate:"omitempty,dive"`
-		Groups    []*types.Group             `json:"groups" validate:"omitempty,dive"`
-		Labels    []*types.Label             `json:"labels" validate:"omitempty,dive"`
-		Locations []*utils.LocationHierarchy `json:"locations"`
-		Resthooks []*types.Resthook          `json:"resthooks" validate:"omitempty,dive"`
-		Templates []*types.Template          `json:"templates" validate:"omitempty,dive"`
+		Channels    []*types.Channel           `json:"channels" validate:"omitempty,dive"`
+		Classifiers []*types.Classifier        `json:"classifiers" validate:"omitempty,dive"`
+		Fields      []*types.Field             `json:"fields" validate:"omitempty,dive"`
+		Flows       []*types.Flow              `json:"flows" validate:"omitempty,dive"`
+		Globals     []*types.Global            `json:"globals" validate:"omitempty,dive"`
+		Groups      []*types.Group             `json:"groups" validate:"omitempty,dive"`
+		Labels      []*types.Label             `json:"labels" validate:"omitempty,dive"`
+		Locations   []*utils.LocationHierarchy `json:"locations"`
+		Resthooks   []*types.Resthook          `json:"resthooks" validate:"omitempty,dive"`
+		Templates   []*types.Template          `json:"templates" validate:"omitempty,dive"`
 	}
 }
 
@@ -60,6 +62,15 @@ func (s *StaticSource) Channels() ([]assets.Channel, error) {
 	return set, nil
 }
 
+// Classifiers returns all classifier assets
+func (s *StaticSource) Classifiers() ([]assets.Classifier, error) {
+	set := make([]assets.Classifier, len(s.s.Classifiers))
+	for i := range s.s.Classifiers {
+		set[i] = s.s.Classifiers[i]
+	}
+	return set, nil
+}
+
 // Fields returns all field assets
 func (s *StaticSource) Fields() ([]assets.Field, error) {
 	set := make([]assets.Field, len(s.s.Fields))
@@ -77,6 +88,15 @@ func (s *StaticSource) Flow(uuid assets.FlowUUID) (assets.Flow, error) {
 		}
 	}
 	return nil, errors.Errorf("no such flow with UUID '%s'", uuid)
+}
+
+// Globals returns all global assets
+func (s *StaticSource) Globals() ([]assets.Global, error) {
+	set := make([]assets.Global, len(s.s.Globals))
+	for i := range s.s.Globals {
+		set[i] = s.s.Globals[i]
+	}
+	return set, nil
 }
 
 // Groups returns all group assets

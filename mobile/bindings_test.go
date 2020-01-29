@@ -18,17 +18,11 @@ func TestMobileBindings(t *testing.T) {
 
 	assert.Equal(t, definition.CurrentSpecVersion.String(), mobile.CurrentSpecVersion())
 
-	// can handle anything that is this major version
-	assert.True(t, mobile.IsSpecVersionSupported("13"))
-	assert.True(t, mobile.IsSpecVersionSupported("13.3"))
-	assert.True(t, mobile.IsSpecVersionSupported("13.3.7"))
-
-	// currently have no support for major version migrations (may change in future)
-	assert.False(t, mobile.IsSpecVersionSupported("12"))
-	assert.False(t, mobile.IsSpecVersionSupported("12.5"))
-
-	// and obviously can't handle versions from the future
-	assert.False(t, mobile.IsSpecVersionSupported("14.0"))
+	assert.False(t, mobile.IsVersionSupported("x"))
+	assert.True(t, mobile.IsVersionSupported("11.12"))
+	assert.True(t, mobile.IsVersionSupported("13"))
+	assert.True(t, mobile.IsVersionSupported("13.3"))
+	assert.False(t, mobile.IsVersionSupported("14.0"))
 
 	// error if we try to create assets from invalid JSON
 	_, err := mobile.NewAssetsSource("{")
@@ -53,7 +47,7 @@ func TestMobileBindings(t *testing.T) {
 
 	contact := mobile.NewEmptyContact(sa)
 
-	trigger := mobile.NewManual(environment, contact, mobile.NewFlowReference("7c3db26f-e12a-48af-9673-e2feefdf8516", "Two Questions"))
+	trigger := mobile.NewManualTrigger(environment, contact, mobile.NewFlowReference("7c3db26f-e12a-48af-9673-e2feefdf8516", "Two Questions"))
 
 	eng := mobile.NewEngine()
 	ss, err := eng.NewSession(sa, trigger)
@@ -82,7 +76,7 @@ func TestMobileBindings(t *testing.T) {
 	assert.Equal(t, "Hi there", msg.Text())
 	assert.Equal(t, 1, msg.Attachments().Length())
 
-	resume := mobile.NewMsg(nil, nil, msg)
+	resume := mobile.NewMsgResume(nil, nil, msg)
 
 	sprint, err = session.Resume(resume)
 	require.NoError(t, err)

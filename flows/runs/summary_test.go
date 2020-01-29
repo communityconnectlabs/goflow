@@ -27,7 +27,7 @@ func TestRunSummary(t *testing.T) {
 	server := test.NewTestHTTPServer(49999)
 	defer server.Close()
 
-	session, _, err := test.CreateTestSession(server.URL, nil, envs.RedactionPolicyNone)
+	session, _, err := test.CreateTestSession(server.URL, envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	run := session.Runs()[0]
@@ -53,7 +53,7 @@ func TestRunSummary(t *testing.T) {
 	assert.Equal(t, "Ryan Lewis@Registration", runs.FormatRunSummary(session.Environment(), summary))
 
 	// try reading with missing assets
-	emptyAssets, err := engine.NewSessionAssets(static.NewEmptySource())
+	emptyAssets, err := engine.NewSessionAssets(static.NewEmptySource(), nil)
 
 	summary, err = runs.ReadRunSummary(emptyAssets, marshaled, assets.IgnoreMissing)
 	require.NoError(t, err)

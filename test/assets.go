@@ -23,7 +23,7 @@ func LoadSessionAssets(path string) (flows.SessionAssets, error) {
 		return nil, err
 	}
 
-	return engine.NewSessionAssets(source)
+	return engine.NewSessionAssets(source, nil)
 }
 
 func LoadFlowFromAssets(path string, uuid assets.FlowUUID) (flows.Flow, error) {
@@ -49,4 +49,8 @@ func NewChannel(name string, address string, schemes []string, roles []assets.Ch
 
 func NewTelChannel(name string, address string, roles []assets.ChannelRole, parent *assets.ChannelReference, country string, matchPrefixes []string) *flows.Channel {
 	return flows.NewChannel(types.NewTelChannel(assets.ChannelUUID(uuids.New()), name, address, roles, parent, country, matchPrefixes))
+}
+
+func NewClassifier(name, type_ string, intents []string) *flows.Classifier {
+	return flows.NewClassifier(types.NewClassifier(assets.ClassifierUUID(uuids.New()), name, type_, intents))
 }

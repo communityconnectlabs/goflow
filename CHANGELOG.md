@@ -1,3 +1,181 @@
+v0.66.3
+----------
+ * Allow globals with empty values
+
+v0.66.2
+----------
+ * Add mobile binding for IsVersionSupported
+ * Re-add version check to ReadFlow
+
+v0.66.1
+----------
+ * Match evaluation of contact queries in ES
+
+v0.66.0
+----------
+ * Fix problems with contact searching and add support for URN as attribute
+
+v0.65.0
+----------
+ * Ignore content-type headers and try to parse all webhook responses as JSON
+ * Update ContactQL to interpret implicit conditions which are URNs as scheme=path
+
+v0.64.11
+----------
+ * Limit the size of evaluated templates and truncate anything bigger
+
+v0.64.10
+----------
+ * Stringify contactql like the queries they came from
+ * Trim webhook_called request traces to 10K same as response traces
+ * Only set extra on webhook result if less than 10000 bytes
+
+v0.64.9
+----------
+ * Allow getting current context even for ended sessions
+
+v0.64.8
+----------
+ * Fix another panic during context walking
+
+v0.64.7
+----------
+ * Fix panic in context walking
+
+v0.64.6
+----------
+ * Add support for marshaling XObjects with their defaults, and tool for walking the context to find objects
+
+v0.64.5
+----------
+ * Fix creation of no-nil interface to nil structs in context
+
+v0.64.4
+----------
+ * Make it easier to get current expression context of a waiting session
+
+v0.64.3
+----------
+ * Allow webhook calls with GET method to have bodies
+
+v0.64.2
+----------
+ * Include parent result references in flow inspection
+
+v0.64.1
+----------
+ * Add support for jitter in webhook retries
+
+v0.64.0
+----------
+ * Make http retrying available to all services which use HTTP
+ * Fix parsing out relative date value during migration of date tests
+
+v0.63.1
+----------
+ * Perform URL validation in call_webhook and skip action appropriately
+
+v0.63.0
+----------
+ * Loosen email regex used by has_email test
+ * Allow cloning of JSON flow definitions not tied to any spec version
+
+v0.62.0
+----------
+ * Render email_sent events in flowrunner
+ * Allow flowmigrate to take a target version argument
+ * Implement 13.1 migration as adding UUID to semd_msg.templating
+
+v0.61.0
+----------
+ * Implement email as a service
+
+v0.60.1
+----------
+ * Fix re-evaluating dynamic groups when query references non-existent field
+
+v0.60.0
+----------
+ * Add @globals to completion
+ * Add topic to send_msg actions
+
+v0.59.0
+----------
+ * Validate run summary JSON passed to flow action triggers
+ * Expose keyword match on trigger in context
+
+v0.58.0
+----------
+ * Give services their own HTTP clients
+ * Allow webhook service to take a map of deafult header values
+
+v0.57.0
+----------
+ * Add globals to evaluation context as @globals
+ * Add global as new asset type
+
+v0.56.3
+----------
+ * DTOne client should record http log for timeouts
+
+v0.56.2
+----------
+ * Fix migrating save actions with URN fields
+
+v0.56.1
+----------
+ * Tweak criteria for deciding whether to try reading a flow as legacy
+
+v0.56.0
+----------
+ * Fix docstring for UPPER()
+ * Rework ReadFlow to accept legacy flows too
+ * Move legacy package inside flows/definition
+
+v0.55.0
+----------
+ * Update start_session action to use escaping when evaluating the contact query
+ * Add support for escaping expressions in templates
+
+v0.54.3
+----------
+ * Relax requirement for field assets to have UUID set since engine doesn't use this
+
+v0.54.2
+----------
+ * Fix naming in mobile bindings
+
+v0.54.1
+----------
+ * Fix docstring for UPPER()
+
+v0.54.0
+----------
+ * NewEnvironmentBuilder() -> envs.NewBuilder() to match engine.NewBuilder()
+ * Include classifiers in flow dependency inspection
+
+v0.53.1
+----------
+ * Add classification service for Bothub
+
+v0.53.0
+----------
+ * Record arrays of http logs on classifier_called and airtime_transferred events
+
+v0.52.1
+----------
+ * Modify grammar to allow result names that start with underscores
+
+v0.52.0
+----------
+ * All service factory methods should return an error if service can't be returned
+ * Rework airtime transfer nodes to function more like NLU nodes
+ * Add classification service implementation for LUIS
+
+v0.51.0
+----------
+ * Add NLU support: a classify action, a classification service and various router tests
+
 v0.50.4
 ----------
  * Revert change to operands for media waits

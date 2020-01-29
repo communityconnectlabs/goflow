@@ -9,6 +9,7 @@ import (
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/utils"
@@ -18,12 +19,22 @@ import (
 	"github.com/pkg/errors"
 )
 
-var webhookCategories = []string{"Success", "Failure"}
-var webhookStatusCategories = map[flows.WebhookStatus]string{
-	flows.WebhookStatusSuccess:         "Success",
-	flows.WebhookStatusResponseError:   "Failure",
-	flows.WebhookStatusConnectionError: "Failure",
-	flows.WebhookStatusSubscriberGone:  "Failure",
+// max number of bytes to be saved to extra on a result
+const resultExtraMaxBytes = 10000
+
+// common category names
+const (
+	CategorySuccess = "Success"
+	CategorySkipped = "Skipped"
+	CategoryFailure = "Failure"
+)
+
+var webhookCategories = []string{CategorySuccess, CategoryFailure}
+var webhookStatusCategories = map[flows.CallStatus]string{
+	flows.CallStatusSuccess:         CategorySuccess,
+	flows.CallStatusResponseError:   CategoryFailure,
+	flows.CallStatusConnectionError: CategoryFailure,
+	flows.CallStatusSubscriberGone:  CategoryFailure,
 }
 
 var registeredTypes = map[string](func() flows.Action){}
@@ -113,13 +124,28 @@ func (a *baseAction) saveResult(run flows.FlowRun, step flows.Step, name, value,
 }
 
 // helper to save a run result based on a webhook call and log it as an event
-func (a *baseAction) saveWebhookResult(run flows.FlowRun, step flows.Step, name string, webhook *flows.WebhookCall, logEvent flows.EventCallback) {
+func (a *baseAction) saveWebhookResult(run flows.FlowRun, step flows.Step, name string, webhook *flows.WebhookCall, status flows.CallStatus, logEvent flows.EventCallback) {
 	input := fmt.Sprintf("%s %s", webhook.Method, webhook.URL)
 	value := strconv.Itoa(webhook.StatusCode)
-	category := webhookStatusCategories[webhook.Status]
-	extra := utils.ExtractResponseJSON(webhook.Response)
+	category := webhookStatusCategories[status]
+
+	var extra json.RawMessage
+	if len(webhook.ResponseJSON) < resultExtraMaxBytes {
+		extra = webhook.ResponseJSON
+	}
 
 	a.saveResult(run, step, name, value, category, "", input, extra, logEvent)
+}
+
+func (a *baseAction) updateWebhook(run flows.FlowRun, call *flows.WebhookCall) {
+	parsed := types.JSONToXValue(call.ResponseJSON)
+
+	switch typed := parsed.(type) {
+	case nil, types.XError:
+		run.SetWebhook(types.XObjectEmpty)
+	default:
+		run.SetWebhook(typed)
+	}
 }
 
 // helper to apply a contact modifier
@@ -225,8 +251,8 @@ func (a *otherContactsAction) resolveRecipients(run flows.FlowRun, logEvent flow
 		}
 	}
 
-	// evalaute contact query
-	contactQuery, err := run.EvaluateTemplate(a.ContactQuery)
+	// evaluate contact query
+	contactQuery, _ := run.EvaluateTemplateText(a.ContactQuery, flows.ContactQueryEscaping, true)
 
 	return groupRefs, contactRefs, contactQuery, urnList, nil
 }

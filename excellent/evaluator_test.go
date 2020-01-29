@@ -1,6 +1,7 @@
 package excellent_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/nyaruka/goflow/envs"
@@ -26,6 +27,7 @@ func TestEvaluateTemplateValue(t *testing.T) {
 	context := types.NewXObject(map[string]types.XValue{
 		"string1": types.NewXText("foo"),
 		"string2": types.NewXText("bar"),
+		"string3": types.NewXText("🐒"),
 		"key":     types.NewXText("four"),
 		"int1":    types.NewXNumberFromInt(1),
 		"int2":    types.NewXNumberFromInt(2),
@@ -36,7 +38,7 @@ func TestEvaluateTemplateValue(t *testing.T) {
 		"array2d": array2d,
 	})
 
-	env := envs.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	evaluateTests := []struct {
 		template string
@@ -59,6 +61,9 @@ func TestEvaluateTemplateValue(t *testing.T) {
 		{"@array2d.0.2", ERROR},
 
 		{"@string1 world", xs("foo world")},
+		{"@string3", xs("🐒")},
+		{`@("\u00a9 \u00ae \u2764")`, xs("© ® ❤")},
+		{`@("\U0001F697 \U0001F680")`, xs("🚗 🚀")},
 
 		{"@(-10)", xi(-10)},
 		{"@(-asdf)", ERROR},
@@ -125,7 +130,7 @@ func TestEvaluateTemplateValue(t *testing.T) {
 		{`@(datetime("2018-04-16") != datetime("2017-03-20"))`, types.XBooleanTrue},
 		{`@(datetime("xxx") == datetime("2017-03-20"))`, ERROR},
 
-		// other comparsions must be numerical
+		// other comparisons must be numerical
 		{"@(2 > 1)", types.XBooleanTrue},
 		{"@(1 > 2)", types.XBooleanFalse},
 		{"@(2 >= 1)", types.XBooleanTrue},
@@ -182,15 +187,16 @@ func TestEvaluateTemplateValue(t *testing.T) {
 func TestEvaluateTemplate(t *testing.T) {
 
 	vars := types.NewXObject(map[string]types.XValue{
-		"string1": types.NewXText("foo"),
-		"string2": types.NewXText("bar"),
-		"汉字":      types.NewXText("simplified chinese"),
-		"int1":    types.NewXNumberFromInt(1),
-		"int2":    types.NewXNumberFromInt(2),
-		"dec1":    types.RequireXNumberFromString("1.5"),
-		"dec2":    types.RequireXNumberFromString("2.5"),
-		"words":   types.NewXText("one two three"),
-		"array1":  types.NewXArray(types.NewXText("one"), types.NewXText("two"), types.NewXText("three")),
+		"string1":  types.NewXText("foo"),
+		"string2":  types.NewXText("bar"),
+		"_special": types.NewXText("🐒"),
+		"汉字":       types.NewXText("simplified chinese"),
+		"int1":     types.NewXNumberFromInt(1),
+		"int2":     types.NewXNumberFromInt(2),
+		"dec1":     types.RequireXNumberFromString("1.5"),
+		"dec2":     types.RequireXNumberFromString("2.5"),
+		"words":    types.NewXText("one two three"),
+		"array1":   types.NewXArray(types.NewXText("one"), types.NewXText("two"), types.NewXText("three")),
 		"thing": types.NewXObject(map[string]types.XValue{
 			"foo":     types.NewXText("bar"),
 			"zed":     types.NewXNumberFromInt(123),
@@ -214,6 +220,8 @@ func TestEvaluateTemplate(t *testing.T) {
 		{`@(title(hello))`, "", true},
 		{`Hello @(title(string1))`, "Hello Foo", false},
 		{`Hello @@string1`, "Hello @string1", false},
+		{`Hello @(_special)`, "Hello 🐒", false},
+		{`Hello @_special`, "Hello 🐒", false},
 
 		// functions are values too
 		{`@(title)`, "function", false},
@@ -284,7 +292,7 @@ func TestEvaluateTemplate(t *testing.T) {
 		{`@(thing.xxx)`, "", true},
 	}
 
-	env := envs.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 	for _, tc := range evaluateAsStringTests {
 		defer func() {
 			if r := recover(); r != nil {
@@ -292,7 +300,7 @@ func TestEvaluateTemplate(t *testing.T) {
 			}
 		}()
 
-		eval, err := excellent.EvaluateTemplate(env, vars, tc.template)
+		eval, err := excellent.EvaluateTemplate(env, vars, tc.template, nil)
 
 		if tc.hasError {
 			assert.Error(t, err, "expected error evaluating template '%s'", tc.template)
@@ -301,6 +309,21 @@ func TestEvaluateTemplate(t *testing.T) {
 			assert.Equal(t, tc.expected, eval, " output mismatch for template: '%s'", tc.template)
 		}
 	}
+}
+
+func TestEvaluateTemplateWithEscaping(t *testing.T) {
+	vars := types.NewXObject(map[string]types.XValue{
+		"string1": types.NewXText(`""; DROP`),
+	})
+
+	escaping := func(s string) string {
+		return strings.Replace(s, `"`, `\"`, -1)
+	}
+
+	env := envs.NewBuilder().Build()
+	eval, err := excellent.EvaluateTemplate(env, vars, `Hi @string1`, escaping)
+	assert.NoError(t, err)
+	assert.Equal(t, `Hi \"\"; DROP`, eval)
 }
 
 var errorTests = []struct {
@@ -346,10 +369,10 @@ func TestEvaluationErrors(t *testing.T) {
 	vars := types.NewXObject(map[string]types.XValue{
 		"foo": types.NewXText("bar"),
 	})
-	env := envs.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	for _, tc := range errorTests {
-		result, err := excellent.EvaluateTemplate(env, vars, tc.template)
+		result, err := excellent.EvaluateTemplate(env, vars, tc.template, nil)
 		assert.Equal(t, "", result)
 		assert.NotNil(t, err)
 
@@ -364,10 +387,10 @@ func BenchmarkEvaluationErrors(b *testing.B) {
 		vars := types.NewXObject(map[string]types.XValue{
 			"foo": types.NewXText("bar"),
 		})
-		env := envs.NewEnvironmentBuilder().Build()
+		env := envs.NewBuilder().Build()
 
 		for _, tc := range errorTests {
-			excellent.EvaluateTemplate(env, vars, tc.template)
+			excellent.EvaluateTemplate(env, vars, tc.template, nil)
 		}
 	}
 }

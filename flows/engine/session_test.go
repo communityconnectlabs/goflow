@@ -11,6 +11,7 @@ import (
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/assets/static"
 	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/engine"
 	"github.com/nyaruka/goflow/flows/events"
@@ -113,7 +114,7 @@ var templateTests = []struct {
 	{"@results.favorite_color.category_localized", "Red", "", false},
 	{"@(is_error(results.favorite_icecream))", "true", "", false},
 	{"@(has_error(results.favorite_icecream).match)", "object has no property 'favorite_icecream'", "", false},
-	{"@(count(results))", "4", "", false},
+	{"@(count(results))", "5", "", false},
 
 	{"@run.results.favorite_color", `red`, "", false},
 	{"@run.results.favorite_color.value", "red", "", false},
@@ -127,7 +128,7 @@ var templateTests = []struct {
 	{"@run.results.favorite_icecream", "", "error evaluating @run.results.favorite_icecream: object has no property 'favorite_icecream'", false},
 	{"@(is_error(run.results.favorite_icecream))", "true", "", false},
 	{"@(has_error(run.results.favorite_icecream).match)", "object has no property 'favorite_icecream'", "", false},
-	{"@(count(run.results))", "4", "", false},
+	{"@(count(run.results))", "5", "", false},
 
 	{"@run.status", "completed", "", false},
 
@@ -156,9 +157,9 @@ func TestEvaluateTemplate(t *testing.T) {
 	server := test.NewTestHTTPServer(0)
 	defer server.Close()
 
-	sessionWithURNs, _, err := test.CreateTestSession(server.URL, nil, envs.RedactionPolicyNone)
+	sessionWithURNs, _, err := test.CreateTestSession(server.URL, envs.RedactionPolicyNone)
 	require.NoError(t, err)
-	sessionWithoutURNs, _, err := test.CreateTestSession(server.URL, nil, envs.RedactionPolicyURNs)
+	sessionWithoutURNs, _, err := test.CreateTestSession(server.URL, envs.RedactionPolicyURNs)
 	require.NoError(t, err)
 
 	for _, tc := range templateTests {
@@ -182,7 +183,7 @@ func TestEvaluateTemplate(t *testing.T) {
 }
 
 func BenchmarkEvaluateTemplate(b *testing.B) {
-	session, _, err := test.CreateTestSession("http://localhost", nil, envs.RedactionPolicyNone)
+	session, _, err := test.CreateTestSession("http://localhost", envs.RedactionPolicyNone)
 	require.NoError(b, err)
 
 	run := session.Runs()[0]
@@ -287,6 +288,44 @@ func TestContextToJSON(t *testing.T) {
 						"node_uuid":"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
 						"value":"red",
 						"values":["red"]
+					},
+					"intent": {
+						"categories": [
+							"Success"
+						],
+						"categories_localized": [
+							"Success"
+						],
+						"category": "Success",
+						"category_localized": "Success",
+						"created_on": "2018-04-11T13:24:30.123456Z",
+						"extra": {
+							"entities": {
+								"location": [
+									{
+										"confidence": 1,
+										"value": "Quito"
+									}
+								]
+							},
+							"intents": [
+								{
+									"confidence": 0.5,
+									"name": "book_flight"
+								},
+								{
+									"confidence": 0.25,
+									"name": "book_hotel"
+								}
+							]
+						},
+						"input": "Hi there",
+						"name": "intent",
+						"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
+						"value": "book_flight",
+						"values": [
+							"book_flight"
+						]
 					},
 					"phone_number":{
 						"category":"",
@@ -593,7 +632,7 @@ func TestContextToJSON(t *testing.T) {
 				"uuid": "4213ac47-93fd-48c4-af12-7da8218ef09d"
 			}`,
 		},
-		{"trigger", `{"params":{"source":"website","address":{"state":"WA"}},"type":"flow_action"}`},
+		{"trigger", `{"type":"flow_action","params":{"source":"website","address":{"state":"WA"}},"keyword": null}`},
 	}
 
 	server := test.NewTestHTTPServer(49992)
@@ -604,7 +643,7 @@ func TestContextToJSON(t *testing.T) {
 	uuids.SetGenerator(uuids.NewSeededGenerator(123456))
 	dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 4, 11, 13, 24, 30, 123456000, time.UTC)))
 
-	session, _, err := test.CreateTestSession(server.URL, nil, envs.RedactionPolicyNone)
+	session, _, err := test.CreateTestSession(server.URL, envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	run := session.Runs()[0]
@@ -621,14 +660,14 @@ func TestContextToJSON(t *testing.T) {
 
 func TestReadWithMissingAssets(t *testing.T) {
 	// create standard test session and marshal to JSON
-	session, _, err := test.CreateTestSession("", nil, envs.RedactionPolicyNone)
+	session, _, err := test.CreateTestSession("", envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	sessionJSON, err := json.Marshal(session)
 	require.NoError(t, err)
 
 	// try to read it back but with no assets
-	sessionAssets, err := engine.NewSessionAssets(static.NewEmptySource())
+	sessionAssets, err := engine.NewSessionAssets(static.NewEmptySource(), nil)
 
 	missingAssets := make([]assets.Reference, 0)
 	missing := func(a assets.Reference, err error) { missingAssets = append(missingAssets, a) }
@@ -651,7 +690,7 @@ func TestResumeWithMissingFlowAssets(t *testing.T) {
 	sa, err := test.CreateSessionAssets(assetsJSON, "")
 	require.NoError(t, err)
 
-	env := envs.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 	contact := flows.NewEmptyContact(sa, "Bob", envs.NilLanguage, nil)
 	trigger := triggers.NewManual(env, assets.NewFlowReference(assets.FlowUUID("76f0a02f-3b75-4b86-9064-e9195e1b3a02"), "Parent Flow"), contact, nil)
 
@@ -741,4 +780,49 @@ func TestWaitTimeout(t *testing.T) {
 	require.Equal(t, "Timeout", result.Category)
 	require.Equal(t, "2018-04-11T13:24:30.123456Z", result.Value)
 	require.Equal(t, "", result.Input)
+}
+
+func TestCurrentContext(t *testing.T) {
+	sessionAssets, err := ioutil.ReadFile("../../test/testdata/runner/subflow_loop_with_wait.json")
+	require.NoError(t, err)
+
+	// create our session assets
+	sa, err := test.CreateSessionAssets(json.RawMessage(sessionAssets), "")
+	require.NoError(t, err)
+
+	flow, err := sa.Flows().Get(assets.FlowUUID("76f0a02f-3b75-4b86-9064-e9195e1b3a02"))
+	require.NoError(t, err)
+
+	contact := flows.NewEmptyContact(sa, "Joe", "eng", nil)
+	trigger := triggers.NewManual(nil, flow.Reference(), contact, nil)
+
+	// create a waiting session
+	eng := test.NewEngine()
+	session, _, err := eng.NewSession(sa, trigger)
+	assert.Equal(t, string(flows.SessionStatusWaiting), string(session.Status()))
+
+	context := session.CurrentContext()
+	assert.NotNil(t, context)
+
+	runContext, _ := context.Get("run")
+	flowContext, _ := runContext.(*types.XObject).Get("flow")
+	flowName, _ := flowContext.(*types.XObject).Get("name")
+	assert.Equal(t, types.NewXText("Child flow"), flowName)
+
+	// check we can marshal it
+	_, err = json.Marshal(context)
+	assert.NoError(t, err)
+
+	// end it
+	session.Resume(resumes.NewRunExpiration(nil, nil))
+	assert.Equal(t, flows.SessionStatusCompleted, session.Status())
+
+	// can still get context of completed session
+	context = session.CurrentContext()
+	assert.NotNil(t, context)
+
+	runContext, _ = context.Get("run")
+	flowContext, _ = runContext.(*types.XObject).Get("flow")
+	flowName, _ = flowContext.(*types.XObject).Get("name")
+	assert.Equal(t, types.NewXText("Parent Flow"), flowName)
 }

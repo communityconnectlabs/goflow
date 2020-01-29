@@ -1,6 +1,8 @@
 package flows
 
 import (
+	"strconv"
+
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/utils"
@@ -12,7 +14,7 @@ type Contextable interface {
 }
 
 // Context generates a lazy object for use in expressions
-func Context(env envs.Environment, contextable Contextable) *types.XObject {
+func Context(env envs.Environment, contextable Contextable) types.XValue {
 	if !utils.IsNil(contextable) {
 		return types.NewXLazyObject(func() map[string]types.XValue {
 			return contextable.Context(env)
@@ -33,6 +35,7 @@ var RunContextTopLevels = []string{
 	"child",
 	"contact",
 	"fields",
+	"globals",
 	"input",
 	"legacy_extra",
 	"parent",
@@ -41,4 +44,9 @@ var RunContextTopLevels = []string{
 	"trigger",
 	"urns",
 	"webhook",
+}
+
+// ContactQueryEscaping is the escaping function used for expressions in contact queries
+func ContactQueryEscaping(s string) string {
+	return strconv.Quote(s)
 }

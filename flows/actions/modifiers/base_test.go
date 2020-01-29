@@ -66,15 +66,15 @@ func testModifierType(t *testing.T, sessionAssets flows.SessionAssets, typeName 
 		require.NoError(t, err, "error loading contact_before in %s", testName)
 
 		// apply the modifier
-		logEvent := make([]flows.Event, 0)
-		modifier.Apply(envs.NewEnvironmentBuilder().Build(), sessionAssets, contact, func(e flows.Event) { logEvent = append(logEvent, e) })
+		eventLog := test.NewEventLog()
+		modifier.Apply(envs.NewBuilder().Build(), sessionAssets, contact, eventLog.Log)
 
 		// check contact is in the expected state
 		contactJSON, _ := json.Marshal(contact)
 		test.AssertEqualJSON(t, tc.ContactAfter, contactJSON, "contact mismatch in %s", testName)
 
 		// check events are what we expected
-		actualEventsJSON, _ := json.Marshal(logEvent)
+		actualEventsJSON, _ := json.Marshal(eventLog.Events)
 		expectedEventsJSON, _ := json.Marshal(tc.Events)
 		test.AssertEqualJSON(t, expectedEventsJSON, actualEventsJSON, "events mismatch in %s", testName)
 
@@ -178,7 +178,7 @@ func TestReadModifier(t *testing.T) {
 	missingAssets := make([]assets.Reference, 0)
 	missing := func(a assets.Reference, err error) { missingAssets = append(missingAssets, a) }
 
-	sessionAssets, err := engine.NewSessionAssets(static.NewEmptySource())
+	sessionAssets, err := engine.NewSessionAssets(static.NewEmptySource(), nil)
 	require.NoError(t, err)
 
 	// error if no type field
@@ -213,7 +213,7 @@ func TestReadModifier(t *testing.T) {
 			{"uuid": "4349cdd6-5385-46f3-8e55-5750dd4f35fb", "name": "Winners"}
 		]
 	}`))
-	sessionAssets, err = engine.NewSessionAssets(source)
+	sessionAssets, err = engine.NewSessionAssets(source, nil)
 	require.NoError(t, err)
 
 	mod, err = modifiers.ReadModifier(sessionAssets, []byte(`{"type": "groups", "modification": "add", "groups": [{"uuid": "cd1a2aa6-0d9d-4a8c-b32d-ca5de9c43bdb", "name": "Losers"}, {"uuid": "4349cdd6-5385-46f3-8e55-5750dd4f35fb", "name": "Winners"}]}`), missing)

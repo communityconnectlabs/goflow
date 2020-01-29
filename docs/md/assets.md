@@ -25,6 +25,23 @@ Is something that can send/receive messages.
 }
 ```
 
+<h2 class="item_title"><a name="asset:classifier" href="#asset:classifier">classifier</a></h2>
+
+Is an NLU classifier.
+
+
+```objectivec
+{
+    "uuid": "37657cf7-5eab-4286-9cb0-bbf270587bad",
+    "name": "Booking",
+    "type": "wit",
+    "intents": [
+        "book_flight",
+        "book_hotel"
+    ]
+}
+```
+
 <h2 class="item_title"><a name="asset:field" href="#asset:field">field</a></h2>
 
 Is a custom contact property.
@@ -51,6 +68,19 @@ Is graph of nodes with actions and routers.
     "definition": {
         "nodes": []
     }
+}
+```
+
+<h2 class="item_title"><a name="asset:global" href="#asset:global">global</a></h2>
+
+Is a named constant.
+
+
+```objectivec
+{
+    "key": "organization_name",
+    "name": "Organization Name",
+    "value": "U-Report"
 }
 ```
 
@@ -81,7 +111,7 @@ Is an organizational tag that can be applied to a message.
 
 <h2 class="item_title"><a name="asset:location" href="#asset:location">location</a></h2>
 
-Is a searchable hierachy of locations.
+Is a searchable hierarchy of locations.
 
 
 ```objectivec

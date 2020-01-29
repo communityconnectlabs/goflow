@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"regexp"
 	"strings"
 	"testing"
@@ -13,12 +14,17 @@ import (
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/assets/static"
 	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/definition/migrations"
 	"github.com/nyaruka/goflow/flows/engine"
 	"github.com/nyaruka/goflow/flows/resumes"
 	"github.com/nyaruka/goflow/flows/triggers"
-	"github.com/nyaruka/goflow/legacy"
+	"github.com/nyaruka/goflow/services/airtime/dtone"
+	"github.com/nyaruka/goflow/services/email/smtp"
+	"github.com/nyaruka/goflow/services/webhooks"
 	"github.com/nyaruka/goflow/utils"
 	"github.com/nyaruka/goflow/utils/dates"
+	"github.com/nyaruka/goflow/utils/httpx"
+	"github.com/nyaruka/goflow/utils/smtpx"
 	"github.com/nyaruka/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
@@ -28,7 +34,6 @@ import (
 
 var writeOutput bool
 var includeTests string
-var serverURL = ""
 var testFilePattern = regexp.MustCompile(`(\w+)\.(\w+)\.json`)
 
 func init() {
@@ -92,9 +97,10 @@ type Output struct {
 }
 
 type FlowTest struct {
-	Trigger json.RawMessage   `json:"trigger"`
-	Resumes []json.RawMessage `json:"resumes"`
-	Outputs []json.RawMessage `json:"outputs"`
+	Trigger   json.RawMessage      `json:"trigger"`
+	Resumes   []json.RawMessage    `json:"resumes"`
+	Outputs   []json.RawMessage    `json:"outputs"`
+	HTTPMocks *httpx.MockRequestor `json:"http_mocks,omitempty"`
 }
 
 type runResult struct {
@@ -102,14 +108,6 @@ type runResult struct {
 	outputs []*Output
 }
 
-type legacyAssets struct {
-	LegacyFlows []json.RawMessage      `json:"legacy_flows"`
-	OtherAssets map[string]interface{} `json:"other_assets"`
-}
-
-// loads assets from a file in one of two formats:
-//   1. a regular static assets file
-//   2. a file with both legacy flow defs and assets, i.e. {"legacy_flows": [], "other_assets": {}}
 func loadAssets(path string) (flows.SessionAssets, error) {
 	// load the test specific assets
 	assetsJSON, err := ioutil.ReadFile(path)
@@ -117,41 +115,15 @@ func loadAssets(path string) (flows.SessionAssets, error) {
 		return nil, err
 	}
 
-	// try reading as legacy assets
-	la := &legacyAssets{}
-	if err := json.Unmarshal(assetsJSON, la); err != nil {
-		return nil, errors.Wrap(err, "unable to read as legacy assets")
-	}
-
-	if len(la.LegacyFlows) > 0 {
-		migratedFlows := make([]json.RawMessage, len(la.LegacyFlows))
-		for i, legacyFlow := range la.LegacyFlows {
-			migrated, err := legacy.MigrateLegacyDefinition(legacyFlow, "")
-			if err != nil {
-				return nil, errors.Wrap(err, "unable to migrate legacy flow")
-			}
-			migratedFlows[i] = migrated
-		}
-
-		la.OtherAssets["flows"] = migratedFlows
-		assetsJSON, err = json.Marshal(la.OtherAssets)
-		if err != nil {
-			return nil, err
-		}
-
-		// ioutil.WriteFile(path+".migrated", assetsJSON, 0666)
-	}
-
-	// rewrite the URL on any webhook actions
-	assetsJSON = json.RawMessage(strings.Replace(string(assetsJSON), "http://localhost", serverURL, -1))
-
 	// create the assets source
 	source, err := static.NewSource(assetsJSON)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error reading test assets '%s'", path)
 	}
 
-	return engine.NewSessionAssets(source)
+	mconfig := &migrations.Config{BaseMediaURL: "http://temba.io/"}
+
+	return engine.NewSessionAssets(source, mconfig)
 }
 
 func runFlow(assetsPath string, rawTrigger json.RawMessage, rawResumes []json.RawMessage) (runResult, error) {
@@ -166,7 +138,19 @@ func runFlow(assetsPath string, rawTrigger json.RawMessage, rawResumes []json.Ra
 		return runResult{}, errors.Wrapf(err, "error unmarshalling trigger")
 	}
 
-	eng := NewEngine()
+	eng := engine.NewBuilder().
+		WithEmailServiceFactory(func(flows.Session) (flows.EmailService, error) {
+			return smtp.NewService("mail.temba.io", 25, "nyaruka", "pass123", "flows@temba.io"), nil
+		}).
+		WithWebhookServiceFactory(webhooks.NewServiceFactory(http.DefaultClient, nil, map[string]string{"User-Agent": "goflow-testing"}, 100000)).
+		WithClassificationServiceFactory(func(s flows.Session, c *flows.Classifier) (flows.ClassificationService, error) {
+			return newClassificationService(c), nil
+		}).
+		WithAirtimeServiceFactory(func(flows.Session) (flows.AirtimeService, error) {
+			return dtone.NewService(http.DefaultClient, nil, "nyaruka", "123456789", "RWF"), nil
+		}).
+		Build()
+
 	session, sprint, err := eng.NewSession(sa, trigger)
 	if err != nil {
 		return runResult{}, err
@@ -194,7 +178,7 @@ func runFlow(assetsPath string, rawTrigger json.RawMessage, rawResumes []json.Ra
 
 		// if we aren't at a wait, that's an error
 		if session.Wait() == nil {
-			return runResult{}, errors.Errorf("did not stop at expected wait, have unused resumes: %#v", rawResumes[i:])
+			return runResult{}, errors.Errorf("did not stop at expected wait, have unused resumes: %d", len(rawResumes[i:]))
 		}
 
 		resume, err := resumes.ReadResume(sa, rawResume, assets.PanicOnMissing)
@@ -228,19 +212,18 @@ func TestFlows(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, len(testCases) > 0)
 
-	server := NewTestHTTPServer(49999)
-	defer server.Close()
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
 	defer dates.SetNowSource(dates.DefaultNowSource)
-
-	// save away our server URL so we can rewrite our URLs
-	serverURL = server.URL
+	defer httpx.SetRequestor(httpx.DefaultRequestor)
+	defer smtpx.SetSender(smtpx.DefaultSender)
 
 	for _, tc := range testCases {
+		var httpMocksCopy *httpx.MockRequestor
 		fmt.Printf("running %s\n", tc)
 
 		uuids.SetGenerator(uuids.NewSeededGenerator(123456))
 		dates.SetNowSource(dates.NewSequentialNowSource(time.Date(2018, 7, 6, 12, 30, 0, 123456789, time.UTC)))
+		smtpx.SetSender(smtpx.NewMockSender(""))
 
 		testJSON, err := ioutil.ReadFile(tc.outputFile)
 		require.NoError(t, err, "error reading output file %s", tc.outputFile)
@@ -248,6 +231,14 @@ func TestFlows(t *testing.T) {
 		flowTest := &FlowTest{}
 		err = json.Unmarshal(json.RawMessage(testJSON), &flowTest)
 		require.NoError(t, err, "error unmarshalling output file %s", tc.outputFile)
+
+		if flowTest.HTTPMocks != nil {
+			httpx.SetRequestor(flowTest.HTTPMocks)
+			httpMocksCopy = flowTest.HTTPMocks.Clone()
+		} else {
+			httpx.SetRequestor(httpx.DefaultRequestor)
+			httpMocksCopy = nil
+		}
 
 		// run our flow
 		runResult, err := runFlow(tc.assetsFile, flowTest.Trigger, flowTest.Resumes)
@@ -263,7 +254,7 @@ func TestFlows(t *testing.T) {
 				rawOutputs[i], err = utils.JSONMarshal(runResult.outputs[i])
 				require.NoError(t, err)
 			}
-			flowTest := &FlowTest{Trigger: flowTest.Trigger, Resumes: flowTest.Resumes, Outputs: rawOutputs}
+			flowTest := &FlowTest{Trigger: flowTest.Trigger, Resumes: flowTest.Resumes, Outputs: rawOutputs, HTTPMocks: httpMocksCopy}
 			testJSON, err := utils.JSONMarshalPretty(flowTest)
 			require.NoError(t, err, "Error marshalling test definition: %s", err)
 
@@ -303,12 +294,6 @@ func TestFlows(t *testing.T) {
 
 func BenchmarkFlows(b *testing.B) {
 	testCases, _ := loadTestCases()
-
-	server := NewTestHTTPServer(49990)
-	defer server.Close()
-
-	// save away our server URL so we can rewrite our URLs
-	serverURL = server.URL
 
 	for n := 0; n < b.N; n++ {
 		for _, tc := range testCases {

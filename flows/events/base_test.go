@@ -2,6 +2,8 @@ package events_test
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -15,19 +17,20 @@ import (
 	"github.com/nyaruka/goflow/test"
 	"github.com/nyaruka/goflow/utils/dates"
 	"github.com/nyaruka/goflow/utils/uuids"
+	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestEventMarshaling(t *testing.T) {
-	dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
 	defer dates.SetNowSource(dates.DefaultNowSource)
-
-	uuids.SetGenerator(uuids.NewSeededGenerator(12345))
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
 
-	session, _, err := test.CreateTestSession("", nil, envs.RedactionPolicyNone)
+	dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
+	uuids.SetGenerator(uuids.NewSeededGenerator(12345))
+
+	session, _, err := test.CreateTestSession("", envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	tz, _ := time.LoadLocation("Africa/Kigali")
@@ -38,6 +41,46 @@ func TestEventMarshaling(t *testing.T) {
 		event     flows.Event
 		marshaled string
 	}{
+		{
+			events.NewAirtimeTransferred(
+				&flows.AirtimeTransfer{
+					Sender:        urns.URN("tel:+593979099111"),
+					Recipient:     urns.URN("tel:+593979099222"),
+					Currency:      "USD",
+					DesiredAmount: decimal.RequireFromString("1.20"),
+					ActualAmount:  decimal.RequireFromString("1.00"),
+				},
+				[]*flows.HTTPLog{
+					&flows.HTTPLog{
+						CreatedOn: dates.Now(),
+						ElapsedMS: 12,
+						Request:   "POST /topup HTTP/1.1\r\nHost: send.money.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+						Response:  "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"errors\":[]}",
+						Status:    flows.CallStatusSuccess,
+						URL:       "https://send.money.com/topup",
+					},
+				},
+			),
+			`{
+				"actual_amount": 1,
+        	    "created_on": "2018-10-18T14:20:30.000123456Z",
+        	    "currency": "USD",
+        	    "desired_amount": 1.2,
+				"http_logs": [
+					{
+						"created_on": "2018-10-18T14:20:30.000123456Z",
+						"elapsed_ms": 12,
+						"request": "POST /topup HTTP/1.1\r\nHost: send.money.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+						"response": "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"errors\":[]}",
+						"status": "success",
+						"url": "https://send.money.com/topup"
+					}
+				],
+				"recipient": "tel:+593979099222",
+        	    "sender": "tel:+593979099111",
+				"type": "airtime_transferred"
+			}`,
+		},
 		{
 			events.NewBroadcastCreated(
 				map[envs.Language]*events.BroadcastTranslation{
@@ -80,6 +123,39 @@ func TestEventMarshaling(t *testing.T) {
 				"urns": [
 					"tel:+12345678900"
 				]
+			}`,
+		},
+		{
+			events.NewClassifierCalled(
+				assets.NewClassifierReference(assets.ClassifierUUID("4b937f49-7fb7-43a5-8e57-14e2f028a471"), "Booking"),
+				[]*flows.HTTPLog{
+					&flows.HTTPLog{
+						CreatedOn: dates.Now(),
+						ElapsedMS: 12,
+						Request:   "GET /message?v=20170307&q=hello HTTP/1.1\r\nHost: api.wit.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+						Response:  "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
+						Status:    flows.CallStatusSuccess,
+						URL:       "https://api.wit.ai/message?v=20170307&q=hello",
+					},
+				},
+			),
+			`{
+				"classifier": {
+					"uuid": "4b937f49-7fb7-43a5-8e57-14e2f028a471",
+					"name": "Booking"
+				},
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"http_logs": [
+					{
+						"created_on": "2018-10-18T14:20:30.000123456Z",
+						"elapsed_ms": 12,
+						"request": "GET /message?v=20170307&q=hello HTTP/1.1\r\nHost: api.wit.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+						"response": "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
+						"status": "success",
+						"url": "https://api.wit.ai/message?v=20170307&q=hello"
+					}
+				],
+				"type": "classifier_called"
 			}`,
 		},
 		{
@@ -215,6 +291,16 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
+			events.NewEmailSent([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Update", "Flows are great!"),
+			`{
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"type": "email_sent",
+				"to": ["bob@nyaruka.com", "jim@nyaruka.com"],
+				"subject": "Update",
+				"body": "Flows are great!"
+			}`,
+		},
+		{
 			events.NewEnvironmentRefreshed(session.Environment()),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
@@ -245,7 +331,10 @@ func TestEventMarshaling(t *testing.T) {
 					"Hi there",
 					nil,
 					nil,
-					nil)),
+					nil,
+					flows.NilMsgTopic,
+				),
+			),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"msg": {
@@ -333,4 +422,24 @@ func TestReadEvent(t *testing.T) {
 	// error if we don't recognize action type
 	_, err = events.ReadEvent([]byte(`{"type": "do_the_foo", "foo": "bar"}`))
 	assert.EqualError(t, err, "unknown type: 'do_the_foo'")
+}
+
+func TestWebhookCalledEventTrimming(t *testing.T) {
+	big := strings.Repeat("X", 20000)
+	call := &flows.WebhookCall{
+		URL:          "http://temba.io/",
+		Method:       "GET",
+		StatusCode:   200,
+		TimeTaken:    time.Second * 1,
+		Request:      []byte(fmt.Sprintf("GET /\r\n%s", big)),
+		Response:     []byte(fmt.Sprintf("HTTP/1.0 200 OK\r\n\r\n%s", big)),
+		ResponseJSON: []byte(big),
+	}
+	event := events.NewWebhookCalled(call, flows.CallStatusSuccess, "")
+
+	assert.Equal(t, "http://temba.io/", event.URL)
+	assert.Equal(t, 10000, len(event.Request))
+	assert.Equal(t, "XXXXXXX...", event.Request[9990:])
+	assert.Equal(t, 10000, len(event.Response))
+	assert.Equal(t, "XXXXXXX...", event.Response[9990:])
 }

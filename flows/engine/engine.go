@@ -2,7 +2,6 @@ package engine
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/flows"
@@ -11,9 +10,9 @@ import (
 
 // an instance of the engine
 type engine struct {
-	httpClient        *http.Client
 	services          *services
 	maxStepsPerSprint int
+	maxTemplateChars  int
 }
 
 // NewSession creates a new session
@@ -37,9 +36,9 @@ func (e *engine) ReadSession(sa flows.SessionAssets, data json.RawMessage, missi
 	return readSession(e, sa, data, missing)
 }
 
-func (e *engine) HTTPClient() *http.Client { return e.httpClient }
 func (e *engine) Services() flows.Services { return e.services }
 func (e *engine) MaxStepsPerSprint() int   { return e.maxStepsPerSprint }
+func (e *engine) MaxTemplateChars() int    { return e.maxTemplateChars }
 
 var _ flows.Engine = (*engine)(nil)
 
@@ -52,38 +51,50 @@ type Builder struct {
 	eng *engine
 }
 
-// NewBuilder creates a new environment builder
+// NewBuilder creates a new engine builder
 func NewBuilder() *Builder {
 	return &Builder{
 		eng: &engine{
-			httpClient:        http.DefaultClient,
 			services:          newEmptyServices(),
 			maxStepsPerSprint: 100,
+			maxTemplateChars:  10000,
 		},
 	}
 }
 
-// WithHTTPClient sets the HTTP client
-func (b *Builder) WithHTTPClient(client *http.Client) *Builder {
-	b.eng.httpClient = client
+// WithEmailServiceFactory sets the email service factory
+func (b *Builder) WithEmailServiceFactory(f EmailServiceFactory) *Builder {
+	b.eng.services.email = f
 	return b
 }
 
-// WithWebhookService sets the webhook service
-func (b *Builder) WithWebhookService(svc WebhookService) *Builder {
-	b.eng.services.webhook = svc
+// WithWebhookServiceFactory sets the webhook service factory
+func (b *Builder) WithWebhookServiceFactory(f WebhookServiceFactory) *Builder {
+	b.eng.services.webhook = f
 	return b
 }
 
-// WithAirtimeService sets the airtime transfer service
-func (b *Builder) WithAirtimeService(svc AirtimeService) *Builder {
-	b.eng.services.airtime = svc
+// WithClassificationServiceFactory sets the NLU service factory
+func (b *Builder) WithClassificationServiceFactory(f ClassificationServiceFactory) *Builder {
+	b.eng.services.classification = f
+	return b
+}
+
+// WithAirtimeServiceFactory sets the airtime service factory
+func (b *Builder) WithAirtimeServiceFactory(f AirtimeServiceFactory) *Builder {
+	b.eng.services.airtime = f
 	return b
 }
 
 // WithMaxStepsPerSprint sets the maximum number of steps allowed in a single sprint
 func (b *Builder) WithMaxStepsPerSprint(max int) *Builder {
 	b.eng.maxStepsPerSprint = max
+	return b
+}
+
+// WithMaxTemplateChars sets the maximum number of characters allowed from an evaluated template
+func (b *Builder) WithMaxTemplateChars(max int) *Builder {
+	b.eng.maxTemplateChars = max
 	return b
 }
 

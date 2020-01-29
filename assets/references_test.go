@@ -21,6 +21,16 @@ func TestReferences(t *testing.T) {
 	// channel references must always be concrete
 	assert.EqualError(t, utils.Validate(assets.NewChannelReference("", "Nexmo")), "field 'uuid' is required")
 
+	classifierRef := assets.NewClassifierReference("61602f3e-f603-4c70-8a8f-c477505bf4bf", "Booking")
+	assert.Equal(t, "classifier", classifierRef.Type())
+	assert.Equal(t, "61602f3e-f603-4c70-8a8f-c477505bf4bf", classifierRef.Identity())
+	assert.Equal(t, uuids.UUID("61602f3e-f603-4c70-8a8f-c477505bf4bf"), classifierRef.GenericUUID())
+	assert.Equal(t, "classifier[uuid=61602f3e-f603-4c70-8a8f-c477505bf4bf,name=Booking]", classifierRef.String())
+	assert.NoError(t, utils.Validate(classifierRef))
+
+	// classifier references must always be concrete
+	assert.EqualError(t, utils.Validate(assets.NewClassifierReference("", "Booking")), "field 'uuid' is required")
+
 	fieldRef := assets.NewFieldReference("gender", "Gender")
 	assert.Equal(t, "field", fieldRef.Type())
 	assert.Equal(t, "gender", fieldRef.Identity())
@@ -39,6 +49,15 @@ func TestReferences(t *testing.T) {
 
 	// flow references must always be concrete
 	assert.EqualError(t, utils.Validate(assets.NewFlowReference("", "Registration")), "field 'uuid' is required")
+
+	globalRef := assets.NewGlobalReference("org_name", "Org Name")
+	assert.Equal(t, "global", globalRef.Type())
+	assert.Equal(t, "org_name", globalRef.Identity())
+	assert.Equal(t, "global[key=org_name,name=Org Name]", globalRef.String())
+	assert.NoError(t, utils.Validate(globalRef))
+
+	// global references must have a key
+	assert.EqualError(t, utils.Validate(assets.NewGlobalReference("", "Org Name")), "field 'key' is required")
 
 	groupRef := assets.NewGroupReference("61602f3e-f603-4c70-8a8f-c477505bf4bf", "Testers")
 	assert.Equal(t, "group", groupRef.Type())

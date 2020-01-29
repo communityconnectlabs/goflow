@@ -125,7 +125,7 @@ Is used when a session was triggered manually by a user
 
 <h2 class="item_title"><a name="trigger:msg" href="#trigger:msg">msg</a></h2>
 
-Is used when a session was triggered by a message being recieved by the caller
+Is used when a session was triggered by a message being received by the caller
 
 
 ```json
@@ -271,8 +271,18 @@ Events are created when airtime has been transferred to the contact.
     "sender": "tel:4748",
     "recipient": "tel:+1242563637",
     "currency": "RWF",
-    "amount": 100,
-    "status": "success"
+    "desired_amount": 120,
+    "actual_amount": 100,
+    "http_logs": [
+        {
+            "url": "https://airtime-api.dtone.com/cgi-bin/shop/topup",
+            "status": "success",
+            "request": "POST /topup HTTP/1.1\r\n\r\naction=ping",
+            "response": "HTTP/1.1 200 OK\r\n\r\ninfo_txt=pong\r\n",
+            "created_on": "2006-01-02T15:04:05Z",
+            "elapsed_ms": 123
+        }
+    ]
 }
 ```
 </div>
@@ -311,6 +321,33 @@ Events are created when an action wants to send a message to other contacts.
     ],
     "urns": [
         "tel:+12065551212"
+    ]
+}
+```
+</div>
+<h2 class="item_title"><a name="event:classifier_called" href="#event:classifier_called">classifier_called</a></h2>
+
+Events are created when a NLU classifier is called.
+
+<div class="output_event">
+
+```json
+{
+    "type": "classifier_called",
+    "created_on": "2006-01-02T15:04:05Z",
+    "classifier": {
+        "uuid": "1c06c884-39dd-4ce4-ad9f-9a01cbe6c000",
+        "name": "Booking"
+    },
+    "http_logs": [
+        {
+            "url": "https://api.wit.ai/message?v=20170307&q=hello",
+            "status": "success",
+            "request": "GET /message?v=20170307&q=hello HTTP/1.1",
+            "response": "HTTP/1.1 200 OK\r\n\r\n{\"intents\":[]}",
+            "created_on": "2006-01-02T15:04:05Z",
+            "elapsed_ms": 123
+        }
     ]
 }
 ```
@@ -440,17 +477,17 @@ Events are created when a contact's URNs have changed.
 }
 ```
 </div>
-<h2 class="item_title"><a name="event:email_created" href="#event:email_created">email_created</a></h2>
+<h2 class="item_title"><a name="event:email_sent" href="#event:email_sent">email_sent</a></h2>
 
-Events are created when an action wants to send an email.
+Events are created when an action has sent an email.
 
 <div class="output_event">
 
 ```json
 {
-    "type": "email_created",
+    "type": "email_sent",
     "created_on": "2006-01-02T15:04:05Z",
-    "addresses": [
+    "to": [
         "foo@bar.com"
     ],
     "subject": "Your activation token",
@@ -774,10 +811,10 @@ request and response.
     "created_on": "2006-01-02T15:04:05Z",
     "url": "http://localhost:49998/?cmd=success",
     "status": "success",
-    "status_code": 200,
-    "elapsed_ms": 123,
     "request": "GET /?format=json HTTP/1.1",
-    "response": "HTTP/1.1 200 OK\r\n\r\n{\"ip\":\"190.154.48.130\"}"
+    "response": "HTTP/1.1 200 OK\r\n\r\n{\"ip\":\"190.154.48.130\"}",
+    "elapsed_ms": 123,
+    "status_code": 200
 }
 ```
 </div>
