@@ -1,12 +1,12 @@
 package httpx_test
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"testing"
 
 	"github.com/nyaruka/goflow/utils/httpx"
+	"github.com/nyaruka/goflow/utils/jsonx"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -17,11 +17,11 @@ func TestMockRequestor(t *testing.T) {
 	// can create requestor with constructor
 	requestor1 := httpx.NewMockRequestor(map[string][]httpx.MockResponse{
 		"http://google.com": []httpx.MockResponse{
-			httpx.NewMockResponse(200, "this is google", nil),
-			httpx.NewMockResponse(201, "this is google again", nil),
+			httpx.NewMockResponse(200, nil, "this is google", 0),
+			httpx.NewMockResponse(201, nil, "this is google again", 0),
 		},
 		"http://yahoo.com": []httpx.MockResponse{
-			httpx.NewMockResponse(202, "this is yahoo", nil),
+			httpx.NewMockResponse(202, nil, "this is yahoo", 0),
 			httpx.MockConnectionError,
 		},
 	})
@@ -39,7 +39,7 @@ func TestMockRequestor(t *testing.T) {
 	}`)
 
 	requestor2 := &httpx.MockRequestor{}
-	err := json.Unmarshal(asJSON, requestor2)
+	err := jsonx.Unmarshal(asJSON, requestor2)
 	assert.NoError(t, err)
 	assert.Equal(t, requestor1, requestor2)
 

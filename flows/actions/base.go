@@ -124,21 +124,25 @@ func (a *baseAction) saveResult(run flows.FlowRun, step flows.Step, name, value,
 }
 
 // helper to save a run result based on a webhook call and log it as an event
-func (a *baseAction) saveWebhookResult(run flows.FlowRun, step flows.Step, name string, webhook *flows.WebhookCall, status flows.CallStatus, logEvent flows.EventCallback) {
-	input := fmt.Sprintf("%s %s", webhook.Method, webhook.URL)
-	value := strconv.Itoa(webhook.StatusCode)
+func (a *baseAction) saveWebhookResult(run flows.FlowRun, step flows.Step, name string, call *flows.WebhookCall, status flows.CallStatus, logEvent flows.EventCallback) {
+	input := fmt.Sprintf("%s %s", call.Request.Method, call.Request.URL.String())
+	value := "0"
 	category := webhookStatusCategories[status]
-
 	var extra json.RawMessage
-	if len(webhook.ResponseJSON) < resultExtraMaxBytes {
-		extra = webhook.ResponseJSON
+
+	if call.Response != nil {
+		value = strconv.Itoa(call.Response.StatusCode)
+
+		if len(call.ResponseBody) < resultExtraMaxBytes {
+			extra = call.ResponseBody
+		}
 	}
 
 	a.saveResult(run, step, name, value, category, "", input, extra, logEvent)
 }
 
 func (a *baseAction) updateWebhook(run flows.FlowRun, call *flows.WebhookCall) {
-	parsed := types.JSONToXValue(call.ResponseJSON)
+	parsed := types.JSONToXValue(call.ResponseBody)
 
 	switch typed := parsed.(type) {
 	case nil, types.XError:
@@ -209,7 +213,7 @@ func (a *otherContactsAction) resolveRecipients(run flows.FlowRun, logEvent flow
 	}
 
 	// resolve group references
-	groups, err := resolveGroups(run, a.Groups, false, logEvent)
+	groups, err := resolveGroups(run, a.Groups, logEvent)
 	if err != nil {
 		return nil, nil, "", nil, err
 	}
@@ -265,7 +269,7 @@ type createMsgAction struct {
 }
 
 // helper function for actions that have a set of group references that must be resolved to actual groups
-func resolveGroups(run flows.FlowRun, references []*assets.GroupReference, staticOnly bool, logEvent flows.EventCallback) ([]*flows.Group, error) {
+func resolveGroups(run flows.FlowRun, references []*assets.GroupReference, logEvent flows.EventCallback) ([]*flows.Group, error) {
 	groupSet := run.Session().Assets().Groups()
 	groups := make([]*flows.Group, 0, len(references))
 
@@ -275,6 +279,9 @@ func resolveGroups(run flows.FlowRun, references []*assets.GroupReference, stati
 		if ref.UUID != "" {
 			// group is a fixed group with a UUID
 			group = groupSet.Get(ref.UUID)
+			if group == nil {
+				logEvent(events.NewDependencyError(ref))
+			}
 		} else {
 			// group is an expression that evaluates to an existing group's name
 			evaluatedGroupName, err := run.EvaluateTemplate(ref.NameMatch)
@@ -290,11 +297,7 @@ func resolveGroups(run flows.FlowRun, references []*assets.GroupReference, stati
 		}
 
 		if group != nil {
-			if staticOnly && group.IsDynamic() {
-				logEvent(events.NewErrorf("can't add or remove contacts from a dynamic group '%s'", group.Name()))
-			} else {
-				groups = append(groups, group)
-			}
+			groups = append(groups, group)
 		}
 	}
 
@@ -312,6 +315,9 @@ func resolveLabels(run flows.FlowRun, references []*assets.LabelReference, logEv
 		if ref.UUID != "" {
 			// label is a fixed label with a UUID
 			label = labelSet.Get(ref.UUID)
+			if label == nil {
+				logEvent(events.NewDependencyError(ref))
+			}
 		} else {
 			// label is an expression that evaluates to an existing label's name
 			evaluatedLabelName, err := run.EvaluateTemplate(ref.NameMatch)

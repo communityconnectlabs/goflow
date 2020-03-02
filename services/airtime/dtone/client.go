@@ -3,7 +3,6 @@ package dtone
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -13,6 +12,7 @@ import (
 	"github.com/nyaruka/goflow/utils"
 	"github.com/nyaruka/goflow/utils/dates"
 	"github.com/nyaruka/goflow/utils/httpx"
+	"github.com/nyaruka/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -175,7 +175,7 @@ func (c *Client) request(data url.Values, dest Response) (*httpx.Trace, error) {
 		"Content-Type": "application/x-www-form-urlencoded",
 	}
 
-	trace, err := httpx.DoTrace(c.httpClient, "POST", apiURL, strings.NewReader(data.Encode()), headers, c.httpRetries)
+	trace, err := httpx.NewTrace(c.httpClient, "POST", apiURL, strings.NewReader(data.Encode()), headers, c.httpRetries)
 	if err != nil {
 		return trace, err
 	}
@@ -218,7 +218,7 @@ func unmarshalResponse(asBytes []byte, dest interface{}) error {
 	}
 
 	// marshal to JSON so we can use nice golang JSON unmarshalling into our response structs
-	respJSON, _ := json.Marshal(data)
+	respJSON, _ := jsonx.Marshal(data)
 
-	return json.Unmarshal(respJSON, dest)
+	return jsonx.Unmarshal(respJSON, dest)
 }
