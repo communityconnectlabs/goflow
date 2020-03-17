@@ -6,19 +6,20 @@ import (
 
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestChannel(t *testing.T) {
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
-	utils.SetUUIDGenerator(test.NewSeededUUIDGenerator(1234))
-	defer utils.SetUUIDGenerator(utils.DefaultUUIDGenerator)
+	uuids.SetGenerator(uuids.NewSeededGenerator(1234))
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
 
 	rolesDefault := []assets.ChannelRole{assets.ChannelRoleSend, assets.ChannelRoleReceive}
 	ch := test.NewChannel("Android", "+250961111111", []string{"tel"}, rolesDefault, nil)

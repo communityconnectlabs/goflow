@@ -4,17 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"sort"
 	"testing"
 	"time"
 
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/actions"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
+	"github.com/greatnonprofits-nfp/goflow/services/airtime/dtone"
+	"github.com/greatnonprofits-nfp/goflow/services/classification/wit"
+	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
 	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -43,10 +51,15 @@ func TestActionTypes(t *testing.T) {
 	assetsJSON, err := ioutil.ReadFile("testdata/_assets.json")
 	require.NoError(t, err)
 
-	server := test.NewTestHTTPServer(49996)
-
+	typeNames := make([]string, 0)
 	for typeName := range actions.RegisteredTypes() {
-		testActionType(t, assetsJSON, typeName, server.URL)
+		typeNames = append(typeNames, typeName)
+	}
+
+	sort.Strings(typeNames)
+
+	for _, typeName := range typeNames {
+		testActionType(t, assetsJSON, typeName)
 	}
 }
 
@@ -56,35 +69,43 @@ type inspectionResults struct {
 	Results      []*flows.ResultInfo `json:"results"`
 }
 
-func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string, testServerURL string) {
+func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 	testFile, err := ioutil.ReadFile(fmt.Sprintf("testdata/%s.json", typeName))
 	require.NoError(t, err)
 
 	tests := []struct {
-		Description     string             `json:"description"`
-		NoContact       bool               `json:"no_contact"`
-		NoURNs          bool               `json:"no_urns"`
-		NoInput         bool               `json:"no_input"`
-		RedactURNs      bool               `json:"redact_urns"`
-		Action          json.RawMessage    `json:"action"`
-		InFlowType      flows.FlowType     `json:"in_flow_type"`
-		ReadError       string             `json:"read_error"`
-		ValidationError string             `json:"validation_error"`
-		SkipValidation  bool               `json:"skip_validation"`
-		Events          []json.RawMessage  `json:"events"`
-		ContactAfter    json.RawMessage    `json:"contact_after"`
-		Inspection      *inspectionResults `json:"inspection"`
+		Description     string               `json:"description"`
+		HTTPMocks       *httpx.MockRequestor `json:"http_mocks"`
+		NoContact       bool                 `json:"no_contact"`
+		NoURNs          bool                 `json:"no_urns"`
+		NoInput         bool                 `json:"no_input"`
+		RedactURNs      bool                 `json:"redact_urns"`
+		Action          json.RawMessage      `json:"action"`
+		Localization    json.RawMessage      `json:"localization"`
+		InFlowType      flows.FlowType       `json:"in_flow_type"`
+		ReadError       string               `json:"read_error"`
+		ValidationError string               `json:"validation_error"`
+		SkipValidation  bool                 `json:"skip_validation"`
+		Events          []json.RawMessage    `json:"events"`
+		ContactAfter    json.RawMessage      `json:"contact_after"`
+		Inspection      json.RawMessage      `json:"inspection"`
 	}{}
 
 	err = json.Unmarshal(testFile, &tests)
 	require.NoError(t, err)
 
-	defer utils.SetTimeSource(utils.DefaultTimeSource)
-	defer utils.SetUUIDGenerator(utils.DefaultUUIDGenerator)
+	defer dates.SetNowSource(dates.DefaultNowSource)
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
+	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
 	for _, tc := range tests {
-		utils.SetTimeSource(test.NewFixedTimeSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
-		utils.SetUUIDGenerator(test.NewSeededUUIDGenerator(12345))
+		dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
+		uuids.SetGenerator(uuids.NewSeededGenerator(12345))
+		if tc.HTTPMocks != nil {
+			httpx.SetRequestor(tc.HTTPMocks)
+		} else {
+			httpx.SetRequestor(httpx.DefaultRequestor)
+		}
 
 		testName := fmt.Sprintf("test '%s' for action type '%s'", tc.Description, typeName)
 
@@ -100,6 +121,12 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string, t
 		actionsPath := []string{"flows", fmt.Sprintf("[%d]", flowIndex), "nodes", "[0]", "actions"}
 		actionsJson := []byte(fmt.Sprintf("[%s]", string(tc.Action)))
 		assetsJSON = test.JSONReplace(assetsJSON, actionsPath, actionsJson)
+
+		// if we have a localization section, inject that too
+		if tc.Localization != nil {
+			localizationPath := []string{"flows", fmt.Sprintf("[%d]", flowIndex), "localization", "spa", "ad154980-7bf7-4ab8-8728-545fd6378912"}
+			assetsJSON = test.JSONReplace(assetsJSON, localizationPath, tc.Localization)
+		}
 
 		// create session assets
 		sa, err := test.CreateSessionAssets(assetsJSON, "")
@@ -137,11 +164,20 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string, t
 				contact.AddURN(flows.NewContactURN(urns.URN("tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d&id=123"), channel))
 				contact.AddURN(flows.NewContactURN(urns.URN("twitterid:54784326227#nyaruka"), nil))
 			}
+
+			// and switch their language
+			if tc.Localization != nil {
+				contact.SetLanguage(envs.Language("spa"))
+			}
 		}
 
-		envBuilder := utils.NewEnvironmentBuilder().WithDefaultCountry("RW")
+		envBuilder := envs.NewBuilder().
+			WithDefaultLanguage("eng").
+			WithAllowedLanguages([]envs.Language{"eng", "spa"}).
+			WithDefaultCountry("RW")
+
 		if tc.RedactURNs {
-			envBuilder.WithRedactionPolicy(utils.RedactionPolicyURNs)
+			envBuilder.WithRedactionPolicy(envs.RedactionPolicyURNs)
 		}
 
 		env := envBuilder.Build()
@@ -153,9 +189,9 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string, t
 			if flow.Type() == flows.FlowTypeVoice {
 				channel := sa.Channels().Get("57f1078f-88aa-46f4-a59a-948a5739c03d")
 				connection = flows.NewConnection(channel.Reference(), urns.URN("tel:+12065551212"))
-				trigger = triggers.NewManualVoiceTrigger(env, flow.Reference(), contact, connection, nil)
+				trigger = triggers.NewManualVoice(env, flow.Reference(), contact, connection, nil)
 			} else {
-				trigger = triggers.NewManualTrigger(env, flow.Reference(), contact, nil)
+				trigger = triggers.NewManual(env, flow.Reference(), contact, nil)
 			}
 		} else {
 			msg := flows.NewMsgIn(
@@ -168,12 +204,25 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string, t
 					"audio/mp3:http://s3.amazon.com/bucket/test.mp3",
 				},
 			)
-			trigger = triggers.NewMsgTrigger(env, flow.Reference(), contact, msg, nil)
+			trigger = triggers.NewMsg(env, flow.Reference(), contact, msg, nil)
 			ignoreEventCount = 1 // need to ignore the msg_received event this trigger creates
 		}
 
+		// create an engine instance
+		eng := engine.NewBuilder().
+			WithWebhookServiceFactory(webhooks.NewServiceFactory("goflow-testing", 10000)).
+			WithClassificationServiceFactory(func(s flows.Session, c *flows.Classifier) (flows.ClassificationService, error) {
+				if c.Type() == "wit" {
+					return wit.NewService(c, "123456789"), nil
+				}
+				return nil, errors.Errorf("no classification service available for %s", c.Reference())
+			}).
+			WithAirtimeServiceFactory(func(flows.Session) (flows.AirtimeService, error) {
+				return dtone.NewService("nyaruka", "123456789", "RWF"), nil
+			}).
+			Build()
+
 		// create session
-		eng := engine.NewBuilder().WithDefaultUserAgent("goflow-testing").Build()
 		session, _, err := eng.NewSession(sa, trigger)
 		require.NoError(t, err)
 
@@ -197,23 +246,20 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string, t
 
 		// finally try inspecting this action
 		if tc.Inspection != nil {
-			templates := flow.ExtractTemplates()
-			assert.Equal(t, tc.Inspection.Templates, templates, "inspected templates mismatch in %s", testName)
-
 			dependencies := flow.ExtractDependencies()
 			depStrings := make([]string, len(dependencies))
 			for i := range dependencies {
 				depStrings[i] = dependencies[i].String()
 			}
-			assert.Equal(t, tc.Inspection.Dependencies, depStrings, "inspected dependencies mismatch in %s", testName)
 
-			results := flow.ExtractResults()
-			assert.Equal(t, len(tc.Inspection.Results), len(results), "inspected results mismatch in %s", testName)
-			if len(tc.Inspection.Results) == len(results) {
-				for i := range results {
-					assert.Equal(t, tc.Inspection.Results[i], results[i], "inspected result[%d] mismatch in %s", i, testName)
-				}
+			actual := &inspectionResults{
+				Templates:    flow.ExtractTemplates(),
+				Dependencies: depStrings,
+				Results:      flow.ExtractResults(),
 			}
+
+			actualJSON, _ := json.Marshal(actual)
+			test.AssertEqualJSON(t, tc.Inspection, actualJSON, "inspection mismatch in %s", testName)
 		}
 	}
 }
@@ -226,7 +272,7 @@ func TestConstructors(t *testing.T) {
 		json   string
 	}{
 		{
-			actions.NewAddContactGroupsAction(
+			actions.NewAddContactGroups(
 				actionUUID,
 				[]*assets.GroupReference{
 					assets.NewGroupReference(assets.GroupUUID("b7cf0d83-f1c9-411c-96fd-c511a4cfa86d"), "Testers"),
@@ -248,7 +294,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewAddContactURNAction(
+			actions.NewAddContactURN(
 				actionUUID,
 				"tel",
 				"+234532626677",
@@ -261,7 +307,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewAddInputLabelsAction(
+			actions.NewAddInputLabels(
 				actionUUID,
 				[]*assets.LabelReference{
 					assets.NewLabelReference(assets.LabelUUID("3f65d88a-95dc-4140-9451-943e94e06fea"), "Spam"),
@@ -283,7 +329,25 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewCallResthookAction(
+			actions.NewCallClassifier(
+				actionUUID,
+				assets.NewClassifierReference(assets.ClassifierUUID("0baee364-07a7-4c93-9778-9f55a35903bb"), "Booking"),
+				"@input.text",
+				"Intent",
+			),
+			`{
+			"type": "call_classifier",
+			"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
+			"classifier": {
+				"uuid": "0baee364-07a7-4c93-9778-9f55a35903bb",
+				"name": "Booking"
+			},
+			"input": "@input.text",
+			"result_name": "Intent"
+		}`,
+		},
+		{
+			actions.NewCallResthook(
 				actionUUID,
 				"new-registration",
 				"My Result",
@@ -296,7 +360,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewCallWebhookAction(
+			actions.NewCallWebhook(
 				actionUUID,
 				"POST",
 				"http://example.com/ping",
@@ -319,7 +383,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewPlayAudioAction(
+			actions.NewPlayAudio(
 				actionUUID,
 				"http://uploads.temba.io/2353262.m4a",
 			),
@@ -330,7 +394,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSayMsgAction(
+			actions.NewSayMsg(
 				actionUUID,
 				"Hi @contact.name, are you ready to complete today's survey?",
 				"http://uploads.temba.io/2353262.m4a",
@@ -343,7 +407,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewRemoveContactGroupsAction(
+			actions.NewRemoveContactGroups(
 				actionUUID,
 				[]*assets.GroupReference{
 					assets.NewGroupReference(assets.GroupUUID("b7cf0d83-f1c9-411c-96fd-c511a4cfa86d"), "Testers"),
@@ -366,7 +430,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSendBroadcastAction(
+			actions.NewSendBroadcast(
 				actionUUID,
 				"Hi there",
 				[]string{"http://example.com/red.jpg"},
@@ -402,7 +466,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSendEmailAction(
+			actions.NewSendEmail(
 				actionUUID,
 				[]string{"bob@example.com"},
 				"Hi there",
@@ -417,7 +481,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSendMsgAction(
+			actions.NewSendMsg(
 				actionUUID,
 				"Hi there",
 				[]string{"http://example.com/red.jpg"},
@@ -434,7 +498,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSetContactChannelAction(
+			actions.NewSetContactChannel(
 				actionUUID,
 				assets.NewChannelReference(assets.ChannelUUID("57f1078f-88aa-46f4-a59a-948a5739c03d"), "My Android Phone"),
 			),
@@ -448,7 +512,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSetContactFieldAction(
+			actions.NewSetContactField(
 				actionUUID,
 				assets.NewFieldReference("gender", "Gender"),
 				"Male",
@@ -464,7 +528,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSetContactLanguageAction(
+			actions.NewSetContactLanguage(
 				actionUUID,
 				"eng",
 			),
@@ -475,7 +539,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSetContactNameAction(
+			actions.NewSetContactName(
 				actionUUID,
 				"Bob",
 			),
@@ -486,7 +550,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSetContactTimezoneAction(
+			actions.NewSetContactTimezone(
 				actionUUID,
 				"Africa/Kigali",
 			),
@@ -497,7 +561,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewSetRunResultAction(
+			actions.NewSetRunResult(
 				actionUUID,
 				"Response 1",
 				"yes",
@@ -512,7 +576,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewEnterFlowAction(
+			actions.NewEnterFlow(
 				actionUUID,
 				assets.NewFlowReference(assets.FlowUUID("fece6eac-9127-4343-9269-56e88f391562"), "Parent"),
 				true, // terminal
@@ -528,7 +592,7 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
-			actions.NewStartSessionAction(
+			actions.NewStartSession(
 				actionUUID,
 				assets.NewFlowReference(assets.FlowUUID("fece6eac-9127-4343-9269-56e88f391562"), "Parent"),
 				[]urns.URN{"twitter:nyaruka"},
@@ -583,4 +647,141 @@ func TestReadAction(t *testing.T) {
 	// error if we don't recognize action type
 	_, err = actions.ReadAction([]byte(`{"type": "do_the_foo", "foo": "bar"}`))
 	assert.EqualError(t, err, "unknown type: 'do_the_foo'")
+}
+
+func TestLegacyWebhookPayload(t *testing.T) {
+	uuids.SetGenerator(uuids.NewSeededGenerator(123456))
+	dates.SetNowSource(dates.NewSequentialNowSource(time.Date(2018, 7, 6, 12, 30, 0, 123456789, time.UTC)))
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
+	defer dates.SetNowSource(dates.DefaultNowSource)
+
+	server := test.NewTestHTTPServer(49999)
+	defer server.Close()
+
+	session, _, err := test.CreateTestSession(server.URL, envs.RedactionPolicyNone)
+	run := session.Runs()[0]
+
+	payload, err := run.EvaluateTemplate(actions.LegacyWebhookPayload)
+	require.NoError(t, err)
+
+	test.AssertEqualJSON(t, []byte(`{
+		"channel": {
+			"address": "+12345671111",
+			"name": "My Android Phone",
+			"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+		},
+		"contact": {
+			"name": "Ryan Lewis",
+			"urn": "tel:+12065551212",
+			"uuid": "5d76d86b-3bb9-4d5a-b822-c9d86f5d8e4f"
+		},
+		"flow": {
+			"name": "Registration",
+			"revision": 123,
+			"uuid": "50c3706e-fedb-42c0-8eab-dda3335714b7"
+		},
+		"input": {
+			"attachments": [
+				{
+					"content_type": "image/jpeg",
+					"url": "http://s3.amazon.com/bucket/test.jpg"
+				},
+				{
+					"content_type": "audio/mp3",
+					"url": "http://s3.amazon.com/bucket/test.mp3"
+				}
+			],
+			"channel": {
+				"address": "+12345671111",
+				"name": "My Android Phone",
+				"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+			},
+			"created_on": "2017-12-31T11:35:10.035757-02:00",
+			"text": "Hi there",
+			"type": "msg",
+			"urn": {
+				"display": "(206) 555-1212",
+				"path": "+12065551212",
+				"scheme": "tel"
+			},
+			"uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5"
+		},
+		"path": [
+			{
+				"arrived_on": "2018-07-06T12:30:03.123456Z",
+				"exit_uuid": "d7a36118-0a38-4b35-a7e4-ae89042f0d3c",
+				"node_uuid": "72a1f5df-49f9-45df-94c9-d86f7ea064e5",
+				"uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
+			},
+			{
+				"arrived_on": "2018-07-06T12:30:19.123456Z",
+				"exit_uuid": "100f2d68-2481-4137-a0a3-177620ba3c5f",
+				"node_uuid": "3dcccbb4-d29c-41dd-a01f-16d814c9ab82",
+				"uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
+			},
+			{
+				"arrived_on": "2018-07-06T12:30:28.123456Z",
+				"exit_uuid": "d898f9a4-f0fc-4ac4-a639-c98c602bb511",
+				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
+				"uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
+			},
+			{
+				"arrived_on": "2018-07-06T12:30:55.123456Z",
+				"exit_uuid": "9fc5f8b4-2247-43db-b899-ab1ac50ba06c",
+				"node_uuid": "c0781400-737f-4940-9a6c-1ec1c3df0325",
+				"uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
+			}
+		],
+		"results": {
+			"2factor": {
+				"category": "",
+				"category_localized": "",
+				"created_on": "2018-07-06T12:30:37.123456Z",
+				"input": "",
+				"name": "2Factor",
+				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
+				"value": "34634624463525"
+			},
+			"favorite_color": {
+				"category": "Red",
+				"category_localized": "Red",
+				"created_on": "2018-07-06T12:30:33.123456Z",
+				"input": "",
+				"name": "Favorite Color",
+				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
+				"value": "red"
+			},
+			"intent": {
+				"category": "Success",
+				"category_localized": "Success",
+				"created_on": "2018-07-06T12:30:51.123456Z",
+				"input": "Hi there",
+				"name": "intent",
+				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
+				"value": "book_flight"
+			},
+			"phone_number": {
+				"category": "",
+				"category_localized": "",
+				"created_on": "2018-07-06T12:30:29.123456Z",
+				"input": "",
+				"name": "Phone Number",
+				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
+				"value": "+12344563452"
+			},
+			"webhook": {
+				"category": "Success",
+				"category_localized": "Success",
+				"created_on": "2018-07-06T12:30:45.123456Z",
+				"input": "GET http://127.0.0.1:49999/?content=%7B%22results%22%3A%5B%7B%22state%22%3A%22WA%22%7D%2C%7B%22state%22%3A%22IN%22%7D%5D%7D",
+				"name": "webhook",
+				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
+				"value": "200"
+			}
+		},
+		"run": {
+			"created_on": "2018-07-06T12:30:00.123456Z",
+			"uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
+		}
+	}`), []byte(payload), "payload mismatch")
 }

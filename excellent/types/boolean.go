@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
@@ -36,7 +37,7 @@ func (x XBoolean) Render() string {
 }
 
 // Format returns the pretty text representation
-func (x XBoolean) Format(env utils.Environment) string {
+func (x XBoolean) Format(env envs.Environment) string {
 	return x.Render()
 }
 

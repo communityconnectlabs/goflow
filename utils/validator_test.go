@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	_ "github.com/nyaruka/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/stretchr/testify/assert"

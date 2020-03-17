@@ -1,15 +1,19 @@
 package runs_test
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/runs"
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,7 +31,8 @@ var sessionAssets = `{
     ],
     "fields": [
         {
-            "key": "gender",
+			"uuid": "d66a7823-eada-40e5-9a3a-57239d4690bf",
+			"key": "gender",
             "name": "Gender",
             "type": "text"
         }
@@ -96,12 +101,52 @@ var sessionTrigger = `{
     }
 }`
 
+func TestRun(t *testing.T) {
+	uuids.SetGenerator(uuids.NewSeededGenerator(12345))
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
+
+	server := test.NewTestHTTPServer(49999)
+	defer server.Close()
+
+	session, _, err := test.CreateTestSession(server.URL, envs.RedactionPolicyNone)
+	require.NoError(t, err)
+
+	flow, err := session.Assets().Flows().Get("50c3706e-fedb-42c0-8eab-dda3335714b7")
+	require.NoError(t, err)
+
+	run := session.Runs()[0]
+
+	checkRun := func(r flows.FlowRun) {
+		assert.Equal(t, string(flows.RunUUID("e7187099-7d38-4f60-955c-325957214c42")), string(r.UUID()))
+		assert.Equal(t, string(flows.RunStatusCompleted), string(r.Status()))
+		assert.Equal(t, flow, r.Flow())
+		assert.Equal(t, flow.Reference(), r.FlowReference())
+		assert.Equal(t, 10, len(r.Events()))
+		assert.Equal(t, "Parent", r.Parent().Flow().Name())
+		assert.Equal(t, 0, len(r.Ancestors())) // no parent runs within this session
+	}
+
+	checkRun(run)
+
+	// check we can marshal and marshal the run and get the same values
+	runJSON, err := json.Marshal(run)
+	require.NoError(t, err)
+
+	run2, err := runs.ReadRun(session, runJSON, assets.IgnoreMissing)
+	require.NoError(t, err)
+
+	checkRun(run2)
+}
+
 func TestRunContext(t *testing.T) {
-	utils.SetTimeSource(test.NewFixedTimeSource(time.Date(2018, 9, 13, 13, 36, 30, 123456789, time.UTC)))
-	defer utils.SetTimeSource(utils.DefaultTimeSource)
+	uuids.SetGenerator(uuids.NewSeededGenerator(12345))
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
+
+	dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 9, 13, 13, 36, 30, 123456789, time.UTC)))
+	defer dates.SetNowSource(dates.DefaultNowSource)
 
 	// create a run with no parent or child
-	session, _, err := test.CreateTestSession("", nil)
+	session, _, err := test.CreateTestSession("", envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	run := session.Runs()[0]
@@ -112,14 +157,20 @@ func TestRunContext(t *testing.T) {
 	}{
 		{`@run`, `Ryan Lewis@Registration`},
 		{`@child`, `Ryan Lewis@Collect Age`},
-		{`@child.run`, `Ryan Lewis@Collect Age`},
+		{`@child.uuid`, `9688d21d-95aa-4bed-afc7-f31b35731a3d`},
+		{`@child.run`, `Ryan Lewis@Collect Age`}, // to be removed in 13.1
 		{`@child.contact.name`, `Ryan Lewis`},
 		{`@child.run.contact.name`, `Ryan Lewis`},
+		{`@child.flow.name`, "Collect Age"},
+		{`@child.status`, "completed"},
 		{`@child.fields`, "Activation Token: AACC55\nAge: 23\nGender: Male\nJoin Date: 2017-12-02T00:00:00.000000-02:00"},
 		{`@parent`, `Jasmine@Parent`},
+		{`@parent.uuid`, `4213ac47-93fd-48c4-af12-7da8218ef09d`},
 		{`@parent.run`, `Jasmine@Parent`},
 		{`@parent.contact.name`, `Jasmine`},
 		{`@parent.run.contact.name`, `Jasmine`},
+		{`@parent.flow.name`, "Parent"},
+		{`@parent.status`, "active"},
 		{`@parent.fields`, "Age: 33\nGender: Female"},
 		{
 			`@(json(contact.fields))`,
@@ -135,7 +186,7 @@ func TestRunContext(t *testing.T) {
 		},
 		{
 			`@(json(urns))`,
-			`{"ext":null,"facebook":null,"fcm":null,"jiochat":null,"line":null,"mailto":"mailto:foo@bar.com","tel":"tel:+12065551212","telegram":null,"twitter":null,"twitterid":"twitterid:54784326227#nyaruka","viber":null,"wechat":null,"whatsapp":null}`,
+			`{"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":"mailto:foo@bar.com","tel":"tel:+12065551212","telegram":null,"twitter":null,"twitterid":"twitterid:54784326227#nyaruka","viber":null,"wechat":null,"whatsapp":null}`,
 		},
 		{
 			`@(json(results.favorite_color))`,
@@ -151,7 +202,7 @@ func TestRunContext(t *testing.T) {
 		},
 		{
 			`@(json(parent.urns))`,
-			`{"ext":null,"facebook":null,"fcm":null,"jiochat":null,"line":null,"mailto":null,"tel":"tel:+593979111222","telegram":null,"twitter":null,"twitterid":null,"viber":null,"wechat":null,"whatsapp":null}`,
+			`{"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":null,"tel":"tel:+593979111222","telegram":null,"twitter":null,"twitterid":null,"viber":null,"wechat":null,"whatsapp":null}`,
 		},
 		{
 			`@(json(parent.fields))`,
@@ -162,8 +213,13 @@ func TestRunContext(t *testing.T) {
 	for _, tc := range testCases {
 		actual, err := run.EvaluateTemplate(tc.template)
 		assert.NoError(t, err)
-		assert.Equal(t, tc.expected, actual)
+		assert.Equal(t, tc.expected, actual, "template mismatch for %s", tc.template)
 	}
+
+	// test with escaping
+	evaluated, err := run.EvaluateTemplateWithEscaping(`gender = @("M\" OR")`, flows.ContactQueryEscaping)
+	assert.NoError(t, err)
+	assert.Equal(t, `gender = "M\" OR"`, evaluated)
 }
 
 func TestMissingRelatedRunContext(t *testing.T) {
@@ -174,7 +230,7 @@ func TestMissingRelatedRunContext(t *testing.T) {
 	trigger, err := triggers.ReadTrigger(sa, []byte(sessionTrigger), assets.IgnoreMissing)
 	require.NoError(t, err)
 
-	eng := engine.NewBuilder().WithDefaultUserAgent("goflow-testing").Build()
+	eng := test.NewEngine()
 	session, _, err := eng.NewSession(sa, trigger)
 	require.NoError(t, err)
 
@@ -188,7 +244,7 @@ func TestMissingRelatedRunContext(t *testing.T) {
 	// check that trying to resolve a property of parent is an error
 	val, err = run.EvaluateTemplateValue(`@parent.contact`)
 	assert.NoError(t, err)
-	assert.Equal(t, types.NewXErrorf("null has no property 'contact'"), val)
+	assert.Equal(t, types.NewXErrorf("null doesn't support lookups"), val)
 
 	// we also have no child, check that it resolves to nil
 	val, err = run.EvaluateTemplateValue(`@child`)
@@ -198,5 +254,5 @@ func TestMissingRelatedRunContext(t *testing.T) {
 	// check that trying to resolve a property of child is an error
 	val, err = run.EvaluateTemplateValue(`@child.contact`)
 	assert.NoError(t, err)
-	assert.Equal(t, types.NewXErrorf("null has no property 'contact'"), val)
+	assert.Equal(t, types.NewXErrorf("null doesn't support lookups"), val)
 }

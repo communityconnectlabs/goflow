@@ -2,7 +2,7 @@
     {
         "description": "Validation fails for invalid flow reference",
         "action": {
-            "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
             "type": "start_session",
             "flow": {
                 "uuid": "33382939-babf-4982-9395-8793feb4e7c6",
@@ -20,7 +20,7 @@
     {
         "description": "Validation fails for invalid group reference",
         "action": {
-            "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
             "type": "start_session",
             "flow": {
                 "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
@@ -38,7 +38,7 @@
     {
         "description": "NOOP if no recipients",
         "action": {
-            "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
             "type": "start_session",
             "flow": {
                 "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
@@ -57,7 +57,7 @@
     {
         "description": "Session triggered event if new session can be triggered",
         "action": {
-            "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
             "type": "start_session",
             "flow": {
                 "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
@@ -66,18 +66,19 @@
             "urns": [
                 "tel:+1234567890"
             ],
-            "contacts": [
-                {
-                    "uuid": "945493e3-933f-4668-9761-ce990fae5e5c",
-                    "name": "Stavros"
-                }
-            ],
             "groups": [
                 {
                     "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
                     "name": "Testers"
                 }
             ],
+            "contacts": [
+                {
+                    "uuid": "945493e3-933f-4668-9761-ce990fae5e5c",
+                    "name": "Stavros"
+                }
+            ],
+            "contact_query": "age > 20 OR gender = @fields.gender",
             "legacy_vars": [
                 "@(\"0788123123\")"
             ]
@@ -90,6 +91,7 @@
                         "uuid": "945493e3-933f-4668-9761-ce990fae5e5c"
                     }
                 ],
+                "contact_query": "age > 20 OR gender = \"Male\"",
                 "created_on": "2018-10-18T14:20:30.000123456Z",
                 "flow": {
                     "name": "Collect Age",
@@ -134,9 +136,9 @@
                     },
                     "results": {},
                     "status": "active",
-                    "uuid": "1ae96956-4b34-433e-8d1a-f05fe6923d6d"
+                    "uuid": "e7187099-7d38-4f60-955c-325957214c42"
                 },
-                "step_uuid": "e7187099-7d38-4f60-955c-325957214c42",
+                "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "type": "session_triggered",
                 "urns": [
                     "tel:+1234567890",
@@ -146,12 +148,14 @@
         ],
         "inspection": {
             "templates": [
+                "age > 20 OR gender = @fields.gender",
                 "@(\"0788123123\")"
             ],
             "dependencies": [
-                "flow[uuid=b7cf0d83-f1c9-411c-96fd-c511a4cfa86d,name=Collect Age]",
+                "field[key=gender,name=]",
                 "group[uuid=b7cf0d83-f1c9-411c-96fd-c511a4cfa86d,name=Testers]",
-                "contact[uuid=945493e3-933f-4668-9761-ce990fae5e5c,name=Stavros]"
+                "contact[uuid=945493e3-933f-4668-9761-ce990fae5e5c,name=Stavros]",
+                "flow[uuid=b7cf0d83-f1c9-411c-96fd-c511a4cfa86d,name=Collect Age]"
             ],
             "results": []
         }
@@ -159,7 +163,7 @@
     {
         "description": "Session triggered event with create contact if set on action",
         "action": {
-            "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
             "type": "start_session",
             "flow": {
                 "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
@@ -208,9 +212,9 @@
                     },
                     "results": {},
                     "status": "active",
-                    "uuid": "1ae96956-4b34-433e-8d1a-f05fe6923d6d"
+                    "uuid": "e7187099-7d38-4f60-955c-325957214c42"
                 },
-                "step_uuid": "e7187099-7d38-4f60-955c-325957214c42",
+                "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "type": "session_triggered"
             }
         ],

@@ -5,31 +5,18 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/contactql"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/pkg/errors"
 )
 
 // Group represents a grouping of contacts. It can be static (contacts are added and removed manually through
-// [actions](#action:add_contact_groups)) or dynamic (contacts are added automatically by a query). It renders as its name in a
-// template, and has the following properties which can be accessed:
-//
-//  * `uuid` the UUID of the group
-//  * `name` the name of the group
-//
-// Examples:
-//
-//   @(foreach(contact.groups, extract, "name")) -> [Testers, Males]
-//   @(contact.groups[0].uuid) -> b7cf0d83-f1c9-411c-96fd-c511a4cfa86d
-//   @(contact.groups[1].name) -> Males
-//   @(json(contact.groups[1])) -> {"name":"Males","uuid":"4f1f98fc-27a7-4a69-bbdb-24744ba739a9"}
-//
-// @context group
+// [actions](#action:add_contact_groups)) or dynamic (contacts are added automatically by a query).
 type Group struct {
 	assets.Group
 
-	parsedQuery *contactql.ContactQuery
+	cachedQuery *contactql.ContactQuery
 }
 
 // NewGroup returns a new group object from the given group asset
@@ -40,26 +27,30 @@ func NewGroup(asset assets.Group) *Group {
 // Asset returns the underlying asset
 func (g *Group) Asset() assets.Group { return g.Group }
 
-// ParsedQuery returns the parsed query of a dynamic group (cached)
-func (g *Group) ParsedQuery() (*contactql.ContactQuery, error) {
-	if g.Query() != "" && g.parsedQuery == nil {
+// the parsed query of a dynamic group (cached)
+func (g *Group) parsedQuery(env envs.Environment, fields *FieldAssets) (*contactql.ContactQuery, error) {
+	if g.Query() != "" && g.cachedQuery == nil {
+		fieldResolver := func(key string) assets.Field {
+			return fields.Get(key)
+		}
+
 		var err error
-		if g.parsedQuery, err = contactql.ParseQuery(g.Query()); err != nil {
+		if g.cachedQuery, err = contactql.ParseQuery(g.Query(), env.RedactionPolicy(), fieldResolver); err != nil {
 			return nil, err
 		}
 	}
-	return g.parsedQuery, nil
+	return g.cachedQuery, nil
 }
 
 // IsDynamic returns whether this group is dynamic
 func (g *Group) IsDynamic() bool { return g.Query() != "" }
 
 // CheckDynamicMembership returns whether the given contact belongs in this dynamic group
-func (g *Group) CheckDynamicMembership(env utils.Environment, contact *Contact) (bool, error) {
+func (g *Group) CheckDynamicMembership(env envs.Environment, contact *Contact, fields *FieldAssets) (bool, error) {
 	if !g.IsDynamic() {
 		return false, errors.Errorf("can't check membership on a non-dynamic group")
 	}
-	parsedQuery, err := g.ParsedQuery()
+	parsedQuery, err := g.parsedQuery(env, fields)
 	if err != nil {
 		return false, err
 	}
@@ -76,7 +67,12 @@ func (g *Group) Reference() *assets.GroupReference {
 }
 
 // ToXValue returns a representation of this object for use in expressions
-func (g *Group) ToXValue(env utils.Environment) types.XValue {
+//
+//   uuid:text -> the UUID of the group
+//   name:text -> the name of the group
+//
+// @context group
+func (g *Group) ToXValue(env envs.Environment) types.XValue {
 	return types.NewXObject(map[string]types.XValue{
 		"uuid": types.NewXText(string(g.UUID())),
 		"name": types.NewXText(g.Name()),
@@ -155,7 +151,7 @@ func (l *GroupList) Count() int {
 }
 
 // ToXValue returns a representation of this object for use in expressions
-func (l GroupList) ToXValue(env utils.Environment) types.XValue {
+func (l GroupList) ToXValue(env envs.Environment) types.XValue {
 	array := make([]types.XValue, len(l.groups))
 	for i, group := range l.groups {
 		array[i] = group.ToXValue(env)

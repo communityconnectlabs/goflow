@@ -5,9 +5,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,7 +22,7 @@ func TestLegacyExtra(t *testing.T) {
 	server.Start()
 	defer server.Close()
 
-	session, _, err := test.CreateTestSession(server.URL, nil)
+	session, _, err := test.CreateTestSession(server.URL, envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	run := session.Runs()[0]
@@ -41,7 +42,7 @@ func TestLegacyExtra(t *testing.T) {
 		{"@(legacy_extra.array[1])", `x`},
 		{"@legacy_extra.object.FOO", `bar`},
 		{`@(legacy_extra.object["1"])`, `xx`},
-		{"@legacy_extra", `{address: {state: WA}, array: [1, x], bool: true, number: 123.34, object: {1: xx, foo: bar}, source: website, text: hello, webhook: {"bool": true, "number": 123.34, "text": "hello", "object": {"foo": "bar", "1": "xx"}, "array": [1, "x"]}}`},
+		{"@legacy_extra", `{address: {state: WA}, array: [1, x], bool: true, entities: {location: [{confidence: 1, value: Quito}]}, intent: {"intents":[{"name":"book_flight","confidence":0.5},{"name":"book_hotel","confidence":0.25}],"entities":{"location":[{"value":"Quito","confidence":1}]}}, intents: [{confidence: 0.5, name: book_flight}, {confidence: 0.25, name: book_hotel}], number: 123.34, object: {1: xx, foo: bar}, source: website, text: hello, webhook: {"bool": true, "number": 123.34, "text": "hello", "object": {"foo": "bar", "1": "xx"}, "array": [1, "x"]}}`},
 	}
 	for _, tc := range tests {
 		output, err := run.EvaluateTemplate(tc.template)
@@ -50,7 +51,7 @@ func TestLegacyExtra(t *testing.T) {
 	}
 
 	// can also add something which is an array
-	result := flows.NewResult("webhook", "200", "Success", "", flows.NodeUUID(""), "", []byte(`[{"foo": 123}, {"foo": 345}]`), utils.Now())
+	result := flows.NewResult("webhook", "200", "Success", "", flows.NodeUUID(""), "", []byte(`[{"foo": 123}, {"foo": 345}]`), dates.Now())
 	run.SaveResult(result)
 
 	output, err := run.EvaluateTemplate(`@(legacy_extra[0])`)

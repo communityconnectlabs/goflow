@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 	"github.com/greatnonprofits-nfp/goflow/flows/routers"
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/random"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -38,10 +40,8 @@ func TestRouterTypes(t *testing.T) {
 	assetsJSON, err := ioutil.ReadFile("testdata/_assets.json")
 	require.NoError(t, err)
 
-	server := test.NewTestHTTPServer(49993)
-
 	for _, typeName := range routers.RegisteredTypes() {
-		testRouterType(t, assetsJSON, typeName, server.URL)
+		testRouterType(t, assetsJSON, typeName)
 	}
 }
 
@@ -51,7 +51,7 @@ type inspectionResults struct {
 	Results      []*flows.ResultInfo `json:"results"`
 }
 
-func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string, testServerURL string) {
+func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 	testFile, err := ioutil.ReadFile(fmt.Sprintf("testdata/%s.json", typeName))
 	require.NoError(t, err)
 
@@ -68,14 +68,14 @@ func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string, t
 	err = json.Unmarshal(testFile, &tests)
 	require.NoError(t, err)
 
-	defer utils.SetTimeSource(utils.DefaultTimeSource)
-	defer utils.SetUUIDGenerator(utils.DefaultUUIDGenerator)
-	defer utils.SetRand(utils.DefaultRand)
+	defer dates.SetNowSource(dates.DefaultNowSource)
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
+	defer random.SetGenerator(random.DefaultGenerator)
 
 	for _, tc := range tests {
-		utils.SetTimeSource(test.NewFixedTimeSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
-		utils.SetUUIDGenerator(test.NewSeededUUIDGenerator(12345))
-		utils.SetRand(utils.NewSeededRand(123456))
+		dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
+		uuids.SetGenerator(uuids.NewSeededGenerator(12345))
+		random.SetGenerator(random.NewSeededGenerator(123456))
 
 		testName := fmt.Sprintf("test '%s' for router type '%s'", tc.Description, typeName)
 
@@ -84,7 +84,7 @@ func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string, t
 		assetsJSON = test.JSONReplace(assetsJSON, routerPath, tc.Router)
 
 		// create session assets
-		sa, err := test.CreateSessionAssets(assetsJSON, testServerURL)
+		sa, err := test.CreateSessionAssets(assetsJSON, "")
 		require.NoError(t, err)
 
 		// now try to read the flow, and if we expect a read error, check that
@@ -111,9 +111,9 @@ func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string, t
 		contact, err := flows.ReadContact(sa, json.RawMessage(contactJSON), assets.PanicOnMissing)
 		require.NoError(t, err)
 
-		trigger := triggers.NewManualTrigger(utils.NewEnvironmentBuilder().Build(), flow.Reference(), contact, nil)
+		trigger := triggers.NewManual(envs.NewBuilder().Build(), flow.Reference(), contact, nil)
 
-		eng := engine.NewBuilder().WithDefaultUserAgent("goflow-testing").Build()
+		eng := test.NewEngine()
 		session, _, err := eng.NewSession(sa, trigger)
 		require.NoError(t, err)
 

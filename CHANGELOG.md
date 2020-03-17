@@ -1,10 +1,185 @@
-v0.41.14.26
+v0.55.0
 ----------
- * Add Trackable Links
+ * Update start_session action to use escaping when evaluating the contact query
+ * Add support for escaping expressions in templates
 
-v0.41.14.19
+v0.54.3
 ----------
- * Add Gift card and Lookup
+ * Relax requirement for field assets to have UUID set since engine doesn't use this
+
+v0.54.2
+----------
+ * Fix naming in mobile bindings
+
+v0.54.1
+----------
+ * Fix docstring for UPPER()
+
+v0.54.0
+----------
+ * NewEnvironmentBuilder() -> envs.NewBuilder() to match engine.NewBuilder()
+ * Include classifiers in flow dependency inspection
+
+v0.53.1
+----------
+ * Add classification service for Bothub
+
+v0.53.0
+----------
+ * Record arrays of http logs on classifier_called and airtime_transferred events
+
+v0.52.1
+----------
+ * Modify grammar to allow result names that start with underscores
+
+v0.52.0
+----------
+ * All service factory methods should return an error if service can't be returned
+ * Rework airtime transfer nodes to function more like NLU nodes
+ * Add classification service implementation for LUIS
+
+v0.51.0
+----------
+ * Add NLU support: a classify action, a classification service and various router tests
+
+v0.50.4
+----------
+ * Revert change to operands for media waits
+
+v0.50.3
+----------
+ * Fix migrating operands on rulesets waiting for media
+ * Change autocompletion type of related_run.results to any since we can't autocomplete it
+
+v0.50.2
+----------
+ * Fix migration of localization when flow has unused base translations
+
+v0.50.1
+----------
+ * Have a single HTTPClient on the engine instead of every service having its own
+
+v0.50.0
+----------
+ * Fix formatting runsummary with missing flow
+ * Add contact_query field to start_session actions
+ * Rework services so they take a session and resolve to a provider that does the work
+
+v0.49.0
+----------
+ * Rework webhook calling code as a service and fix not saving result when connection errors
+
+v0.48.2
+----------
+ * Include sender and recipient in airtime events
+
+v0.48.1
+----------
+ * Add .Source() to SessionAssets interface
+
+v0.48.0
+----------
+ * Unexport things that no longer need to be exported now that we've ditched extensions, clean up names of typed things
+ * Remove transferto extension functionality and instead have standard transfer_airtime action which defers to an airtime service
+
+v0.47.3
+----------
+ * completions.json should include section for session-less contexts
+
+v0.47.2
+----------
+ * Add FlowReference to FlowRun interface and add some more tests
+
+v0.47.1
+----------
+ * Renamed errored statuses to failed, replace fatal error events with failure events
+
+v0.47.0
+----------
+ * Allow loading of runs with missing flows
+ * A terminal enter_flow action should leave existing runs as completed instead of interrupted
+ * Make documented item titles into actual links so it's easier to get the link of a particular item in the docs
+
+v0.46.0
+----------
+ * Add UUID to assets.Field
+
+v0.45.2
+----------
+ * Fix parsing context references like foo.0
+
+v0.45.1
+----------
+ * ContactSQL query parsing should error if URN schenme used when URN redaction is enabled, and validate fields
+
+v0.45.0
+----------
+ * urn_parts should error for non-URNs and so Wrap migrated urn_parts expressions with default to catch errors
+ * Migrate non-tel URN types using urn_parts(..).path
+ * Redacted URNs should still have scheme, and format_urn should work for redacted URNs
+
+v0.44.4
+----------
+ * Set redaction policy in visitor constructor for contactql
+
+v0.44.3
+----------
+ * Fix parsing of implicit conditions in contactql
+
+v0.44.2
+----------
+ * Add UUID() to Session interface
+
+v0.44.1
+----------
+ * Make trigger.params null for trigger types that don't use it, non-null for those that do
+
+v0.44.0
+----------
+ * Add UUID field to sessions
+ * Rework trigger.params to be an XObject and always non-null in expressions
+ * Implement a week_number function which matches Excel's WEEKNUM
+
+v0.43.2
+----------
+ * rename voice trigger to be more consistent
+
+v0.43.1
+----------
+ * add ivr flow trigger constructor
+
+v0.43.0
+----------
+ * Allow array lookups like foo.0
+ * More re-organization of utils code into smaller packages
+
+v0.42.0
+----------
+ * Move Environment type and environment based date parsing to new envs package
+ * Move Date and TimeOfDay types to new dates package
+ * Do template and dependency enumeration by reflection
+
+v0.41.18
+----------
+ * Drop current template rewriting functionality which isn't used and can't be used with migrations
+ * Generate context map from docstrings
+
+v0.41.17
+----------
+ * Add SetURN function to Msg
+ * Fix localization UUID in test action holder flow
+ * Update send_email action to allow localization of subject and body
+ * Reorganize docgen code to make it easier to add new doc outputs
+
+v0.41.16
+----------
+ * Allow setting channel on a non-tel URN if it doesn't have a channel
+ * Deprecate parent.run and child.run in the context and move those fields up one level
+
+v0.41.15
+----------
+ * Tweak to goflow interfaces to allow introspection into contactql
+ * Include external ID of msg on input expression context
 
 v0.41.14
 ----------

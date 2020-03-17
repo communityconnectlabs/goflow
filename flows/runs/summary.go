@@ -2,8 +2,10 @@ package runs
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
@@ -13,6 +15,7 @@ import (
 type runSummary struct {
 	uuid    flows.RunUUID
 	flow    flows.Flow
+	flowRef *assets.FlowReference
 	contact *flows.Contact
 	status  flows.RunStatus
 	results flows.Results
@@ -23,6 +26,7 @@ func newRunSummaryFromRun(run flows.FlowRun) flows.RunSummary {
 	return &runSummary{
 		uuid:    run.UUID(),
 		flow:    run.Flow(),
+		flowRef: run.Flow().Reference(),
 		contact: run.Contact().Clone(),
 		status:  run.Status(),
 		results: run.Results().Clone(),
@@ -49,8 +53,19 @@ func newRelatedRunContext(run flows.RunSummary) *relatedRunContext {
 	return &relatedRunContext{run: run}
 }
 
-// RootContext returns the properties available in expressions for @parent and @child
-func (c *relatedRunContext) Context(env utils.Environment) map[string]types.XValue {
+// Context returns the properties available in expressions for @parent and @child
+//
+//   __default__:text -> the contact name and flow UUID
+//   uuid:text -> the UUID of the run
+//   contact:contact -> the contact of the run
+//   flow:flow -> the flow of the run
+//   fields:fields -> the custom field values of the run's contact
+//   urns:urns -> the URN values of the run's contact
+//   results:any -> the results saved by the run
+//   status:text -> the current status of the run
+//
+// @context related_run
+func (c *relatedRunContext) Context(env envs.Environment) map[string]types.XValue {
 	var urns, fields types.XValue
 	if c.run.Contact() != nil {
 		urns = flows.ContextFunc(env, c.run.Contact().URNs().MapContext)
@@ -58,20 +73,23 @@ func (c *relatedRunContext) Context(env utils.Environment) map[string]types.XVal
 	}
 
 	return map[string]types.XValue{
-		"__default__": types.NewXText(formatRunSummary(env, c.run)),
-		"run":         flows.ContextFunc(env, c.RunContext),
+		"__default__": types.NewXText(FormatRunSummary(env, c.run)),
+		"uuid":        types.NewXText(string(c.run.UUID())),
+		"run":         flows.ContextFunc(env, c.RunContext), // deprecated to be removed in 13.1
 		"contact":     flows.Context(env, c.run.Contact()),
+		"flow":        flows.Context(env, c.run.Flow()),
 		"urns":        urns,
 		"fields":      fields,
 		"results":     flows.Context(env, c.run.Results()),
+		"status":      types.NewXText(string(c.run.Status())),
 	}
 }
 
 // Context returns the properties available in expressions. Run summaries expose a
 // subset of the properties exposed by a real run.
-func (c *relatedRunContext) RunContext(env utils.Environment) map[string]types.XValue {
+func (c *relatedRunContext) RunContext(env envs.Environment) map[string]types.XValue {
 	return map[string]types.XValue{
-		"__default__": types.NewXText(formatRunSummary(env, c.run)),
+		"__default__": types.NewXText(FormatRunSummary(env, c.run)),
 		"uuid":        types.NewXText(string(c.run.UUID())),
 		"contact":     flows.Context(env, c.run.Contact()),
 		"flow":        flows.Context(env, c.run.Flow()),
@@ -80,12 +98,23 @@ func (c *relatedRunContext) RunContext(env utils.Environment) map[string]types.X
 	}
 }
 
-func formatRunSummary(env utils.Environment, run flows.RunSummary) string {
-	s := "@" + run.Flow().Name()
-	if run.Contact() != nil {
-		s = run.Contact().Format(env) + s
+// FormatRunSummary formats an instance of the RunSummary interface
+func FormatRunSummary(env envs.Environment, run flows.RunSummary) string {
+	var flow, contact string
+
+	if run.Flow() != nil {
+		flow = run.Flow().Name()
+	} else {
+		flow = "<missing>"
 	}
-	return s
+
+	if run.Contact() != nil {
+		contact = run.Contact().Format(env)
+	} else {
+		contact = "<nocontact>"
+	}
+
+	return fmt.Sprintf("%s@%s", contact, flow)
 }
 
 //------------------------------------------------------------------------------------------
@@ -95,7 +124,7 @@ func formatRunSummary(env utils.Environment, run flows.RunSummary) string {
 type runSummaryEnvelope struct {
 	UUID    flows.RunUUID         `json:"uuid" validate:"uuid4"`
 	Flow    *assets.FlowReference `json:"flow" validate:"required,dive"`
-	Contact json.RawMessage       `json:"contact" validate:"required"`
+	Contact json.RawMessage       `json:"contact"`
 	Status  flows.RunStatus       `json:"status" validate:"required"`
 	Results flows.Results         `json:"results"`
 }
@@ -110,13 +139,14 @@ func ReadRunSummary(sessionAssets flows.SessionAssets, data json.RawMessage, mis
 
 	run := &runSummary{
 		uuid:    e.UUID,
+		flowRef: e.Flow,
 		status:  e.Status,
 		results: e.Results,
 	}
 
-	// lookup the flow
+	// lookup the actual flow
 	if run.flow, err = sessionAssets.Flows().Get(e.Flow.UUID); err != nil {
-		return nil, err
+		missing(e.Flow, err)
 	}
 
 	// read the contact
@@ -135,7 +165,7 @@ func (r *runSummary) MarshalJSON() ([]byte, error) {
 	var err error
 
 	envelope.UUID = r.uuid
-	envelope.Flow = r.flow.Reference()
+	envelope.Flow = r.flowRef
 	envelope.Status = r.status
 	envelope.Results = r.results
 

@@ -1,4 +1,4 @@
-# Goflow [![Build Status](https://travis-ci.org/nyaruka/goflow.svg?branch=master)](https://travis-ci.org/nyaruka/goflow) [![codecov](https://codecov.io/gh/nyaruka/goflow/branch/master/graph/badge.svg)](https://codecov.io/gh/nyaruka/goflow) [![Go Report Card](https://goreportcard.com/badge/github.com/greatnonprofits-nfp/goflow)](https://goreportcard.com/report/github.com/greatnonprofits-nfp/goflow)
+# Goflow ![Build Status](https://github.com/nyaruka/goflow/workflows/Test/badge.svg) [![codecov](https://codecov.io/gh/nyaruka/goflow/branch/master/graph/badge.svg)](https://codecov.io/gh/nyaruka/goflow) [![Go Report Card](https://goreportcard.com/badge/github.com/nyaruka/goflow)](https://goreportcard.com/report/github.com/nyaruka/goflow)
 
 ## Specification
 
@@ -17,9 +17,9 @@ import (
 source, _ := static.LoadSource("myassets.json")
 assets, _ := engine.NewSessionAssets(source)
 contact := flows.NewContact(assets, ...)
-env := utils.NewEnvironmentBuilder().Build()
-trigger := triggers.NewManualTrigger(env, contact, flow.Reference(), nil, nil, time.Now())
-eng := engine.NewBuilder().WithDefaultUserAgent("goflow-flowrunner").Build()
+env := envs.NewBuilder().Build()
+trigger := triggers.NewManual(env, contact, flow.Reference(), nil, nil, time.Now())
+eng := engine.NewBuilder().Build()
 session, sprint, err := eng.NewSession(assets, trigger)
 ```
 

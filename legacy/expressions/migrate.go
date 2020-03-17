@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/legacy/gen"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
@@ -110,7 +110,7 @@ func migrateLegacyTemplateAsString(template string, options *MigrateOptions) (st
 }
 
 // migrates an old expression into a new format expression
-func migrateExpression(env utils.Environment, expression string) (string, error) {
+func migrateExpression(env envs.Environment, expression string) (string, error) {
 	errListener := excellent.NewErrorListener(expression)
 
 	input := antlr.NewInputStream(expression)

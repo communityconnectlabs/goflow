@@ -3,15 +3,15 @@ package types_test
 import (
 	"testing"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestXObject(t *testing.T) {
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	object := types.NewXObject(map[string]types.XValue{
 		"foo": types.NewXText("abc"),
@@ -47,8 +47,28 @@ func TestXObject(t *testing.T) {
 	}))
 }
 
+func TestReadXObject(t *testing.T) {
+	_, err := types.ReadXObject(nil)
+	assert.EqualError(t, err, "JSON doesn't contain an object")
+	_, err = types.ReadXObject([]byte(`null`))
+	assert.EqualError(t, err, "JSON doesn't contain an object")
+	_, err = types.ReadXObject([]byte(`[]`))
+	assert.EqualError(t, err, "JSON doesn't contain an object")
+
+	obj, err := types.ReadXObject([]byte(`{}`))
+	assert.NoError(t, err)
+	test.AssertXEqual(t, obj, types.NewXObject(map[string]types.XValue{}))
+
+	obj, err = types.ReadXObject([]byte(`{"foo": "abc", "bar": 123}`))
+	assert.NoError(t, err)
+	test.AssertXEqual(t, obj, types.NewXObject(map[string]types.XValue{
+		"foo": types.NewXText("abc"),
+		"bar": types.NewXNumberFromInt(123),
+	}))
+}
+
 func TestXObjectWithDefault(t *testing.T) {
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	object := types.NewXObject(map[string]types.XValue{
 		"__default__": types.NewXText("abc-123"),
@@ -85,7 +105,7 @@ func TestXObjectWithDefault(t *testing.T) {
 }
 
 func TestXLazyObject(t *testing.T) {
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 	initialized := false
 
 	object := types.NewXLazyObject(func() map[string]types.XValue {
@@ -125,7 +145,7 @@ func TestToXObject(t *testing.T) {
 		{types.NewXObject(map[string]types.XValue{"foo": types.NewXText("bar")}), types.NewXObject(map[string]types.XValue{"foo": types.NewXText("bar")}), false},
 	}
 
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	for _, tc := range tests {
 		object, err := types.ToXObject(env, tc.value)

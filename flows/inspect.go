@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/excellent/tools"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
@@ -16,21 +15,25 @@ type FlowInfo struct {
 }
 
 type Dependencies struct {
-	Channels  []*assets.ChannelReference  `json:"channels,omitempty"`
-	Contacts  []*ContactReference         `json:"contacts,omitempty"`
-	Fields    []*assets.FieldReference    `json:"fields,omitempty"`
-	Flows     []*assets.FlowReference     `json:"flows,omitempty"`
-	Groups    []*assets.GroupReference    `json:"groups,omitempty"`
-	Labels    []*assets.LabelReference    `json:"labels,omitempty"`
-	Templates []*assets.TemplateReference `json:"templates,omitempty"`
+	Classifiers []*assets.ClassifierReference `json:"classifiers,omitempty"`
+	Channels    []*assets.ChannelReference    `json:"channels,omitempty"`
+	Contacts    []*ContactReference           `json:"contacts,omitempty"`
+	Fields      []*assets.FieldReference      `json:"fields,omitempty"`
+	Flows       []*assets.FlowReference       `json:"flows,omitempty"`
+	Groups      []*assets.GroupReference      `json:"groups,omitempty"`
+	Labels      []*assets.LabelReference      `json:"labels,omitempty"`
+	Templates   []*assets.TemplateReference   `json:"templates,omitempty"`
 }
 
+// NewDependencies creates a new dependency listing from the slice of references
 func NewDependencies(refs []assets.Reference) *Dependencies {
 	d := &Dependencies{}
 	for _, r := range refs {
 		switch typed := r.(type) {
 		case *assets.ChannelReference:
 			d.Channels = append(d.Channels, typed)
+		case *assets.ClassifierReference:
+			d.Classifiers = append(d.Classifiers, typed)
 		case *ContactReference:
 			d.Contacts = append(d.Contacts, typed)
 		case *assets.FieldReference:
@@ -43,6 +46,8 @@ func NewDependencies(refs []assets.Reference) *Dependencies {
 			d.Labels = append(d.Labels, typed)
 		case *assets.TemplateReference:
 			d.Templates = append(d.Templates, typed)
+		default:
+			panic(fmt.Sprintf("unknown dependency type reference: %v", r))
 		}
 	}
 	return d
@@ -52,6 +57,11 @@ func NewDependencies(refs []assets.Reference) *Dependencies {
 func (d *Dependencies) Check(sa SessionAssets, missing assets.MissingCallback) error {
 	for _, ref := range d.Channels {
 		if sa.Channels().Get(ref.UUID) == nil {
+			missing(ref, nil)
+		}
+	}
+	for _, ref := range d.Classifiers {
+		if sa.Classifiers().Get(ref.UUID) == nil {
 			missing(ref, nil)
 		}
 	}
@@ -83,23 +93,6 @@ func (d *Dependencies) Check(sa SessionAssets, missing assets.MissingCallback) e
 	}
 
 	return nil
-}
-
-var fieldRefPaths = [][]string{
-	{"fields"},
-	{"contact", "fields"},
-	{"parent", "fields"},
-	{"parent", "contact", "fields"},
-	{"child", "fields"},
-	{"child", "contact", "fields"},
-}
-
-// Inspectable is implemented by various flow components to allow walking the definition and extracting things like dependencies
-type Inspectable interface {
-	Inspect(func(Inspectable))
-	EnumerateTemplates(TemplateIncluder)
-	EnumerateDependencies(Localization, func(assets.Reference))
-	EnumerateResults(Node, func(*ResultInfo))
 }
 
 // ResultInfo is possible result that a flow might generate
@@ -161,149 +154,4 @@ func MergeResultInfos(specs []*ResultInfo) []*ResultInfo {
 		}
 	}
 	return merged
-}
-
-// TemplateIncluder is interface passed to EnumerateTemplates to include templates on flow entities
-type TemplateIncluder interface {
-	String(*string)
-	Slice([]string)
-	Map(map[string]string)
-	Translations(Localizable, string)
-}
-
-type templateEnumerator struct {
-	localization Localization
-	include      func(string)
-}
-
-// NewTemplateEnumerator creates a template includer for enumerating templates
-func NewTemplateEnumerator(localization Localization, include func(string)) TemplateIncluder {
-	return &templateEnumerator{localization: localization, include: include}
-}
-
-func (t *templateEnumerator) String(s *string) {
-	t.include(*s)
-}
-
-func (t *templateEnumerator) Slice(a []string) {
-	for i := range a {
-		t.include(a[i])
-	}
-}
-
-func (t *templateEnumerator) Map(m map[string]string) {
-	for k := range m {
-		t.include(m[k])
-	}
-}
-
-func (t *templateEnumerator) Translations(localizable Localizable, key string) {
-	for _, lang := range t.localization.Languages() {
-		translations := t.localization.GetTranslations(lang)
-		t.Slice(translations.GetTextArray(localizable.LocalizationUUID(), key))
-	}
-}
-
-type templateRewriter struct {
-	localization Localization
-	rewrite      func(string) string
-}
-
-// NewTemplateRewriter creates a template includer for rewriting templates
-func NewTemplateRewriter(localization Localization, rewrite func(string) string) TemplateIncluder {
-	return &templateRewriter{localization: localization, rewrite: rewrite}
-}
-
-func (t *templateRewriter) String(s *string) {
-	*s = t.rewrite(*s)
-}
-
-func (t *templateRewriter) Slice(a []string) {
-	for i := range a {
-		a[i] = t.rewrite(a[i])
-	}
-}
-
-func (t *templateRewriter) Map(m map[string]string) {
-	for k := range m {
-		m[k] = t.rewrite(m[k])
-	}
-}
-
-func (t *templateRewriter) Translations(localizable Localizable, key string) {
-	for _, lang := range t.localization.Languages() {
-		translations := t.localization.GetTranslations(lang)
-		t.Slice(translations.GetTextArray(localizable.LocalizationUUID(), key))
-	}
-}
-
-// wrapper for an asset reference to make it inspectable
-type inspectableReference struct {
-	ref assets.Reference
-}
-
-// InspectReference inspects the given asset reference if it's non-nil
-func InspectReference(ref assets.Reference, inspect func(Inspectable)) {
-	if ref != nil {
-		inspectableReference{ref: ref}.Inspect(inspect)
-	}
-}
-
-// Inspect inspects this object and any children
-func (r inspectableReference) Inspect(inspect func(Inspectable)) {
-	inspect(r)
-}
-
-// EnumerateTemplates enumerates all expressions on this object and its children
-func (r inspectableReference) EnumerateTemplates(include TemplateIncluder) {
-	if r.ref != nil && r.ref.Variable() {
-		switch typed := r.ref.(type) {
-		case *assets.GroupReference:
-			include.String(&typed.NameMatch)
-		case *assets.LabelReference:
-			include.String(&typed.NameMatch)
-		}
-	}
-}
-
-// EnumerateDependencies enumerates all dependencies on this object and its children
-func (r inspectableReference) EnumerateDependencies(localization Localization, include func(assets.Reference)) {
-	if r.ref != nil && !r.ref.Variable() {
-		include(r.ref)
-	}
-}
-
-// EnumerateResults enumerates all potential results on this object
-// Asset references can't contain results.
-func (r inspectableReference) EnumerateResults(node Node, include func(*ResultInfo)) {}
-
-// ExtractFieldReferences extracts fields references from the given template
-func ExtractFieldReferences(template string) []*assets.FieldReference {
-	fieldRefs := make([]*assets.FieldReference, 0)
-	tools.FindContextRefsInTemplate(template, RunContextTopLevels, func(path []string) {
-		isField, fieldKey := isFieldRefPath(path)
-		if isField {
-			fieldRefs = append(fieldRefs, assets.NewFieldReference(fieldKey, ""))
-		}
-	})
-	return fieldRefs
-}
-
-// checks whether the given context path is a reference to a contact field
-func isFieldRefPath(path []string) (bool, string) {
-	for _, possible := range fieldRefPaths {
-		if len(path) == len(possible)+1 {
-			matches := true
-			for i := range possible {
-				if strings.ToLower(path[i]) != possible[i] {
-					matches = false
-					break
-				}
-			}
-			if matches {
-				return true, strings.ToLower(path[len(possible)])
-			}
-		}
-	}
-	return false, ""
 }

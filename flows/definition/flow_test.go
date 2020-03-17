@@ -3,10 +3,10 @@ package definition_test
 import (
 	"encoding/json"
 	"io/ioutil"
-	"strings"
 	"testing"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/actions"
@@ -16,6 +16,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
 	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -202,13 +203,13 @@ func TestNewFlow(t *testing.T) {
     ]
 }`
 
-	session, _, err := test.CreateTestSession("", nil)
+	session, _, err := test.CreateTestSession("", envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	flow, err := definition.NewFlow(
 		assets.FlowUUID("8ca44c09-791d-453a-9799-a70dd3303306"),
-		"Test Flow",           // name
-		utils.Language("eng"), // base language
+		"Test Flow",          // name
+		envs.Language("eng"), // base language
 		flows.FlowTypeMessaging,
 		123, // revision
 		30,  // expires after minutes
@@ -217,7 +218,7 @@ func TestNewFlow(t *testing.T) {
 			definition.NewNode(
 				flows.NodeUUID("a58be63b-907d-4a1a-856b-0bb5579d7507"),
 				[]flows.Action{
-					actions.NewSendMsgAction(
+					actions.NewSendMsg(
 						flows.ActionUUID("76112ef2-790e-4b5b-84cb-e910f191a335"),
 						"Do you like beer?",
 						nil,
@@ -225,7 +226,7 @@ func TestNewFlow(t *testing.T) {
 						false,
 					),
 				},
-				routers.NewSwitchRouter(
+				routers.NewSwitch(
 					waits.NewMsgWait(nil, hints.NewImageHint()),
 					"Response 1",
 					[]*routers.Category{
@@ -242,7 +243,7 @@ func TestNewFlow(t *testing.T) {
 					},
 					"@input.text",
 					[]*routers.Case{
-						routers.NewCase(utils.UUID("9f593e22-7886-4c08-a52f-0e8780504d75"), "has_any_word", []string{"yes", "yeah"}, flows.CategoryUUID("97b9451c-2856-475b-af38-32af68100897")),
+						routers.NewCase(uuids.UUID("9f593e22-7886-4c08-a52f-0e8780504d75"), "has_any_word", []string{"yes", "yeah"}, flows.CategoryUUID("97b9451c-2856-475b-af38-32af68100897")),
 					},
 					flows.CategoryUUID("8fd08f1c-8f4e-42c1-af6c-df2db2e0eda6"),
 				),
@@ -260,7 +261,7 @@ func TestNewFlow(t *testing.T) {
 			definition.NewNode(
 				flows.NodeUUID("baaf9085-1198-4b41-9a1c-cc51c6dbec99"),
 				[]flows.Action{
-					actions.NewAddInputLabelsAction(
+					actions.NewAddInputLabels(
 						flows.ActionUUID("ad154980-7bf7-4ab8-8728-545fd6378912"),
 						[]*assets.LabelReference{
 							assets.NewLabelReference(assets.LabelUUID("3f65d88a-95dc-4140-9451-943e94e06fea"), "Spam"),
@@ -478,7 +479,7 @@ func TestReadFlow(t *testing.T) {
 	}`), flow.UI(), "ui mismatch for read flow")
 }
 
-func TestExtractAndRewriteTemplates(t *testing.T) {
+func TestExtractTemplates(t *testing.T) {
 	testCases := []struct {
 		path      string
 		uuid      string
@@ -489,9 +490,9 @@ func TestExtractAndRewriteTemplates(t *testing.T) {
 			"615b8a0f-588c-4d20-a05f-363b0b4ce6f4",
 			[]string{
 				`Hi @contact.name! What is your favorite color? (red/blue) Your number is @(format_urn(contact.urn))`,
+				`Quelle est votres couleur preferee? (rouge/blue)`,
 				`Red`,
 				`Blue`,
-				`Quelle est votres couleur preferee? (rouge/blue)`,
 				`@input.text`,
 				`red`,
 				`rouge`,
@@ -517,10 +518,10 @@ func TestExtractAndRewriteTemplates(t *testing.T) {
 				`@(format_location(contact.fields.state)) Members`,
 				`@(replace(lower(contact.name), " ", "_"))`,
 				`XXX-YYY-ZZZ`,
-				"Here is your activation token",
-				"Hi @fields.first_name, Your activation token is @fields.activation_token, your coupon is @(trigger.params.coupons[0].code)",
 				"@urns.mailto",
 				"test@@example.com",
+				"Here is your activation token",
+				"Hi @fields.first_name, Your activation token is @fields.activation_token, your coupon is @(trigger.params.coupons[0].code)",
 				`Hi @contact.name, are you ready?`,
 				`Hola @contact.name, ¿estás listo?`,
 				`Hi @contact.name, are you ready for these attachments?`,
@@ -547,18 +548,6 @@ func TestExtractAndRewriteTemplates(t *testing.T) {
 		// try extracting all templates
 		templates := flow.ExtractTemplates()
 		assert.Equal(t, tc.templates, templates, "extracted templates mismatch for flow %s[uuid=%s]", tc.path, tc.uuid)
-
-		// try rewriting all templates in uppercase
-		flow.RewriteTemplates(func(t string) string { return strings.ToUpper(t) })
-
-		// re-extract all templates
-		rewritten := flow.ExtractTemplates()
-
-		for i := range templates {
-			templates[i] = strings.ToUpper(templates[i])
-		}
-
-		assert.Equal(t, templates, rewritten)
 	}
 }
 
@@ -572,15 +561,15 @@ func TestExtractDependencies(t *testing.T) {
 			"../../test/testdata/runner/all_actions.json",
 			"8ca44c09-791d-453a-9799-a70dd3303306",
 			[]assets.Reference{
-				assets.NewLabelReference("3f65d88a-95dc-4140-9451-943e94e06fea", "Spam"),
 				assets.NewFieldReference("state", ""),
-				assets.NewGroupReference("2aad21f6-30b7-42c5-bd7f-1b720c154817", "Survey Audience"),
-				assets.NewFieldReference("activation_token", "Activation Token"),
 				assets.NewFieldReference("first_name", ""),
+				assets.NewFieldReference("activation_token", ""),
+				assets.NewFieldReference("raw_district", ""),
+				assets.NewLabelReference("3f65d88a-95dc-4140-9451-943e94e06fea", "Spam"),
+				assets.NewGroupReference("2aad21f6-30b7-42c5-bd7f-1b720c154817", "Survey Audience"),
 				assets.NewFlowReference("b7cf0d83-f1c9-411c-96fd-c511a4cfa86d", "Collect Language"),
 				flows.NewContactReference("820f5923-3369-41c6-b3cd-af577c0bd4b8", "Bob"),
 				assets.NewFieldReference("gender", "Gender"),
-				assets.NewFieldReference("raw_district", ""),
 				assets.NewFieldReference("district", "District"),
 				assets.NewChannelReference("57f1078f-88aa-46f4-a59a-948a5739c03d", "Android Channel"),
 			},
@@ -697,14 +686,14 @@ func TestClone(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		utils.SetUUIDGenerator(test.NewSeededUUIDGenerator(12345))
-		defer utils.SetUUIDGenerator(utils.DefaultUUIDGenerator)
+		uuids.SetGenerator(uuids.NewSeededGenerator(12345))
+		defer uuids.SetGenerator(uuids.DefaultGenerator)
 
 		flow, err := test.LoadFlowFromAssets(tc.path, assets.FlowUUID(tc.uuid))
 		require.NoError(t, err)
 
-		depMappings := map[utils.UUID]utils.UUID{
-			utils.UUID(tc.uuid):                    "e0af9907-e0d3-4363-99c6-324ece7f628e", // the flow itself
+		depMappings := map[uuids.UUID]uuids.UUID{
+			uuids.UUID(tc.uuid):                    "e0af9907-e0d3-4363-99c6-324ece7f628e", // the flow itself
 			"2aad21f6-30b7-42c5-bd7f-1b720c154817": "cd8a68c0-6673-4a02-98a0-7fb3ac788860", // group used in has_group test
 		}
 
@@ -719,19 +708,19 @@ func TestClone(t *testing.T) {
 		// extract all UUIDs from original definition
 		flowJSON, err := json.Marshal(flow)
 		require.NoError(t, err)
-		originalUUIDs := utils.UUID4Regex.FindAllString(string(flowJSON), -1)
+		originalUUIDs := uuids.V4Regex.FindAllString(string(flowJSON), -1)
 
 		// extract all UUIDs from cloned definition
 		cloneJSON, err := json.Marshal(clone)
 		require.NoError(t, err)
-		cloneUUIDs := utils.UUID4Regex.FindAllString(string(cloneJSON), -1)
+		cloneUUIDs := uuids.V4Regex.FindAllString(string(cloneJSON), -1)
 
 		assert.Equal(t, len(originalUUIDs), len(cloneUUIDs))
 		assert.NotContains(t, cloneUUIDs, []string{"2aad21f6-30b7-42c5-bd7f-1b720c154817"}) // group used in has_group test
 
 		for _, u1 := range originalUUIDs {
 			for _, u2 := range cloneUUIDs {
-				if u1 == u2 && depMappings[utils.UUID(u1)] != "" {
+				if u1 == u2 && depMappings[uuids.UUID(u1)] != "" {
 					assert.Fail(t, "uuid", "cloned flow contains non-dependency UUID from original flow: %s", u1)
 				}
 			}

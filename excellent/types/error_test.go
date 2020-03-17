@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestXError(t *testing.T) {
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	err1 := types.NewXError(errors.Errorf("I failed"))
 	assert.Equal(t, "error", err1.Describe())

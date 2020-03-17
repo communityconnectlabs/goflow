@@ -8,14 +8,16 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/cases"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
 )
 
 func init() {
-	RegisterType(TypeSwitch, readSwitchRouter)
+	registerType(TypeSwitch, readSwitchRouter)
 }
 
 // TypeSwitch is the constant for our switch router
@@ -23,14 +25,14 @@ const TypeSwitch string = "switch"
 
 // Case represents a single case and test in our switch
 type Case struct {
-	UUID         utils.UUID         `json:"uuid"                   validate:"required"`
+	UUID         uuids.UUID         `json:"uuid"                   validate:"required"`
 	Type         string             `json:"type"                   validate:"required"`
-	Arguments    []string           `json:"arguments,omitempty"`
+	Arguments    []string           `json:"arguments,omitempty"    engine:"localized,evaluated"`
 	CategoryUUID flows.CategoryUUID `json:"category_uuid"          validate:"required"`
 }
 
 // NewCase creates a new case
-func NewCase(uuid utils.UUID, type_ string, arguments []string, categoryUUID flows.CategoryUUID) *Case {
+func NewCase(uuid uuids.UUID, type_ string, arguments []string, categoryUUID flows.CategoryUUID) *Case {
 	return &Case{
 		UUID:         uuid,
 		Type:         type_,
@@ -40,21 +42,9 @@ func NewCase(uuid utils.UUID, type_ string, arguments []string, categoryUUID flo
 }
 
 // LocalizationUUID gets the UUID which identifies this object for localization
-func (c *Case) LocalizationUUID() utils.UUID { return utils.UUID(c.UUID) }
+func (c *Case) LocalizationUUID() uuids.UUID { return uuids.UUID(c.UUID) }
 
-// Inspect inspects this object and any children
-func (c *Case) Inspect(inspect func(flows.Inspectable)) {
-	inspect(c)
-}
-
-// EnumerateTemplates enumerates all expressions on this object and its children
-func (c *Case) EnumerateTemplates(include flows.TemplateIncluder) {
-	include.Slice(c.Arguments)
-	include.Translations(c, "arguments")
-}
-
-// EnumerateDependencies enumerates all dependencies on this object and its children
-func (c *Case) EnumerateDependencies(localization flows.Localization, include func(assets.Reference)) {
+func (c *Case) Dependencies(localization flows.Localization, include func(assets.Reference)) {
 	groupRef := func(args []string) assets.Reference {
 		// if we have two args, the second is name
 		name := ""
@@ -78,23 +68,20 @@ func (c *Case) EnumerateDependencies(localization flows.Localization, include fu
 	}
 }
 
-// EnumerateResults enumerates all potential results on this object
-func (c *Case) EnumerateResults(node flows.Node, include func(*flows.ResultInfo)) {}
-
 // SwitchRouter is a router which allows specifying 0-n cases which should each be tested in order, following
 // whichever case returns true, or if none do, then taking the default category
 type SwitchRouter struct {
-	BaseRouter
+	baseRouter
 
 	operand  string
 	cases    []*Case
 	default_ flows.CategoryUUID
 }
 
-// NewSwitchRouter creates a new switch router
-func NewSwitchRouter(wait flows.Wait, resultName string, categories []*Category, operand string, cases []*Case, defaultCategory flows.CategoryUUID) *SwitchRouter {
+// NewSwitch creates a new switch router
+func NewSwitch(wait flows.Wait, resultName string, categories []*Category, operand string, cases []*Case, defaultCategory flows.CategoryUUID) *SwitchRouter {
 	return &SwitchRouter{
-		BaseRouter: newBaseRouter(TypeSwitch, wait, resultName, categories),
+		baseRouter: newBaseRouter(TypeSwitch, wait, resultName, categories),
 		default_:   defaultCategory,
 		operand:    operand,
 		cases:      cases,
@@ -221,22 +208,16 @@ func (r *SwitchRouter) matchCase(run flows.FlowRun, step flows.Step, operand typ
 	return "", "", nil, nil
 }
 
-// Inspect inspects this object and any children
-func (r *SwitchRouter) Inspect(inspect func(flows.Inspectable)) {
-	inspect(r)
-
-	for _, cs := range r.cases {
-		cs.Inspect(inspect)
-	}
-}
-
 // EnumerateTemplates enumerates all expressions on this object and its children
-func (r *SwitchRouter) EnumerateTemplates(include flows.TemplateIncluder) {
-	include.String(&r.operand)
+func (r *SwitchRouter) EnumerateTemplates(localization flows.Localization, include func(string)) {
+	include(r.operand)
+
+	inspect.Templates(r.cases, localization, include)
 }
 
 // EnumerateDependencies enumerates all dependencies on this object and its children
 func (r *SwitchRouter) EnumerateDependencies(localization flows.Localization, include func(assets.Reference)) {
+	inspect.Dependencies(r.cases, localization, include)
 }
 
 //------------------------------------------------------------------------------------------

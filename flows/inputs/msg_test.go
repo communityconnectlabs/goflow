@@ -7,6 +7,7 @@ import (
 
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/inputs"
@@ -18,7 +19,7 @@ import (
 )
 
 func TestMsgInput(t *testing.T) {
-	session, _, err := test.CreateTestSession("", nil)
+	session, _, err := test.CreateTestSession("", envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	env := session.Environment()
@@ -35,7 +36,9 @@ func TestMsgInput(t *testing.T) {
 			"video/mp4:http://example.com/test.mp4",
 		},
 	)
-	input, err := inputs.NewMsgInput(session.Assets(), msg, time.Date(2018, 10, 22, 16, 12, 30, 123456, time.UTC))
+	msg.SetExternalID("ext12345")
+
+	input, err := inputs.NewMsg(session.Assets(), msg, time.Date(2018, 10, 22, 16, 12, 30, 123456, time.UTC))
 	require.NoError(t, err)
 
 	assert.Equal(t, "msg", input.Type())
@@ -53,10 +56,11 @@ func TestMsgInput(t *testing.T) {
 		"urn":         types.NewXText("tel:+1234567890"),
 		"text":        types.NewXText("Hi there!"),
 		"attachments": types.NewXArray(types.NewXText("image/jpg:http://example.com/test.jpg"), types.NewXText("video/mp4:http://example.com/test.mp4")),
+		"external_id": types.NewXText("ext12345"),
 	}), flows.Context(env, input))
 
 	// check marshaling to JSON
 	marshaled, err := json.Marshal(input)
 	assert.NoError(t, err)
-	assert.Equal(t, `{"type":"msg","uuid":"f51d7220-10b3-4faa-a91c-1ae70beaae3e","channel":{"uuid":"57f1078f-88aa-46f4-a59a-948a5739c03d","name":"My Android Phone"},"created_on":"2018-10-22T16:12:30.000123456Z","urn":"tel:+1234567890","text":"Hi there!","attachments":["image/jpg:http://example.com/test.jpg","video/mp4:http://example.com/test.mp4"]}`, string(marshaled))
+	assert.Equal(t, `{"type":"msg","uuid":"f51d7220-10b3-4faa-a91c-1ae70beaae3e","channel":{"uuid":"57f1078f-88aa-46f4-a59a-948a5739c03d","name":"My Android Phone"},"created_on":"2018-10-22T16:12:30.000123456Z","urn":"tel:+1234567890","text":"Hi there!","attachments":["image/jpg:http://example.com/test.jpg","video/mp4:http://example.com/test.mp4"],"external_id":"ext12345"}`, string(marshaled))
 }

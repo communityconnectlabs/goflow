@@ -5,10 +5,12 @@ import (
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
 
 	"github.com/pkg/errors"
 )
@@ -17,34 +19,36 @@ type readFunc func(flows.SessionAssets, json.RawMessage, assets.MissingCallback)
 
 var registeredTypes = map[string]readFunc{}
 
-// RegisterType registers a new type of trigger
-func RegisterType(name string, f readFunc) {
+// registers a new type of trigger
+func registerType(name string, f readFunc) {
 	registeredTypes[name] = f
 }
 
+// base of all trigger types
 type baseTrigger struct {
 	type_       string
-	environment utils.Environment
+	environment envs.Environment
 	flow        *assets.FlowReference
 	contact     *flows.Contact
 	connection  *flows.Connection
-	params      types.XValue
+	params      *types.XObject
 	triggeredOn time.Time
 }
 
-func newBaseTrigger(typeName string, env utils.Environment, flow *assets.FlowReference, contact *flows.Contact, connection *flows.Connection, params types.XValue) baseTrigger {
-	return baseTrigger{type_: typeName, environment: env, flow: flow, contact: contact, connection: connection, params: params, triggeredOn: utils.Now()}
+// create a new base trigger
+func newBaseTrigger(typeName string, env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, connection *flows.Connection, params *types.XObject) baseTrigger {
+	return baseTrigger{type_: typeName, environment: env, flow: flow, contact: contact, connection: connection, params: params, triggeredOn: dates.Now()}
 }
 
 // Type returns the type of this trigger
 func (t *baseTrigger) Type() string { return t.type_ }
 
-func (t *baseTrigger) Environment() utils.Environment { return t.environment }
-func (t *baseTrigger) Flow() *assets.FlowReference    { return t.flow }
-func (t *baseTrigger) Contact() *flows.Contact        { return t.contact }
-func (t *baseTrigger) Connection() *flows.Connection  { return t.connection }
-func (t *baseTrigger) Params() types.XValue           { return t.params }
-func (t *baseTrigger) TriggeredOn() time.Time         { return t.triggeredOn }
+func (t *baseTrigger) Environment() envs.Environment { return t.environment }
+func (t *baseTrigger) Flow() *assets.FlowReference   { return t.flow }
+func (t *baseTrigger) Contact() *flows.Contact       { return t.contact }
+func (t *baseTrigger) Connection() *flows.Connection { return t.connection }
+func (t *baseTrigger) Params() *types.XObject        { return t.params }
+func (t *baseTrigger) TriggeredOn() time.Time        { return t.triggeredOn }
 
 // Initialize initializes the session
 func (t *baseTrigger) Initialize(session flows.Session, logEvent flows.EventCallback) error {
@@ -64,7 +68,7 @@ func (t *baseTrigger) Initialize(session flows.Session, logEvent flows.EventCall
 	if t.environment != nil {
 		session.SetEnvironment(t.environment)
 	} else {
-		session.SetEnvironment(utils.NewEnvironmentBuilder().Build())
+		session.SetEnvironment(envs.NewBuilder().Build())
 	}
 
 	if t.contact != nil {
@@ -81,7 +85,12 @@ func (t *baseTrigger) InitializeRun(run flows.FlowRun, logEvent flows.EventCallb
 }
 
 // Context returns the properties available in expressions
-func (t *baseTrigger) Context(env utils.Environment) map[string]types.XValue {
+//
+//   type:text -> the type of trigger that started this session
+//   params:any -> the parameters passed to the trigger
+//
+// @context trigger
+func (t *baseTrigger) Context(env envs.Environment) map[string]types.XValue {
 	return map[string]types.XValue{
 		"type":   types.NewXText(t.type_),
 		"params": t.params,
@@ -92,16 +101,17 @@ func (t *baseTrigger) Context(env utils.Environment) map[string]types.XValue {
 // as far as the engine is concerned
 func EnsureDynamicGroups(session flows.Session, logEvent flows.EventCallback) {
 	allGroups := session.Assets().Groups()
-	added, removed, errors := session.Contact().ReevaluateDynamicGroups(session.Environment(), allGroups)
+	allFields := session.Assets().Fields()
+	added, removed, errors := session.Contact().ReevaluateDynamicGroups(session.Environment(), allGroups, allFields)
 
 	// add error event for each group we couldn't re-evaluate
 	for _, err := range errors {
-		logEvent(events.NewErrorEvent(err))
+		logEvent(events.NewError(err))
 	}
 
 	// add groups changed event for the groups we were added/removed to/from
 	if len(added) > 0 || len(removed) > 0 {
-		logEvent(events.NewContactGroupsChangedEvent(added, removed))
+		logEvent(events.NewContactGroupsChanged(added, removed))
 	}
 }
 
@@ -142,7 +152,7 @@ func (t *baseTrigger) unmarshal(sessionAssets flows.SessionAssets, e *baseTrigge
 	t.triggeredOn = e.TriggeredOn
 
 	if e.Environment != nil {
-		if t.environment, err = utils.ReadEnvironment(e.Environment); err != nil {
+		if t.environment, err = envs.ReadEnvironment(e.Environment); err != nil {
 			return errors.Wrap(err, "unable to read environment")
 		}
 	}
@@ -152,7 +162,9 @@ func (t *baseTrigger) unmarshal(sessionAssets flows.SessionAssets, e *baseTrigge
 		}
 	}
 	if e.Params != nil {
-		t.params = types.JSONToXValue(e.Params)
+		if t.params, err = types.ReadXObject(e.Params); err != nil {
+			return errors.Wrap(err, "unable to read params")
+		}
 	}
 
 	return nil

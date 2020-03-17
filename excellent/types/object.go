@@ -6,7 +6,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+
+	"github.com/pkg/errors"
 )
 
 const serializeDefaultAs = "__default__"
@@ -68,7 +71,7 @@ func (x *XObject) Render() string {
 }
 
 // Format returns the pretty text representation
-func (x *XObject) Format(env utils.Environment) string {
+func (x *XObject) Format(env envs.Environment) string {
 	if x.hasDefault() {
 		return Format(env, x.Default())
 	}
@@ -97,6 +100,19 @@ func (x *XObject) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(marshaled)
+}
+
+// ReadXObject reads an instance of this type from JSON
+func ReadXObject(data []byte) (*XObject, error) {
+	v := JSONToXValue(data)
+	switch typed := v.(type) {
+	case *XObject:
+		return typed, nil
+	case XError:
+		return nil, typed
+	default:
+		return nil, errors.New("JSON doesn't contain an object")
+	}
 }
 
 // String returns the native string representation of this type for debugging
@@ -206,7 +222,7 @@ var XObjectEmpty = NewXObject(map[string]XValue{})
 var _ json.Marshaler = (*XObject)(nil)
 
 // ToXObject converts the given value to an object
-func ToXObject(env utils.Environment, x XValue) (*XObject, XError) {
+func ToXObject(env envs.Environment, x XValue) (*XObject, XError) {
 	if utils.IsNil(x) {
 		return XObjectEmpty, nil
 	}

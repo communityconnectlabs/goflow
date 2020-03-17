@@ -10,11 +10,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/legacy/expressions"
 	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -48,9 +50,9 @@ var tests = []testTemplate{
 	{old: `@contact.tel.scheme`, new: `@(urn_parts(urns.tel).scheme)`},
 	{old: `@contact.tel.path`, new: `@(urn_parts(urns.tel).path)`},
 	{old: `@contact.tel.urn`, new: `@urns.tel`},
-	{old: `@contact.tel_e164`, new: `@(urn_parts(urns.tel).path)`},
-	{old: `@contact.twitterid`, new: `@(format_urn(urns.twitterid))`},
-	{old: `@contact.mailto`, new: `@(format_urn(urns.mailto))`},
+	{old: `@contact.tel_e164`, new: `@(default(urn_parts(urns.tel).path, ""))`},
+	{old: `@contact.twitterid`, new: `@(default(urn_parts(urns.twitterid).path, ""))`},
+	{old: `@contact.mailto`, new: `@(default(urn_parts(urns.mailto).path, ""))`},
 
 	// run variables
 	{old: `@flow`, new: `@results`},
@@ -94,7 +96,8 @@ var tests = []testTemplate{
 	{old: `@parent.contact.tel.scheme`, new: `@(urn_parts(parent.urns.tel).scheme)`},
 	{old: `@parent.contact.tel.path`, new: `@(urn_parts(parent.urns.tel).path)`},
 	{old: `@parent.contact.tel.urn`, new: `@parent.urns.tel`},
-	{old: `@parent.contact.tel_e164`, new: `@(urn_parts(parent.urns.tel).path)`},
+	{old: `@parent.contact.tel_e164`, new: `@(default(urn_parts(parent.urns.tel).path, ""))`},
+	{old: `@parent.contact.twitterid`, new: `@(default(urn_parts(parent.urns.twitterid).path, ""))`},
 
 	// input
 	{old: `@step`, new: `@input`},
@@ -227,7 +230,7 @@ func TestMigrateTemplate(t *testing.T) {
 	server := test.NewTestHTTPServer(49997)
 	defer server.Close()
 
-	session, _, err := test.CreateTestSession(server.URL, nil)
+	session, _, err := test.CreateTestSession(server.URL, envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	for _, tc := range tests {
@@ -262,7 +265,7 @@ func BenchmarkMigrateTemplate(b *testing.B) {
 
 type legacyVariables map[string]interface{}
 
-func (v legacyVariables) Context(env utils.Environment) *types.XObject {
+func (v legacyVariables) Context(env envs.Environment) *types.XObject {
 	entries := make(map[string]types.XValue, len(v))
 
 	for k, val := range v {
@@ -271,7 +274,7 @@ func (v legacyVariables) Context(env utils.Environment) *types.XObject {
 	return types.NewXObject(entries)
 }
 
-func toXType(env utils.Environment, val interface{}) types.XValue {
+func toXType(env envs.Environment, val interface{}) types.XValue {
 	if utils.IsNil(val) {
 		return nil
 	}
@@ -368,22 +371,19 @@ func TestLegacyTests(t *testing.T) {
 			tz, err := time.LoadLocation(tc.Context.Timezone)
 			require.NoError(t, err)
 
-			env := utils.NewEnvironmentBuilder().WithDateFormat(utils.DateFormatDayMonthYear).WithTimezone(tz).Build()
+			env := envs.NewBuilder().WithDateFormat(envs.DateFormatDayMonthYear).WithTimezone(tz).Build()
 			if tc.Context.Now != nil {
-				utils.SetTimeSource(test.NewFixedTimeSource(*tc.Context.Now))
-				defer utils.SetTimeSource(utils.DefaultTimeSource)
+				dates.SetNowSource(dates.NewFixedNowSource(*tc.Context.Now))
+				defer dates.SetNowSource(dates.DefaultNowSource)
 			}
 
 			migratedVars := tc.Context.Variables.Migrate().Context(env)
 			migratedVarsJSON, _ := json.Marshal(migratedVars)
 
-			_, err = excellent.EvaluateTemplate(env, migratedVars, migratedTemplate)
+			_, err = excellent.EvaluateTemplate(env, migratedVars, migratedTemplate, nil)
 
 			if len(tc.Errors) > 0 {
 				assert.Error(t, err, "expecting error evaluating template '%s' (migrated from '%s') with context %s", migratedTemplate, tc.Template, migratedVarsJSON)
-			} else {
-				// TODO enable checking of output
-				//assert.Equal(t, tc.Output, output, "output mismatch for template '%s' (migrated from '%s') with context %s", migratedTemplate, tc.Template, migratedVarsJSON)
 			}
 		}
 	}

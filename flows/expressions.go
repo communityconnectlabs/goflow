@@ -1,17 +1,20 @@
 package flows
 
 import (
+	"strconv"
+
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // Contextable is an object that can accessed in expressions as a object with properties
 type Contextable interface {
-	Context(env utils.Environment) map[string]types.XValue
+	Context(env envs.Environment) map[string]types.XValue
 }
 
 // Context generates a lazy object for use in expressions
-func Context(env utils.Environment, contextable Contextable) *types.XObject {
+func Context(env envs.Environment, contextable Contextable) *types.XObject {
 	if !utils.IsNil(contextable) {
 		return types.NewXLazyObject(func() map[string]types.XValue {
 			return contextable.Context(env)
@@ -21,7 +24,7 @@ func Context(env utils.Environment, contextable Contextable) *types.XObject {
 }
 
 // ContextFunc generates a lazy object for use in expressions
-func ContextFunc(env utils.Environment, fn func(utils.Environment) map[string]types.XValue) *types.XObject {
+func ContextFunc(env envs.Environment, fn func(envs.Environment) map[string]types.XValue) *types.XObject {
 	return types.NewXLazyObject(func() map[string]types.XValue {
 		return fn(env)
 	})
@@ -40,4 +43,9 @@ var RunContextTopLevels = []string{
 	"trigger",
 	"urns",
 	"webhook",
+}
+
+// ContactQueryEscaping
+func ContactQueryEscaping(s string) string {
+	return strconv.Quote(s)
 }

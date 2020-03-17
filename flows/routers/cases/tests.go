@@ -1,15 +1,18 @@
 package cases
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/functions"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
 
 	"github.com/nyaruka/phonenumbers"
 	"github.com/shopspring/decimal"
@@ -62,10 +65,14 @@ var XTESTS = map[string]types.XFunction{
 	"has_time":  functions.OneTextFunction(HasTime),
 	"has_phone": functions.InitialTextFunction(0, 1, HasPhone),
 	"has_email": functions.OneTextFunction(HasEmail),
-	"has_group": functions.ArgCountCheck(2, 3, HasGroup),
+	"has_group": functions.MinAndMaxArgsCheck(2, 3, HasGroup),
+
+	"has_category":   functions.ObjectAndTextsFunction(HasCategory),
+	"has_intent":     functions.ObjectTextAndNumberFunction(HasIntent),
+	"has_top_intent": functions.ObjectTextAndNumberFunction(HasTopIntent),
 
 	"has_state":    functions.OneTextFunction(HasState),
-	"has_district": HasDistrict,
+	"has_district": functions.MinAndMaxArgsCheck(1, 2, HasDistrict),
 	"has_ward":     HasWard,
 }
 
@@ -113,7 +120,7 @@ var FalseResult = types.NewXObject(map[string]types.XValue{
 //   @(has_only_text(results.webhook.category, "Failure")) -> false
 //
 // @test has_only_text(text1, text2)
-func HasOnlyText(env utils.Environment, text1 types.XText, text2 types.XText) types.XValue {
+func HasOnlyText(env envs.Environment, text1 types.XText, text2 types.XText) types.XValue {
 	if text1.Equals(text2) {
 		return NewTrueResult(text1)
 	}
@@ -130,7 +137,7 @@ func HasOnlyText(env utils.Environment, text1 types.XText, text2 types.XText) ty
 //   @(has_error("hello")) -> false
 //
 // @test has_error(value)
-func HasError(env utils.Environment, value types.XValue) types.XValue {
+func HasError(env envs.Environment, value types.XValue) types.XValue {
 	if types.IsXError(value) {
 		return NewTrueResult(types.NewXText(value.(types.XError).Error()))
 	}
@@ -152,7 +159,7 @@ func HasError(env utils.Environment, value types.XValue) types.XValue {
 //   @(has_value("")) -> false
 //
 // @test has_value(value)
-func HasValue(env utils.Environment, value types.XValue) types.XValue {
+func HasValue(env envs.Environment, value types.XValue) types.XValue {
 	if types.IsEmpty(value) || types.IsXError(value) {
 		return FalseResult
 	}
@@ -166,7 +173,7 @@ func HasValue(env utils.Environment, value types.XValue) types.XValue {
 //   @(has_group(array(), "97fe7029-3a15-4005-b0c7-277b884fc1d5")) -> false
 //
 // @test has_group(contact, group_uuid)
-func HasGroup(env utils.Environment, args ...types.XValue) types.XValue {
+func HasGroup(env envs.Environment, args ...types.XValue) types.XValue {
 	// is the first argument an array
 	array, xerr := types.ToXArray(env, args[0])
 	if xerr != nil {
@@ -209,7 +216,7 @@ func HasGroup(env utils.Environment, args ...types.XValue) types.XValue {
 //   @(has_phrase("the Quick Brown fox", "").match) ->
 //
 // @test has_phrase(text, phrase)
-func HasPhrase(env utils.Environment, text types.XText, test types.XText) types.XValue {
+func HasPhrase(env envs.Environment, text types.XText, test types.XText) types.XValue {
 	return testStringTokens(env, text, test, hasPhraseTest)
 }
 
@@ -222,7 +229,7 @@ func HasPhrase(env utils.Environment, text types.XText, test types.XText) types.
 //   @(has_all_words("the quick brown fox", "red fox")) -> false
 //
 // @test has_all_words(text, words)
-func HasAllWords(env utils.Environment, text types.XText, test types.XText) types.XValue {
+func HasAllWords(env envs.Environment, text types.XText, test types.XText) types.XValue {
 	return testStringTokens(env, text, test, hasAllWordsTest)
 }
 
@@ -235,7 +242,7 @@ func HasAllWords(env utils.Environment, text types.XText, test types.XText) type
 //   @(has_any_word("The Quick Brown Fox", "red fox").match) -> Fox
 //
 // @test has_any_word(text, words)
-func HasAnyWord(env utils.Environment, text types.XText, test types.XText) types.XValue {
+func HasAnyWord(env envs.Environment, text types.XText, test types.XText) types.XValue {
 	return testStringTokens(env, text, test, hasAnyWordTest)
 }
 
@@ -251,7 +258,7 @@ func HasAnyWord(env utils.Environment, text types.XText, test types.XText) types
 //   @(has_only_phrase("The Quick Brown Fox", "red fox")) -> false
 //
 // @test has_only_phrase(text, phrase)
-func HasOnlyPhrase(env utils.Environment, text types.XText, test types.XText) types.XValue {
+func HasOnlyPhrase(env envs.Environment, text types.XText, test types.XText) types.XValue {
 	return testStringTokens(env, text, test, hasOnlyPhraseTest)
 }
 
@@ -265,7 +272,7 @@ func HasOnlyPhrase(env utils.Environment, text types.XText, test types.XText) ty
 //   @(has_text(contact.fields.not_set)) -> false
 //
 // @test has_text(text)
-func HasText(env utils.Environment, text types.XText) types.XValue {
+func HasText(env envs.Environment, text types.XText) types.XValue {
 	// trim any whitespace
 	text = types.NewXText(strings.TrimSpace(text.Native()))
 
@@ -288,7 +295,7 @@ func HasText(env utils.Environment, text types.XText) types.XValue {
 //   @(has_beginning("The Quick Brown", "quick brown")) -> false
 //
 // @test has_beginning(text, beginning)
-func HasBeginning(env utils.Environment, text types.XText, beginning types.XText) types.XValue {
+func HasBeginning(env envs.Environment, text types.XText, beginning types.XText) types.XValue {
 	// trim both
 	hayStack := strings.TrimSpace(text.Native())
 	pinCushion := strings.TrimSpace(beginning.Native())
@@ -321,7 +328,7 @@ func HasBeginning(env utils.Environment, text types.XText, beginning types.XText
 //   @(has_pattern("Sell cheese please", "buy (\w+)")) -> false
 //
 // @test has_pattern(text, pattern)
-func HasPattern(env utils.Environment, text types.XText, pattern types.XText) types.XValue {
+func HasPattern(env envs.Environment, text types.XText, pattern types.XText) types.XValue {
 	regex, err := regexp.Compile("(?mi)" + strings.TrimSpace(pattern.Native()))
 	if err != nil {
 		return types.NewXErrorf("must be called with a valid regular expression")
@@ -347,7 +354,7 @@ func HasPattern(env utils.Environment, text types.XText, pattern types.XText) ty
 //   @(has_number("the number is forty two")) -> false
 //
 // @test has_number(text)
-func HasNumber(env utils.Environment, text types.XText) types.XValue {
+func HasNumber(env envs.Environment, text types.XText) types.XValue {
 	return testNumber(env, text, types.XNumberZero, types.XNumberZero, isNumberTest)
 }
 
@@ -360,7 +367,7 @@ func HasNumber(env utils.Environment, text types.XText) types.XValue {
 //   @(has_number_between("the number is not there", "foo", 60)) -> ERROR
 //
 // @test has_number_between(text, min, max)
-func HasNumberBetween(env utils.Environment, arg1 types.XValue, arg2 types.XValue, arg3 types.XValue) types.XValue {
+func HasNumberBetween(env envs.Environment, arg1 types.XValue, arg2 types.XValue, arg3 types.XValue) types.XValue {
 	text, xerr := types.ToXText(env, arg1)
 	if xerr != nil {
 		return xerr
@@ -386,7 +393,7 @@ func HasNumberBetween(env utils.Environment, arg1 types.XValue, arg2 types.XValu
 //   @(has_number_lt("the number is not there", "foo")) -> ERROR
 //
 // @test has_number_lt(text, max)
-func HasNumberLT(env utils.Environment, text types.XText, num types.XNumber) types.XValue {
+func HasNumberLT(env envs.Environment, text types.XText, num types.XNumber) types.XValue {
 	return testNumber(env, text, num, types.XNumberZero, isNumberLT)
 }
 
@@ -399,7 +406,7 @@ func HasNumberLT(env utils.Environment, text types.XText, num types.XNumber) typ
 //   @(has_number_lte("the number is not there", "foo")) -> ERROR
 //
 // @test has_number_lte(text, max)
-func HasNumberLTE(env utils.Environment, text types.XText, num types.XNumber) types.XValue {
+func HasNumberLTE(env envs.Environment, text types.XText, num types.XNumber) types.XValue {
 	return testNumber(env, text, num, types.XNumberZero, isNumberLTE)
 }
 
@@ -412,7 +419,7 @@ func HasNumberLTE(env utils.Environment, text types.XText, num types.XNumber) ty
 //   @(has_number_eq("the number is not there", "foo")) -> ERROR
 //
 // @test has_number_eq(text, value)
-func HasNumberEQ(env utils.Environment, text types.XText, num types.XNumber) types.XValue {
+func HasNumberEQ(env envs.Environment, text types.XText, num types.XNumber) types.XValue {
 	return testNumber(env, text, num, types.XNumberZero, isNumberEQ)
 }
 
@@ -425,7 +432,7 @@ func HasNumberEQ(env utils.Environment, text types.XText, num types.XNumber) typ
 //   @(has_number_gte("the number is not there", "foo")) -> ERROR
 //
 // @test has_number_gte(text, min)
-func HasNumberGTE(env utils.Environment, text types.XText, num types.XNumber) types.XValue {
+func HasNumberGTE(env envs.Environment, text types.XText, num types.XNumber) types.XValue {
 	return testNumber(env, text, num, types.XNumberZero, isNumberGTE)
 }
 
@@ -438,7 +445,7 @@ func HasNumberGTE(env utils.Environment, text types.XText, num types.XNumber) ty
 //   @(has_number_gt("the number is not there", "foo")) -> ERROR
 //
 // @test has_number_gt(text, min)
-func HasNumberGT(env utils.Environment, text types.XText, num types.XNumber) types.XValue {
+func HasNumberGT(env envs.Environment, text types.XText, num types.XNumber) types.XValue {
 	return testNumber(env, text, num, types.XNumberZero, isNumberGT)
 }
 
@@ -449,7 +456,7 @@ func HasNumberGT(env utils.Environment, text types.XText, num types.XNumber) typ
 //   @(has_date("there is no date here, just a year 2017")) -> false
 //
 // @test has_date(text)
-func HasDate(env utils.Environment, text types.XText) types.XValue {
+func HasDate(env envs.Environment, text types.XText) types.XValue {
 	return testDate(env, text, types.XDateTimeZero, isDateTest)
 }
 
@@ -461,7 +468,7 @@ func HasDate(env utils.Environment, text types.XText) types.XValue {
 //   @(has_date_lt("there is no date here, just a year 2017", "not date")) -> ERROR
 //
 // @test has_date_lt(text, max)
-func HasDateLT(env utils.Environment, text types.XText, date types.XDateTime) types.XValue {
+func HasDateLT(env envs.Environment, text types.XText, date types.XDateTime) types.XValue {
 	return testDate(env, text, date, isDateLTTest)
 }
 
@@ -474,7 +481,7 @@ func HasDateLT(env utils.Environment, text types.XText, date types.XDateTime) ty
 //   @(has_date_eq("there is no date here, just a year 2017", "not date")) -> ERROR
 //
 // @test has_date_eq(text, date)
-func HasDateEQ(env utils.Environment, text types.XText, date types.XDateTime) types.XValue {
+func HasDateEQ(env envs.Environment, text types.XText, date types.XDateTime) types.XValue {
 	return testDate(env, text, date, isDateEQTest)
 }
 
@@ -487,7 +494,7 @@ func HasDateEQ(env utils.Environment, text types.XText, date types.XDateTime) ty
 //   @(has_date_gt("there is no date here, just a year 2017", "not date")) -> ERROR
 //
 // @test has_date_gt(text, min)
-func HasDateGT(env utils.Environment, text types.XText, date types.XDateTime) types.XValue {
+func HasDateGT(env envs.Environment, text types.XText, date types.XDateTime) types.XValue {
 	return testDate(env, text, date, isDateGTTest)
 }
 
@@ -500,7 +507,7 @@ func HasDateGT(env utils.Environment, text types.XText, date types.XDateTime) ty
 //   @(has_time("there is no time here, just the number 25")) -> false
 //
 // @test has_time(text)
-func HasTime(env utils.Environment, text types.XText) types.XValue {
+func HasTime(env envs.Environment, text types.XText) types.XValue {
 	t, xerr := types.ToXTime(env, text)
 	if xerr == nil {
 		return NewTrueResult(t)
@@ -519,7 +526,7 @@ var emailAddressRE = regexp.MustCompile(`([\pL\pN][-_.\pL\pN]*)@([\pL\pN][-_\pL\
 //   @(has_email("i'm not sharing my email")) -> false
 //
 // @test has_email(text)
-func HasEmail(env utils.Environment, text types.XText) types.XValue {
+func HasEmail(env envs.Environment, text types.XText) types.XValue {
 	// split by whitespace
 	email := emailAddressRE.FindString(text.Native())
 	if email != "" {
@@ -539,7 +546,7 @@ func HasEmail(env utils.Environment, text types.XText) types.XValue {
 //   @(has_phone("my number is none of your business", "US")) -> false
 //
 // @test has_phone(text, country_code)
-func HasPhone(env utils.Environment, text types.XText, args ...types.XValue) types.XValue {
+func HasPhone(env envs.Environment, text types.XText, args ...types.XValue) types.XValue {
 	var country types.XText
 	var xerr types.XError
 	if len(args) == 1 {
@@ -566,6 +573,50 @@ func HasPhone(env utils.Environment, text types.XText, args ...types.XValue) typ
 	return NewTrueResult(types.NewXText(formatted))
 }
 
+// HasCategory tests whether the category of a result on of the passed in `categories`
+//
+//   @(has_category(results.webhook, "Success", "Failure")) -> true
+//   @(has_category(results.webhook, "Success", "Failure").match) -> Success
+//   @(has_category(results.webhook, "Failure")) -> false
+//
+// @test has_category(result, categories...)
+func HasCategory(env envs.Environment, resultObj *types.XObject, categories ...types.XText) types.XValue {
+	result, err := resultFromXObject(resultObj)
+	if err != nil {
+		return types.NewXErrorf("first argument must be a result")
+	}
+
+	category := types.NewXText(result.Category)
+
+	for _, textCategory := range categories {
+		if category.Equals(textCategory) {
+			return NewTrueResult(category)
+		}
+	}
+
+	return FalseResult
+}
+
+// HasIntent tests whether any intent in a classification result has `name` and minimum `confidence`
+//
+//   @(has_intent(results.intent, "book_flight", 0.5)) -> true
+//   @(has_intent(results.intent, "book_hotel", 0.2)) -> true
+//
+// @test has_intent(result, name, confidence)
+func HasIntent(env envs.Environment, result *types.XObject, name types.XText, confidence types.XNumber) types.XValue {
+	return hasIntent(result, name, confidence, false)
+}
+
+// HasTopIntent tests whether the top intent in a classification result has `name` and minimum `confidence`
+//
+//   @(has_top_intent(results.intent, "book_flight", 0.5)) -> true
+//   @(has_top_intent(results.intent, "book_hotel", 0.5)) -> false
+//
+// @test has_top_intent(result, name, confidence)
+func HasTopIntent(env envs.Environment, result *types.XObject, name types.XText, confidence types.XNumber) types.XValue {
+	return hasIntent(result, name, confidence, true)
+}
+
 // HasState tests whether a state name is contained in the `text`
 //
 //   @(has_state("Kigali").match) -> Rwanda > Kigali City
@@ -574,7 +625,7 @@ func HasPhone(env utils.Environment, text types.XText, args ...types.XValue) typ
 //   @(has_state("Boston")) -> false
 //
 // @test has_state(text)
-func HasState(env utils.Environment, text types.XText) types.XValue {
+func HasState(env envs.Environment, text types.XText) types.XValue {
 	runEnv, _ := env.(flows.RunEnvironment)
 
 	states, err := runEnv.FindLocationsFuzzy(text.Native(), flows.LocationLevelState, nil)
@@ -596,11 +647,7 @@ func HasState(env utils.Environment, text types.XText) types.XValue {
 //   @(has_district("Gasabo").match) -> Rwanda > Kigali City > Gasabo
 //
 // @test has_district(text, state)
-func HasDistrict(env utils.Environment, args ...types.XValue) types.XValue {
-	if len(args) != 1 && len(args) != 2 {
-		return types.NewXErrorf("takes one or two arguments, got %d", len(args))
-	}
-
+func HasDistrict(env envs.Environment, args ...types.XValue) types.XValue {
 	runEnv, _ := env.(flows.RunEnvironment)
 
 	var text, stateText types.XText
@@ -655,7 +702,7 @@ func HasDistrict(env utils.Environment, args ...types.XValue) types.XValue {
 //   @(has_ward("Gisozi").match) -> Rwanda > Kigali City > Gasabo > Gisozi
 //
 // @test has_ward(text, district, state)
-func HasWard(env utils.Environment, args ...types.XValue) types.XValue {
+func HasWard(env envs.Environment, args ...types.XValue) types.XValue {
 	if len(args) != 1 && len(args) != 3 {
 		return types.NewXErrorf("takes one or three arguments, got %d", len(args))
 	}
@@ -718,7 +765,7 @@ func HasWard(env utils.Environment, args ...types.XValue) types.XValue {
 
 type stringTokenTest func(origHayTokens []string, hayTokens []string, pinTokens []string) types.XValue
 
-func testStringTokens(env utils.Environment, str types.XText, testStr types.XText, testFunc stringTokenTest) types.XValue {
+func testStringTokens(env envs.Environment, str types.XText, testStr types.XText, testFunc stringTokenTest) types.XValue {
 	hayStack := strings.TrimSpace(str.Native())
 	needle := strings.TrimSpace(testStr.Native())
 
@@ -835,7 +882,7 @@ func hasOnlyPhraseTest(origHays []string, hays []string, pins []string) types.XV
 //------------------------------------------------------------------------------------------
 
 // ParseDecimalFuzzy parses a decimal from a string
-func ParseDecimalFuzzy(val string, format *utils.NumberFormat) (decimal.Decimal, error) {
+func ParseDecimalFuzzy(val string, format *envs.NumberFormat) (decimal.Decimal, error) {
 	cleaned := strings.TrimSpace(val)
 
 	// remove digit grouping symbol
@@ -849,7 +896,7 @@ func ParseDecimalFuzzy(val string, format *utils.NumberFormat) (decimal.Decimal,
 
 type decimalTest func(value decimal.Decimal, test1 decimal.Decimal, test2 decimal.Decimal) bool
 
-func testNumber(env utils.Environment, str types.XText, testNum1 types.XNumber, testNum2 types.XNumber, testFunc decimalTest) types.XValue {
+func testNumber(env envs.Environment, str types.XText, testNum1 types.XNumber, testNum2 types.XNumber, testFunc decimalTest) types.XValue {
 	// create a number finding regex based on current environment
 	pattern := regexp.MustCompile(fmt.Sprintf(`[-+]?([\pN\%[1]s]+(\%[2]s[\pN]+)?|(\W|^)\%[2]s[\pN]+)`, env.NumberFormat().DigitGroupingSymbol, env.NumberFormat().DecimalSymbol))
 
@@ -898,15 +945,15 @@ func isNumberBetween(value decimal.Decimal, test1 decimal.Decimal, test2 decimal
 // Date Test Functions
 //------------------------------------------------------------------------------------------
 
-type dateTest func(utils.Date, utils.Date) bool
+type dateTest func(dates.Date, dates.Date) bool
 
-func testDate(env utils.Environment, str types.XText, testDate types.XDateTime, testFunc dateTest) types.XValue {
+func testDate(env envs.Environment, str types.XText, testDate types.XDateTime, testFunc dateTest) types.XValue {
 	// first parse with time filling which will be the test result
 	value, xerr := types.ToXDateTimeWithTimeFill(env, str)
 
 	// but comparsion should be against only the date portions
-	valueAsDate := utils.ExtractDate(value.In(env.Timezone()).Native())
-	testAsDate := utils.ExtractDate(testDate.In(env.Timezone()).Native())
+	valueAsDate := dates.ExtractDate(value.In(env.Timezone()).Native())
+	testAsDate := dates.ExtractDate(testDate.In(env.Timezone()).Native())
 
 	if xerr != nil {
 		return FalseResult
@@ -919,18 +966,64 @@ func testDate(env utils.Environment, str types.XText, testDate types.XDateTime, 
 	return FalseResult
 }
 
-func isDateTest(value utils.Date, test utils.Date) bool {
+func isDateTest(value dates.Date, test dates.Date) bool {
 	return true
 }
 
-func isDateLTTest(value utils.Date, test utils.Date) bool {
+func isDateLTTest(value dates.Date, test dates.Date) bool {
 	return value.Compare(test) < 0
 }
 
-func isDateEQTest(value utils.Date, test utils.Date) bool {
+func isDateEQTest(value dates.Date, test dates.Date) bool {
 	return value.Compare(test) == 0
 }
 
-func isDateGTTest(value utils.Date, test utils.Date) bool {
+func isDateGTTest(value dates.Date, test dates.Date) bool {
 	return value.Compare(test) > 0
+}
+
+//------------------------------------------------------------------------------------------
+// Result Test helpers
+//------------------------------------------------------------------------------------------
+
+// loads a result from an object
+func resultFromXObject(object *types.XObject) (*flows.Result, error) {
+	marshaled, _ := json.Marshal(object)
+	result := &flows.Result{}
+	err := utils.UnmarshalAndValidate(marshaled, result)
+	return result, err
+}
+
+func hasIntent(resultObj *types.XObject, name types.XText, confidence types.XNumber, topOnly bool) types.XValue {
+	result, err := resultFromXObject(resultObj)
+	if err != nil {
+		return types.NewXErrorf("first argument must be a result")
+	}
+
+	// extra should contain the NLU classification
+	classification := &flows.Classification{}
+	json.Unmarshal(result.Extra, classification)
+
+	// which intents will be considered
+	intents := classification.Intents
+	if topOnly && len(intents) > 0 {
+		intents = []flows.ExtractedIntent{classification.Intents[0]}
+	}
+
+	for _, intent := range intents {
+		intentName := types.NewXText(intent.Name)
+		if intentName.Equals(name) && intent.Confidence.GreaterThanOrEqual(confidence.Native()) {
+			// build extra as a mapping of entity names to most likely values
+			extra := make(map[string]types.XValue, len(classification.Entities))
+			for entitiyName, possibilities := range classification.Entities {
+				if len(possibilities) > 0 {
+					extra[entitiyName] = types.NewXText(possibilities[0].Value)
+				}
+			}
+
+			return NewTrueResultWithExtra(intentName, types.NewXObject(extra))
+		}
+	}
+
+	return FalseResult
 }

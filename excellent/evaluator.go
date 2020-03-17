@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/functions"
 	"github.com/greatnonprofits-nfp/goflow/excellent/gen"
 	"github.com/greatnonprofits-nfp/goflow/excellent/operators"
@@ -13,8 +14,11 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
+// Escaping is a function applied to expressions in a template after they've been evaluated
+type Escaping func(string) string
+
 // EvaluateTemplate evaluates the passed in template
-func EvaluateTemplate(env utils.Environment, context *types.XObject, template string) (string, error) {
+func EvaluateTemplate(env envs.Environment, context *types.XObject, template string, escaping Escaping) (string, error) {
 	var buf strings.Builder
 
 	err := VisitTemplate(template, context.Properties(), func(tokenType XTokenType, token string) error {
@@ -30,8 +34,14 @@ func EvaluateTemplate(env utils.Environment, context *types.XObject, template st
 			}
 
 			// if not, stringify value and append to the output
-			strValue, _ := types.ToXText(env, value)
-			buf.WriteString(strValue.Native())
+			asText, _ := types.ToXText(env, value)
+			asString := asText.Native()
+
+			if escaping != nil {
+				asString = escaping(asString)
+			}
+
+			buf.WriteString(asString)
 		}
 		return nil
 	})
@@ -42,7 +52,7 @@ func EvaluateTemplate(env utils.Environment, context *types.XObject, template st
 // EvaluateTemplateValue is equivalent to EvaluateTemplate except in the case where the template contains
 // a single identifier or expression, ie: "@contact" or "@(first(contact.urns))". In these cases we return
 // the typed value from EvaluateExpression instead of stringifying the result.
-func EvaluateTemplateValue(env utils.Environment, context *types.XObject, template string) (types.XValue, error) {
+func EvaluateTemplateValue(env envs.Environment, context *types.XObject, template string) (types.XValue, error) {
 	template = strings.TrimSpace(template)
 	scanner := NewXScanner(strings.NewReader(template), context.Properties())
 
@@ -61,13 +71,13 @@ func EvaluateTemplateValue(env utils.Environment, context *types.XObject, templa
 	}
 
 	// otherwise fallback to full template evaluation
-	asStr, err := EvaluateTemplate(env, context, template)
+	asStr, err := EvaluateTemplate(env, context, template, nil)
 	return types.NewXText(asStr), err
 }
 
 // EvaluateExpression evalutes the passed in Excellent expression, returning the typed value it evaluates to,
 // which might be an error, e.g. "2 / 3" or "contact.fields.age"
-func EvaluateExpression(env utils.Environment, context *types.XObject, expression string) types.XValue {
+func EvaluateExpression(env envs.Environment, context *types.XObject, expression string) types.XValue {
 	visitor := newEvaluationVisitor(env, context)
 	output, err := VisitExpression(expression, visitor)
 	if err != nil {
@@ -81,12 +91,12 @@ func EvaluateExpression(env utils.Environment, context *types.XObject, expressio
 type visitor struct {
 	gen.BaseExcellent2Visitor
 
-	env     utils.Environment
+	env     envs.Environment
 	context *types.XObject
 }
 
 // creates a new visitor for evaluation
-func newEvaluationVisitor(env utils.Environment, context *types.XObject) *visitor {
+func newEvaluationVisitor(env envs.Environment, context *types.XObject) *visitor {
 	return &visitor{env: env, context: context}
 }
 
@@ -145,17 +155,15 @@ func (v *visitor) VisitDotLookup(ctx *gen.DotLookupContext) interface{} {
 		return container
 	}
 
-	property := ctx.NAME().GetText()
+	var lookup types.XText
 
-	object, isObject := container.(*types.XObject)
-	if isObject && object != nil {
-		value, exists := object.Get(property)
-		if exists {
-			return value
-		}
+	if ctx.NAME() != nil {
+		lookup = types.NewXText(ctx.NAME().GetText())
+	} else {
+		lookup = types.NewXText(ctx.INTEGER().GetText())
 	}
 
-	return types.NewXErrorf("%s has no property '%s'", types.Describe(container), property)
+	return resolveLookup(v.env, container, lookup, lookupNotationDot)
 }
 
 // VisitArrayLookup deals with lookups such as foo[5] or foo["key with spaces"]
@@ -165,39 +173,9 @@ func (v *visitor) VisitArrayLookup(ctx *gen.ArrayLookupContext) interface{} {
 		return container
 	}
 
-	expression := toXValue(v.Visit(ctx.Expression()))
+	lookup := toXValue(v.Visit(ctx.Expression()))
 
-	// if left-hand side is an array, then this is an index
-	array, isArray := container.(*types.XArray)
-	if isArray && array != nil {
-		index, xerr := types.ToInteger(v.env, expression)
-		if xerr != nil {
-			return xerr
-		}
-
-		if index >= array.Count() || index < -array.Count() {
-			return types.NewXErrorf("index %d out of range for %d items", index, array.Count())
-		}
-		if index < 0 {
-			index += array.Count()
-		}
-		return array.Get(index)
-	}
-
-	// if left-hand side is an object, then this is a property lookup
-	object, isObject := container.(*types.XObject)
-	if isObject && object != nil {
-		lookup, xerr := types.ToXText(v.env, expression)
-		if xerr != nil {
-			return xerr
-		}
-
-		// [] notation doesn't error
-		value, _ := object.Get(lookup.Native())
-		return value
-	}
-
-	return types.NewXErrorf("%s is not indexable", types.Describe(container))
+	return resolveLookup(v.env, container, lookup, lookupNotationArray)
 }
 
 // VisitFunctionCall deals with function calls like TITLE(foo.bar)
@@ -339,4 +317,50 @@ func toXValue(val interface{}) types.XValue {
 		panic("Attempt to convert a non XValue to an XValue")
 	}
 	return asX
+}
+
+type lookupNotation string
+
+const (
+	lookupNotationDot   lookupNotation = "dot"
+	lookupNotationArray lookupNotation = "array"
+)
+
+func resolveLookup(env envs.Environment, container types.XValue, lookup types.XValue, notation lookupNotation) types.XValue {
+	// if left-hand side is an array, then this is an index
+	array, isArray := container.(*types.XArray)
+	if isArray && array != nil {
+		index, xerr := types.ToInteger(env, lookup)
+		if xerr != nil {
+			return xerr
+		}
+
+		if index >= array.Count() || index < -array.Count() {
+			return types.NewXErrorf("index %d out of range for %d items", index, array.Count())
+		}
+		if index < 0 {
+			index += array.Count()
+		}
+		return array.Get(index)
+	}
+
+	// if left-hand side is an object, then this is a property lookup
+	object, isObject := container.(*types.XObject)
+	if isObject && object != nil {
+		property, xerr := types.ToXText(env, lookup)
+		if xerr != nil {
+			return xerr
+		}
+
+		value, exists := object.Get(property.Native())
+
+		// [] notation doesn't error for non-existent properties, . does
+		if !exists && notation == lookupNotationDot {
+			return types.NewXErrorf("%s has no property '%s'", types.Describe(container), property.Native())
+		}
+
+		return value
+	}
+
+	return types.NewXErrorf("%s doesn't support lookups", types.Describe(container))
 }

@@ -1,17 +1,19 @@
 package flows
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
-var redactedURN = types.NewXText("********")
+var redacted = "********"
 
 func init() {
 	utils.Validator.RegisterValidation("urn", ValidateURN)
@@ -36,16 +38,6 @@ func ValidateURNScheme(fl validator.FieldLevel) bool {
 //  - _twitterid:54784326227#nyaruka_
 //  - _telegram:34642632786#bobby_
 //
-// To render a URN in a human friendly format, use the [function:format_urn] function.
-//
-// Examples:
-//
-//   @(urns.tel) -> tel:+12065551212
-//   @(urn_parts(urns.tel).scheme) -> tel
-//   @(format_urn(urns.tel)) -> (206) 555-1212
-//   @(json(contact.urns[0])) -> "tel:+12065551212"
-//
-// @context urn
 type ContactURN struct {
 	urn     urns.URN
 	channel *Channel
@@ -110,18 +102,23 @@ func (u *ContactURN) Equal(other *ContactURN) bool {
 }
 
 // returns this URN as a raw URN without the query portion (i.e. only scheme, path, display)
-func (u *ContactURN) withoutQuery() urns.URN {
+func (u *ContactURN) withoutQuery(redact bool) urns.URN {
 	scheme, path, _, display := u.urn.ToParts()
+
+	if redact {
+		return urns.URN(fmt.Sprintf("%s:%s", scheme, redacted))
+	}
+
 	urn, _ := urns.NewURNFromParts(scheme, path, "", display)
+
 	return urn
 }
 
 // ToXValue returns a representation of this object for use in expressions
-func (u *ContactURN) ToXValue(env utils.Environment) types.XValue {
-	if env.RedactionPolicy() == utils.RedactionPolicyURNs {
-		return redactedURN
-	}
-	return types.NewXText(string(u.withoutQuery()))
+func (u *ContactURN) ToXValue(env envs.Environment) types.XValue {
+	redact := env.RedactionPolicy() == envs.RedactionPolicyURNs
+
+	return types.NewXText(string(u.withoutQuery(redact)))
 }
 
 // URNList is the list of a contact's URNs
@@ -186,7 +183,7 @@ func (l URNList) WithScheme(scheme string) URNList {
 }
 
 // ToXValue returns a representation of this object for use in expressions
-func (l URNList) ToXValue(env utils.Environment) types.XValue {
+func (l URNList) ToXValue(env envs.Environment) types.XValue {
 	return types.NewXLazyArray(func() []types.XValue {
 		array := make([]types.XValue, len(l))
 		for i, urn := range l {
@@ -197,7 +194,7 @@ func (l URNList) ToXValue(env utils.Environment) types.XValue {
 }
 
 // MapContext returns a map of the highest priority URN for each scheme - exposed in expressions as @urns
-func (l URNList) MapContext(env utils.Environment) map[string]types.XValue {
+func (l URNList) MapContext(env envs.Environment) map[string]types.XValue {
 	byScheme := make(map[string]types.XValue)
 
 	for _, u := range l {

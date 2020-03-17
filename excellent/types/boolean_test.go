@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestXBoolean(t *testing.T) {
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	// test equality
 	assert.True(t, types.XBooleanFalse.Equals(types.XBooleanFalse))

@@ -6,6 +6,7 @@ import (
 	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
 func init() {
@@ -25,7 +26,7 @@ type Reference interface {
 // UUIDReference is interface for all reference types that contain a UUID
 type UUIDReference interface {
 	Reference
-	GenericUUID() utils.UUID
+	GenericUUID() uuids.UUID
 }
 
 // ChannelReference is used to reference a channel
@@ -45,8 +46,8 @@ func (r *ChannelReference) Type() string {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *ChannelReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *ChannelReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset
@@ -65,11 +66,48 @@ func (r *ChannelReference) String() string {
 
 var _ UUIDReference = (*ChannelReference)(nil)
 
+// ClassifierReference is used to reference a classifier
+type ClassifierReference struct {
+	UUID ClassifierUUID `json:"uuid" validate:"required,uuid"`
+	Name string         `json:"name"`
+}
+
+// NewClassifierReference creates a new classifier reference with the given UUID and name
+func NewClassifierReference(uuid ClassifierUUID, name string) *ClassifierReference {
+	return &ClassifierReference{UUID: uuid, Name: name}
+}
+
+// Type returns the name of the asset type
+func (r *ClassifierReference) Type() string {
+	return "classifier"
+}
+
+// GenericUUID returns the untyped UUID
+func (r *ClassifierReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
+}
+
+// Identity returns the unique identity of the asset
+func (r *ClassifierReference) Identity() string {
+	return string(r.UUID)
+}
+
+// Variable returns whether this a variable (vs concrete) reference
+func (r *ClassifierReference) Variable() bool {
+	return false
+}
+
+func (r *ClassifierReference) String() string {
+	return fmt.Sprintf("%s[uuid=%s,name=%s]", r.Type(), r.Identity(), r.Name)
+}
+
+var _ UUIDReference = (*ClassifierReference)(nil)
+
 // GroupReference is used to reference a group
 type GroupReference struct {
 	UUID      GroupUUID `json:"uuid,omitempty" validate:"omitempty,uuid4"`
 	Name      string    `json:"name,omitempty"`
-	NameMatch string    `json:"name_match,omitempty"`
+	NameMatch string    `json:"name_match,omitempty" engine:"evaluated"`
 }
 
 // NewGroupReference creates a new group reference with the given UUID and name
@@ -88,8 +126,8 @@ func (r *GroupReference) Type() string {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *GroupReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *GroupReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset
@@ -157,8 +195,8 @@ func (r *FlowReference) Type() string {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *FlowReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *FlowReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset
@@ -181,7 +219,7 @@ var _ UUIDReference = (*FlowReference)(nil)
 type LabelReference struct {
 	UUID      LabelUUID `json:"uuid,omitempty" validate:"omitempty,uuid4"`
 	Name      string    `json:"name,omitempty"`
-	NameMatch string    `json:"name_match,omitempty"`
+	NameMatch string    `json:"name_match,omitempty" engine:"evaluated"`
 }
 
 // NewLabelReference creates a new label reference with the given UUID and name
@@ -200,8 +238,8 @@ func (r *LabelReference) Type() string {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *LabelReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *LabelReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset
@@ -232,8 +270,8 @@ func NewTemplateReference(uuid TemplateUUID, name string) *TemplateReference {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *TemplateReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *TemplateReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 
@@ -13,13 +14,13 @@ import (
 )
 
 type runEnvironment struct {
-	utils.Environment
+	envs.Environment
 
 	run *flowRun
 }
 
 // creates a run environment based on the given run
-func newRunEnvironment(base utils.Environment, run *flowRun) flows.RunEnvironment {
+func newRunEnvironment(base envs.Environment, run *flowRun) flows.RunEnvironment {
 	return &runEnvironment{base, run}
 }
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/flows/inputs"
@@ -27,8 +28,9 @@ type session struct {
 	assets flows.SessionAssets
 
 	// state which is maintained between engine calls
+	uuid    flows.SessionUUID
 	type_   flows.FlowType
-	env     utils.Environment
+	env     envs.Environment
 	trigger flows.Trigger
 	contact *flows.Contact
 	runs    []flows.FlowRun
@@ -47,11 +49,13 @@ type session struct {
 func (s *session) Assets() flows.SessionAssets { return s.assets }
 func (s *session) Trigger() flows.Trigger      { return s.trigger }
 
+func (s *session) UUID() flows.SessionUUID { return s.uuid }
+
 func (s *session) Type() flows.FlowType         { return s.type_ }
 func (s *session) SetType(type_ flows.FlowType) { s.type_ = type_ }
 
-func (s *session) Environment() utils.Environment       { return s.env }
-func (s *session) SetEnvironment(env utils.Environment) { s.env = env }
+func (s *session) Environment() envs.Environment       { return s.env }
+func (s *session) SetEnvironment(env envs.Environment) { s.env = env }
 
 func (s *session) Contact() *flows.Contact           { return s.contact }
 func (s *session) SetContact(contact *flows.Contact) { s.contact = contact }
@@ -114,7 +118,7 @@ func (s *session) Engine() flows.Engine { return s.engine }
 // Start initializes this session with the given trigger and runs the flow to the first wait
 func (s *session) start(trigger flows.Trigger) (flows.Sprint, error) {
 	sprint := NewEmptySprint()
-	
+
 	if err := s.prepareForSprint(); err != nil {
 		return sprint, err
 	}
@@ -150,9 +154,9 @@ func (s *session) Resume(resume flows.Resume) (flows.Sprint, error) {
 
 	if err := s.tryToResume(sprint, waitingRun, resume); err != nil {
 		// if we got an error, add it to the log and shut everything down
-		fatalError(sprint, waitingRun, nil, err)
+		failure(sprint, waitingRun, nil, err)
 
-		s.status = flows.SessionStatusErrored
+		s.status = flows.SessionStatusFailed
 	}
 
 	return sprint, nil
@@ -176,6 +180,11 @@ func (s *session) prepareForSprint() error {
 
 // Resume resumes a waiting session
 func (s *session) tryToResume(sprint flows.Sprint, waitingRun flows.FlowRun, resume flows.Resume) error {
+	// if flow for this run is a missing asset, we have a problem
+	if waitingRun.Flow() == nil {
+		return errors.New("can't resume run with missing flow asset")
+	}
+
 	// figure out where in the flow we began waiting on
 	step, node, err := waitingRun.PathLocation()
 	if err != nil {
@@ -188,7 +197,7 @@ func (s *session) tryToResume(sprint flows.Sprint, waitingRun flows.FlowRun, res
 
 	// try to end our wait which will return and log an error if it can't be ended with this resume
 	if err := node.Router().Wait().End(resume); err != nil {
-		sprint.LogEvent(events.NewErrorEvent(err))
+		sprint.LogEvent(events.NewError(err))
 		return nil
 	}
 	s.wait = nil
@@ -247,10 +256,10 @@ func (s *session) continueUntilWait(sprint flows.Sprint, currentRun flows.FlowRu
 	for {
 		// if we have a flow trigger handle that first to find our destination in the new flow
 		if s.pushedFlow != nil {
-			// if this is terminal, then we need to interrupt all other runs so we don't try to resume them
+			// if this is terminal, then we need to mark all other runs as completed so we don't try to resume them
 			if s.pushedFlow.terminal {
 				for _, run := range s.runs {
-					run.Exit(flows.RunStatusInterrupted)
+					run.Exit(flows.RunStatusCompleted)
 				}
 			}
 
@@ -284,20 +293,25 @@ func (s *session) continueUntilWait(sprint flows.Sprint, currentRun flows.FlowRu
 				currentRun = parentRun
 
 				// as long as we didn't error, we can try to resume it
-				if childRun.Status() != flows.RunStatusErrored {
+				if childRun.Status() != flows.RunStatusFailed {
+					// if flow for this run is a missing asset, we have a problem
+					if currentRun.Flow() == nil {
+						return errors.New("can't resume parent run with missing flow asset")
+					}
+
 					if destination, err = s.findResumeDestination(sprint, currentRun, false); err != nil {
-						fatalError(sprint, currentRun, step, errors.Wrapf(err, "can't resume run as node no longer exists"))
+						failure(sprint, currentRun, step, errors.Wrapf(err, "can't resume run as node no longer exists"))
 					}
 				} else {
 					// if we did error then that needs to bubble back up through the run hierarchy
 					step, _, _ := currentRun.PathLocation()
-					fatalError(sprint, currentRun, step, errors.Errorf("child run for flow '%s' ended in error, ending execution", childRun.Flow().UUID()))
+					failure(sprint, currentRun, step, errors.Errorf("child run for flow '%s' ended in error, ending execution", childRun.Flow().UUID()))
 				}
 
 			} else {
 				// If we have no destination and no parent, then the whole session is done. A run error bubbles up the session status.
-				if currentRun.Status() == flows.RunStatusErrored {
-					s.status = flows.SessionStatusErrored
+				if currentRun.Status() == flows.RunStatusFailed {
+					s.status = flows.SessionStatusFailed
 				} else {
 					s.status = flows.SessionStatusCompleted
 				}
@@ -313,7 +327,7 @@ func (s *session) continueUntilWait(sprint flows.Sprint, currentRun flows.FlowRu
 
 			if numNewSteps > s.Engine().MaxStepsPerSprint() {
 				// we've hit the step limit - usually a sign of a loop
-				fatalError(sprint, currentRun, step, errors.Errorf("step limit exceeded, stopping execution before entering '%s'", destination))
+				failure(sprint, currentRun, step, errors.Errorf("step limit exceeded, stopping execution before entering '%s'", destination))
 				destination = noDestination
 			} else {
 				node := currentRun.Flow().GetNode(destination)
@@ -361,7 +375,7 @@ func (s *session) visitNode(sprint flows.Sprint, run flows.FlowRun, node flows.N
 			}
 
 			// check if this action has errored the run
-			if run.Status() == flows.RunStatusErrored {
+			if run.Status() == flows.RunStatusFailed {
 				return step, noDestination, nil
 			}
 		}
@@ -415,7 +429,7 @@ func (s *session) pickNodeExit(sprint flows.Sprint, run flows.FlowRun, node flow
 		}
 		// router didn't error.. but it failed to pick a category
 		if exitUUID == "" {
-			fatalError(sprint, run, step, errors.Errorf("router on node[uuid=%s] failed to pick a category", node.UUID()))
+			failure(sprint, run, step, errors.Errorf("router on node[uuid=%s] failed to pick a category", node.UUID()))
 			return noDestination, nil
 		}
 	} else if len(node.Exits()) > 0 {
@@ -438,11 +452,11 @@ func (s *session) pickNodeExit(sprint flows.Sprint, run flows.FlowRun, node flow
 
 const noDestination = flows.NodeUUID("")
 
-// utility to log a fatal error event
-func fatalError(sprint flows.Sprint, run flows.FlowRun, step flows.Step, err error) {
-	event := events.NewFatalErrorEvent(err)
+// utility to fail the session and log a failure event
+func failure(sprint flows.Sprint, run flows.FlowRun, step flows.Step, err error) {
+	event := events.NewFailure(err)
 	if run != nil {
-		run.Exit(flows.RunStatusErrored)
+		run.Exit(flows.RunStatusFailed)
 		run.LogEvent(step, event)
 	}
 	sprint.LogEvent(event)
@@ -453,6 +467,7 @@ func fatalError(sprint flows.Sprint, run flows.FlowRun, step flows.Step, err err
 //------------------------------------------------------------------------------------------
 
 type sessionEnvelope struct {
+	UUID        flows.SessionUUID   `json:"uuid"` // TODO validate:"required"`
 	Type        flows.FlowType      `json:"type"` // TODO validate:"required"`
 	Environment json.RawMessage     `json:"environment"`
 	Trigger     json.RawMessage     `json:"trigger" validate:"required"`
@@ -475,13 +490,14 @@ func readSession(eng flows.Engine, sessionAssets flows.SessionAssets, data json.
 	s := &session{
 		engine:     eng,
 		assets:     sessionAssets,
+		uuid:       e.UUID,
 		type_:      e.Type,
 		status:     e.Status,
 		runsByUUID: make(map[flows.RunUUID]flows.FlowRun),
 	}
 
 	// read our environment
-	s.env, err = utils.ReadEnvironment(e.Environment)
+	s.env, err = envs.ReadEnvironment(e.Environment)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to read environment")
 	}
@@ -502,7 +518,7 @@ func readSession(eng flows.Engine, sessionAssets flows.SessionAssets, data json.
 
 	// read each of our runs
 	for i := range e.Runs {
-		run, err := runs.ReadRun(s, e.Runs[i])
+		run, err := runs.ReadRun(s, e.Runs[i], missing)
 		if err != nil {
 			return nil, errors.Wrapf(err, "unable to read run %d", i)
 		}
@@ -534,6 +550,7 @@ func readSession(eng flows.Engine, sessionAssets flows.SessionAssets, data json.
 // MarshalJSON marshals this session into JSON
 func (s *session) MarshalJSON() ([]byte, error) {
 	e := &sessionEnvelope{
+		UUID:   s.uuid,
 		Type:   s.type_,
 		Status: s.status,
 	}

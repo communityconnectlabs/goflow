@@ -12,7 +12,7 @@ package mobile
 // cd $GOPATH/src/github.com/greatnonprofits-nfp/goflow
 // GO111MODULE=on go mod vendor
 // GO111MODULE=off go get golang.org/x/mobile/cmd/gomobile
-// $GOPATH/bin/gomobile init
+// GO111MODULE=off $GOPATH/bin/gomobile init
 // GO111MODULE=off gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/greatnonprofits-nfp/goflow/mobile
 
 import (
@@ -22,6 +22,7 @@ import (
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/definition"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
@@ -50,7 +51,7 @@ func IsSpecVersionSupported(ver string) bool {
 
 // Environment defines the environment for expression evaluation etc
 type Environment struct {
-	target utils.Environment
+	target envs.Environment
 }
 
 // NewEnvironment creates a new environment.
@@ -60,20 +61,20 @@ func NewEnvironment(dateFormat string, timeFormat string, timezone string, defau
 		return nil, err
 	}
 
-	langs := make([]utils.Language, allowedLanguages.Length())
+	langs := make([]envs.Language, allowedLanguages.Length())
 	for i := 0; i < allowedLanguages.Length(); i++ {
-		langs[i] = utils.Language(allowedLanguages.Get(i))
+		langs[i] = envs.Language(allowedLanguages.Get(i))
 	}
 
 	return &Environment{
-		target: utils.NewEnvironmentBuilder().
-			WithDateFormat(utils.DateFormat(dateFormat)).
-			WithTimeFormat(utils.TimeFormat(timeFormat)).
+		target: envs.NewBuilder().
+			WithDateFormat(envs.DateFormat(dateFormat)).
+			WithTimeFormat(envs.TimeFormat(timeFormat)).
 			WithTimezone(tz).
-			WithDefaultLanguage(utils.Language(defaultLanguage)).
+			WithDefaultLanguage(envs.Language(defaultLanguage)).
 			WithAllowedLanguages(langs).
-			WithDefaultCountry(utils.Country(defaultCountry)).
-			WithRedactionPolicy(utils.RedactionPolicy(redactionPolicy)).
+			WithDefaultCountry(envs.Country(defaultCountry)).
+			WithRedactionPolicy(envs.RedactionPolicy(redactionPolicy)).
 			Build(),
 	}, nil
 }
@@ -114,7 +115,7 @@ type Contact struct {
 // NewEmptyContact creates a new contact
 func NewEmptyContact(sa *SessionAssets) *Contact {
 	return &Contact{
-		target: flows.NewEmptyContact(sa.target, "", utils.NilLanguage, nil),
+		target: flows.NewEmptyContact(sa.target, "", envs.NilLanguage, nil),
 	}
 }
 
@@ -170,7 +171,7 @@ type Trigger struct {
 func NewManualTrigger(environment *Environment, contact *Contact, flow *FlowReference) *Trigger {
 	flowRef := assets.NewFlowReference(assets.FlowUUID(flow.uuid), flow.name)
 	return &Trigger{
-		target: triggers.NewManualTrigger(environment.target, flowRef, contact.target, nil),
+		target: triggers.NewManual(environment.target, flowRef, contact.target, nil),
 	}
 }
 
@@ -181,7 +182,7 @@ type Resume struct {
 
 // NewMsgResume creates a new message resume
 func NewMsgResume(environment *Environment, contact *Contact, msg *MsgIn) *Resume {
-	var e utils.Environment
+	var e envs.Environment
 	if environment != nil {
 		e = environment.target
 	}
@@ -191,7 +192,7 @@ func NewMsgResume(environment *Environment, contact *Contact, msg *MsgIn) *Resum
 	}
 
 	return &Resume{
-		target: resumes.NewMsgResume(e, c, msg.target),
+		target: resumes.NewMsg(e, c, msg.target),
 	}
 }
 
@@ -315,9 +316,9 @@ type Engine struct {
 	target flows.Engine
 }
 
-func NewEngine(httpUserAgent string) *Engine {
+func NewEngine() *Engine {
 	return &Engine{
-		target: engine.NewBuilder().WithDefaultUserAgent(httpUserAgent).Build(),
+		target: engine.NewBuilder().Build(),
 	}
 }
 

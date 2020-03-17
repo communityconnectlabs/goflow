@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+
 	"github.com/pkg/errors"
 )
 
 // Translations is an inline translation map used for localization
-type Translations map[utils.Language]string
+type Translations map[envs.Language]string
 
 // ReadTranslations reads a translations map
 func ReadTranslations(data json.RawMessage) (Translations, error) {
@@ -22,7 +24,7 @@ func ReadTranslations(data json.RawMessage) (Translations, error) {
 }
 
 // Base looks up the translation in the given base language, or "base"
-func (t Translations) Base(baseLanguage utils.Language) string {
+func (t Translations) Base(baseLanguage envs.Language) string {
 	val, exists := t[baseLanguage]
 	if exists {
 		return val
@@ -42,13 +44,34 @@ func (t *Translations) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	asMap := make(map[utils.Language]string)
+	asMap := make(map[envs.Language]string)
 	if err := json.Unmarshal(data, &asMap); err != nil {
 		return err
 	}
 
 	*t = asMap
 	return nil
+}
+
+// TransformTranslations transforms a list of single item translations into a map of multi-item translations, e.g.
+//
+// [{"eng": "yes", "fra": "oui"}, {"eng": "no", "fra": "non"}] becomes {"eng": ["yes", "no"], "fra": ["oui", "non"]}
+//
+func TransformTranslations(items []Translations) map[envs.Language][]string {
+	// re-organize into a map of arrays
+	transformed := make(map[envs.Language][]string)
+
+	for i := range items {
+		for language, translation := range items[i] {
+			perLanguage, found := transformed[language]
+			if !found {
+				perLanguage = make([]string, len(items))
+				transformed[language] = perLanguage
+			}
+			perLanguage[i] = translation
+		}
+	}
+	return transformed
 }
 
 // StringOrNumber represents something we need to read as a string, but might actually be number value in the JSON source

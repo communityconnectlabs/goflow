@@ -11,8 +11,7 @@
         "events": [
             {
                 "created_on": "2018-10-18T14:20:30.000123456Z",
-                "fatal": false,
-                "step_uuid": "e7187099-7d38-4f60-955c-325957214c42",
+                "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "text": "error evaluating @(1 / 0): division by zero",
                 "type": "error"
             }
@@ -50,7 +49,7 @@
                 "category": "Set",
                 "created_on": "2018-10-18T14:20:30.000123456Z",
                 "name": "Response 1",
-                "step_uuid": "e7187099-7d38-4f60-955c-325957214c42",
+                "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "type": "run_result_changed",
                 "value": "Male"
             }
@@ -90,7 +89,7 @@
                 "category": "Yes",
                 "created_on": "2018-10-18T14:20:30.000123456Z",
                 "name": "Response 1",
-                "step_uuid": "e7187099-7d38-4f60-955c-325957214c42",
+                "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "type": "run_result_changed",
                 "value": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis sus"
             }
@@ -126,7 +125,7 @@
             {
                 "created_on": "2018-10-18T14:20:30.000123456Z",
                 "name": "Response 1",
-                "step_uuid": "e7187099-7d38-4f60-955c-325957214c42",
+                "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "type": "run_result_changed",
                 "value": "",
                 "category": ""
@@ -140,6 +139,50 @@
                     "key": "response_1",
                     "name": "Response 1",
                     "categories": [],
+                    "node_uuids": [
+                        "72a1f5df-49f9-45df-94c9-d86f7ea064e5"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "description": "Category can be localized",
+        "action": {
+            "type": "set_run_result",
+            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
+            "name": "Preference",
+            "value": "yeah",
+            "category": "Yes"
+        },
+        "localization": {
+            "category": [
+                "Si"
+            ]
+        },
+        "events": [
+            {
+                "created_on": "2018-10-18T14:20:30.000123456Z",
+                "name": "Preference",
+                "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
+                "type": "run_result_changed",
+                "value": "yeah",
+                "category": "Yes",
+                "category_localized": "Si"
+            }
+        ],
+        "inspection": {
+            "templates": [
+                "yeah"
+            ],
+            "dependencies": [],
+            "results": [
+                {
+                    "key": "preference",
+                    "name": "Preference",
+                    "categories": [
+                        "Yes"
+                    ],
                     "node_uuids": [
                         "72a1f5df-49f9-45df-94c9-d86f7ea064e5"
                     ]

@@ -7,6 +7,11 @@
             "language": "eng",
             "type": "messaging",
             "revision": 123,
+            "localization": {
+                "spa": {
+                    "ad154980-7bf7-4ab8-8728-545fd6378912": {}
+                }
+            },
             "nodes": [
                 {
                     "uuid": "72a1f5df-49f9-45df-94c9-d86f7ea064e5",
@@ -26,6 +31,11 @@
             "language": "eng",
             "type": "voice",
             "revision": 123,
+            "localization": {
+                "spa": {
+                    "ad154980-7bf7-4ab8-8728-545fd6378912": {}
+                }
+            },
             "nodes": [
                 {
                     "uuid": "6cc35e54-fd49-4ae7-af6e-47facd95f3da",
@@ -112,13 +122,26 @@
             ]
         }
     ],
+    "classifiers": [
+        {
+            "uuid": "1c06c884-39dd-4ce4-ad9f-9a01cbe6c000",
+            "name": "Booking",
+            "type": "wit",
+            "intents": [
+                "book_flight",
+                "book_hotel"
+            ]
+        }
+    ],
     "fields": [
         {
+            "uuid": "d66a7823-eada-40e5-9a3a-57239d4690bf",
             "key": "gender",
             "name": "Gender",
             "type": "text"
         },
         {
+            "uuid": "f1b5aea6-6586-41c7-9020-1a6326cc6565",
             "key": "age",
             "name": "Age",
             "type": "number"
@@ -164,15 +187,15 @@
         {
             "slug": "new-registration",
             "subscribers": [
-                "http://localhost:49996/?cmd=success",
-                "http://localhost:49996/?cmd=unavailable"
+                "http://temba.io/",
+                "http://unavailable.com/"
             ]
         },
         {
             "slug": "registration-complete",
             "subscribers": [
-                "http://localhost:49996/?cmd=success",
-                "http://localhost:49996/?cmd=gone"
+                "http://temba.io/",
+                "http://subscribergone.com/"
             ]
         },
         {

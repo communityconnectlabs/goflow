@@ -2,39 +2,46 @@ package flows
 
 import (
 	"encoding/json"
+	"net/http"
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/excellent"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
 // NodeUUID is a UUID of a flow node
-type NodeUUID utils.UUID
+type NodeUUID uuids.UUID
 
 // CategoryUUID is the UUID of a node category
-type CategoryUUID utils.UUID
+type CategoryUUID uuids.UUID
 
 // ExitUUID is the UUID of a node exit
-type ExitUUID utils.UUID
+type ExitUUID uuids.UUID
 
 // ActionUUID is the UUID of an action
-type ActionUUID utils.UUID
+type ActionUUID uuids.UUID
 
 // ContactID is the ID of a contact
 type ContactID int64
 
 // ContactUUID is the UUID of a contact
-type ContactUUID utils.UUID
+type ContactUUID uuids.UUID
 
 // RunUUID is the UUID of a flow run
-type RunUUID utils.UUID
+type RunUUID uuids.UUID
 
 // StepUUID is the UUID of a run step
-type StepUUID utils.UUID
+type StepUUID uuids.UUID
 
 // InputUUID is the UUID of an input
-type InputUUID utils.UUID
+type InputUUID uuids.UUID
+
+// SessionUUID is the UUID of a session
+type SessionUUID uuids.UUID
 
 // MsgID is the ID of a message
 type MsgID int64
@@ -43,7 +50,7 @@ type MsgID int64
 const NilMsgID = MsgID(0)
 
 // MsgUUID is the UUID of a message
-type MsgUUID utils.UUID
+type MsgUUID uuids.UUID
 
 // FlowType represents the different types of flows
 type FlowType string
@@ -72,8 +79,8 @@ const (
 	// SessionStatusWaiting represents a session which is waiting for something from the caller
 	SessionStatusWaiting SessionStatus = "waiting"
 
-	// SessionStatusErrored represents a session that encountered an error
-	SessionStatusErrored SessionStatus = "errored"
+	// SessionStatusFailed represents a session that encountered an unrecoverable error
+	SessionStatusFailed SessionStatus = "failed"
 )
 
 // RunStatus represents the current status of the flow run
@@ -89,14 +96,11 @@ const (
 	// RunStatusWaiting represents a run which is waiting for something from the caller
 	RunStatusWaiting RunStatus = "waiting"
 
-	// RunStatusErrored represents a run that encountered an error
-	RunStatusErrored RunStatus = "errored"
+	// RunStatusFailed represents a run that encountered an unrecoverable error
+	RunStatusFailed RunStatus = "failed"
 
 	// RunStatusExpired represents a run that expired due to inactivity
 	RunStatusExpired RunStatus = "expired"
-
-	// RunStatusInterrupted represents a run that was interrupted by another flow
-	RunStatusInterrupted RunStatus = "interrupted"
 )
 
 type FlowAssets interface {
@@ -105,7 +109,10 @@ type FlowAssets interface {
 
 // SessionAssets is the assets available to a session
 type SessionAssets interface {
+	Source() assets.Source
+
 	Channels() *ChannelAssets
+	Classifiers() *ClassifierAssets
 	Fields() *FieldAssets
 	Flows() FlowAssets
 	Groups() *GroupAssets
@@ -117,24 +124,10 @@ type SessionAssets interface {
 
 // Localizable is anything in the flow definition which can be localized and therefore needs a UUID
 type Localizable interface {
-	LocalizationUUID() utils.UUID
+	LocalizationUUID() uuids.UUID
 }
 
-// Flow describes the ordered logic of actions and routers. It renders as its name in a template, and has the following
-// properties which can be accessed:
-//
-//  * `uuid` the UUID of the flow
-//  * `name` the name of the flow
-//  * `revision` the revision number of the flow
-//
-// Examples:
-//
-//   @run.flow -> Registration
-//   @child.run.flow.name -> Collect Age
-//   @run.flow.uuid -> 50c3706e-fedb-42c0-8eab-dda3335714b7
-//   @(json(run.flow)) -> {"name":"Registration","revision":123,"uuid":"50c3706e-fedb-42c0-8eab-dda3335714b7"}
-//
-// @context flow
+// Flow describes the ordered logic of actions and routers
 type Flow interface {
 	Contextable
 
@@ -142,7 +135,7 @@ type Flow interface {
 	UUID() assets.FlowUUID
 	Name() string
 	Revision() int
-	Language() utils.Language
+	Language() envs.Language
 	Type() FlowType
 	ExpireAfterMinutes() int
 	Localization() Localization
@@ -151,14 +144,13 @@ type Flow interface {
 	GetNode(uuid NodeUUID) Node
 	Reference() *assets.FlowReference
 	Generic() map[string]interface{}
-	Clone(map[utils.UUID]utils.UUID) Flow
+	Clone(map[uuids.UUID]uuids.UUID) Flow
 
 	Inspect() *FlowInfo
 	Validate(SessionAssets, func(assets.Reference)) error
 	ValidateRecursive(SessionAssets, func(assets.Reference)) error
 
 	ExtractTemplates() []string
-	RewriteTemplates(func(string) string)
 	ExtractDependencies() []assets.Reference
 	ExtractResults() []*ResultInfo
 
@@ -167,21 +159,22 @@ type Flow interface {
 
 // Node is a single node in a flow
 type Node interface {
-	Inspectable
-
 	UUID() NodeUUID
 	Actions() []Action
 	Router() Router
 	Exits() []Exit
 
-	Validate(Flow, map[utils.UUID]bool) error
+	Validate(Flow, map[uuids.UUID]bool) error
+
+	EnumerateTemplates(Localization, func(string))
+	EnumerateDependencies(Localization, func(assets.Reference))
+	EnumerateResults(Node, func(*ResultInfo))
 }
 
 // Action is an action within a flow node
 type Action interface {
 	utils.Typed
 	Localizable
-	Inspectable
 
 	UUID() ActionUUID
 	Execute(FlowRun, Step, ModifierCallback, EventCallback) error
@@ -191,7 +184,6 @@ type Action interface {
 
 type Router interface {
 	utils.Typed
-	Inspectable
 
 	Wait() Wait
 	ResultName() string
@@ -200,6 +192,10 @@ type Router interface {
 	AllowTimeout() bool
 	Route(FlowRun, Step, EventCallback) (ExitUUID, error)
 	RouteTimeout(FlowRun, Step, EventCallback) (ExitUUID, error)
+
+	EnumerateTemplates(Localization, func(string))
+	EnumerateDependencies(Localization, func(assets.Reference))
+	EnumerateResults(Node, func(*ResultInfo))
 }
 
 type Exit interface {
@@ -233,30 +229,18 @@ type Hint interface {
 
 // Localization provide a way to get the translations for a specific language
 type Localization interface {
-	AddItemTranslation(utils.Language, utils.UUID, string, []string)
-	GetTranslations(utils.Language) Translations
-	Languages() []utils.Language
+	AddItemTranslation(envs.Language, uuids.UUID, string, []string)
+	GetTranslations(envs.Language) Translations
+	Languages() []envs.Language
 }
 
 // Translations provide a way to get the translation for a specific language for a uuid/key pair
 type Translations interface {
-	GetTextArray(utils.UUID, string) []string
-	SetTextArray(utils.UUID, string, []string)
+	GetTextArray(uuids.UUID, string) []string
+	SetTextArray(uuids.UUID, string, []string)
 }
 
-// Trigger represents something which can initiate a session with the flow engine. It has several properties which can be
-// accessed in expressions:
-//
-//  * `type` the type of the trigger, one of "manual" or "flow"
-//  * `params` the parameters passed to the trigger
-//
-// Examples:
-//
-//   @trigger.type -> flow_action
-//   @trigger.params -> {address: {state: WA}, source: website}
-//   @(json(trigger)) -> {"params":{"address":{"state":"WA"},"source":"website"},"type":"flow_action"}
-//
-// @context trigger
+// Trigger represents something which can initiate a session with the flow engine
 type Trigger interface {
 	utils.Typed
 	Contextable
@@ -264,11 +248,11 @@ type Trigger interface {
 	Initialize(Session, EventCallback) error
 	InitializeRun(FlowRun, EventCallback) error
 
-	Environment() utils.Environment
+	Environment() envs.Environment
 	Flow() *assets.FlowReference
 	Contact() *Contact
 	Connection() *Connection
-	Params() types.XValue
+	Params() *types.XObject
 	TriggeredOn() time.Time
 }
 
@@ -285,7 +269,7 @@ type Resume interface {
 
 	Apply(FlowRun, EventCallback) error
 
-	Environment() utils.Environment
+	Environment() envs.Environment
 	Contact() *Contact
 	ResumedOn() time.Time
 }
@@ -294,7 +278,7 @@ type Resume interface {
 type Modifier interface {
 	utils.Typed
 
-	Apply(utils.Environment, SessionAssets, *Contact, EventCallback)
+	Apply(envs.Environment, SessionAssets, *Contact, EventCallback)
 }
 
 // ModifierCallback is a callback invoked when a modifier has been generated
@@ -312,29 +296,7 @@ type Event interface {
 // EventCallback is a callback invoked when an event has been generated
 type EventCallback func(Event)
 
-// Input describes input from the contact and currently we only support one type of input: `msg`. Any input has the following
-// properties which can be accessed:
-//
-//  * `uuid` the UUID of the input
-//  * `type` the type of the input, e.g. `msg`
-//  * `channel` the [channel](#context:channel) that the input was received on
-//  * `created_on` the time when the input was created
-//
-// An input of type `msg` renders as its text and attachments in a template, and has the following additional properties:
-//
-//  * `text` the text of the message
-//  * `attachments` any [attachments](#context:attachment) on the message
-//  * `urn` the [URN](#context:urn) that the input was received on
-//
-// Examples:
-//
-//   @input -> Hi there\nhttp://s3.amazon.com/bucket/test.jpg\nhttp://s3.amazon.com/bucket/test.mp3
-//   @input.type -> msg
-//   @input.text -> Hi there
-//   @input.attachments -> [image/jpeg:http://s3.amazon.com/bucket/test.jpg, audio/mp3:http://s3.amazon.com/bucket/test.mp3]
-//   @(json(input)) -> {"attachments":["image/jpeg:http://s3.amazon.com/bucket/test.jpg","audio/mp3:http://s3.amazon.com/bucket/test.mp3"],"channel":{"address":"+12345671111","name":"My Android Phone","uuid":"57f1078f-88aa-46f4-a59a-948a5739c03d"},"created_on":"2017-12-31T11:35:10.035757-02:00","text":"Hi there","type":"msg","urn":"tel:+12065551212","uuid":"9bf91c2b-ce58-4cef-aacc-281e03f69ab5"}
-//
-// @context input
+// Input describes input from the contact and currently we only support one type of input: `msg`
 type Input interface {
 	utils.Typed
 	Contextable
@@ -359,9 +321,8 @@ type Engine interface {
 	NewSession(SessionAssets, Trigger) (Session, Sprint, error)
 	ReadSession(SessionAssets, json.RawMessage, assets.MissingCallback) (Session, error)
 
-	HTTPClient() *utils.HTTPClient
-	DisableWebhooks() bool
-	MaxWebhookResponseBytes() int
+	HTTPClient() *http.Client
+	Services() Services
 	MaxStepsPerSprint() int
 }
 
@@ -377,11 +338,12 @@ type Sprint interface {
 type Session interface {
 	Assets() SessionAssets
 
+	UUID() SessionUUID
 	Type() FlowType
 	SetType(FlowType)
 
-	Environment() utils.Environment
-	SetEnvironment(utils.Environment)
+	Environment() envs.Environment
+	SetEnvironment(envs.Environment)
 
 	Contact() *Contact
 	SetContact(*Contact)
@@ -415,33 +377,19 @@ type RunSummary interface {
 
 // RunEnvironment is a run specific environment which adds location functionality required by some router tests
 type RunEnvironment interface {
-	utils.Environment
+	envs.Environment
 
 	FindLocations(string, utils.LocationLevel, *utils.Location) ([]*utils.Location, error)
 	FindLocationsFuzzy(string, utils.LocationLevel, *utils.Location) ([]*utils.Location, error)
 	LookupLocation(utils.LocationPath) (*utils.Location, error)
 }
 
-// FlowRun is a single contact's journey through a flow. It records the path they have taken, and the results that have been
-// collected. It has several properties which can be accessed in expressions:
-//
-//  * `uuid` the UUID of the run
-//  * `flow` the [flow](#context:flow) of the run
-//  * `contact` the [contact](#context:contact) of the flow run
-//  * `input` the [input](#context:input) of the current run
-//  * `results` the results that have been saved for this run
-//  * `results.[snaked_result_name]` the value of the specific result, e.g. `results.age`
-//
-// Examples:
-//
-//   @run -> Ryan Lewis@Registration
-//   @run.contact.name -> Ryan Lewis
-//   @run.flow.name -> Registration
-//
-// @context run
+// FlowRun is a single contact's journey through a flow. It records the path they have taken,
+// and the results that have been collected.
 type FlowRun interface {
 	Contextable
 	RunSummary
+	FlowReference() *assets.FlowReference
 
 	Environment() RunEnvironment
 	Session() Session
@@ -456,12 +404,13 @@ type FlowRun interface {
 	LogError(Step, error)
 	Events() []Event
 
-	EvaluateTemplateValue(template string) (types.XValue, error)
-	EvaluateTemplate(template string) (string, error)
+	EvaluateTemplateValue(string) (types.XValue, error)
+	EvaluateTemplate(string) (string, error)
+	EvaluateTemplateWithEscaping(string, excellent.Escaping) (string, error)
 
-	GetText(utils.UUID, string, string) string
-	GetTextArray(utils.UUID, string, []string) []string
-	GetTranslatedTextArray(utils.UUID, string, []string, []utils.Language) []string
+	GetText(uuids.UUID, string, string) string
+	GetTextArray(uuids.UUID, string, []string) []string
+	GetTranslatedTextArray(uuids.UUID, string, []string, []envs.Language) []string
 
 	Snapshot() RunSummary
 	Parent() RunSummary

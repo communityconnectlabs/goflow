@@ -6,9 +6,12 @@ import (
 	"strings"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/Masterminds/semver"
 	"github.com/pkg/errors"
@@ -22,7 +25,7 @@ type flow struct {
 	uuid               assets.FlowUUID
 	name               string
 	specVersion        *semver.Version
-	language           utils.Language
+	language           envs.Language
 	flowType           flows.FlowType
 	revision           int
 	expireAfterMinutes int
@@ -37,7 +40,7 @@ type flow struct {
 }
 
 // NewFlow creates a new flow
-func NewFlow(uuid assets.FlowUUID, name string, language utils.Language, flowType flows.FlowType, revision int, expireAfterMinutes int, localization flows.Localization, nodes []flows.Node, ui json.RawMessage) (flows.Flow, error) {
+func NewFlow(uuid assets.FlowUUID, name string, language envs.Language, flowType flows.FlowType, revision int, expireAfterMinutes int, localization flows.Localization, nodes []flows.Node, ui json.RawMessage) (flows.Flow, error) {
 	f := &flow{
 		uuid:               uuid,
 		name:               name,
@@ -67,7 +70,7 @@ func (f *flow) UUID() assets.FlowUUID                  { return f.uuid }
 func (f *flow) Name() string                           { return f.name }
 func (f *flow) SpecVersion() *semver.Version           { return f.specVersion }
 func (f *flow) Revision() int                          { return f.revision }
-func (f *flow) Language() utils.Language               { return f.language }
+func (f *flow) Language() envs.Language                { return f.language }
 func (f *flow) Type() flows.FlowType                   { return f.flowType }
 func (f *flow) ExpireAfterMinutes() int                { return f.expireAfterMinutes }
 func (f *flow) Nodes() []flows.Node                    { return f.nodes }
@@ -77,14 +80,14 @@ func (f *flow) GetNode(uuid flows.NodeUUID) flows.Node { return f.nodeMap[uuid] 
 
 func (f *flow) validate() error {
 	// track UUIDs used by nodes and actions to ensure that they are unique
-	seenUUIDs := make(map[utils.UUID]bool)
+	seenUUIDs := make(map[uuids.UUID]bool)
 
 	for _, node := range f.nodes {
-		uuidAlreadySeen := seenUUIDs[utils.UUID(node.UUID())]
+		uuidAlreadySeen := seenUUIDs[uuids.UUID(node.UUID())]
 		if uuidAlreadySeen {
 			return errors.Errorf("node UUID %s isn't unique", node.UUID())
 		}
-		seenUUIDs[utils.UUID(node.UUID())] = true
+		seenUUIDs[uuids.UUID(node.UUID())] = true
 
 		if err := node.Validate(f, seenUUIDs); err != nil {
 			return errors.Wrapf(err, "invalid node[uuid=%s]", node.UUID())
@@ -175,7 +178,14 @@ func (f *flow) validateAssets(sa flows.SessionAssets, recursive bool, seen map[a
 }
 
 // Context returns the properties available in expressions
-func (f *flow) Context(env utils.Environment) map[string]types.XValue {
+//
+//   __default__:text -> the name
+//   uuid:text -> the UUID of the flow
+//   name:text -> the name of the flow
+//   revision:text -> the revision number of the flow
+//
+// @context flow
+func (f *flow) Context(env envs.Environment) map[string]types.XValue {
 	return map[string]types.XValue{
 		"__default__": types.NewXText(f.name),
 		"uuid":        types.NewXText(string(f.UUID())),
@@ -192,35 +202,20 @@ func (f *flow) Reference() *assets.FlowReference {
 	return assets.NewFlowReference(f.uuid, f.name)
 }
 
-func (f *flow) inspect(inspect func(flows.Node, flows.Inspectable)) {
-	// inspect each node
-	for _, n := range f.Nodes() {
-		n.Inspect(func(i flows.Inspectable) {
-			inspect(n, i)
-		})
-	}
-}
-
 // ExtractTemplates extracts all non-empty templates
 func (f *flow) ExtractTemplates() []string {
 	templates := make([]string, 0)
-	include := flows.NewTemplateEnumerator(f.Localization(), func(template string) {
+	include := func(template string) {
 		if template != "" {
 			templates = append(templates, template)
 		}
-	})
+	}
 
-	f.inspect(func(node flows.Node, item flows.Inspectable) {
-		item.EnumerateTemplates(include)
-	})
+	for _, n := range f.nodes {
+		n.EnumerateTemplates(f.Localization(), include)
+	}
+
 	return templates
-}
-
-// RewriteTemplates rewrites all templates
-func (f *flow) RewriteTemplates(rewrite func(string) string) {
-	f.inspect(func(node flows.Node, item flows.Inspectable) {
-		item.EnumerateTemplates(flows.NewTemplateRewriter(f.Localization(), rewrite))
-	})
 }
 
 // ExtractDependencies extracts all asset dependencies
@@ -234,22 +229,24 @@ func (f *flow) ExtractDependencies() []assets.Reference {
 				dependencies = append(dependencies, r)
 				dependenciesSeen[key] = true
 			}
+
+			// TODO replace if we saw a field ref without a name but now have same field with a name
 		}
 	}
 
-	include := flows.NewTemplateEnumerator(f.Localization(), func(template string) {
-		fieldRefs := flows.ExtractFieldReferences(template)
+	include := func(template string) {
+		fieldRefs := inspect.ExtractFieldReferences(template)
 		for _, f := range fieldRefs {
 			addDependency(f)
 		}
-	})
+	}
 
-	f.inspect(func(node flows.Node, item flows.Inspectable) {
-		item.EnumerateTemplates(include)
-		item.EnumerateDependencies(f.Localization(), func(r assets.Reference) {
+	for _, n := range f.nodes {
+		n.EnumerateTemplates(f.Localization(), include)
+		n.EnumerateDependencies(f.Localization(), func(r assets.Reference) {
 			addDependency(r)
 		})
-	})
+	}
 
 	return dependencies
 }
@@ -257,11 +254,13 @@ func (f *flow) ExtractDependencies() []assets.Reference {
 // ExtractResults extracts all result specs
 func (f *flow) ExtractResults() []*flows.ResultInfo {
 	specs := make([]*flows.ResultInfo, 0)
-	f.inspect(func(node flows.Node, item flows.Inspectable) {
-		item.EnumerateResults(node, func(spec *flows.ResultInfo) {
+
+	for _, n := range f.nodes {
+		n.EnumerateResults(n, func(spec *flows.ResultInfo) {
 			specs = append(specs, spec)
 		})
-	})
+	}
+
 	return flows.MergeResultInfos(specs)
 }
 
@@ -297,7 +296,7 @@ func (f *flow) Generic() map[string]interface{} {
 
 // Clone clones this flow replacing all UUIDs using the provided mapping and generating new
 // random UUIDs if they aren't in the mapping
-func (f *flow) Clone(depMapping map[utils.UUID]utils.UUID) flows.Flow {
+func (f *flow) Clone(depMapping map[uuids.UUID]uuids.UUID) flows.Flow {
 	generic := f.Generic()
 	remapUUIDs(generic, depMapping)
 
@@ -325,7 +324,7 @@ type flowHeader struct {
 type flowEnvelope struct {
 	flowHeader
 
-	Language           utils.Language  `json:"language" validate:"required"`
+	Language           envs.Language   `json:"language" validate:"required"`
 	Type               flows.FlowType  `json:"type" validate:"required,flow_type"`
 	Revision           int             `json:"revision"`
 	ExpireAfterMinutes int             `json:"expire_after_minutes"`

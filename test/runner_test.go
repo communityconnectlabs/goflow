@@ -12,13 +12,17 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	_ "github.com/greatnonprofits-nfp/goflow/extensions/transferto"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/legacy"
+	"github.com/greatnonprofits-nfp/goflow/services/airtime/dtone"
+	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -27,7 +31,6 @@ import (
 
 var writeOutput bool
 var includeTests string
-var serverURL = ""
 var testFilePattern = regexp.MustCompile(`(\w+)\.(\w+)\.json`)
 
 func init() {
@@ -91,9 +94,10 @@ type Output struct {
 }
 
 type FlowTest struct {
-	Trigger json.RawMessage   `json:"trigger"`
-	Resumes []json.RawMessage `json:"resumes"`
-	Outputs []json.RawMessage `json:"outputs"`
+	Trigger   json.RawMessage      `json:"trigger"`
+	Resumes   []json.RawMessage    `json:"resumes"`
+	Outputs   []json.RawMessage    `json:"outputs"`
+	HTTPMocks *httpx.MockRequestor `json:"http_mocks,omitempty"`
 }
 
 type runResult struct {
@@ -141,9 +145,6 @@ func loadAssets(path string) (flows.SessionAssets, error) {
 		// ioutil.WriteFile(path+".migrated", assetsJSON, 0666)
 	}
 
-	// rewrite the URL on any webhook actions
-	assetsJSON = json.RawMessage(strings.Replace(string(assetsJSON), "http://localhost", serverURL, -1))
-
 	// create the assets source
 	source, err := static.NewSource(assetsJSON)
 	if err != nil {
@@ -165,7 +166,16 @@ func runFlow(assetsPath string, rawTrigger json.RawMessage, rawResumes []json.Ra
 		return runResult{}, errors.Wrapf(err, "error unmarshalling trigger")
 	}
 
-	eng := engine.NewBuilder().WithDefaultUserAgent("goflow-testing").Build()
+	eng := engine.NewBuilder().
+		WithWebhookServiceFactory(webhooks.NewServiceFactory("goflow-testing", 10000)).
+		WithClassificationServiceFactory(func(s flows.Session, c *flows.Classifier) (flows.ClassificationService, error) {
+			return newClassificationService(c), nil
+		}).
+		WithAirtimeServiceFactory(func(flows.Session) (flows.AirtimeService, error) {
+			return dtone.NewService("nyaruka", "123456789", "RWF"), nil
+		}).
+		Build()
+
 	session, sprint, err := eng.NewSession(sa, trigger)
 	if err != nil {
 		return runResult{}, err
@@ -193,7 +203,7 @@ func runFlow(assetsPath string, rawTrigger json.RawMessage, rawResumes []json.Ra
 
 		// if we aren't at a wait, that's an error
 		if session.Wait() == nil {
-			return runResult{}, errors.Errorf("did not stop at expected wait, have unused resumes: %#v", rawResumes[i:])
+			return runResult{}, errors.Errorf("did not stop at expected wait, have unused resumes: %d", len(rawResumes[i:]))
 		}
 
 		resume, err := resumes.ReadResume(sa, rawResume, assets.PanicOnMissing)
@@ -227,19 +237,16 @@ func TestFlows(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, len(testCases) > 0)
 
-	server := NewTestHTTPServer(49999)
-	defer server.Close()
-	defer utils.SetUUIDGenerator(utils.DefaultUUIDGenerator)
-	defer utils.SetTimeSource(utils.DefaultTimeSource)
-
-	// save away our server URL so we can rewrite our URLs
-	serverURL = server.URL
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
+	defer dates.SetNowSource(dates.DefaultNowSource)
+	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
 	for _, tc := range testCases {
+		var httpMocksCopy *httpx.MockRequestor
 		fmt.Printf("running %s\n", tc)
 
-		utils.SetUUIDGenerator(NewSeededUUIDGenerator(123456))
-		utils.SetTimeSource(NewSequentialTimeSource(time.Date(2018, 7, 6, 12, 30, 0, 123456789, time.UTC)))
+		uuids.SetGenerator(uuids.NewSeededGenerator(123456))
+		dates.SetNowSource(dates.NewSequentialNowSource(time.Date(2018, 7, 6, 12, 30, 0, 123456789, time.UTC)))
 
 		testJSON, err := ioutil.ReadFile(tc.outputFile)
 		require.NoError(t, err, "error reading output file %s", tc.outputFile)
@@ -247,6 +254,14 @@ func TestFlows(t *testing.T) {
 		flowTest := &FlowTest{}
 		err = json.Unmarshal(json.RawMessage(testJSON), &flowTest)
 		require.NoError(t, err, "error unmarshalling output file %s", tc.outputFile)
+
+		if flowTest.HTTPMocks != nil {
+			httpx.SetRequestor(flowTest.HTTPMocks)
+			httpMocksCopy = flowTest.HTTPMocks.Clone()
+		} else {
+			httpx.SetRequestor(httpx.DefaultRequestor)
+			httpMocksCopy = nil
+		}
 
 		// run our flow
 		runResult, err := runFlow(tc.assetsFile, flowTest.Trigger, flowTest.Resumes)
@@ -262,7 +277,7 @@ func TestFlows(t *testing.T) {
 				rawOutputs[i], err = utils.JSONMarshal(runResult.outputs[i])
 				require.NoError(t, err)
 			}
-			flowTest := &FlowTest{Trigger: flowTest.Trigger, Resumes: flowTest.Resumes, Outputs: rawOutputs}
+			flowTest := &FlowTest{Trigger: flowTest.Trigger, Resumes: flowTest.Resumes, Outputs: rawOutputs, HTTPMocks: httpMocksCopy}
 			testJSON, err := utils.JSONMarshalPretty(flowTest)
 			require.NoError(t, err, "Error marshalling test definition: %s", err)
 
@@ -302,12 +317,6 @@ func TestFlows(t *testing.T) {
 
 func BenchmarkFlows(b *testing.B) {
 	testCases, _ := loadTestCases()
-
-	server := NewTestHTTPServer(49990)
-	defer server.Close()
-
-	// save away our server URL so we can rewrite our URLs
-	serverURL = server.URL
 
 	for n := 0; n < b.N; n++ {
 		for _, tc := range testCases {
