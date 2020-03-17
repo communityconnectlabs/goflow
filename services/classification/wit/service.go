@@ -1,7 +1,7 @@
 package wit
 
 import (
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 // a classification service implementation for a wit.ai app

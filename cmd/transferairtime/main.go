@@ -1,6 +1,6 @@
 package main
 
-// go install github.com/nyaruka/goflow/cmd/transferairtime
+// go install github.com/greatnonprofits-nfp/goflow/cmd/transferairtime
 
 import (
 	"encoding/json"
@@ -10,14 +10,14 @@ import (
 	"os"
 
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/assets/static"
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/engine"
-	"github.com/nyaruka/goflow/flows/triggers"
-	"github.com/nyaruka/goflow/services/airtime/dtone"
-	"github.com/nyaruka/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/engine"
+	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
+	"github.com/greatnonprofits-nfp/goflow/services/airtime/dtone"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"

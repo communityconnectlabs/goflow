@@ -3,7 +3,7 @@ package uuids_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/utils/uuids"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
 )

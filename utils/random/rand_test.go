@@ -3,7 +3,7 @@ package random_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/utils/random"
+	"github.com/greatnonprofits-nfp/goflow/utils/random"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

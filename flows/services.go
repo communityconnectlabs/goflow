@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
 
 	"github.com/shopspring/decimal"
 )

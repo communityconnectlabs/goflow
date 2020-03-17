@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/nyaruka/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets"
 )
 
 // Classifier is a JSON serializable implementation of a classifier asset

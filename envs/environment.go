@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/nyaruka/goflow/utils"
-	"github.com/nyaruka/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
 )
 
 type RedactionPolicy string

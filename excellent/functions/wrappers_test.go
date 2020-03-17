@@ -3,10 +3,10 @@ package functions_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/excellent/functions"
-	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/nyaruka/goflow/test"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/excellent/functions"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/test"
 )
 
 func TestWrappers(t *testing.T) {

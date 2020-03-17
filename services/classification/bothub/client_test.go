@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/nyaruka/goflow/services/classification/bothub"
-	"github.com/nyaruka/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/services/classification/bothub"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
 	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/assert"

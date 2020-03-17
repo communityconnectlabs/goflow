@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/goflow/cmd/docgen/completion"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/cmd/docgen/completion"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/pkg/errors"
 )

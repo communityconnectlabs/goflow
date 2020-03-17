@@ -1,7 +1,7 @@
 package bothub
 
 import (
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 // a classification service implementation for a bothub.it bot

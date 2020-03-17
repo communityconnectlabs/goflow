@@ -3,8 +3,8 @@ package inspect
 import (
 	"reflect"
 
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 // DependencyContainer allows flow objects to declare other dependencies

@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"net/http/httputil"
 
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 type mockService struct {
