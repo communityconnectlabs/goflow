@@ -5,6 +5,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/utils/random"
 
 	"github.com/shopspring/decimal"
@@ -70,5 +71,5 @@ func (r *RandomRouter) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

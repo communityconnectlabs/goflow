@@ -11,17 +11,24 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 )
 
-type readFunc func(flows.SessionAssets, json.RawMessage, assets.MissingCallback) (flows.Trigger, error)
+// ReadFunc is a function that can read a trigger from JSON
+type ReadFunc func(flows.SessionAssets, json.RawMessage, assets.MissingCallback) (flows.Trigger, error)
 
-var registeredTypes = map[string]readFunc{}
+var registeredTypes = map[string]ReadFunc{}
 
 // registers a new type of trigger
-func registerType(name string, f readFunc) {
+func registerType(name string, f ReadFunc) {
 	registeredTypes[name] = f
+}
+
+// RegisteredTypes gets the registered types of trigger
+func RegisteredTypes() map[string]ReadFunc {
+	return registeredTypes
 }
 
 // base of all trigger types
@@ -88,21 +95,21 @@ func (t *baseTrigger) InitializeRun(run flows.FlowRun, logEvent flows.EventCallb
 //
 //   type:text -> the type of trigger that started this session
 //   params:any -> the parameters passed to the trigger
+//   keyword:any -> the keyword match if this is a keyword trigger
 //
 // @context trigger
 func (t *baseTrigger) Context(env envs.Environment) map[string]types.XValue {
 	return map[string]types.XValue{
-		"type":   types.NewXText(t.type_),
-		"params": t.params,
+		"type":    types.NewXText(t.type_),
+		"params":  t.params,
+		"keyword": nil,
 	}
 }
 
 // EnsureDynamicGroups ensures that our session contact is in the correct dynamic groups as
 // as far as the engine is concerned
 func EnsureDynamicGroups(session flows.Session, logEvent flows.EventCallback) {
-	allGroups := session.Assets().Groups()
-	allFields := session.Assets().Fields()
-	added, removed, errors := session.Contact().ReevaluateDynamicGroups(session.Environment(), allGroups, allFields)
+	added, removed, errors := session.Contact().ReevaluateDynamicGroups(session.Environment())
 
 	// add error event for each group we couldn't re-evaluate
 	for _, err := range errors {
@@ -178,19 +185,19 @@ func (t *baseTrigger) marshal(e *baseTriggerEnvelope) error {
 	e.TriggeredOn = t.triggeredOn
 
 	if t.environment != nil {
-		e.Environment, err = json.Marshal(t.environment)
+		e.Environment, err = jsonx.Marshal(t.environment)
 		if err != nil {
 			return err
 		}
 	}
 	if t.contact != nil {
-		e.Contact, err = json.Marshal(t.contact)
+		e.Contact, err = jsonx.Marshal(t.contact)
 		if err != nil {
 			return err
 		}
 	}
 	if t.params != nil {
-		e.Params, err = json.Marshal(t.params)
+		e.Params, err = jsonx.Marshal(t.params)
 		if err != nil {
 			return err
 		}

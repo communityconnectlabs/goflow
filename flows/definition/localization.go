@@ -5,6 +5,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
@@ -50,6 +51,7 @@ func (t languageTranslations) SetTextArray(uuid uuids.UUID, property string, tra
 // our top level container for all the translations for all languages
 type localization map[envs.Language]languageTranslations
 
+// NewLocalization creates a new empty localization
 func NewLocalization() flows.Localization {
 	return make(localization)
 }
@@ -80,7 +82,7 @@ func (l localization) GetTranslations(lang envs.Language) flows.Translations {
 // ReadLocalization reads entire localization flow segment
 func ReadLocalization(data json.RawMessage) (flows.Localization, error) {
 	translations := &localization{}
-	if err := json.Unmarshal(data, translations); err != nil {
+	if err := jsonx.Unmarshal(data, translations); err != nil {
 		return nil, err
 	}
 	return translations, nil

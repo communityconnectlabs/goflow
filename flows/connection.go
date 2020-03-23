@@ -1,10 +1,9 @@
 package flows
 
 import (
-	"encoding/json"
-
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 // Connection represents a connection to a specific channel using a specific URN
@@ -18,8 +17,11 @@ func NewConnection(channel *assets.ChannelReference, urn urns.URN) *Connection {
 	return &Connection{channel: channel, urn: urn}
 }
 
+// Channel returns a reference to the channel
 func (c *Connection) Channel() *assets.ChannelReference { return c.channel }
-func (c *Connection) URN() urns.URN                     { return c.urn }
+
+// URN returns the URN
+func (c *Connection) URN() urns.URN { return c.urn }
 
 //------------------------------------------------------------------------------------------
 // JSON Encoding / Decoding
@@ -30,9 +32,10 @@ type connectionEnvelope struct {
 	URN     urns.URN                 `json:"urn" validate:"required,urn"`
 }
 
+// UnmarshalJSON unmarshals a connection from JSON
 func (c *Connection) UnmarshalJSON(data []byte) error {
 	e := &connectionEnvelope{}
-	if err := json.Unmarshal(data, e); err != nil {
+	if err := jsonx.Unmarshal(data, e); err != nil {
 		return err
 	}
 
@@ -43,7 +46,7 @@ func (c *Connection) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON marshals this connection into JSON
 func (c *Connection) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&connectionEnvelope{
+	return jsonx.Marshal(&connectionEnvelope{
 		Channel: c.channel,
 		URN:     c.urn,
 	})

@@ -1,10 +1,13 @@
 package utils_test
 
 import (
+	"bytes"
+	"io/ioutil"
 	"strings"
 	"testing"
 
 	_ "github.com/greatnonprofits-nfp/goflow/envs"
+	_ "github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/stretchr/testify/assert"
@@ -26,6 +29,7 @@ type TestObject struct {
 	Things     []string  `json:"things" validate:"min=1,max=3,dive,http_method"`
 	DateFormat string    `json:"date_format" validate:"date_format"`
 	TimeFormat string    `json:"time_format" validate:"time_format"`
+	Topic      string    `json:"topic" validate:"msg_topic"`
 }
 
 func TestValidate(t *testing.T) {
@@ -40,6 +44,7 @@ func TestValidate(t *testing.T) {
 		Things:     []string{"GET", "POST", "PATCH"},
 		DateFormat: "DD-MM-YYYY",
 		TimeFormat: "hh:mm:ss",
+		Topic:      "account",
 	})
 	assert.Nil(t, errs)
 
@@ -54,6 +59,7 @@ func TestValidate(t *testing.T) {
 		Things:     nil,
 		DateFormat: "hh:mm",
 		TimeFormat: "DD-MM",
+		Topic:      "beer",
 	})
 	assert.NotNil(t, errs)
 
@@ -67,6 +73,7 @@ func TestValidate(t *testing.T) {
 		`field 'things' must have a minimum of 1 items`,
 		`field 'date_format' is not a valid date format`,
 		`field 'time_format' is not a valid time format`,
+		`field 'topic' is not a valid message topic`,
 	}, msgs)
 
 	// test with another invalid object
@@ -78,6 +85,7 @@ func TestValidate(t *testing.T) {
 			SomeValue: 2,
 		},
 		Things: []string{"UGHHH"},
+		Topic:  "football",
 	})
 	assert.NotNil(t, errs)
 
@@ -85,5 +93,27 @@ func TestValidate(t *testing.T) {
 	msgs = strings.Split(errs.Error(), ", ")
 	assert.Equal(t, []string{
 		`field 'things[0]' is not a valid HTTP method`,
+		`field 'topic' is not a valid message topic`,
 	}, msgs)
+}
+
+func TestUnmarshalAndValidate(t *testing.T) {
+	o := &BaseObject{}
+	err := utils.UnmarshalAndValidate([]byte(`{}`), o)
+
+	assert.EqualError(t, err, "field 'foo' is required")
+
+	err = utils.UnmarshalAndValidate([]byte(`{"foo": "123"}`), o)
+
+	assert.NoError(t, err)
+	assert.Equal(t, "123", o.Foo)
+
+	err = utils.UnmarshalAndValidateWithLimit(ioutil.NopCloser(bytes.NewReader([]byte(`{"foo": "abc"}`))), o, 100)
+
+	assert.NoError(t, err)
+	assert.Equal(t, "abc", o.Foo)
+
+	err = utils.UnmarshalAndValidateWithLimit(ioutil.NopCloser(bytes.NewReader([]byte(`{"foo": "abc"}`))), o, 5)
+
+	assert.EqualError(t, err, "unexpected end of JSON input")
 }

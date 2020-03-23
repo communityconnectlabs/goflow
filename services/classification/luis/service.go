@@ -1,29 +1,38 @@
 package luis
 
 import (
+	"net/http"
+
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
 )
 
 // a classification service implementation for a LUIS app
 type service struct {
-	classifier *flows.Classifier
-	endpoint   string
-	appID      string
-	key        string
+	httpClient  *http.Client
+	httpRetries *httpx.RetryConfig
+	httpAccess  *httpx.AccessConfig
+	classifier  *flows.Classifier
+	endpoint    string
+	appID       string
+	key         string
 }
 
 // NewService creates a new classification service
-func NewService(classifier *flows.Classifier, endpoint, appID, key string) flows.ClassificationService {
+func NewService(httpClient *http.Client, httpRetries *httpx.RetryConfig, httpAccess *httpx.AccessConfig, classifier *flows.Classifier, endpoint, appID, key string) flows.ClassificationService {
 	return &service{
-		classifier: classifier,
-		endpoint:   endpoint,
-		appID:      appID,
-		key:        key,
+		httpClient:  httpClient,
+		httpRetries: httpRetries,
+		httpAccess:  httpAccess,
+		classifier:  classifier,
+		endpoint:    endpoint,
+		appID:       appID,
+		key:         key,
 	}
 }
 
 func (s *service) Classify(session flows.Session, input string, logHTTP flows.HTTPLogCallback) (*flows.Classification, error) {
-	client := NewClient(session.Engine().HTTPClient(), s.endpoint, s.appID, s.key)
+	client := NewClient(s.httpClient, s.httpRetries, s.httpAccess, s.endpoint, s.appID, s.key)
 
 	response, trace, err := client.Predict(input)
 	if trace != nil {

@@ -19,21 +19,22 @@ func TestClient(t *testing.T) {
 
 	mocks := httpx.NewMockRequestor(map[string][]httpx.MockResponse{
 		"https://airtime-api.dtone.com/cgi-bin/shop/topup": []httpx.MockResponse{
-			httpx.NewMockResponse(200, "info_txt=pong\r\n"),                  // successful ping
-			httpx.NewMockResponse(400, "error_code=1\r\nerror_txt=Oops\r\n"), // unsuccessful ping
-			httpx.NewMockResponse(200, withCRLF(msisdnResponse)),             // successful msdninfo query
-			httpx.NewMockResponse(200, "xxx=yyy\r\n"),                        // unexpected response to msdninfo query
-			httpx.NewMockResponse(200, withCRLF(reserveResponse)),            // successful reserve ID request
-			httpx.NewMockResponse(200, "xxx=yyy\r\n"),                        // unexpected response to reserve ID request
-			httpx.NewMockResponse(200, withCRLF(topupResponse)),              // successful topup request
-			httpx.NewMockResponse(200, "xxx=yyy\r\n"),                        // unexpected response to topup request
+			httpx.NewMockResponse(200, nil, "info_txt=pong\r\n", 1),                  // successful ping
+			httpx.NewMockResponse(400, nil, "error_code=1\r\nerror_txt=Oops\r\n", 1), // unsuccessful ping
+			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse), 1),             // successful msdninfo query
+			httpx.NewMockResponse(200, nil, "xxx=yyy\r\n", 1),                        // unexpected response to msdninfo query
+			httpx.NewMockResponse(200, nil, withCRLF(reserveResponse), 1),            // successful reserve ID request
+			httpx.NewMockResponse(200, nil, "xxx=yyy\r\n", 1),                        // unexpected response to reserve ID request
+			httpx.NewMockResponse(200, nil, withCRLF(topupResponse), 1),              // successful topup request
+			httpx.NewMockResponse(200, nil, "xxx=yyy\r\n", 1),                        // unexpected response to topup request
+			httpx.MockConnectionError,                                                // timeout
 		},
 	})
 
 	httpx.SetRequestor(mocks)
 	dates.SetNowSource(dates.NewSequentialNowSource(time.Date(2019, 10, 9, 15, 25, 30, 123456789, time.UTC)))
 
-	cl := dtone.NewClient(http.DefaultClient, "joe", "1234567")
+	cl := dtone.NewClient(http.DefaultClient, nil, "joe", "1234567")
 
 	// test ping action
 	trace, err := cl.Ping()
@@ -75,6 +76,12 @@ func TestClient(t *testing.T) {
 	topup, _, err = cl.Topup(123455, "593999000001", "593999000002", "1", "2")
 	assert.EqualError(t, err, "DTOne API request failed: field 'destination_currency' is required")
 	assert.Nil(t, topup)
+
+	// test timeout still gives us a trace
+	trace, err = cl.Ping()
+	assert.EqualError(t, err, "unable to connect to server")
+	assert.Equal(t, "POST /cgi-bin/shop/topup HTTP/1.1\r\nHost: airtime-api.dtone.com\r\nUser-Agent: Go-http-client/1.1\r\nContent-Length: 76\r\nContent-Type: application/x-www-form-urlencoded\r\nAccept-Encoding: gzip\r\n\r\naction=ping&key=1570634754123&login=joe&md5=9b97b9694adede6840de4e8056245f6d", string(trace.RequestTrace))
+	assert.Equal(t, "", string(trace.ResponseTrace))
 
 	assert.False(t, mocks.HasUnused())
 }

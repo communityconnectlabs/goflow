@@ -1,10 +1,9 @@
 package definition
 
 import (
-	"encoding/json"
-
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
@@ -50,5 +49,5 @@ func (e *exit) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON marshals this node exit into JSON
 func (e *exit) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&exitEnvelope{e.uuid, e.destination})
+	return jsonx.Marshal(&exitEnvelope{e.uuid, e.destination})
 }

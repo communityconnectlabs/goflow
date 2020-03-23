@@ -9,6 +9,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 // concrete run summary which might be stored on a trigger or event
@@ -175,5 +176,5 @@ func (r *runSummary) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	return json.Marshal(envelope)
+	return jsonx.Marshal(envelope)
 }

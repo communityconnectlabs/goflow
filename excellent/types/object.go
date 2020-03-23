@@ -8,6 +8,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 )
@@ -27,9 +28,10 @@ type XObject struct {
 	XValue
 	XCountable
 
-	def    XValue
-	props  map[string]XValue
-	source func() map[string]XValue
+	def            XValue
+	props          map[string]XValue
+	source         func() map[string]XValue
+	marshalDefault bool
 }
 
 // NewXObject returns a new object with the given properties
@@ -99,7 +101,15 @@ func (x *XObject) MarshalJSON() ([]byte, error) {
 			marshaled[p] = json.RawMessage(asJSON.Native())
 		}
 	}
-	return json.Marshal(marshaled)
+
+	if x.hasDefault() && x.marshalDefault {
+		asJSON, err := ToXJSON(x.def)
+		if err == nil {
+			marshaled[serializeDefaultAs] = json.RawMessage(asJSON.Native())
+		}
+	}
+
+	return jsonx.Marshal(marshaled)
 }
 
 // ReadXObject reads an instance of this type from JSON
@@ -193,6 +203,10 @@ func (x *XObject) properties() map[string]XValue {
 func (x *XObject) Default() XValue {
 	x.ensureInitialized()
 	return x.def
+}
+
+func (x *XObject) SetMarshalDefault(marshal bool) {
+	x.marshalDefault = marshal
 }
 
 // Default returns the default value for this

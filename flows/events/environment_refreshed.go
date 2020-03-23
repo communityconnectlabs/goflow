@@ -5,6 +5,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
@@ -37,7 +38,7 @@ type EnvironmentRefreshedEvent struct {
 
 // NewEnvironmentRefreshed creates a new environment changed event
 func NewEnvironmentRefreshed(env envs.Environment) *EnvironmentRefreshedEvent {
-	marshalled, _ := json.Marshal(env)
+	marshalled, _ := jsonx.Marshal(env)
 	return &EnvironmentRefreshedEvent{
 		baseEvent:   newBaseEvent(TypeEnvironmentRefreshed),
 		Environment: marshalled,

@@ -16,9 +16,9 @@ func TestPredict(t *testing.T) {
 
 	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
 		"https://nlp.bothub.it/parse": []httpx.MockResponse{
-			httpx.NewMockResponse(200, `xx`), // non-JSON response
-			httpx.NewMockResponse(200, `{}`), // invalid JSON response
-			httpx.NewMockResponse(200, `{
+			httpx.NewMockResponse(200, nil, `xx`, 1), // non-JSON response
+			httpx.NewMockResponse(200, nil, `{}`, 1), // invalid JSON response
+			httpx.NewMockResponse(200, nil, `{
 				"intent": {
 					"name": "book_flight",
 					"confidence": 0.8341536248216568
@@ -51,11 +51,11 @@ func TestPredict(t *testing.T) {
 				"text": "book a flight to Quito",
 				"update_id": 4786,
 				"language": "pt_br"
-			}`),
+			}`, 1),
 		},
 	}))
 
-	client := bothub.NewClient(http.DefaultClient, "123e4567-e89b-12d3-a456-426655440000")
+	client := bothub.NewClient(http.DefaultClient, nil, "123e4567-e89b-12d3-a456-426655440000")
 
 	response, trace, err := client.Parse("Hello")
 	assert.EqualError(t, err, `invalid character 'x' looking for beginning of value`)

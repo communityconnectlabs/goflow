@@ -1,25 +1,32 @@
 package bothub
 
 import (
+	"net/http"
+
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
 )
 
 // a classification service implementation for a bothub.it bot
 type service struct {
+	httpClient  *http.Client
+	httpRetries *httpx.RetryConfig
 	classifier  *flows.Classifier
 	accessToken string
 }
 
 // NewService creates a new classification service
-func NewService(classifier *flows.Classifier, accessToken string) flows.ClassificationService {
+func NewService(httpClient *http.Client, httpRetries *httpx.RetryConfig, classifier *flows.Classifier, accessToken string) flows.ClassificationService {
 	return &service{
+		httpClient:  httpClient,
+		httpRetries: httpRetries,
 		classifier:  classifier,
 		accessToken: accessToken,
 	}
 }
 
 func (s *service) Classify(session flows.Session, input string, logHTTP flows.HTTPLogCallback) (*flows.Classification, error) {
-	client := NewClient(session.Engine().HTTPClient(), s.accessToken)
+	client := NewClient(s.httpClient, s.httpRetries, s.accessToken)
 
 	response, trace, err := client.Parse(input)
 	if trace != nil {

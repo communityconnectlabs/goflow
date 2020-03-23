@@ -5,49 +5,55 @@ import (
 	"strings"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/tools"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
 // Templates extracts template values by reading engine tags on a struct
-func Templates(s interface{}, localization flows.Localization, include func(string)) {
+func Templates(s interface{}, localization flows.Localization, include func(envs.Language, string)) {
 	templateValues(reflect.ValueOf(s), localization, include)
 }
 
-func templateValues(v reflect.Value, localization flows.Localization, include func(string)) {
+func templateValues(v reflect.Value, localization flows.Localization, include func(envs.Language, string)) {
 	walk(v, nil, func(sv reflect.Value, fv reflect.Value, ef *EngineField) {
 		if ef.Evaluated {
-			extractTemplates(fv, include)
+			extractTemplates(fv, envs.NilLanguage, include)
 
 			// if this field is also localized, each translation is a template and needs to be included
 			if ef.Localized && localization != nil {
 				localizable := sv.Interface().(flows.Localizable)
 
-				for _, lang := range localization.Languages() {
-					translations := localization.GetTranslations(lang)
-					for _, v := range translations.GetTextArray(localizable.LocalizationUUID(), ef.JSONName) {
-						include(v)
-					}
-				}
+				Translations(localization, localizable.LocalizationUUID(), ef.JSONName, include)
 			}
 		}
 	})
 }
 
+func Translations(localization flows.Localization, itemUUID uuids.UUID, property string, include func(envs.Language, string)) {
+	for _, lang := range localization.Languages() {
+		translations := localization.GetTranslations(lang)
+		for _, v := range translations.GetTextArray(itemUUID, property) {
+			include(lang, v)
+		}
+	}
+}
+
 // Evaluated tags can be applied to fields of type string, slices of string or map of strings.
 // This method extracts template values from any such field.
-func extractTemplates(v reflect.Value, include func(string)) {
+func extractTemplates(v reflect.Value, lang envs.Language, include func(envs.Language, string)) {
 	switch typed := v.Interface().(type) {
 	case map[string]string:
 		for _, i := range typed {
-			include(i)
+			include(lang, i)
 		}
 	case []string:
 		for _, i := range typed {
-			include(i)
+			include(lang, i)
 		}
 	case string:
-		include(v.String())
+		include(lang, typed)
 	}
 }
 
@@ -63,6 +69,7 @@ func TemplatePaths(t reflect.Type, base string, include func(string)) {
 	})
 }
 
+// all the paths in the context where contact field references are found
 var fieldRefPaths = [][]string{
 	{"fields"},
 	{"contact", "fields"},
@@ -72,16 +79,32 @@ var fieldRefPaths = [][]string{
 	{"child", "contact", "fields"},
 }
 
-// ExtractFieldReferences extracts fields references from the given template
-func ExtractFieldReferences(template string) []*assets.FieldReference {
-	fieldRefs := make([]*assets.FieldReference, 0)
+// ExtractFromTemplate extracts asset references and parent result references from the given template. Note that
+// duplicates are not removed.
+func ExtractFromTemplate(template string) ([]assets.Reference, []string) {
+	assetRefs := make([]assets.Reference, 0)
+	parentRefs := make([]string, 0)
+
 	tools.FindContextRefsInTemplate(template, flows.RunContextTopLevels, func(path []string) {
-		isField, fieldKey := isFieldRefPath(path)
-		if isField {
-			fieldRefs = append(fieldRefs, assets.NewFieldReference(fieldKey, ""))
+		if len(path) <= 1 {
+			return
+		}
+
+		path0 := strings.ToLower(path[0])
+		path1 := strings.ToLower(path[1])
+
+		if path0 == "globals" {
+			assetRefs = append(assetRefs, assets.NewGlobalReference(path1, ""))
+		} else if path0 == "parent" && path1 == "results" && len(path) > 2 {
+			parentRefs = append(parentRefs, strings.ToLower(path[2]))
+		} else {
+			isField, fieldKey := isFieldRefPath(path)
+			if isField {
+				assetRefs = append(assetRefs, assets.NewFieldReference(fieldKey, ""))
+			}
 		}
 	})
-	return fieldRefs
+	return assetRefs, parentRefs
 }
 
 // checks whether the given context path is a reference to a contact field

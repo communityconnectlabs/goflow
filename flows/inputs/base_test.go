@@ -5,6 +5,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 	"github.com/greatnonprofits-nfp/goflow/flows/inputs"
 
@@ -13,10 +14,12 @@ import (
 )
 
 func TestReadInput(t *testing.T) {
+	env := envs.NewBuilder().Build()
+
 	missingAssets := make([]assets.Reference, 0)
 	missing := func(a assets.Reference, err error) { missingAssets = append(missingAssets, a) }
 
-	sessionAssets, err := engine.NewSessionAssets(static.NewEmptySource())
+	sessionAssets, err := engine.NewSessionAssets(env, static.NewEmptySource(), nil)
 	require.NoError(t, err)
 
 	// error if no type field

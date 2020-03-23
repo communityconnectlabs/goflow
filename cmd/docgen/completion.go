@@ -9,7 +9,7 @@ import (
 
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/cmd/docgen/completion"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 )
@@ -22,7 +22,8 @@ func generateCompletionMap(baseDir string, outputDir string, items map[string][]
 	types := []completion.Type{
 		// the dynamic types in the context aren't described in the code so we add them manually here
 		completion.NewDynamicType("fields", "fields", completion.NewProperty("{key}", "{key} for the contact", "any")),
-		completion.NewDynamicType("results", "results", completion.NewProperty("{key}", "result for {key}", "result")),
+		completion.NewDynamicType("results", "results", completion.NewProperty("{key}", "the result for {key}", "result")),
+		completion.NewDynamicType("globals", "globals", completion.NewProperty("{key}", "the global value {key}", "text")),
 
 		// the urns type also added here as it's "dynamic" in sense that keys are known at build time
 		createURNsType(),
@@ -56,13 +57,14 @@ func generateCompletionMap(baseDir string, outputDir string, items map[string][]
 	}
 
 	mapPath := path.Join(outputDir, "completion.json")
-	marshaled, _ := utils.JSONMarshalPretty(c)
+	marshaled, _ := jsonx.MarshalPretty(c)
 	ioutil.WriteFile(mapPath, marshaled, 0755)
 
 	fmt.Printf(" > %d completion map written to %s\n", len(items["context"]), mapPath)
 
 	context := completion.NewContext(map[string][]string{
 		"fields":  []string{"age", "gender"},
+		"globals": []string{"org_name"},
 		"results": []string{"response_1"},
 	})
 	nodes := c.EnumerateNodes(context)

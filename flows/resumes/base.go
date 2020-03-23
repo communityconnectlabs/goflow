@@ -11,17 +11,24 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 )
 
-type readFunc func(flows.SessionAssets, json.RawMessage, assets.MissingCallback) (flows.Resume, error)
+// ReadFunc is a function that can read a resume from JSON
+type ReadFunc func(flows.SessionAssets, json.RawMessage, assets.MissingCallback) (flows.Resume, error)
 
-var registeredTypes = map[string]readFunc{}
+var registeredTypes = map[string]ReadFunc{}
 
 // registers a new type of resume
-func registerType(name string, f readFunc) {
+func registerType(name string, f ReadFunc) {
 	registeredTypes[name] = f
+}
+
+// RegisteredTypes gets the registered types of resumes
+func RegisteredTypes() map[string]ReadFunc {
+	return registeredTypes
 }
 
 // base of all resume types
@@ -120,13 +127,13 @@ func (r *baseResume) marshal(e *baseResumeEnvelope) error {
 	e.ResumedOn = r.resumedOn
 
 	if r.environment != nil {
-		e.Environment, err = json.Marshal(r.environment)
+		e.Environment, err = jsonx.Marshal(r.environment)
 		if err != nil {
 			return err
 		}
 	}
 	if r.contact != nil {
-		e.Contact, err = json.Marshal(r.contact)
+		e.Contact, err = jsonx.Marshal(r.contact)
 		if err != nil {
 			return err
 		}

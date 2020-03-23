@@ -8,6 +8,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
@@ -69,7 +70,7 @@ func readChannelModifier(assets flows.SessionAssets, data json.RawMessage, missi
 }
 
 func (m *ChannelModifier) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&channelModifierEnvelope{
+	return jsonx.Marshal(&channelModifierEnvelope{
 		TypedEnvelope: utils.TypedEnvelope{Type: m.Type()},
 		Channel:       m.channel.Reference(),
 	})

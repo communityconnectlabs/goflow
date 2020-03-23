@@ -1,3 +1,253 @@
+v0.77.4
+----------
+ * Fix loading flow assets that are new spec but also have metadata section
+
+v0.77.3
+----------
+ * Update README
+
+v0.77.2
+----------
+ * Update README
+
+v0.77.1
+----------
+ * Fix not passing access config correctly to webhook services
+
+v0.77.0
+----------
+ * Allow http services to be configured with a list of disallowed hosts
+
+v0.76.3
+----------
+ * fix @legacy_extra issue on routers
+ * update gomobile instructions
+
+v0.76.2
+----------
+ * Add trim, trim_left and trim_right excellent functions
+
+v0.76.1
+----------
+ * Sort issues by node order
+ * Add issues to report on invalid regex and usage of @legacy_extra
+
+v0.76.0
+----------
+ * Validate language codes in contact queries
+ * Disallow group queries against group names that don't exist
+
+v0.75.1
+----------
+ * Remove contacts from broken groups
+
+v0.75.0
+----------
+ * Handle missing groups on contact creation
+ * Fix != with multiple values and add support for group attribute in contact queries
+ * Improve docs for operators
+
+v0.74.0
+----------
+ * Use jsonx functions for all JSON marshal/unmarshal
+ * Add support for removing a URN to the urns modifier
+ * Groups modifier should log errors for dynamic groups
+ * Rename snapshot flag to -update
+
+v0.73.0
+----------
+ * Include translation language with missing dependency issues
+
+v0.72.2
+----------
+ * Allow flow inspection without assets
+
+v0.72.1
+----------
+ * Quote telephone numbers in contact queries
+ * Tweak parsing of phone numbers in contact queries
+
+v0.72.0
+----------
+ * Rename "problems" to "issues"
+
+v0.71.3
+----------
+ * Implement missing_dependency as a type of problem
+ * Add framework for checking for problems during flow inspection
+
+v0.71.2
+----------
+ * Rework dependency and template extraction to include actions and routers
+
+v0.71.1
+----------
+ * Channels with no country are implicitly international
+
+v0.71.0
+----------
+ * Add field to channel assets which determines whether they should try to send internationally
+
+v0.70.0
+----------
+ * Make cloning a flow definition more deterministic
+ * Update actions to log error events when dependencies are missing
+ * Interpret contact queries which are formatted phone numbers as tel = queries
+
+v0.69.0
+----------
+ * Move JSON utils into their own package
+ * Track node UUIDs of dependencies
+
+v0.68.0
+----------
+ * Convert dependency inspection output to list of things with type attribute
+ * Replace Flow.CheckDepedencies and CheckDependenciesRecursive with passing assets to Inspect
+
+v0.67.1
+----------
+ * Update to gocommon v1.2.0
+
+v0.67.0
+----------
+ * Rename Flow.Validate to Flow.CheckDependencies for clarity
+ * Create error event when webhook response too big
+ * Rework webhook calls to use same calling code as other HTTP services
+
+v0.66.3
+----------
+ * Allow globals with empty values
+
+v0.66.2
+----------
+ * Add mobile binding for IsVersionSupported
+ * Re-add version check to ReadFlow
+
+v0.66.1
+----------
+ * Match evaluation of contact queries in ES
+
+v0.66.0
+----------
+ * Fix problems with contact searching and add support for URN as attribute
+
+v0.65.0
+----------
+ * Ignore content-type headers and try to parse all webhook responses as JSON
+ * Update ContactQL to interpret implicit conditions which are URNs as scheme=path
+
+v0.64.11
+----------
+ * Limit the size of evaluated templates and truncate anything bigger
+
+v0.64.10
+----------
+ * Stringify contactql like the queries they came from
+ * Trim webhook_called request traces to 10K same as response traces
+ * Only set extra on webhook result if less than 10000 bytes
+
+v0.64.9
+----------
+ * Allow getting current context even for ended sessions
+
+v0.64.8
+----------
+ * Fix another panic during context walking
+
+v0.64.7
+----------
+ * Fix panic in context walking
+
+v0.64.6
+----------
+ * Add support for marshaling XObjects with their defaults, and tool for walking the context to find objects
+
+v0.64.5
+----------
+ * Fix creation of no-nil interface to nil structs in context
+
+v0.64.4
+----------
+ * Make it easier to get current expression context of a waiting session
+
+v0.64.3
+----------
+ * Allow webhook calls with GET method to have bodies
+
+v0.64.2
+----------
+ * Include parent result references in flow inspection
+
+v0.64.1
+----------
+ * Add support for jitter in webhook retries
+
+v0.64.0
+----------
+ * Make http retrying available to all services which use HTTP
+ * Fix parsing out relative date value during migration of date tests
+
+v0.63.1
+----------
+ * Perform URL validation in call_webhook and skip action appropriately
+
+v0.63.0
+----------
+ * Loosen email regex used by has_email test
+ * Allow cloning of JSON flow definitions not tied to any spec version
+
+v0.62.0
+----------
+ * Render email_sent events in flowrunner
+ * Allow flowmigrate to take a target version argument
+ * Implement 13.1 migration as adding UUID to semd_msg.templating
+
+v0.61.0
+----------
+ * Implement email as a service
+
+v0.60.1
+----------
+ * Fix re-evaluating dynamic groups when query references non-existent field
+
+v0.60.0
+----------
+ * Add @globals to completion
+ * Add topic to send_msg actions
+
+v0.59.0
+----------
+ * Validate run summary JSON passed to flow action triggers
+ * Expose keyword match on trigger in context
+
+v0.58.0
+----------
+ * Give services their own HTTP clients
+ * Allow webhook service to take a map of deafult header values
+
+v0.57.0
+----------
+ * Add globals to evaluation context as @globals
+ * Add global as new asset type
+
+v0.56.3
+----------
+ * DTOne client should record http log for timeouts
+
+v0.56.2
+----------
+ * Fix migrating save actions with URN fields
+
+v0.56.1
+----------
+ * Tweak criteria for deciding whether to try reading a flow as legacy
+
+v0.56.0
+----------
+ * Fix docstring for UPPER()
+ * Rework ReadFlow to accept legacy flows too
+ * Move legacy package inside flows/definition
+
 v0.55.0
 ----------
  * Update start_session action to use escaping when evaluating the contact query

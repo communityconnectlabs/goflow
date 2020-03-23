@@ -5,6 +5,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
@@ -49,6 +50,15 @@ func TestReferences(t *testing.T) {
 
 	// flow references must always be concrete
 	assert.EqualError(t, utils.Validate(assets.NewFlowReference("", "Registration")), "field 'uuid' is required")
+
+	globalRef := assets.NewGlobalReference("org_name", "Org Name")
+	assert.Equal(t, "global", globalRef.Type())
+	assert.Equal(t, "org_name", globalRef.Identity())
+	assert.Equal(t, "global[key=org_name,name=Org Name]", globalRef.String())
+	assert.NoError(t, utils.Validate(globalRef))
+
+	// global references must have a key
+	assert.EqualError(t, utils.Validate(assets.NewGlobalReference("", "Org Name")), "field 'key' is required")
 
 	groupRef := assets.NewGroupReference("61602f3e-f603-4c70-8a8f-c477505bf4bf", "Testers")
 	assert.Equal(t, "group", groupRef.Type())
@@ -107,4 +117,15 @@ func TestChannelReferenceUnmarsal(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, assets.ChannelUUID("ffffffff-9b24-92e1-ffff-ffffb207cdb4"), channel.UUID)
 	assert.Equal(t, "Old Channel", channel.Name)
+}
+
+func TestTypedReference(t *testing.T) {
+	ref := assets.NewGroupReference("61602f3e-f603-4c70-8a8f-c477505bf4bf", "Bobs")
+	typed := assets.NewTypedReference(ref)
+
+	refJSON, _ := jsonx.Marshal(ref)
+	typedJSON, _ := jsonx.Marshal(typed)
+
+	assert.Equal(t, `{"uuid":"61602f3e-f603-4c70-8a8f-c477505bf4bf","name":"Bobs"}`, string(refJSON))
+	assert.Equal(t, `{"uuid":"61602f3e-f603-4c70-8a8f-c477505bf4bf","name":"Bobs","type":"group"}`, string(typedJSON))
 }

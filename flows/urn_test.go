@@ -17,25 +17,28 @@ import (
 )
 
 func TestContactURN(t *testing.T) {
+	env := envs.NewBuilder().Build()
+
 	source, err := static.NewSource([]byte(`{
         "channels": [
             {
                 "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                 "name": "Android Channel",
-				"address": "+12345671111",
+				"address": "+17036975131",
 				"schemes": [
 					"tel"
 				],
 				"roles": [
 					"send",
 					"receive"
-				]
+				],
+				"country": "US"
             }
         ]
     }`))
 	require.NoError(t, err)
 
-	sessionAssets, err := engine.NewSessionAssets(source)
+	sessionAssets, err := engine.NewSessionAssets(env, source, nil)
 	require.NoError(t, err)
 
 	channels := sessionAssets.Channels()
@@ -55,7 +58,6 @@ func TestContactURN(t *testing.T) {
 	assert.False(t, urn.Equal(urn3))
 
 	// check using URN in expressions
-	env := envs.NewBuilder().Build()
 	assert.Equal(t, types.NewXText("tel:+250781234567"), urn.ToXValue(env))
 
 	// check when URNs have to be redacted

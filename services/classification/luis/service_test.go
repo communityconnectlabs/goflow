@@ -1,6 +1,7 @@
 package luis_test
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
@@ -29,7 +30,7 @@ func TestService(t *testing.T) {
 	dates.SetNowSource(dates.NewSequentialNowSource(time.Date(2019, 10, 7, 15, 21, 30, 123456789, time.UTC)))
 	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
 		"https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/f96abf2f-3b53-4766-8ea6-09a655222a02?verbose=true&subscription-key=3246231&q=book+flight+to+Quito": []httpx.MockResponse{
-			httpx.NewMockResponse(200, `{
+			httpx.NewMockResponse(200, nil, `{
 				"query": "book a flight to Quito",
 				"topScoringIntent": {
 				  "intent": "Book Flight",
@@ -62,11 +63,14 @@ func TestService(t *testing.T) {
 				  "label": "positive",
 				  "score": 0.731448531
 				}
-			}`),
+			}`, 1),
 		},
 	}))
 
 	svc := luis.NewService(
+		http.DefaultClient,
+		nil,
+		nil,
 		test.NewClassifier("Booking", "luis", []string{"book_flight", "book_hotel"}),
 		"https://westus.api.cognitive.microsoft.com/luis/v2.0",
 		"f96abf2f-3b53-4766-8ea6-09a655222a02",

@@ -9,6 +9,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
@@ -18,7 +19,7 @@ func init() {
 // TypeChannel is the type for sessions triggered by channel events
 const TypeChannel string = "channel"
 
-// ChannelEventType is the type of event that occured on the channel
+// ChannelEventType is the type of event that occurred on the channel
 type ChannelEventType string
 
 // different channel event types
@@ -122,5 +123,5 @@ func (t *ChannelTrigger) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

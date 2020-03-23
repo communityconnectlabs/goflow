@@ -29,24 +29,24 @@ func (t *testFlowThing) LocalizationUUID() uuids.UUID {
 
 func TestTemplates(t *testing.T) {
 	l := definition.NewLocalization()
-	l.AddItemTranslation(envs.Language("eng"), uuids.UUID("f50df34b-18f8-489b-b8e8-ccb14d720641"), "foo", []string{"Hola"})
+	l.AddItemTranslation(envs.Language("spa"), uuids.UUID("f50df34b-18f8-489b-b8e8-ccb14d720641"), "foo", []string{"Hola"})
 
 	thing := &testFlowThing{UUID: uuids.UUID("f50df34b-18f8-489b-b8e8-ccb14d720641"), Foo: "Hello", Bar: "World"}
 
-	templates := make([]string, 0)
-	inspect.Templates(thing, l, func(t string) {
-		templates = append(templates, t)
+	templates := make(map[envs.Language][]string)
+	inspect.Templates(thing, l, func(l envs.Language, t string) {
+		templates[l] = append(templates[l], t)
 	})
 
-	assert.Equal(t, []string{"Hello", "Hola", "World"}, templates)
+	assert.Equal(t, map[envs.Language][]string{"": []string{"Hello", "World"}, "spa": []string{"Hola"}}, templates)
 
 	// can also extract from slice of things
-	templates = make([]string, 0)
-	inspect.Templates([]*testFlowThing{thing}, l, func(t string) {
-		templates = append(templates, t)
+	templates = make(map[envs.Language][]string)
+	inspect.Templates([]*testFlowThing{thing}, l, func(l envs.Language, t string) {
+		templates[l] = append(templates[l], t)
 	})
 
-	assert.Equal(t, []string{"Hello", "Hola", "World"}, templates)
+	assert.Equal(t, map[envs.Language][]string{"": []string{"Hello", "World"}, "spa": []string{"Hola"}}, templates)
 
 	// or a slice of actions
 	actions := []flows.Action{
@@ -54,12 +54,12 @@ func TestTemplates(t *testing.T) {
 		actions.NewSetContactLanguage(flows.ActionUUID("d5ecd045-a15f-467c-925a-54bcdc726b9f"), "Gibberish"),
 	}
 
-	templates = make([]string, 0)
-	inspect.Templates(actions, nil, func(t string) {
-		templates = append(templates, t)
+	templates = make(map[envs.Language][]string)
+	inspect.Templates(actions, nil, func(l envs.Language, t string) {
+		templates[l] = append(templates[l], t)
 	})
 
-	assert.Equal(t, []string{"Bob", "Gibberish"}, templates)
+	assert.Equal(t, map[envs.Language][]string{"": []string{"Bob", "Gibberish"}}, templates)
 }
 
 func TestTemplatePaths(t *testing.T) {
@@ -109,29 +109,71 @@ func TestTemplatePaths(t *testing.T) {
 	}, paths)
 }
 
-func TestExtractFieldReferences(t *testing.T) {
+func TestExtractFromTemplate(t *testing.T) {
 	testCases := []struct {
-		template string
-		refs     []*assets.FieldReference
+		template   string
+		assetRefs  []assets.Reference
+		parentRefs []string
 	}{
-		{``, []*assets.FieldReference{}},
-		{`Hi @contact`, []*assets.FieldReference{}},
-		{`You are @fields.age`, []*assets.FieldReference{assets.NewFieldReference("age", "")}},
-		{`You are @contact.fields.age`, []*assets.FieldReference{assets.NewFieldReference("age", "")}},
-		{`You are @CONTACT.FIELDS.AGE`, []*assets.FieldReference{assets.NewFieldReference("age", "")}},
-		{`You are @parent.fields.age`, []*assets.FieldReference{assets.NewFieldReference("age", "")}},
-		{`You are @parent.contact.fields.age`, []*assets.FieldReference{assets.NewFieldReference("age", "")}},
-		{`You are @child.contact.fields.age today`, []*assets.FieldReference{assets.NewFieldReference("age", "")}},
-		{`You are @(ABS(contact . fields . age) + 1)`, []*assets.FieldReference{assets.NewFieldReference("age", "")}},
-		{`You are @CONTACT.fields.age on @(contact.fields["Birthday"])`, []*assets.FieldReference{
-			assets.NewFieldReference("age", ""),
-			assets.NewFieldReference("birthday", ""),
-		}},
+		{``, []assets.Reference{}, []string{}},
+		{`Hi @contact`, []assets.Reference{}, []string{}},
+		{
+			`You are @fields.age`,
+			[]assets.Reference{assets.NewFieldReference("age", "")},
+			[]string{},
+		},
+		{
+			`You are @contact.fields.age`,
+			[]assets.Reference{assets.NewFieldReference("age", "")},
+			[]string{},
+		},
+		{
+			`You are @CONTACT.FIELDS.AGE`,
+			[]assets.Reference{assets.NewFieldReference("age", "")},
+			[]string{},
+		},
+		{
+			`You are @parent.fields.age`,
+			[]assets.Reference{assets.NewFieldReference("age", "")},
+			[]string{},
+		},
+		{
+			`You are @parent.contact.fields.age`,
+			[]assets.Reference{assets.NewFieldReference("age", "")},
+			[]string{},
+		},
+		{
+			`You are @child.contact.fields.age today`,
+			[]assets.Reference{assets.NewFieldReference("age", "")},
+			[]string{},
+		},
+		{
+			`You are @(ABS(contact . fields . age) + 1)`,
+			[]assets.Reference{assets.NewFieldReference("age", "")},
+			[]string{},
+		},
+		{
+			`You are @FIELDS.AGE in @GLOBALS.ORG_NAME from @PARENT.RESULTS.STATE `,
+			[]assets.Reference{
+				assets.NewFieldReference("age", ""),
+				assets.NewGlobalReference("org_name", ""),
+			},
+			[]string{"state"},
+		},
+		{
+			`You are @(fields["age"]) in @(globals["org_name"]) from @(parent.results["state"])`,
+			[]assets.Reference{
+				assets.NewFieldReference("age", ""),
+				assets.NewGlobalReference("org_name", ""),
+			},
+			[]string{"state"},
+		},
 	}
 
 	for _, tc := range testCases {
-		actual := inspect.ExtractFieldReferences(tc.template)
+		assetRefs, parentRefs := inspect.ExtractFromTemplate(tc.template)
 
-		assert.Equal(t, tc.refs, actual, "field refs mismatch for template '%s'", tc.template)
+		assert.Equal(t, tc.assetRefs, assetRefs, "asset refs mismatch for template '%s'", tc.template)
+		assert.Equal(t, tc.parentRefs, parentRefs, "parent result refs mismatch for template '%s'", tc.template)
 	}
 }

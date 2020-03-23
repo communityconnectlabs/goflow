@@ -14,12 +14,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-var telRegex = regexp.MustCompile(`^[+ \d\-\(\)]+$`)
-var cleanSpecialCharsRegex = regexp.MustCompile(`[+ \-\(\)]+`)
+// an implicit condition like +123-124-6546 or 1234 will be interpreted as a tel ~ condition
+var implicitIsPhoneNumberRegex = regexp.MustCompile(`^\+?[\-\d]{4,}$`)
 
-var comparatorAliases = map[string]string{
-	"has": "~",
-	"is":  "=",
+// used to strip formatting from phone number values
+var cleanPhoneNumberRegex = regexp.MustCompile(`[^+\d]+`)
+
+var comparatorAliases = map[string]Comparator{
+	"has": ComparatorContains,
+	"is":  ComparatorEqual,
 }
 
 // Fixed attributes that can be searched
@@ -27,31 +30,38 @@ const (
 	AttributeID        = "id"
 	AttributeName      = "name"
 	AttributeLanguage  = "language"
+	AttributeURN       = "urn"
+	AttributeGroup     = "group"
 	AttributeCreatedOn = "created_on"
 )
 
 var attributes = map[string]assets.FieldType{
-	AttributeID:        assets.FieldTypeNumber,
+	AttributeID:        assets.FieldTypeText,
 	AttributeName:      assets.FieldTypeText,
 	AttributeLanguage:  assets.FieldTypeText,
+	AttributeURN:       assets.FieldTypeText,
+	AttributeGroup:     assets.FieldTypeText,
 	AttributeCreatedOn: assets.FieldTypeDatetime,
 }
 
-// FieldResolverFunc resolves a query property key to a possible contact field
-type FieldResolverFunc func(string) assets.Field
+// Resolver provides functions for resolving fields and groups referenced in queries
+type Resolver interface {
+	ResolveField(key string) assets.Field
+	ResolveGroup(name string) assets.Group
+}
 
 type visitor struct {
 	gen.BaseContactQLVisitor
 
-	redaction     envs.RedactionPolicy
-	fieldResolver FieldResolverFunc
+	redaction envs.RedactionPolicy
+	resolver  Resolver
 
 	errors []error
 }
 
 // creates a new ContactQL visitor
-func newVisitor(redaction envs.RedactionPolicy, fieldResolver FieldResolverFunc) *visitor {
-	return &visitor{redaction: redaction, fieldResolver: fieldResolver}
+func newVisitor(redaction envs.RedactionPolicy, resolver Resolver) *visitor {
+	return &visitor{redaction: redaction, resolver: resolver}
 }
 
 // Visit the top level parse tree
@@ -66,31 +76,50 @@ func (v *visitor) VisitParse(ctx *gen.ParseContext) interface{} {
 
 // expression : TEXT
 func (v *visitor) VisitImplicitCondition(ctx *gen.ImplicitConditionContext) interface{} {
-	value := ctx.TEXT().GetText()
+	value := v.Visit(ctx.Literal()).(string)
+
+	asURN, _ := urns.Parse(value)
 
 	if v.redaction == envs.RedactionPolicyURNs {
 		num, err := strconv.Atoi(value)
 		if err == nil {
-			return newCondition(PropertyTypeAttribute, AttributeID, "=", strconv.Itoa(num), attributes[AttributeID])
+			return newCondition(PropertyTypeAttribute, AttributeID, ComparatorEqual, strconv.Itoa(num), attributes[AttributeID])
 		}
-	} else if telRegex.MatchString(value) {
-		value = cleanSpecialCharsRegex.ReplaceAllString(value, "")
+	} else if asURN != urns.NilURN {
+		scheme, path, _, _ := asURN.ToParts()
 
-		return newCondition(PropertyTypeScheme, urns.TelScheme, "~", value, assets.FieldTypeText)
+		return newCondition(PropertyTypeScheme, scheme, ComparatorEqual, path, assets.FieldTypeText)
+
+	} else if implicitIsPhoneNumberRegex.MatchString(value) {
+		value = cleanPhoneNumberRegex.ReplaceAllLiteralString(value, "")
+
+		return newCondition(PropertyTypeScheme, urns.TelScheme, ComparatorContains, value, assets.FieldTypeText)
 	}
 
-	return newCondition(PropertyTypeAttribute, AttributeName, "~", value, attributes[AttributeName])
+	// convert to contains condition only if we have the right tokens, otherwise make equals check
+	comparator := ComparatorContains
+	if len(tokenizeNameValue(value)) == 0 {
+		comparator = ComparatorEqual
+	}
+
+	condition := newCondition(PropertyTypeAttribute, AttributeName, comparator, value, attributes[AttributeName])
+
+	if err := condition.Validate(v.resolver); err != nil {
+		v.addError(err)
+	}
+
+	return condition
 }
 
 // expression : TEXT COMPARATOR literal
 func (v *visitor) VisitCondition(ctx *gen.ConditionContext) interface{} {
 	propKey := strings.ToLower(ctx.TEXT().GetText())
-	comparator := strings.ToLower(ctx.COMPARATOR().GetText())
+	comparatorText := strings.ToLower(ctx.COMPARATOR().GetText())
 	value := v.Visit(ctx.Literal()).(string)
 
-	resolvedAlias, isAlias := comparatorAliases[comparator]
-	if isAlias {
-		comparator = resolvedAlias
+	comparator, isAlias := comparatorAliases[comparatorText]
+	if !isAlias {
+		comparator = Comparator(comparatorText)
 	}
 
 	var propType PropertyType
@@ -100,25 +129,35 @@ func (v *visitor) VisitCondition(ctx *gen.ConditionContext) interface{} {
 	if isAttribute {
 		propType = PropertyTypeAttribute
 
+		if propKey == AttributeURN && v.redaction == envs.RedactionPolicyURNs {
+			v.addError(errors.New("cannot query on redacted URNs"))
+		}
+
 	} else if urns.IsValidScheme(propKey) {
 		// second try to match a URN scheme
 		propType = PropertyTypeScheme
 		valueType = assets.FieldTypeText
 
 		if v.redaction == envs.RedactionPolicyURNs {
-			v.errors = append(v.errors, errors.New("cannot query on redacted URNs"))
+			v.addError(errors.New("cannot query on redacted URNs"))
 		}
 	} else {
-		field := v.fieldResolver(propKey)
+		field := v.resolver.ResolveField(propKey)
 		if field != nil {
 			propType = PropertyTypeField
 			valueType = field.Type()
 		} else {
-			v.errors = append(v.errors, errors.Errorf("can't resolve '%s' to attribute, scheme or field", propKey))
+			v.addError(errors.Errorf("can't resolve '%s' to attribute, scheme or field", propKey))
 		}
 	}
 
-	return newCondition(propType, propKey, comparator, value, valueType)
+	condition := newCondition(propType, propKey, comparator, value, valueType)
+
+	if err := condition.Validate(v.resolver); err != nil {
+		v.addError(err)
+	}
+
+	return condition
 }
 
 // expression : expression AND expression
@@ -165,4 +204,8 @@ func (v *visitor) VisitStringLiteral(ctx *gen.StringLiteralContext) interface{} 
 	}
 
 	return unquoted
+}
+
+func (v *visitor) addError(err error) {
+	v.errors = append(v.errors, err)
 }

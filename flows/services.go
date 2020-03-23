@@ -12,9 +12,15 @@ import (
 
 // Services groups together interfaces for several services whose implementation is provided outside of the flow engine.
 type Services interface {
+	Email(Session) (EmailService, error)
 	Webhook(Session) (WebhookService, error)
 	Classification(Session, *Classifier) (ClassificationService, error)
 	Airtime(Session) (AirtimeService, error)
+}
+
+// EmailService provides email functionality to the engine
+type EmailService interface {
+	Send(session Session, addresses []string, subject, body string) error
 }
 
 // CallStatus represents the status of a call to an external service
@@ -36,20 +42,13 @@ const (
 
 // WebhookCall is the result of a webhook call
 type WebhookCall struct {
-	URL         string
-	Method      string
-	StatusCode  int
-	Status      CallStatus
-	TimeTaken   time.Duration
-	Request     []byte
-	Response    []byte
+	*httpx.Trace
 	BodyIgnored bool
-	Resthook    string
 }
 
 // WebhookService provides webhook functionality to the engine
 type WebhookService interface {
-	Call(session Session, request *http.Request, resthook string) (*WebhookCall, error)
+	Call(session Session, request *http.Request) (*WebhookCall, error)
 }
 
 // ExtractedIntent models an intent match
@@ -109,12 +108,15 @@ type HTTPLog struct {
 	ElapsedMS int        `json:"elapsed_ms"`
 }
 
+// HTTPLogCallback is a function that handles an HTTP log
 type HTTPLogCallback func(*HTTPLog)
 
+// HTTPLogger logs HTTP logs
 type HTTPLogger struct {
 	Logs []*HTTPLog
 }
 
+// Log logs the given HTTP log
 func (l *HTTPLogger) Log(h *HTTPLog) {
 	l.Logs = append(l.Logs, h)
 }

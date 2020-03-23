@@ -35,10 +35,11 @@ urns.telegram -> Telegram URN for the contact
 urns.twitter -> Twitter URN for the contact
 urns.twitterid -> Twitterid URN for the contact
 urns.viber -> Viber URN for the contact
+urns.vk -> Vk URN for the contact
 urns.wechat -> Wechat URN for the contact
 urns.whatsapp -> Whatsapp URN for the contact
 results -> the current run results
-results.response_1 -> result for response_1 (defaults to the value)
+results.response_1 -> the result for response_1 (defaults to the value)
 results.response_1.name -> the name of the result
 results.response_1.value -> the value of the result
 results.response_1.category -> the category of the result
@@ -88,7 +89,7 @@ run.flow.name -> the name of the flow
 run.flow.revision -> the revision number of the flow
 run.status -> the current status of the run
 run.results -> the results saved by the run
-run.results.response_1 -> result for response_1 (defaults to the value)
+run.results.response_1 -> the result for response_1 (defaults to the value)
 run.results.response_1.name -> the name of the result
 run.results.response_1.value -> the value of the result
 run.results.response_1.category -> the category of the result
@@ -142,6 +143,7 @@ child.urns.telegram -> Telegram URN for the contact
 child.urns.twitter -> Twitter URN for the contact
 child.urns.twitterid -> Twitterid URN for the contact
 child.urns.viber -> Viber URN for the contact
+child.urns.vk -> Vk URN for the contact
 child.urns.wechat -> Wechat URN for the contact
 child.urns.whatsapp -> Whatsapp URN for the contact
 child.results -> the results saved by the run
@@ -189,11 +191,15 @@ parent.urns.telegram -> Telegram URN for the contact
 parent.urns.twitter -> Twitter URN for the contact
 parent.urns.twitterid -> Twitterid URN for the contact
 parent.urns.viber -> Viber URN for the contact
+parent.urns.vk -> Vk URN for the contact
 parent.urns.wechat -> Wechat URN for the contact
 parent.urns.whatsapp -> Whatsapp URN for the contact
 parent.results -> the results saved by the run
 parent.status -> the current status of the run
 webhook -> the parsed JSON response of the last webhook call
+globals -> the global values
+globals.org_name -> the global value org_name
 trigger -> the trigger that started this session
 trigger.type -> the type of trigger that started this session
 trigger.params -> the parameters passed to the trigger
+trigger.keyword -> the keyword match if this is a keyword trigger

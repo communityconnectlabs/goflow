@@ -1,4 +1,4 @@
-# Goflow ![Build Status](https://github.com/nyaruka/goflow/workflows/Test/badge.svg) [![codecov](https://codecov.io/gh/nyaruka/goflow/branch/master/graph/badge.svg)](https://codecov.io/gh/nyaruka/goflow) [![Go Report Card](https://goreportcard.com/badge/github.com/nyaruka/goflow)](https://goreportcard.com/report/github.com/nyaruka/goflow)
+# Goflow [![Build Status](https://github.com/nyaruka/goflow/workflows/CI/badge.svg)](https://github.com/nyaruka/goflow/actions?query=workflow%3ACI) [![codecov](https://codecov.io/gh/nyaruka/goflow/branch/master/graph/badge.svg)](https://codecov.io/gh/nyaruka/goflow) [![Go Report Card](https://goreportcard.com/badge/github.com/nyaruka/goflow)](https://goreportcard.com/report/github.com/nyaruka/goflow)
 
 ## Specification
 
@@ -14,10 +14,10 @@ import (
     "github.com/greatnonprofits-nfp/goflow/utils"
 )
 
-source, _ := static.LoadSource("myassets.json")
-assets, _ := engine.NewSessionAssets(source)
-contact := flows.NewContact(assets, ...)
 env := envs.NewBuilder().Build()
+source, _ := static.LoadSource("myassets.json")
+assets, _ := engine.NewSessionAssets(env, source, nil)
+contact := flows.NewContact(assets, ...)
 trigger := triggers.NewManual(env, contact, flow.Reference(), nil, nil, time.Now())
 eng := engine.NewBuilder().Build()
 session, sprint, err := eng.NewSession(assets, trigger)
@@ -25,7 +25,7 @@ session, sprint, err := eng.NewSession(assets, trigger)
 
 ## Sessions
 
-Sessions can easily be persisted between waits by calling `json.Marshal` on the `Session` instance to marshal it as JSON. You can inspect this JSON at https://sessions.temba.io/.
+Sessions can be persisted between waits by calling `json.Marshal` on the `Session` instance to marshal it as JSON. You can inspect this JSON at https://sessions.temba.io/.
 
 ## Utilities
 
@@ -86,5 +86,5 @@ You can run all the tests with:
 If you've made changes to the flow engine output, regenerate the test files with:
 
 ```
-% go test github.com/greatnonprofits-nfp/goflow/test -write
+% go test github.com/nyaruka/goflow/test -update
 ```

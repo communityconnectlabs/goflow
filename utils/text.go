@@ -2,7 +2,10 @@ package utils
 
 import (
 	"regexp"
+	"sort"
 	"strings"
+
+	"github.com/blevesearch/segment"
 )
 
 var snakedChars = regexp.MustCompile(`[^\p{L}\d_]+`)
@@ -35,6 +38,22 @@ func TokenizeStringByChars(str string, chars string) []string {
 	return strings.FieldsFunc(str, f)
 }
 
+// TokenizeStringByUnicodeSeg tokenizes the given string using the Unicode Text Segmentation standard described at http://www.unicode.org/reports/tr29/
+func TokenizeStringByUnicodeSeg(str string) []string {
+	segmenter := segment.NewWordSegmenter(strings.NewReader(str))
+	tokens := make([]string, 0)
+
+	for segmenter.Segment() {
+		token := string(segmenter.Bytes())
+		ttype := segmenter.Type()
+		if ttype != segment.None {
+			tokens = append(tokens, token)
+		}
+	}
+
+	return tokens
+}
+
 // PrefixOverlap returns the number of prefix characters which s1 and s2 have in common
 func PrefixOverlap(s1, s2 string) int {
 	r1 := []rune(s1)
@@ -64,6 +83,16 @@ func StringSliceContains(slice []string, str string, caseSensitive bool) bool {
 	return false
 }
 
+// StringSetKeys returns the keys of string set in lexical order
+func StringSetKeys(m map[string]bool) []string {
+	vals := make([]string, 0, len(m))
+	for v := range m {
+		vals = append(vals, v)
+	}
+	sort.Strings(vals)
+	return vals
+}
+
 // Indent indents each non-empty line in the given string
 func Indent(s string, prefix string) string {
 	output := strings.Builder{}
@@ -77,4 +106,22 @@ func Indent(s string, prefix string) string {
 		bol = c == '\n'
 	}
 	return output.String()
+}
+
+// Truncate truncates the given string to ensure it's less than limit characters
+func Truncate(s string, limit int) string {
+	return truncate(s, limit, "")
+}
+
+// TruncateEllipsis truncates the given string and adds ellipsis where the input is cut
+func TruncateEllipsis(s string, limit int) string {
+	return truncate(s, limit, "...")
+}
+
+func truncate(s string, limit int, ending string) string {
+	runes := []rune(s)
+	if len(runes) <= limit {
+		return s
+	}
+	return string(runes[:limit-len(ending)]) + ending
 }

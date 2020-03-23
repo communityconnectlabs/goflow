@@ -2,6 +2,9 @@ package events_test
 
 import (
 	"encoding/json"
+	"errors"
+	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -12,8 +15,11 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
+	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
 	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 	"github.com/shopspring/decimal"
 
@@ -248,7 +254,7 @@ func TestEventMarshaling(t *testing.T) {
 					"name": "Ryan Lewis",
 					"timezone": "America/Guayaquil",
 					"urns": [
-						"tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
+						"tel:+12024561111?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
 						"twitterid:54784326227#nyaruka",
 						"mailto:foo@bar.com"
 					],
@@ -289,6 +295,16 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
+			events.NewEmailSent([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Update", "Flows are great!"),
+			`{
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"type": "email_sent",
+				"to": ["bob@nyaruka.com", "jim@nyaruka.com"],
+				"subject": "Update",
+				"body": "Flows are great!"
+			}`,
+		},
+		{
 			events.NewEnvironmentRefreshed(session.Environment()),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
@@ -312,6 +328,22 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
+			events.NewError(errors.New("I'm an error")),
+			`{
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"text": "I'm an error",
+				"type": "error"
+			}`,
+		},
+		{
+			events.NewDependencyError(assets.NewFieldReference("age", "Age")),
+			`{
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"text": "missing dependency: field[key=age,name=Age]",
+				"type": "error"
+			}`,
+		},
+		{
 			events.NewIVRCreated(
 				flows.NewMsgOut(
 					urns.URN("tel:+12345678900"),
@@ -319,7 +351,10 @@ func TestEventMarshaling(t *testing.T) {
 					"Hi there",
 					nil,
 					nil,
-					nil)),
+					nil,
+					flows.NilMsgTopic,
+				),
+			),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"msg": {
@@ -388,7 +423,7 @@ func TestEventMarshaling(t *testing.T) {
 	}
 
 	for _, tc := range eventTests {
-		eventJSON, err := json.Marshal(tc.event)
+		eventJSON, err := jsonx.Marshal(tc.event)
 		assert.NoError(t, err)
 
 		test.AssertEqualJSON(t, []byte(tc.marshaled), eventJSON, "event JSON mismatch")
@@ -407,4 +442,28 @@ func TestReadEvent(t *testing.T) {
 	// error if we don't recognize action type
 	_, err = events.ReadEvent([]byte(`{"type": "do_the_foo", "foo": "bar"}`))
 	assert.EqualError(t, err, "unknown type: 'do_the_foo'")
+}
+
+func TestWebhookCalledEventTrimming(t *testing.T) {
+	defer httpx.SetRequestor(httpx.DefaultRequestor)
+
+	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
+		"http://temba.io/": []httpx.MockResponse{
+			httpx.NewMockResponse(200, nil, "Y", 20000),
+		},
+	}))
+
+	request, _ := http.NewRequest("GET", "http://temba.io/", strings.NewReader(strings.Repeat("X", 20000)))
+
+	svc := webhooks.NewService(http.DefaultClient, nil, nil, nil, 1024*1024)
+	call, err := svc.Call(nil, request)
+	require.NoError(t, err)
+
+	event := events.NewWebhookCalled(call, flows.CallStatusSuccess, "")
+
+	assert.Equal(t, "http://temba.io/", event.URL)
+	assert.Equal(t, 10000, len(event.Request))
+	assert.Equal(t, "XXXXXXX...", event.Request[9990:])
+	assert.Equal(t, 10000, len(event.Response))
+	assert.Equal(t, "YYYYYYY...", event.Response[9990:])
 }

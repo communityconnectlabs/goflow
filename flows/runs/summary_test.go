@@ -1,7 +1,6 @@
 package runs_test
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/runs"
 	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
@@ -42,7 +42,7 @@ func TestRunSummary(t *testing.T) {
 	assert.Equal(t, "Ryan Lewis@Registration", runs.FormatRunSummary(session.Environment(), summary))
 
 	// test marshaling and unmarshaling
-	marshaled, err := json.Marshal(summary)
+	marshaled, err := jsonx.Marshal(summary)
 	require.NoError(t, err)
 
 	summary, err = runs.ReadRunSummary(session.Assets(), marshaled, assets.PanicOnMissing)
@@ -53,7 +53,7 @@ func TestRunSummary(t *testing.T) {
 	assert.Equal(t, "Ryan Lewis@Registration", runs.FormatRunSummary(session.Environment(), summary))
 
 	// try reading with missing assets
-	emptyAssets, err := engine.NewSessionAssets(static.NewEmptySource())
+	emptyAssets, err := engine.NewSessionAssets(session.Environment(), static.NewEmptySource(), nil)
 
 	summary, err = runs.ReadRunSummary(emptyAssets, marshaled, assets.IgnoreMissing)
 	require.NoError(t, err)

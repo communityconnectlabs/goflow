@@ -133,7 +133,7 @@ will be created when this action is encountered.
     "created_on": "2018-04-11T18:24:30.123456Z",
     "step_uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
     "urns": [
-        "tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
+        "tel:+12024561111?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
         "twitterid:54784326227#nyaruka",
         "mailto:foo@bar.com",
         "tel:+12344563452"
@@ -212,9 +212,9 @@ and entities were.
         },
         "http_logs": [
             {
-                "url": "http://test.acme.ai?classifiy",
+                "url": "http://test.acme.ai?classify",
                 "status": "success",
-                "request": "GET /?classifiy HTTP/1.1\r\nHost: test.acme.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+                "request": "GET /?classify HTTP/1.1\r\nHost: test.acme.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
                 "response": "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
                 "created_on": "2019-10-16T13:59:30.123456789Z",
                 "elapsed_ms": 1000
@@ -282,13 +282,13 @@ through `extra` on the result.
         "resthook": "new-registration",
         "payload": {
             "channel": {
-                "address": "+12345671111",
+                "address": "+17036975131",
                 "name": "My Android Phone",
                 "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
             },
             "contact": {
                 "name": "Ryan Lewis",
-                "urn": "tel:+12065551212",
+                "urn": "tel:+12024561111",
                 "uuid": "5d76d86b-3bb9-4d5a-b822-c9d86f5d8e4f"
             },
             "flow": {
@@ -308,7 +308,7 @@ through `extra` on the result.
                     }
                 ],
                 "channel": {
-                    "address": "+12345671111",
+                    "address": "+17036975131",
                     "name": "My Android Phone",
                     "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                 },
@@ -407,7 +407,7 @@ through `extra` on the result.
         "step_uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
         "url": "http://127.0.0.1:49998/?cmd=success",
         "status": "success",
-        "request": "POST /?cmd=success HTTP/1.1\r\nHost: 127.0.0.1:49998\r\nUser-Agent: goflow-testing\r\nContent-Length: 2821\r\nContent-Type: application/json\r\nAccept-Encoding: gzip\r\n\r\n{\"channel\":{\"address\":\"+12345671111\",\"name\":\"My Android Phone\",\"uuid\":\"57f1078f-88aa-46f4-a59a-948a5739c03d\"},\"contact\":{\"name\":\"Ryan Lewis\",\"urn\":\"tel:+12065551212\",\"uuid\":\"5d76d86b-3bb9-4d5a-b822-c9d86f5d8e4f\"},\"flow\":{\"name\":\"Registration\",\"revision\":123,\"uuid\":\"50c3706e-fedb-42c0-8eab-dda3335714b7\"},\"input\":{\"attachments\":[{\"content_type\":\"image/jpeg\",\"url\":\"http://s3.amazon.com/bucket/test.jpg\"},{\"content_type\":\"audio/mp3\",\"url\":\"http://s3.amazon.com/bucket/test.mp3\"}],\"channel\":{\"address\":\"+12345671111\",\"name\":\"My Android Phone\",\"uuid\":\"57f1078f-88aa-46f4-a59a-948a5739c03d\"},\"created_on\":\"2017-12-31T11:35:10.035757-02:00\",\"text\":\"Hi there\",\"type\":\"msg\",\"urn\":{\"display\":\"(206) 555-1212\",\"path\":\"+12065551212\",\"scheme\":\"tel\"},\"uuid\":\"9bf91c2b-ce58-4cef-aacc-281e03f69ab5\"},\"path\":[{\"arrived_on\":\"2018-04-11T18:24:30.123456Z\",\"exit_uuid\":\"d7a36118-0a38-4b35-a7e4-ae89042f0d3c\",\"node_uuid\":\"72a1f5df-49f9-45df-94c9-d86f7ea064e5\",\"uuid\":\"8720f157-ca1c-432f-9c0b-2014ddc77094\"},{\"arrived_on\":\"2018-04-11T18:24:30.123456Z\",\"exit_uuid\":\"100f2d68-2481-4137-a0a3-177620ba3c5f\",\"node_uuid\":\"3dcccbb4-d29c-41dd-a01f-16d814c9ab82\",\"uuid\":\"970b8069-50f5-4f6f-8f41-6b2d9f33d623\"},{\"arrived_on\":\"2018-04-11T18:24:30.123456Z\",\"exit_uuid\":\"d898f9a4-f0fc-4ac4-a639-c98c602bb511\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"uuid\":\"5ecda5fc-951c-437b-a17e-f85e49829fb9\"},{\"arrived_on\":\"2018-04-11T18:24:30.123456Z\",\"exit_uuid\":\"9fc5f8b4-2247-43db-b899-ab1ac50ba06c\",\"node_uuid\":\"c0781400-737f-4940-9a6c-1ec1c3df0325\",\"uuid\":\"312d3af0-a565-4c96-ba00-bd7f0d08e671\"}],\"results\":{\"2factor\":{\"category\":\"\",\"category_localized\":\"\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"\",\"name\":\"2Factor\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"value\":\"34634624463525\"},\"favorite_color\":{\"category\":\"Red\",\"category_localized\":\"Red\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"\",\"name\":\"Favorite Color\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"value\":\"red\"},\"intent\":{\"category\":\"Success\",\"category_localized\":\"Success\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"Hi there\",\"name\":\"Intent\",\"node_uuid\":\"c0781400-737f-4940-9a6c-1ec1c3df0325\",\"value\":\"book_flight\"},\"phone_number\":{\"category\":\"\",\"category_localized\":\"\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"\",\"name\":\"Phone Number\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"value\":\"+12344563452\"},\"webhook\":{\"category\":\"Success\",\"category_localized\":\"Success\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"GET http://127.0.0.1:49998/?content=%7B%22results%22%3A%5B%7B%22state%22%3A%22WA%22%7D%2C%7B%22state%22%3A%22IN%22%7D%5D%7D\",\"name\":\"webhook\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"value\":\"200\"}},\"run\":{\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"uuid\":\"692926ea-09d6-4942-bd38-d266ec8d3716\"}}",
+        "request": "POST /?cmd=success HTTP/1.1\r\nHost: 127.0.0.1:49998\r\nUser-Agent: goflow-testing\r\nContent-Length: 2821\r\nContent-Type: application/json\r\nAccept-Encoding: gzip\r\n\r\n{\"channel\":{\"address\":\"+17036975131\",\"name\":\"My Android Phone\",\"uuid\":\"57f1078f-88aa-46f4-a59a-948a5739c03d\"},\"contact\":{\"name\":\"Ryan Lewis\",\"urn\":\"tel:+12024561111\",\"uuid\":\"5d76d86b-3bb9-4d5a-b822-c9d86f5d8e4f\"},\"flow\":{\"name\":\"Registration\",\"revision\":123,\"uuid\":\"50c3706e-fedb-42c0-8eab-dda3335714b7\"},\"input\":{\"attachments\":[{\"content_type\":\"image/jpeg\",\"url\":\"http://s3.amazon.com/bucket/test.jpg\"},{\"content_type\":\"audio/mp3\",\"url\":\"http://s3.amazon.com/bucket/test.mp3\"}],\"channel\":{\"address\":\"+17036975131\",\"name\":\"My Android Phone\",\"uuid\":\"57f1078f-88aa-46f4-a59a-948a5739c03d\"},\"created_on\":\"2017-12-31T11:35:10.035757-02:00\",\"text\":\"Hi there\",\"type\":\"msg\",\"urn\":{\"display\":\"(206) 555-1212\",\"path\":\"+12065551212\",\"scheme\":\"tel\"},\"uuid\":\"9bf91c2b-ce58-4cef-aacc-281e03f69ab5\"},\"path\":[{\"arrived_on\":\"2018-04-11T18:24:30.123456Z\",\"exit_uuid\":\"d7a36118-0a38-4b35-a7e4-ae89042f0d3c\",\"node_uuid\":\"72a1f5df-49f9-45df-94c9-d86f7ea064e5\",\"uuid\":\"8720f157-ca1c-432f-9c0b-2014ddc77094\"},{\"arrived_on\":\"2018-04-11T18:24:30.123456Z\",\"exit_uuid\":\"100f2d68-2481-4137-a0a3-177620ba3c5f\",\"node_uuid\":\"3dcccbb4-d29c-41dd-a01f-16d814c9ab82\",\"uuid\":\"970b8069-50f5-4f6f-8f41-6b2d9f33d623\"},{\"arrived_on\":\"2018-04-11T18:24:30.123456Z\",\"exit_uuid\":\"d898f9a4-f0fc-4ac4-a639-c98c602bb511\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"uuid\":\"5ecda5fc-951c-437b-a17e-f85e49829fb9\"},{\"arrived_on\":\"2018-04-11T18:24:30.123456Z\",\"exit_uuid\":\"9fc5f8b4-2247-43db-b899-ab1ac50ba06c\",\"node_uuid\":\"c0781400-737f-4940-9a6c-1ec1c3df0325\",\"uuid\":\"312d3af0-a565-4c96-ba00-bd7f0d08e671\"}],\"results\":{\"2factor\":{\"category\":\"\",\"category_localized\":\"\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"\",\"name\":\"2Factor\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"value\":\"34634624463525\"},\"favorite_color\":{\"category\":\"Red\",\"category_localized\":\"Red\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"\",\"name\":\"Favorite Color\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"value\":\"red\"},\"intent\":{\"category\":\"Success\",\"category_localized\":\"Success\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"Hi there\",\"name\":\"Intent\",\"node_uuid\":\"c0781400-737f-4940-9a6c-1ec1c3df0325\",\"value\":\"book_flight\"},\"phone_number\":{\"category\":\"\",\"category_localized\":\"\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"\",\"name\":\"Phone Number\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"value\":\"+12344563452\"},\"webhook\":{\"category\":\"Success\",\"category_localized\":\"Success\",\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"input\":\"GET http://127.0.0.1:49998/?content=%7B%22results%22%3A%5B%7B%22state%22%3A%22WA%22%7D%2C%7B%22state%22%3A%22IN%22%7D%5D%7D\",\"name\":\"webhook\",\"node_uuid\":\"f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03\",\"value\":\"200\"}},\"run\":{\"created_on\":\"2018-04-11T18:24:30.123456Z\",\"uuid\":\"692926ea-09d6-4942-bd38-d266ec8d3716\"}}",
         "response": "HTTP/1.1 200 OK\r\nContent-Length: 16\r\nContent-Type: text/plain; charset=utf-8\r\nDate: Wed, 11 Apr 2018 18:24:30 GMT\r\n\r\n{ \"ok\": \"true\" }",
         "elapsed_ms": 0,
         "resthook": "new-registration",
@@ -659,7 +659,7 @@ with the evaluated text.
 Can be used to send an email to one or more recipients. The subject, body and addresses
 can all contain expressions.
 
-An [email_created](sessions.html#event:email_created) event will be created for each email address.
+An [email_sent](sessions.html#event:email_sent) event will be created if the email could be sent.
 
 <div class="input_action"><h3>Action</h3>
 
@@ -678,10 +678,10 @@ An [email_created](sessions.html#event:email_created) event will be created for 
 
 ```json
 {
-    "type": "email_created",
+    "type": "email_sent",
     "created_on": "2018-04-11T18:24:30.123456Z",
     "step_uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
-    "addresses": [
+    "to": [
         "foo@bar.com"
     ],
     "subject": "Here is your activation token",
@@ -705,6 +705,7 @@ A [msg_created](sessions.html#event:msg_created) event will be created with the 
     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
     "text": "Hi @contact.name, are you ready to complete today's survey?",
     "templating": {
+        "uuid": "32c2ead6-3fa3-4402-8e27-9cc718175c5a",
         "template": {
             "uuid": "3ce100b7-a734-4b4e-891b-350b1279ade2",
             "name": "revive_issue"
@@ -712,7 +713,8 @@ A [msg_created](sessions.html#event:msg_created) event will be created with the 
         "variables": [
             "@contact.name"
         ]
-    }
+    },
+    "topic": "event"
 }
 ```
 </div><div class="output_event"><h3>Event</h3>
@@ -724,12 +726,13 @@ A [msg_created](sessions.html#event:msg_created) event will be created with the 
     "step_uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
     "msg": {
         "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459",
-        "urn": "tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
+        "urn": "tel:+12024561111?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
         "channel": {
             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
             "name": "My Android Phone"
         },
-        "text": "Hi Ryan Lewis, are you ready to complete today's survey?"
+        "text": "Hi Ryan Lewis, are you ready to complete today's survey?",
+        "topic": "event"
     }
 }
 ```
@@ -955,7 +958,7 @@ will be created and it's the responsibility of the caller to act on that by init
             "timezone": "Africa/Kigali",
             "created_on": "2018-06-20T11:40:30.123456789Z",
             "urns": [
-                "tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
+                "tel:+12024561111?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
                 "twitterid:54784326227#nyaruka",
                 "mailto:foo@bar.com",
                 "tel:+12344563452"
@@ -1063,7 +1066,7 @@ will be created and it's the responsibility of the caller to act on that by init
 
 Attempts to make an airtime transfer to the contact.
 
-An [email_created](sessions.html#event:email_created) event will be created for each email address.
+An [airtime_transferred](sessions.html#event:airtime_transferred) event will be created if the airtime could be sent.
 
 <div class="input_action"><h3>Action</h3>
 
@@ -1086,8 +1089,8 @@ An [email_created](sessions.html#event:email_created) event will be created for 
         "type": "airtime_transferred",
         "created_on": "2018-04-11T18:24:30.123456Z",
         "step_uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
-        "sender": "tel:+12345671111",
-        "recipient": "tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
+        "sender": "tel:+17036975131",
+        "recipient": "tel:+12024561111?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
         "currency": "RWF",
         "desired_amount": 500,
         "actual_amount": 500,

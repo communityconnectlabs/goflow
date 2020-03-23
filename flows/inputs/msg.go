@@ -11,6 +11,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
@@ -141,5 +142,5 @@ func (i *MsgInput) MarshalJSON() ([]byte, error) {
 
 	i.marshal(&e.baseInputEnvelope)
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

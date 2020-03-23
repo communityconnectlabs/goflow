@@ -2,15 +2,16 @@ package definition
 
 import (
 	"encoding/json"
-	"fmt"
-	"strings"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
 	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
+	"github.com/greatnonprofits-nfp/goflow/flows/inspect/issues"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/Masterminds/semver"
@@ -18,7 +19,13 @@ import (
 )
 
 // CurrentSpecVersion is the flow spec version supported by this library
-var CurrentSpecVersion = semver.MustParse("13.0")
+var CurrentSpecVersion = semver.MustParse("13.1.0")
+
+// IsVersionSupported checks the given version is supported
+func IsVersionSupported(v *semver.Version) bool {
+	// can't do anything with a pre-11 flow or a newer major version
+	return v.Major() >= 11 && v.Major() <= CurrentSpecVersion.Major()
+}
 
 type flow struct {
 	// spec properties
@@ -98,83 +105,16 @@ func (f *flow) validate() error {
 }
 
 // Inspect enumerates dependencies, results etc
-func (f *flow) Inspect() *flows.FlowInfo {
-	return &flows.FlowInfo{
-		Dependencies: flows.NewDependencies(f.ExtractDependencies()),
-		Results:      f.ExtractResults(),
-		WaitingExits: f.ExtractExitsFromWaits(),
+func (f *flow) Inspect(sa flows.SessionAssets) *flows.Inspection {
+	templates, assetRefs, parentRefs := f.extract()
+
+	return &flows.Inspection{
+		Dependencies: inspect.NewDependencies(assetRefs, sa),
+		Results:      flows.NewResultSpecs(f.extractResults()),
+		WaitingExits: f.extractExitsFromWaits(),
+		ParentRefs:   parentRefs,
+		Issues:       issues.Check(sa, f, templates, assetRefs),
 	}
-}
-
-// Validate checks that all of this flow's dependencies exist
-func (f *flow) Validate(sa flows.SessionAssets, missing func(assets.Reference)) error {
-	return f.validateAssets(sa, false, nil, missing)
-}
-
-// Validate checks that all of this flow's dependencies exist, and all our flow dependencies are also valid
-func (f *flow) ValidateRecursive(sa flows.SessionAssets, missing func(assets.Reference)) error {
-	seen := make(map[assets.FlowUUID]bool)
-
-	return f.validateAssets(sa, true, seen, missing)
-}
-
-type brokenDependency struct {
-	dependency assets.Reference
-	reason     error
-}
-
-func (f *flow) validateAssets(sa flows.SessionAssets, recursive bool, seen map[assets.FlowUUID]bool, missing func(assets.Reference)) error {
-	// prevent looping if recursive
-	if recursive && seen[f.UUID()] {
-		return nil
-	}
-
-	// extract all dependencies (assets, contacts)
-	deps := flows.NewDependencies(f.ExtractDependencies())
-
-	// check dependencies actually exist
-	missingAssets := make([]brokenDependency, 0)
-	err := deps.Check(sa, func(r assets.Reference, err error) {
-		missingAssets = append(missingAssets, brokenDependency{r, err})
-	})
-	if err != nil {
-		return err
-	}
-
-	if len(missingAssets) > 0 {
-		// if we have callback for missing dependencies, call that
-		if missing != nil {
-			for _, ma := range missingAssets {
-				missing(ma.dependency)
-			}
-		} else {
-			// otherwise error
-			depStrings := make([]string, len(missingAssets))
-			for i, ma := range missingAssets {
-				depStrings[i] = ma.dependency.String()
-				if ma.reason != nil {
-					depStrings[i] += fmt.Sprintf(" (%s)", ma.reason)
-				}
-			}
-			return errors.Errorf("missing dependencies: %s", strings.Join(depStrings, ","))
-		}
-	}
-
-	if recursive {
-		seen[f.UUID()] = true
-
-		// go check any non-missing flow dependencies
-		for _, flowRef := range deps.Flows {
-			flowDep, err := sa.Flows().Get(flowRef.UUID)
-			if err == nil {
-				if err := flowDep.(*flow).validateAssets(sa, true, seen, missing); err != nil {
-					return errors.Wrapf(err, "invalid child %s", flowRef)
-				}
-			}
-		}
-	}
-
-	return nil
 }
 
 // Context returns the properties available in expressions
@@ -205,9 +145,9 @@ func (f *flow) Reference() *assets.FlowReference {
 // ExtractTemplates extracts all non-empty templates
 func (f *flow) ExtractTemplates() []string {
 	templates := make([]string, 0)
-	include := func(template string) {
-		if template != "" {
-			templates = append(templates, template)
+	include := func(a flows.Action, r flows.Router, l envs.Language, t string) {
+		if t != "" {
+			templates = append(templates, t)
 		}
 	}
 
@@ -218,54 +158,53 @@ func (f *flow) ExtractTemplates() []string {
 	return templates
 }
 
-// ExtractDependencies extracts all asset dependencies
-func (f *flow) ExtractDependencies() []assets.Reference {
-	dependencies := make([]assets.Reference, 0)
-	dependenciesSeen := make(map[string]bool)
-	addDependency := func(r assets.Reference) {
-		if !utils.IsNil(r) && !r.Variable() {
-			key := fmt.Sprintf("%s:%s", r.Type(), r.Identity())
-			if !dependenciesSeen[key] {
-				dependencies = append(dependencies, r)
-				dependenciesSeen[key] = true
+// extracts all templates, asset dependencies and parent result references
+func (f *flow) extract() ([]flows.ExtractedTemplate, []flows.ExtractedReference, []string) {
+	templates := make([]flows.ExtractedTemplate, 0)
+	assetRefs := make([]flows.ExtractedReference, 0)
+	parentRefs := make(map[string]bool)
+
+	recordAssetRef := func(n flows.Node, a flows.Action, r flows.Router, l envs.Language, ref assets.Reference) {
+		if ref != nil && !ref.Variable() {
+			er := flows.NewExtractedReference(n, a, r, l, ref)
+			assetRefs = append(assetRefs, er)
+		}
+	}
+
+	for _, n := range f.nodes {
+		n.EnumerateTemplates(f.Localization(), func(a flows.Action, r flows.Router, l envs.Language, t string) {
+			templates = append(templates, flows.NewExtractedTemplate(n, a, r, l, t))
+			ars, prs := inspect.ExtractFromTemplate(t)
+			for _, ref := range ars {
+				recordAssetRef(n, a, r, l, ref)
 			}
-
-			// TODO replace if we saw a field ref without a name but now have same field with a name
-		}
-	}
-
-	include := func(template string) {
-		fieldRefs := inspect.ExtractFieldReferences(template)
-		for _, f := range fieldRefs {
-			addDependency(f)
-		}
-	}
-
-	for _, n := range f.nodes {
-		n.EnumerateTemplates(f.Localization(), include)
-		n.EnumerateDependencies(f.Localization(), func(r assets.Reference) {
-			addDependency(r)
+			for _, r := range prs {
+				parentRefs[r] = true
+			}
+		})
+		n.EnumerateDependencies(f.Localization(), func(a flows.Action, r flows.Router, l envs.Language, ref assets.Reference) {
+			recordAssetRef(n, a, r, l, ref)
 		})
 	}
 
-	return dependencies
+	return templates, assetRefs, utils.StringSetKeys(parentRefs)
 }
 
-// ExtractResults extracts all result specs
-func (f *flow) ExtractResults() []*flows.ResultInfo {
-	specs := make([]*flows.ResultInfo, 0)
+// extracts all result specs
+func (f *flow) extractResults() []flows.ExtractedResult {
+	results := make([]flows.ExtractedResult, 0)
 
 	for _, n := range f.nodes {
-		n.EnumerateResults(n, func(spec *flows.ResultInfo) {
-			specs = append(specs, spec)
+		n.EnumerateResults(func(a flows.Action, r flows.Router, i *flows.ResultInfo) {
+			results = append(results, flows.ExtractedResult{Node: n, Action: a, Router: r, Info: i})
 		})
 	}
 
-	return flows.MergeResultInfos(specs)
+	return results
 }
 
-// ExtractExitsFromWaits extracts all exits coming from nodes with waits
-func (f *flow) ExtractExitsFromWaits() []flows.ExitUUID {
+// extracts all exits coming from nodes with waits
+func (f *flow) extractExitsFromWaits() []flows.ExitUUID {
 	exitUUIDs := make([]flows.ExitUUID, 0)
 	include := func(e flows.ExitUUID) { exitUUIDs = append(exitUUIDs, e) }
 
@@ -279,31 +218,6 @@ func (f *flow) ExtractExitsFromWaits() []flows.ExitUUID {
 	return exitUUIDs
 }
 
-// Generic returns this flow's data modelled as a hierarchy of generic maps and slices
-func (f *flow) Generic() map[string]interface{} {
-	marshaled, err := json.Marshal(f)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	g, err := utils.JSONDecodeGeneric(marshaled)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return g.(map[string]interface{})
-}
-
-// Clone clones this flow replacing all UUIDs using the provided mapping and generating new
-// random UUIDs if they aren't in the mapping
-func (f *flow) Clone(depMapping map[uuids.UUID]uuids.UUID) flows.Flow {
-	generic := f.Generic()
-	remapUUIDs(generic, depMapping)
-
-	// read back as a real flow in the current spec.. since we control this it can't error in theory
-	return MustReadFlowFromGeneric(generic)
-}
-
 var _ flows.Flow = (*flow)(nil)
 
 //------------------------------------------------------------------------------------------
@@ -314,15 +228,8 @@ func init() {
 	utils.Validator.RegisterAlias("flow_type", "eq=messaging|eq=messaging_offline|eq=voice")
 }
 
-// the set of fields common to all new flow spec versions
-type flowHeader struct {
-	UUID        assets.FlowUUID `json:"uuid" validate:"required,uuid4"`
-	Name        string          `json:"name"`
-	SpecVersion *semver.Version `json:"spec_version" validate:"required"`
-}
-
 type flowEnvelope struct {
-	flowHeader
+	migrations.Header13
 
 	Language           envs.Language   `json:"language" validate:"required"`
 	Type               flows.FlowType  `json:"type" validate:"required,flow_type"`
@@ -333,26 +240,20 @@ type flowEnvelope struct {
 	UI                 json.RawMessage `json:"_ui,omitempty"`
 }
 
-// IsSpecVersionSupported determines if we can read the given flow version
-func IsSpecVersionSupported(ver *semver.Version) bool {
-	// major versions change flow schema
-	// we currently have no support for migrations but that will change in future
-	return ver.Major() == CurrentSpecVersion.Major()
-}
-
-// ReadFlow reads a single flow definition from the passed in byte array
-func ReadFlow(data json.RawMessage) (flows.Flow, error) {
-	header := &flowHeader{}
-	if err := utils.UnmarshalAndValidate(data, header); err != nil {
-		return nil, errors.Wrap(err, "unable to read flow header")
+// ReadFlow a flow definition from the passed in byte array, migrating it to the spec version of the engine if necessary
+func ReadFlow(data json.RawMessage, migrationConfig *migrations.Config) (flows.Flow, error) {
+	var err error
+	data, err = migrations.MigrateToLatest(data, migrationConfig)
+	if err != nil {
+		return nil, err
 	}
 
-	// can't do anything with a newer major version than this library supports
-	if !IsSpecVersionSupported(header.SpecVersion) {
+	header := &migrations.Header13{}
+	jsonx.Unmarshal(data, header)
+
+	if !IsVersionSupported(header.SpecVersion) {
 		return nil, errors.Errorf("spec version %s is newer than this library (%s)", header.SpecVersion, CurrentSpecVersion)
 	}
-
-	// TODO flow spec migrations
 
 	e := &flowEnvelope{}
 	if err := utils.UnmarshalAndValidate(data, e); err != nil {
@@ -374,7 +275,7 @@ func ReadFlow(data json.RawMessage) (flows.Flow, error) {
 // MarshalJSON marshals this flow into JSON
 func (f *flow) MarshalJSON() ([]byte, error) {
 	e := &flowEnvelope{
-		flowHeader: flowHeader{
+		Header13: migrations.Header13{
 			UUID:        f.uuid,
 			Name:        f.name,
 			SpecVersion: f.specVersion,
@@ -392,44 +293,5 @@ func (f *flow) MarshalJSON() ([]byte, error) {
 		e.Nodes[i] = f.nodes[i].(*node)
 	}
 
-	return json.Marshal(e)
-}
-
-type flowWithInfoEnvelope struct {
-	*flowEnvelope
-
-	Dependencies *flows.Dependencies `json:"_dependencies"`
-	Results      []*flows.ResultInfo `json:"_results"`
-	WaitingExits []flows.ExitUUID    `json:"_waiting_exits"`
-}
-
-// MarshalWithInfo is temporary workaround to help us with the response format of the current /flow/validate endpoint
-func (f *flow) MarshalWithInfo() ([]byte, error) {
-	e := &flowEnvelope{
-		flowHeader: flowHeader{
-			UUID:        f.uuid,
-			Name:        f.name,
-			SpecVersion: f.specVersion,
-		},
-		Language:           f.language,
-		Type:               f.flowType,
-		Revision:           f.revision,
-		ExpireAfterMinutes: f.expireAfterMinutes,
-		Localization:       f.localization.(localization),
-		Nodes:              make([]*node, len(f.nodes)),
-		UI:                 f.ui,
-	}
-
-	for i := range f.nodes {
-		e.Nodes[i] = f.nodes[i].(*node)
-	}
-
-	info := f.Inspect()
-
-	return json.Marshal(&flowWithInfoEnvelope{
-		flowEnvelope: e,
-		Dependencies: info.Dependencies,
-		Results:      info.Results,
-		WaitingExits: info.WaitingExits,
-	})
+	return jsonx.Marshal(e)
 }

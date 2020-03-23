@@ -6,13 +6,15 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
 	"github.com/greatnonprofits-nfp/goflow/assets/static/types"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
 // LoadSessionAssets loads a session assets instance from a static JSON file
-func LoadSessionAssets(path string) (flows.SessionAssets, error) {
+func LoadSessionAssets(env envs.Environment, path string) (flows.SessionAssets, error) {
 	assetsJSON, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -23,11 +25,13 @@ func LoadSessionAssets(path string) (flows.SessionAssets, error) {
 		return nil, err
 	}
 
-	return engine.NewSessionAssets(source)
+	mconfig := &migrations.Config{BaseMediaURL: "http://temba.io/"}
+
+	return engine.NewSessionAssets(env, source, mconfig)
 }
 
-func LoadFlowFromAssets(path string, uuid assets.FlowUUID) (flows.Flow, error) {
-	sa, err := LoadSessionAssets(path)
+func LoadFlowFromAssets(env envs.Environment, path string, uuid assets.FlowUUID) (flows.Flow, error) {
+	sa, err := LoadSessionAssets(env, path)
 	if err != nil {
 		return nil, err
 	}
@@ -35,20 +39,12 @@ func LoadFlowFromAssets(path string, uuid assets.FlowUUID) (flows.Flow, error) {
 	return sa.Flows().Get(uuid)
 }
 
-func NewField(key string, name string, valueType assets.FieldType) *flows.Field {
-	return flows.NewField(types.NewField(assets.FieldUUID(uuids.New()), key, name, valueType))
-}
-
-func NewGroup(name string, query string) *flows.Group {
-	return flows.NewGroup(types.NewGroup(assets.GroupUUID(uuids.New()), name, query))
-}
-
 func NewChannel(name string, address string, schemes []string, roles []assets.ChannelRole, parent *assets.ChannelReference) *flows.Channel {
 	return flows.NewChannel(types.NewChannel(assets.ChannelUUID(uuids.New()), name, address, schemes, roles, parent))
 }
 
-func NewTelChannel(name string, address string, roles []assets.ChannelRole, parent *assets.ChannelReference, country string, matchPrefixes []string) *flows.Channel {
-	return flows.NewChannel(types.NewTelChannel(assets.ChannelUUID(uuids.New()), name, address, roles, parent, country, matchPrefixes))
+func NewTelChannel(name string, address string, roles []assets.ChannelRole, parent *assets.ChannelReference, country envs.Country, matchPrefixes []string, allowInternational bool) *flows.Channel {
+	return flows.NewChannel(types.NewTelChannel(assets.ChannelUUID(uuids.New()), name, address, roles, parent, country, matchPrefixes, allowInternational))
 }
 
 func NewClassifier(name, type_ string, intents []string) *flows.Classifier {

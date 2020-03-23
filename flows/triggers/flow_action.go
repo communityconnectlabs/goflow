@@ -7,6 +7,9 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+
+	"github.com/pkg/errors"
 )
 
 func init() {
@@ -51,19 +54,24 @@ type FlowActionTrigger struct {
 }
 
 // NewFlowAction creates a new flow action trigger with the passed in values
-func NewFlowAction(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, runSummary json.RawMessage) *FlowActionTrigger {
-	return &FlowActionTrigger{
-		baseTrigger: newBaseTrigger(TypeFlowAction, env, flow, contact, nil, nil),
-		runSummary:  runSummary,
-	}
+func NewFlowAction(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, runSummary json.RawMessage) (*FlowActionTrigger, error) {
+	return newFlowAction(env, flow, contact, nil, runSummary)
 }
 
 // NewFlowActionVoice creates a new flow action trigger with the passed in values
-func NewFlowActionVoice(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, connection *flows.Connection, runSummary json.RawMessage) *FlowActionTrigger {
+func NewFlowActionVoice(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, connection *flows.Connection, runSummary json.RawMessage) (*FlowActionTrigger, error) {
+	return newFlowAction(env, flow, contact, connection, runSummary)
+}
+
+func newFlowAction(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, connection *flows.Connection, runSummary json.RawMessage) (*FlowActionTrigger, error) {
+	if !json.Valid(runSummary) {
+		return nil, errors.Errorf("invalid run summary JSON: %s", string(runSummary))
+	}
+
 	return &FlowActionTrigger{
 		baseTrigger: newBaseTrigger(TypeFlowAction, env, flow, contact, connection, nil),
 		runSummary:  runSummary,
-	}
+	}, nil
 }
 
 // RunSummary returns the summary of the run that triggered this session
@@ -77,7 +85,7 @@ var _ flows.TriggerWithRun = (*FlowActionTrigger)(nil)
 
 type flowActionTriggerEnvelope struct {
 	baseTriggerEnvelope
-	RunSummary json.RawMessage `json:"run_summary"`
+	RunSummary json.RawMessage `json:"run_summary" validate:"required"`
 }
 
 func readFlowActionTrigger(sessionAssets flows.SessionAssets, data json.RawMessage, missing assets.MissingCallback) (flows.Trigger, error) {
@@ -107,5 +115,5 @@ func (t *FlowActionTrigger) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

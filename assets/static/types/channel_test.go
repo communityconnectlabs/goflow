@@ -5,6 +5,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static/types"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/stretchr/testify/assert"
@@ -25,8 +26,9 @@ func TestChannel(t *testing.T) {
 	assert.Equal(t, []string{"tel"}, channel.Schemes())
 	assert.Equal(t, []assets.ChannelRole{assets.ChannelRoleSend}, channel.Roles())
 	assert.Nil(t, channel.Parent())
-	assert.Equal(t, "", channel.Country())
+	assert.Equal(t, envs.NilCountry, channel.Country())
 	assert.Nil(t, channel.MatchPrefixes())
+	assert.True(t, channel.AllowInternational())
 
 	// check that UUIDs aren't required to be valid UUID4s
 	assert.Nil(t, utils.Validate(channel))
@@ -39,8 +41,10 @@ func TestChannel(t *testing.T) {
 		nil,
 		"RW",
 		[]string{"+25079"},
+		false,
 	)
 
-	assert.Equal(t, "RW", channel.Country())
+	assert.Equal(t, envs.Country("RW"), channel.Country())
 	assert.Equal(t, []string{"+25079"}, channel.MatchPrefixes())
+	assert.False(t, channel.AllowInternational())
 }

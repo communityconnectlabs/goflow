@@ -3,7 +3,6 @@ package main
 // go install github.com/greatnonprofits-nfp/goflow/cmd/transferairtime
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
@@ -18,6 +17,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/services/airtime/dtone"
 	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -114,15 +114,16 @@ func transferAirtime(destination urns.URN, amount decimal.Decimal, currency stri
 		return err
 	}
 
-	sa, err := engine.NewSessionAssets(source)
+	env := envs.NewBuilder().Build()
+
+	sa, err := engine.NewSessionAssets(env, source, nil)
 	if err != nil {
 		return errors.Wrap(err, "error parsing assets")
 	}
 
 	eng := engine.NewBuilder().WithAirtimeServiceFactory(svcFactory).Build()
-	env := envs.NewBuilder().Build()
 	contact := flows.NewEmptyContact(sa, "", "", nil)
-	contact.AddURN(flows.NewContactURN(destination, nil))
+	contact.AddURN(destination, nil)
 
 	_, sprint, err := eng.NewSession(sa, triggers.NewManual(env, assets.NewFlowReference(assets.FlowUUID("2374f60d-7412-442c-9177-585967afa972"), "Airtime"), contact, nil))
 	if err != nil {
@@ -130,7 +131,7 @@ func transferAirtime(destination urns.URN, amount decimal.Decimal, currency stri
 	}
 
 	for _, event := range sprint.Events() {
-		marshaled, _ := json.Marshal(event)
+		marshaled, _ := jsonx.Marshal(event)
 		fmt.Println(string(marshaled))
 	}
 
@@ -139,13 +140,13 @@ func transferAirtime(destination urns.URN, amount decimal.Decimal, currency stri
 
 func configureDTOne(login, token string) (engine.AirtimeServiceFactory, error) {
 	// test credentials using ping
-	client := dtone.NewClient(http.DefaultClient, login, token)
+	client := dtone.NewClient(http.DefaultClient, nil, login, token)
 	_, err := client.Ping()
 	if err != nil {
 		return nil, errors.Wrap(err, "ping failed for provided DTOne credentials")
 	}
 
 	return func(flows.Session) (flows.AirtimeService, error) {
-		return dtone.NewService(login, token, ""), nil
+		return dtone.NewService(http.DefaultClient, nil, login, token, ""), nil
 	}, nil
 }

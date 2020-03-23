@@ -16,6 +16,7 @@ type Channel struct {
 	assets.Channel
 }
 
+// NewChannel creates a new channenl
 func NewChannel(asset assets.Channel) *Channel {
 	return &Channel{Channel: asset}
 }
@@ -51,6 +52,7 @@ func (c *Channel) HasRole(role assets.ChannelRole) bool {
 	return false
 }
 
+// HasParent returns whether this channel has a parent
 func (c *Channel) HasParent() bool {
 	return c.Parent() != nil
 }
@@ -110,13 +112,20 @@ func (s *ChannelAssets) GetForURN(urn *ContactURN, role assets.ChannelRole) *Cha
 
 	// tel is a special case because we do number based matching
 	if urn.URN().Scheme() == urns.TelScheme {
-		countryCode := utils.DeriveCountryFromTel(urn.URN().Path())
+		countryCode := envs.DeriveCountryFromTel(urn.URN().Path())
 		candidates := make([]*Channel, 0)
 
 		for _, ch := range s.all {
-			if ch.HasRole(role) && ch.SupportsScheme(urns.TelScheme) && (countryCode == "" || countryCode == ch.Country()) && !ch.HasParent() {
-				candidates = append(candidates, ch)
+			// skip if not tel and not sendable
+			if !ch.SupportsScheme(urns.TelScheme) || !ch.HasRole(role) {
+				continue
 			}
+			// skip if international and channel doesn't allow that
+			if ch.Country() != "" && countryCode != "" && countryCode != ch.Country() && !ch.AllowInternational() {
+				continue
+			}
+
+			candidates = append(candidates, ch)
 		}
 
 		var channel *Channel
@@ -147,6 +156,8 @@ func (s *ChannelAssets) GetForURN(urn *ContactURN, role assets.ChannelRole) *Cha
 		if channel != nil {
 			return s.getDelegate(channel, role)
 		}
+
+		return nil
 	}
 
 	return s.getForSchemeAndRole(urn.URN().Scheme(), role)

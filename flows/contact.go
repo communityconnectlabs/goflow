@@ -13,7 +13,9 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/shopspring/decimal"
 
 	"github.com/pkg/errors"
 )
@@ -44,20 +46,18 @@ func NewContact(
 	timezone *time.Location,
 	createdOn time.Time,
 	urns []urns.URN,
-	groups []assets.Group,
-	fields map[string]*Value) (*Contact, error) {
+	groups []*assets.GroupReference,
+	fields map[string]*Value,
+	missing assets.MissingCallback) (*Contact, error) {
 
-	urnList, err := ReadURNList(sa, urns, assets.IgnoreMissing)
+	urnList, err := ReadURNList(sa, urns, missing)
 	if err != nil {
 		return nil, err
 	}
 
-	groupList, err := NewGroupListFromAssets(sa, groups)
-	if err != nil {
-		return nil, err
-	}
+	groupList := NewGroupList(sa, groups, missing)
 
-	fieldValues, err := NewFieldValues(sa, fields, assets.IgnoreMissing)
+	fieldValues, err := NewFieldValues(sa, fields, missing)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func NewEmptyContact(sa SessionAssets, name string, language envs.Language, time
 		timezone:  timezone,
 		createdOn: dates.Now(),
 		urns:      URNList{},
-		groups:    NewGroupList([]*Group{}),
+		groups:    NewGroupList(sa, nil, assets.IgnoreMissing),
 		fields:    make(FieldValues),
 		assets:    sa,
 	}
@@ -113,8 +113,8 @@ func (c *Contact) Clone() *Contact {
 
 // Equal returns true if this instance is equal to the given instance
 func (c *Contact) Equal(other *Contact) bool {
-	asJSON1, _ := json.Marshal(c)
-	asJSON2, _ := json.Marshal(other)
+	asJSON1, _ := jsonx.Marshal(c)
+	asJSON2, _ := jsonx.Marshal(other)
 	return string(asJSON1) == string(asJSON2)
 }
 
@@ -156,12 +156,29 @@ func (c *Contact) Name() string { return c.name }
 func (c *Contact) URNs() URNList { return c.urns }
 
 // AddURN adds a new URN to this contact
-func (c *Contact) AddURN(urn *ContactURN) bool {
-	if c.HasURN(urn.URN()) {
+func (c *Contact) AddURN(urn urns.URN, channel *Channel) bool {
+	if c.HasURN(urn) {
 		return false
 	}
 
-	c.urns = append(c.urns, urn)
+	c.urns = append(c.urns, NewContactURN(urn, channel))
+	return true
+}
+
+// RemoveURN adds a new URN to this contact
+func (c *Contact) RemoveURN(urn urns.URN) bool {
+	if !c.HasURN(urn) {
+		return false
+	}
+
+	newURNs := make([]*ContactURN, 0, len(c.urns)-1)
+	for _, u := range c.urns {
+		if u.URN().Identity() != urn.Identity() {
+			newURNs = append(newURNs, u)
+		}
+	}
+
+	c.urns = URNList(newURNs)
 	return true
 }
 
@@ -198,7 +215,7 @@ func (c *Contact) Format(env envs.Environment) string {
 		return c.name
 	}
 
-	// otherwise use either id or the higest priority URN depending on the env
+	// otherwise use either id or the highest priority URN depending on the env
 	if env.RedactionPolicy() == envs.RedactionPolicyURNs {
 		return strconv.Itoa(int(c.id))
 	}
@@ -338,20 +355,22 @@ func (c *Contact) UpdatePreferredChannel(channel *Channel) bool {
 }
 
 // ReevaluateDynamicGroups reevaluates membership of all dynamic groups for this contact
-func (c *Contact) ReevaluateDynamicGroups(env envs.Environment, allGroups *GroupAssets, allFields *FieldAssets) ([]*Group, []*Group, []error) {
+func (c *Contact) ReevaluateDynamicGroups(env envs.Environment) ([]*Group, []*Group, []error) {
 	added := make([]*Group, 0)
 	removed := make([]*Group, 0)
-	errors := make([]error, 0)
+	errs := make([]error, 0)
 
-	for _, group := range allGroups.All() {
+	for _, group := range c.assets.Groups().All() {
 		if !group.IsDynamic() {
 			continue
 		}
 
-		qualifies, err := group.CheckDynamicMembership(env, c, allFields)
+		qualifies, err := group.CheckDynamicMembership(env, c)
 		if err != nil {
-			errors = append(errors, err)
-		} else if qualifies {
+			errs = append(errs, errors.Wrapf(err, "unable to re-evaluate membership of group '%s'", group.Name()))
+		}
+
+		if qualifies {
 			if c.groups.Add(group) {
 				added = append(added, group)
 			}
@@ -362,13 +381,18 @@ func (c *Contact) ReevaluateDynamicGroups(env envs.Environment, allGroups *Group
 		}
 	}
 
-	return added, removed, errors
+	return added, removed, errs
 }
 
 // QueryProperty resolves a contact query search key for this contact
 func (c *Contact) QueryProperty(env envs.Environment, key string, propType contactql.PropertyType) []interface{} {
 	if propType == contactql.PropertyTypeAttribute {
 		switch key {
+		case contactql.AttributeID:
+			if c.id != 0 {
+				return []interface{}{decimal.New(int64(c.id), 0)}
+			}
+			return nil
 		case contactql.AttributeName:
 			if c.name != "" {
 				return []interface{}{c.name}
@@ -379,6 +403,18 @@ func (c *Contact) QueryProperty(env envs.Environment, key string, propType conta
 				return []interface{}{string(c.language)}
 			}
 			return nil
+		case contactql.AttributeURN:
+			vals := make([]interface{}, len(c.URNs()))
+			for i, urn := range c.URNs() {
+				vals[i] = urn.URN().Path()
+			}
+			return vals
+		case contactql.AttributeGroup:
+			vals := make([]interface{}, c.Groups().Count())
+			for i, group := range c.Groups().All() {
+				vals[i] = group.Name()
+			}
+			return vals
 		case contactql.AttributeCreatedOn:
 			return []interface{}{c.createdOn}
 		default:
@@ -388,7 +424,7 @@ func (c *Contact) QueryProperty(env envs.Environment, key string, propType conta
 		urnsWithScheme := c.urns.WithScheme(key)
 		vals := make([]interface{}, len(urnsWithScheme))
 		for i := range urnsWithScheme {
-			vals[i] = string(urnsWithScheme[i].URN())
+			vals[i] = urnsWithScheme[i].URN().Path()
 		}
 		return vals
 	}
@@ -484,20 +520,7 @@ func ReadContact(sa SessionAssets, data json.RawMessage, missing assets.MissingC
 		}
 	}
 
-	if envelope.Groups == nil {
-		c.groups = NewGroupList([]*Group{})
-	} else {
-		groups := make([]*Group, 0, len(envelope.Groups))
-		for _, g := range envelope.Groups {
-			group := sa.Groups().Get(g.UUID)
-			if group == nil {
-				missing(g, nil)
-			} else {
-				groups = append(groups, group)
-			}
-		}
-		c.groups = NewGroupList(groups)
-	}
+	c.groups = NewGroupList(sa, envelope.Groups, missing)
 
 	if c.fields, err = NewFieldValues(sa, envelope.Fields, missing); err != nil {
 		return nil, errors.Wrap(err, "error reading fields")
@@ -533,5 +556,5 @@ func (c *Contact) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	return json.Marshal(ce)
+	return jsonx.Marshal(ce)
 }

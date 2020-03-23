@@ -6,6 +6,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 
 	"github.com/pkg/errors"
@@ -37,10 +38,12 @@ var assetsJSON = `{
 }`
 
 func TestSessionAssets(t *testing.T) {
+	env := envs.NewBuilder().Build()
+
 	source, err := static.NewSource([]byte(assetsJSON))
 	require.NoError(t, err)
 
-	sa, err := engine.NewSessionAssets(source)
+	sa, err := engine.NewSessionAssets(env, source, nil)
 	require.NoError(t, err)
 
 	assert.Equal(t, source, sa.Source())
@@ -65,18 +68,20 @@ func TestSessionAssets(t *testing.T) {
 }
 
 func TestSessionAssetsWithSourceErrors(t *testing.T) {
+	env := envs.NewBuilder().Build()
+
 	source := &testSource{}
 
-	sa, err := engine.NewSessionAssets(source)
+	sa, err := engine.NewSessionAssets(env, source, nil)
 	require.NoError(t, err)
 
 	source.currentErrType = "flow"
 	_, err = sa.Flows().Get(assets.FlowUUID("ddba5842-252f-4a20-b901-08696fc773e2"))
 	assert.EqualError(t, err, "unable to load flow assets")
 
-	for _, errType := range []string{"channels", "classifiers", "fields", "groups", "labels", "locations", "resthooks", "templates"} {
+	for _, errType := range []string{"channels", "classifiers", "fields", "globals", "groups", "labels", "locations", "resthooks", "templates"} {
 		source.currentErrType = errType
-		_, err = engine.NewSessionAssets(source)
+		_, err = engine.NewSessionAssets(env, source, nil)
 		assert.EqualError(t, err, fmt.Sprintf("unable to load %s assets", errType), "error mismatch for type %s", errType)
 	}
 }
@@ -107,6 +112,10 @@ func (s *testSource) Fields() ([]assets.Field, error) {
 
 func (s *testSource) Flow(assets.FlowUUID) (assets.Flow, error) {
 	return nil, s.err("flow")
+}
+
+func (s *testSource) Globals() ([]assets.Global, error) {
+	return nil, s.err("globals")
 }
 
 func (s *testSource) Groups() ([]assets.Group, error) {

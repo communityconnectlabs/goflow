@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"sort"
 	"testing"
 	"time"
@@ -17,11 +18,14 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/services/airtime/dtone"
 	"github.com/greatnonprofits-nfp/goflow/services/classification/wit"
+	"github.com/greatnonprofits-nfp/goflow/services/email/smtp"
 	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
 	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 	"github.com/greatnonprofits-nfp/goflow/utils/dates"
 	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/smtpx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
@@ -63,49 +67,53 @@ func TestActionTypes(t *testing.T) {
 	}
 }
 
-type inspectionResults struct {
-	Templates    []string            `json:"templates"`
-	Dependencies []string            `json:"dependencies"`
-	Results      []*flows.ResultInfo `json:"results"`
-}
-
 func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
-	testFile, err := ioutil.ReadFile(fmt.Sprintf("testdata/%s.json", typeName))
+	testPath := fmt.Sprintf("testdata/%s.json", typeName)
+	testFile, err := ioutil.ReadFile(testPath)
 	require.NoError(t, err)
 
 	tests := []struct {
-		Description     string               `json:"description"`
-		HTTPMocks       *httpx.MockRequestor `json:"http_mocks"`
-		NoContact       bool                 `json:"no_contact"`
-		NoURNs          bool                 `json:"no_urns"`
-		NoInput         bool                 `json:"no_input"`
-		RedactURNs      bool                 `json:"redact_urns"`
-		Action          json.RawMessage      `json:"action"`
-		Localization    json.RawMessage      `json:"localization"`
-		InFlowType      flows.FlowType       `json:"in_flow_type"`
-		ReadError       string               `json:"read_error"`
-		ValidationError string               `json:"validation_error"`
-		SkipValidation  bool                 `json:"skip_validation"`
-		Events          []json.RawMessage    `json:"events"`
-		ContactAfter    json.RawMessage      `json:"contact_after"`
-		Inspection      json.RawMessage      `json:"inspection"`
+		Description  string               `json:"description"`
+		HTTPMocks    *httpx.MockRequestor `json:"http_mocks,omitempty"`
+		SMTPError    string               `json:"smtp_error,omitempty"`
+		NoContact    bool                 `json:"no_contact,omitempty"`
+		NoURNs       bool                 `json:"no_urns,omitempty"`
+		NoInput      bool                 `json:"no_input,omitempty"`
+		RedactURNs   bool                 `json:"redact_urns,omitempty"`
+		Action       json.RawMessage      `json:"action"`
+		Localization json.RawMessage      `json:"localization,omitempty"`
+		InFlowType   flows.FlowType       `json:"in_flow_type,omitempty"`
+
+		ReadError         string          `json:"read_error,omitempty"`
+		DependenciesError string          `json:"dependencies_error,omitempty"`
+		SkipValidation    bool            `json:"skip_validation,omitempty"`
+		Events            json.RawMessage `json:"events,omitempty"`
+		Webhook           json.RawMessage `json:"webhook,omitempty"`
+		ContactAfter      json.RawMessage `json:"contact_after,omitempty"`
+		Templates         []string        `json:"templates,omitempty"`
+		Inspection        json.RawMessage `json:"inspection,omitempty"`
 	}{}
 
-	err = json.Unmarshal(testFile, &tests)
+	err = jsonx.Unmarshal(testFile, &tests)
 	require.NoError(t, err)
 
 	defer dates.SetNowSource(dates.DefaultNowSource)
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
 	defer httpx.SetRequestor(httpx.DefaultRequestor)
+	defer smtpx.SetSender(smtpx.DefaultSender)
 
-	for _, tc := range tests {
+	for i, tc := range tests {
 		dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
 		uuids.SetGenerator(uuids.NewSeededGenerator(12345))
+
+		var clonedMocks *httpx.MockRequestor
 		if tc.HTTPMocks != nil {
 			httpx.SetRequestor(tc.HTTPMocks)
+			clonedMocks = tc.HTTPMocks.Clone()
 		} else {
 			httpx.SetRequestor(httpx.DefaultRequestor)
 		}
+		smtpx.SetSender(smtpx.NewMockSender(tc.SMTPError))
 
 		testName := fmt.Sprintf("test '%s' for action type '%s'", tc.Description, typeName)
 
@@ -124,7 +132,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 
 		// if we have a localization section, inject that too
 		if tc.Localization != nil {
-			localizationPath := []string{"flows", fmt.Sprintf("[%d]", flowIndex), "localization", "spa", "ad154980-7bf7-4ab8-8728-545fd6378912"}
+			localizationPath := []string{"flows", fmt.Sprintf("[%d]", flowIndex), "localization"}
 			assetsJSON = test.JSONReplace(assetsJSON, localizationPath, tc.Localization)
 		}
 
@@ -142,16 +150,6 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 			assert.NoError(t, err, "unexpected read error in %s", testName)
 		}
 
-		// if this action is expected to cause a validation error, check that
-		err = flow.Validate(sa, nil)
-		if tc.ValidationError != "" {
-			rootErr := errors.Cause(err)
-			assert.EqualError(t, rootErr, tc.ValidationError, "validation error mismatch in %s", testName)
-			continue
-		} else if !tc.SkipValidation {
-			assert.NoError(t, err, "unexpected validation error in %s", testName)
-		}
-
 		// optionally load our contact
 		var contact *flows.Contact
 		if !tc.NoContact {
@@ -161,8 +159,8 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 			// optionally give our contact some URNs
 			if !tc.NoURNs {
 				channel := sa.Channels().Get("57f1078f-88aa-46f4-a59a-948a5739c03d")
-				contact.AddURN(flows.NewContactURN(urns.URN("tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d&id=123"), channel))
-				contact.AddURN(flows.NewContactURN(urns.URN("twitterid:54784326227#nyaruka"), nil))
+				contact.AddURN(urns.URN("tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d&id=123"), channel)
+				contact.AddURN(urns.URN("twitterid:54784326227#nyaruka"), nil)
 			}
 
 			// and switch their language
@@ -210,15 +208,18 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 
 		// create an engine instance
 		eng := engine.NewBuilder().
-			WithWebhookServiceFactory(webhooks.NewServiceFactory("goflow-testing", 10000)).
+			WithEmailServiceFactory(func(flows.Session) (flows.EmailService, error) {
+				return smtp.NewService("mail.temba.io", 25, "nyaruka", "pass123", "flows@temba.io"), nil
+			}).
+			WithWebhookServiceFactory(webhooks.NewServiceFactory(http.DefaultClient, nil, nil, map[string]string{"User-Agent": "goflow-testing"}, 100000)).
 			WithClassificationServiceFactory(func(s flows.Session, c *flows.Classifier) (flows.ClassificationService, error) {
 				if c.Type() == "wit" {
-					return wit.NewService(c, "123456789"), nil
+					return wit.NewService(http.DefaultClient, nil, c, "123456789"), nil
 				}
 				return nil, errors.Errorf("no classification service available for %s", c.Reference())
 			}).
 			WithAirtimeServiceFactory(func(flows.Session) (flows.AirtimeService, error) {
-				return dtone.NewService("nyaruka", "123456789", "RWF"), nil
+				return dtone.NewService(http.DefaultClient, nil, "nyaruka", "123456789", "RWF"), nil
 			}).
 			Build()
 
@@ -226,41 +227,74 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		session, _, err := eng.NewSession(sa, trigger)
 		require.NoError(t, err)
 
-		// check events are what we expected
+		// check all http mocks were used
+		if tc.HTTPMocks != nil {
+			require.False(t, tc.HTTPMocks.HasUnused(), "unused HTTP mocks in %s", testName)
+		}
+
+		// clone test case and populate with actual values
+		actual := tc
+		actual.HTTPMocks = clonedMocks
+
+		// re-marshal the action
+		actual.Action, err = jsonx.Marshal(flow.Nodes()[0].Actions()[0])
+		require.NoError(t, err)
+
+		// and the events
 		run := session.Runs()[0]
 		runEvents := run.Events()
-		actualEventsJSON, _ := json.Marshal(runEvents[ignoreEventCount:])
-		expectedEventsJSON, _ := json.Marshal(tc.Events)
-		test.AssertEqualJSON(t, expectedEventsJSON, actualEventsJSON, "events mismatch in %s", testName)
+		actual.Events, _ = jsonx.Marshal(runEvents[ignoreEventCount:])
 
-		// check contact is in the expected state
+		if tc.Webhook != nil {
+			actual.Webhook, _ = jsonx.Marshal(run.Webhook())
+		}
 		if tc.ContactAfter != nil {
-			contactJSON, _ := json.Marshal(session.Contact())
-
-			test.AssertEqualJSON(t, tc.ContactAfter, contactJSON, "contact mismatch in %s", testName)
+			actual.ContactAfter, _ = jsonx.Marshal(session.Contact())
 		}
-
-		// try marshaling the action back to JSON
-		actionJSON, err := json.Marshal(flow.Nodes()[0].Actions()[0])
-		test.AssertEqualJSON(t, tc.Action, actionJSON, "marshal mismatch in %s", testName)
-
-		// finally try inspecting this action
+		if tc.Templates != nil {
+			actual.Templates = flow.ExtractTemplates()
+		}
 		if tc.Inspection != nil {
-			dependencies := flow.ExtractDependencies()
-			depStrings := make([]string, len(dependencies))
-			for i := range dependencies {
-				depStrings[i] = dependencies[i].String()
-			}
-
-			actual := &inspectionResults{
-				Templates:    flow.ExtractTemplates(),
-				Dependencies: depStrings,
-				Results:      flow.ExtractResults(),
-			}
-
-			actualJSON, _ := json.Marshal(actual)
-			test.AssertEqualJSON(t, tc.Inspection, actualJSON, "inspection mismatch in %s", testName)
+			actual.Inspection, _ = jsonx.Marshal(flow.Inspect(sa))
 		}
+
+		if !test.UpdateSnapshots {
+			// check the action marshaled correctly
+			test.AssertEqualJSON(t, tc.Action, actual.Action, "marshal mismatch in %s", testName)
+
+			// check events are what we expected
+			test.AssertEqualJSON(t, tc.Events, actual.Events, "events mismatch in %s", testName)
+
+			// check webhook is in expected state
+			if tc.Webhook != nil {
+				test.AssertEqualJSON(t, tc.Webhook, actual.Webhook, "webhook mismatch in %s", testName)
+			}
+
+			// check contact is in the expected state
+			if tc.ContactAfter != nil {
+				test.AssertEqualJSON(t, tc.ContactAfter, actual.ContactAfter, "contact mismatch in %s", testName)
+			}
+
+			// check extracted templates
+			if tc.Templates != nil {
+				assert.Equal(t, tc.Templates, actual.Templates, "extracted templates mismatch in %s", testName)
+			}
+
+			// check inspection results
+			if tc.Inspection != nil {
+				test.AssertEqualJSON(t, tc.Inspection, actual.Inspection, "inspection mismatch in %s", testName)
+			}
+		} else {
+			tests[i] = actual
+		}
+	}
+
+	if test.UpdateSnapshots {
+		actualJSON, err := jsonx.MarshalPretty(tests)
+		require.NoError(t, err)
+
+		err = ioutil.WriteFile(testPath, actualJSON, 0666)
+		require.NoError(t, err)
 	}
 }
 
@@ -632,7 +666,7 @@ func TestConstructors(t *testing.T) {
 
 	for _, tc := range tests {
 		// test marshaling the action
-		actualJSON, err := json.Marshal(tc.action)
+		actualJSON, err := jsonx.Marshal(tc.action)
 		assert.NoError(t, err)
 
 		test.AssertEqualJSON(t, json.RawMessage(tc.json), actualJSON, "new action produced unexpected JSON")
@@ -649,7 +683,7 @@ func TestReadAction(t *testing.T) {
 	assert.EqualError(t, err, "unknown type: 'do_the_foo'")
 }
 
-func TestLegacyWebhookPayload(t *testing.T) {
+func TestResthookPayload(t *testing.T) {
 	uuids.SetGenerator(uuids.NewSeededGenerator(123456))
 	dates.SetNowSource(dates.NewSequentialNowSource(time.Date(2018, 7, 6, 12, 30, 0, 123456789, time.UTC)))
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
@@ -661,18 +695,18 @@ func TestLegacyWebhookPayload(t *testing.T) {
 	session, _, err := test.CreateTestSession(server.URL, envs.RedactionPolicyNone)
 	run := session.Runs()[0]
 
-	payload, err := run.EvaluateTemplate(actions.LegacyWebhookPayload)
+	payload, err := run.EvaluateTemplate(actions.ResthookPayload)
 	require.NoError(t, err)
 
 	test.AssertEqualJSON(t, []byte(`{
 		"channel": {
-			"address": "+12345671111",
+			"address": "+17036975131",
 			"name": "My Android Phone",
 			"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
 		},
 		"contact": {
 			"name": "Ryan Lewis",
-			"urn": "tel:+12065551212",
+			"urn": "tel:+12024561111",
 			"uuid": "5d76d86b-3bb9-4d5a-b822-c9d86f5d8e4f"
 		},
 		"flow": {
@@ -692,7 +726,7 @@ func TestLegacyWebhookPayload(t *testing.T) {
 				}
 			],
 			"channel": {
-				"address": "+12345671111",
+				"address": "+17036975131",
 				"name": "My Android Phone",
 				"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
 			},

@@ -1,6 +1,7 @@
 package dtone_test
 
 import (
+	"net/http"
 	"strings"
 	"testing"
 	"time"
@@ -80,9 +81,9 @@ func TestServiceWithSuccessfulTopup(t *testing.T) {
 
 	mocks := httpx.NewMockRequestor(map[string][]httpx.MockResponse{
 		"https://airtime-api.dtone.com/cgi-bin/shop/topup": []httpx.MockResponse{
-			httpx.NewMockResponse(200, withCRLF(msisdnResponse)),
-			httpx.NewMockResponse(200, withCRLF(reserveResponse)),
-			httpx.NewMockResponse(200, withCRLF(topupResponse)),
+			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse), 1),
+			httpx.NewMockResponse(200, nil, withCRLF(reserveResponse), 1),
+			httpx.NewMockResponse(200, nil, withCRLF(topupResponse), 1),
 		},
 	})
 
@@ -91,7 +92,7 @@ func TestServiceWithSuccessfulTopup(t *testing.T) {
 	httpx.SetRequestor(mocks)
 	dates.SetNowSource(dates.NewSequentialNowSource(time.Date(2019, 10, 9, 15, 25, 30, 123456789, time.UTC)))
 
-	svc := dtone.NewService("login", "token", "USD")
+	svc := dtone.NewService(http.DefaultClient, nil, "login", "token", "USD")
 
 	httpLogger := &flows.HTTPLogger{}
 
@@ -126,8 +127,8 @@ func TestServiceFailedTransfers(t *testing.T) {
 
 	mocks := httpx.NewMockRequestor(map[string][]httpx.MockResponse{
 		"https://airtime-api.dtone.com/cgi-bin/shop/topup": []httpx.MockResponse{
-			httpx.NewMockResponse(200, withCRLF(msisdnResponse)),
-			httpx.NewMockResponse(200, withCRLF(msisdnResponse)),
+			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse), 1),
+			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse), 1),
 		},
 	})
 
@@ -136,7 +137,7 @@ func TestServiceFailedTransfers(t *testing.T) {
 	httpx.SetRequestor(mocks)
 	dates.SetNowSource(dates.NewSequentialNowSource(time.Date(2019, 10, 9, 15, 25, 30, 123456789, time.UTC)))
 
-	svc := dtone.NewService("login", "token", "USD")
+	svc := dtone.NewService(http.DefaultClient, nil, "login", "token", "USD")
 
 	httpLogger := &flows.HTTPLogger{}
 
@@ -157,7 +158,7 @@ func TestServiceFailedTransfers(t *testing.T) {
 	assert.Equal(t, decimal.Zero, transfer.ActualAmount)
 	assert.Equal(t, 1, len(httpLogger.Logs))
 
-	// try when amount is smaller than mimimum in currency
+	// try when amount is smaller than minimum in currency
 	transfer, err = svc.Transfer(
 		session,
 		urns.URN("tel:+593979099111"),
@@ -165,7 +166,7 @@ func TestServiceFailedTransfers(t *testing.T) {
 		map[string]decimal.Decimal{"USD": decimal.RequireFromString("0.10")},
 		httpLogger.Log,
 	)
-	assert.EqualError(t, err, "amount requested is smaller than the mimimum topup of 1 USD")
+	assert.EqualError(t, err, "amount requested is smaller than the minimum topup of 1 USD")
 	assert.NotNil(t, transfer)
 	assert.Equal(t, urns.URN("tel:+593979099111"), transfer.Sender)
 	assert.Equal(t, urns.URN("tel:+593979099222"), transfer.Recipient)

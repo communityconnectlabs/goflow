@@ -6,7 +6,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -41,20 +41,20 @@ func TestGenerateDocs(t *testing.T) {
 	assert.Contains(t, completion, "root")
 
 	types := completion["types"].([]interface{})
-	assert.Equal(t, 12, len(types))
+	assert.Equal(t, 13, len(types))
 
 	root := completion["root"].([]interface{})
-	assert.Equal(t, 10, len(root))
+	assert.Equal(t, 11, len(root))
 
 	functions := readJSONOutput(t, outputDir, "functions.json").([]interface{})
-	assert.Equal(t, 76, len(functions))
+	assert.Equal(t, 79, len(functions))
 }
 
 func readJSONOutput(t *testing.T, outputDir string, name string) interface{} {
 	output, err := ioutil.ReadFile(path.Join(outputDir, name))
 	require.NoError(t, err)
 
-	generic, err := utils.JSONDecodeGeneric(output)
+	generic, err := jsonx.DecodeGeneric(output)
 	require.NoError(t, err)
 
 	return generic

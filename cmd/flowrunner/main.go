@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/services/classification/wit"
 	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
@@ -74,19 +76,19 @@ func main() {
 
 	if printRepro {
 		fmt.Println("---------------------------------------")
-		marshaledRepro, _ := utils.JSONMarshalPretty(repro)
+		marshaledRepro, _ := jsonx.MarshalPretty(repro)
 		fmt.Println(string(marshaledRepro))
 	}
 }
 
 func createEngine(witToken string) flows.Engine {
 	builder := engine.NewBuilder().
-		WithWebhookServiceFactory(webhooks.NewServiceFactory("goflow-runner", 10000))
+		WithWebhookServiceFactory(webhooks.NewServiceFactory(http.DefaultClient, nil, nil, map[string]string{"User-Agent": "goflow-runner"}, 10000))
 
 	if witToken != "" {
 		builder.WithClassificationServiceFactory(func(session flows.Session, classifier *flows.Classifier) (flows.ClassificationService, error) {
 			if classifier.Type() == "wit" {
-				return wit.NewService(classifier, witToken), nil
+				return wit.NewService(http.DefaultClient, nil, classifier, witToken), nil
 			}
 			return nil, errors.New("only classifiers of type wit supported")
 		})
@@ -102,17 +104,13 @@ func RunFlow(eng flows.Engine, assetsPath string, flowUUID assets.FlowUUID, init
 		return nil, err
 	}
 
-	sa, err := engine.NewSessionAssets(source)
+	sa, err := engine.NewSessionAssets(envs.NewBuilder().Build(), source, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error parsing assets")
 	}
 
 	flow, err := sa.Flows().Get(flowUUID)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := flow.ValidateRecursive(sa, nil); err != nil {
 		return nil, err
 	}
 
@@ -222,6 +220,8 @@ func printEvents(log []flows.Event, out io.Writer) {
 			msg = "👤 contact refreshed on resume"
 		case *events.ContactTimezoneChangedEvent:
 			msg = fmt.Sprintf("🕑 timezone changed to '%s'", typed.Timezone)
+		case *events.EmailSentEvent:
+			msg = fmt.Sprintf("✉️ email sent with subject '%s'", typed.Subject)
 		case *events.EnvironmentRefreshedEvent:
 			msg = "⚙️ environment refreshed on resume"
 		case *events.ErrorEvent:

@@ -1,23 +1,26 @@
 package httpx
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 
+	"github.com/nyaruka/goflow/utils/jsonx"
 	"github.com/pkg/errors"
 )
 
+// MockRequestor is a requestor which can be mocked with responses for given URLs
 type MockRequestor struct {
 	mocks map[string][]MockResponse
 }
 
+// NewMockRequestor creates a new mock requestor with the given mocks
 func NewMockRequestor(mocks map[string][]MockResponse) *MockRequestor {
 	return &MockRequestor{mocks: mocks}
 }
 
+// Do returns the mocked reponse for the given request
 func (r *MockRequestor) Do(client *http.Client, request *http.Request) (*http.Response, error) {
 	url := request.URL.String()
 	mockedResponses := r.mocks[url]
@@ -56,21 +59,34 @@ func (r *MockRequestor) Clone() *MockRequestor {
 }
 
 func (r *MockRequestor) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&r.mocks)
+	return jsonx.Marshal(&r.mocks)
 }
 
 func (r *MockRequestor) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &r.mocks)
+	return jsonx.Unmarshal(data, &r.mocks)
 }
 
 var _ Requestor = (*MockRequestor)(nil)
 
 type MockResponse struct {
-	Status int    `json:"status" validate:"required"`
-	Body   string `json:"body" validate:"required"`
+	Status     int               `json:"status" validate:"required"`
+	Headers    map[string]string `json:"headers,omitempty"`
+	Body       string            `json:"body" validate:"required"`
+	BodyRepeat int               `json:"body_repeat,omitempty"`
 }
 
+// Make mocks making the given request and returning this as the response
 func (m MockResponse) Make(request *http.Request) *http.Response {
+	header := make(http.Header, len(m.Headers))
+	for k, v := range m.Headers {
+		header.Set(k, v)
+	}
+
+	body := m.Body
+	if m.BodyRepeat > 1 {
+		body = strings.Repeat(body, m.BodyRepeat)
+	}
+
 	return &http.Response{
 		Request:       request,
 		Status:        fmt.Sprintf("%d %s", m.Status, http.StatusText(m.Status)),
@@ -78,16 +94,16 @@ func (m MockResponse) Make(request *http.Request) *http.Response {
 		Proto:         "HTTP/1.0",
 		ProtoMajor:    1,
 		ProtoMinor:    0,
-		Header:        nil,
-		Body:          ioutil.NopCloser(strings.NewReader(m.Body)),
-		ContentLength: int64(len(m.Body)),
+		Header:        header,
+		Body:          ioutil.NopCloser(strings.NewReader(body)),
+		ContentLength: int64(len(body)),
 	}
 }
 
 // MockConnectionError mocks a connection error
-var MockConnectionError = MockResponse{0, ""}
+var MockConnectionError = MockResponse{0, nil, "", 0}
 
 // NewMockResponse creates a new mock response
-func NewMockResponse(status int, body string) MockResponse {
-	return MockResponse{status, body}
+func NewMockResponse(status int, headers map[string]string, body string, bodyRepeat int) MockResponse {
+	return MockResponse{status, headers, body, bodyRepeat}
 }

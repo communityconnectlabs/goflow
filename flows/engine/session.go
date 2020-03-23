@@ -5,6 +5,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/flows/inputs"
@@ -13,6 +14,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/runs"
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 )
@@ -98,6 +100,25 @@ func (s *session) ParentRun() flows.RunSummary {
 
 func (s *session) Status() flows.SessionStatus { return s.status }
 func (s *session) Wait() flows.ActivatedWait   { return s.wait }
+
+func (s *session) CurrentContext() *types.XObject {
+	run := s.currentRun()
+	if run == nil {
+		return nil
+	}
+	return types.NewXObject(run.RootContext(s.env))
+}
+
+// looks through this session's run for the one that was last modified
+func (s *session) currentRun() flows.FlowRun {
+	var lastRun flows.FlowRun
+	for _, run := range s.runs {
+		if lastRun == nil || run.ModifiedOn().After(lastRun.ModifiedOn()) {
+			lastRun = run
+		}
+	}
+	return lastRun
+}
 
 // looks through this session's run for the one that is waiting
 func (s *session) waitingRun() flows.FlowRun {
@@ -556,29 +577,29 @@ func (s *session) MarshalJSON() ([]byte, error) {
 	}
 	var err error
 
-	if e.Environment, err = json.Marshal(s.env); err != nil {
+	if e.Environment, err = jsonx.Marshal(s.env); err != nil {
 		return nil, err
 	}
 	if s.contact != nil {
 		var contactJSON json.RawMessage
-		contactJSON, err = json.Marshal(s.contact)
+		contactJSON, err = jsonx.Marshal(s.contact)
 		if err != nil {
 			return nil, err
 		}
 		e.Contact = &contactJSON
 	}
 	if s.trigger != nil {
-		if e.Trigger, err = json.Marshal(s.trigger); err != nil {
+		if e.Trigger, err = jsonx.Marshal(s.trigger); err != nil {
 			return nil, err
 		}
 	}
 	if s.wait != nil {
-		if e.Wait, err = json.Marshal(s.wait); err != nil {
+		if e.Wait, err = jsonx.Marshal(s.wait); err != nil {
 			return nil, err
 		}
 	}
 	if s.input != nil {
-		e.Input, err = json.Marshal(s.input)
+		e.Input, err = jsonx.Marshal(s.input)
 		if err != nil {
 			return nil, err
 		}
@@ -586,11 +607,11 @@ func (s *session) MarshalJSON() ([]byte, error) {
 
 	e.Runs = make([]json.RawMessage, len(s.runs))
 	for i := range s.runs {
-		e.Runs[i], err = json.Marshal(s.runs[i])
+		e.Runs[i], err = jsonx.Marshal(s.runs[i])
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

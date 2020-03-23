@@ -2,18 +2,8 @@ package mobile
 
 // To build an Android Archive:
 //
-// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/greatnonprofits-nfp/goflow/mobile
-//
-// ... except gomobile doesn't yet support gomodules (https://github.com/golang/go/issues/27234). So you need to recreate
-// this as a non-module go project first, i.e.
-//
-// mkdir -p $GOPATH/src/github.com/greatnonprofits-nfp/goflow
-// rsync -a . $GOPATH/src/github.com/greatnonprofits-nfp/goflow
-// cd $GOPATH/src/github.com/greatnonprofits-nfp/goflow
-// GO111MODULE=on go mod vendor
-// GO111MODULE=off go get golang.org/x/mobile/cmd/gomobile
-// GO111MODULE=off $GOPATH/bin/gomobile init
-// GO111MODULE=off gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/greatnonprofits-nfp/goflow/mobile
+// go get golang.org/x/mobile/cmd/gomobile
+// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/nyaruka/goflow/mobile
 
 import (
 	"encoding/json"
@@ -25,11 +15,13 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/definition"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits"
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/utils/jsonx"
 
 	"github.com/Masterminds/semver"
 )
@@ -39,14 +31,14 @@ func CurrentSpecVersion() string {
 	return definition.CurrentSpecVersion.String()
 }
 
-// IsSpecVersionSupported returns whether the given flow spec version is supported
-func IsSpecVersionSupported(ver string) bool {
-	v, err := semver.NewVersion(ver)
+// IsVersionSupported returns whether the given spec version is supported
+func IsVersionSupported(version string) bool {
+	v, err := semver.NewVersion(version)
 	if err != nil {
 		return false
 	}
 
-	return definition.IsSpecVersionSupported(v)
+	return definition.IsVersionSupported(v)
 }
 
 // Environment defines the environment for expression evaluation etc
@@ -99,8 +91,8 @@ type SessionAssets struct {
 }
 
 // NewSessionAssets creates a new session assets
-func NewSessionAssets(source *AssetsSource) (*SessionAssets, error) {
-	s, err := engine.NewSessionAssets(source.target)
+func NewSessionAssets(environment *Environment, source *AssetsSource) (*SessionAssets, error) {
+	s, err := engine.NewSessionAssets(environment.target, source.target, &migrations.Config{BaseMediaURL: ""})
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +223,7 @@ type Sprint struct {
 func (s *Sprint) Modifiers() *ModifierSlice {
 	mods := NewModifierSlice(len(s.target.Modifiers()))
 	for _, mod := range s.target.Modifiers() {
-		marshaled, _ := json.Marshal(mod)
+		marshaled, _ := jsonx.Marshal(mod)
 		mods.Add(&Modifier{type_: mod.Type(), payload: string(marshaled)})
 	}
 	return mods
@@ -241,7 +233,7 @@ func (s *Sprint) Modifiers() *ModifierSlice {
 func (s *Sprint) Events() *EventSlice {
 	events := NewEventSlice(len(s.target.Events()))
 	for _, event := range s.target.Events() {
-		marshaled, _ := json.Marshal(event)
+		marshaled, _ := jsonx.Marshal(event)
 		events.Add(&Event{type_: event.Type(), payload: string(marshaled)})
 	}
 	return events
@@ -281,7 +273,7 @@ func (s *Session) GetWait() *Wait {
 
 // ToJSON serializes this session as JSON
 func (s *Session) ToJSON() (string, error) {
-	data, err := json.Marshal(s.target)
+	data, err := jsonx.Marshal(s.target)
 	if err != nil {
 		return "", err
 	}

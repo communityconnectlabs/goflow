@@ -3,16 +3,33 @@ package contactql
 import (
 	"fmt"
 	"reflect"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/contactql/gen"
 	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
+)
+
+// Comparator is a way of comparing two values in a condition
+type Comparator string
+
+// supported comparators
+const (
+	ComparatorEqual              Comparator = "="
+	ComparatorNotEqual           Comparator = "!="
+	ComparatorContains           Comparator = "~"
+	ComparatorGreaterThan        Comparator = ">"
+	ComparatorLessThan           Comparator = "<"
+	ComparatorGreaterThanOrEqual Comparator = ">="
+	ComparatorLessThanOrEqual    Comparator = "<="
 )
 
 // BoolOperator is a boolean operator (and or or)
@@ -40,6 +57,14 @@ const (
 	PropertyTypeField PropertyType = "field"
 )
 
+// name based contains conditions are tokenized but only tokens of at least 2 characters are used
+const minNameTokenContainsLength = 2
+
+// URN based contains conditions ust be at least 3 characters long as the ES implementation uses trigrams
+const minURNContainsLength = 3
+
+var isNumberRegex = regexp.MustCompile(`^\d+(\.\d+)?$`)
+
 // QueryNode is the base for nodes in our query parse tree
 type QueryNode interface {
 	fmt.Stringer
@@ -50,12 +75,12 @@ type QueryNode interface {
 type Condition struct {
 	propType   PropertyType
 	propKey    string
-	comparator string
+	comparator Comparator
 	value      string
 	valueType  assets.FieldType
 }
 
-func newCondition(propType PropertyType, propKey string, comparator string, value string, valueType assets.FieldType) *Condition {
+func newCondition(propType PropertyType, propKey string, comparator Comparator, value string, valueType assets.FieldType) *Condition {
 	return &Condition{
 		propType:   propType,
 		propKey:    propKey,
@@ -72,10 +97,61 @@ func (c *Condition) PropertyKey() string { return c.propKey }
 func (c *Condition) PropertyType() PropertyType { return c.propType }
 
 // Comparator returns the type of comparison being made
-func (c *Condition) Comparator() string { return c.comparator }
+func (c *Condition) Comparator() Comparator { return c.comparator }
 
 // Value returns the value being compared against
 func (c *Condition) Value() string { return c.value }
+
+// Validate checks that this condition is valid (and thus can be evaluated)
+func (c *Condition) Validate(resolver Resolver) error {
+	switch c.comparator {
+	case ComparatorContains:
+		if c.propKey == AttributeName {
+			if len(tokenizeNameValue(c.value)) == 0 {
+				return errors.Errorf("value must contain a word of at least %d characters long for a contains condition on name", minNameTokenContainsLength)
+			}
+		} else if c.propKey == AttributeURN || c.propType == PropertyTypeScheme {
+			if len(c.value) < minURNContainsLength {
+				return errors.Errorf("value must be least %d characters long for a contains condition on a URN", minURNContainsLength)
+			}
+		} else {
+			// ~ can only be used with the name/urn attributes or actual URNs
+			return errors.Errorf("contains conditions can only be used with name or URN values")
+		}
+
+	case ComparatorGreaterThan, ComparatorGreaterThanOrEqual, ComparatorLessThan, ComparatorLessThanOrEqual:
+		if c.valueType != assets.FieldTypeNumber && c.valueType != assets.FieldTypeDatetime {
+			return errors.Errorf("comparisons with %s can only be used with date and number fields", c.comparator)
+		}
+	}
+
+	// if existence check, disallow certain attributes
+	if c.value == "" {
+		switch c.propKey {
+		case AttributeID, AttributeCreatedOn, AttributeGroup:
+			return errors.Errorf("can't check whether '%s' is set or not set", c.propKey)
+		}
+	} else {
+		// check values are valid for the attribute type
+		switch c.propKey {
+		case AttributeGroup:
+			group := resolver.ResolveGroup(c.value)
+			if group == nil {
+				return errors.Errorf("'%s' is not a valid group name", c.value)
+			}
+			c.value = group.Name()
+		case AttributeLanguage:
+			if c.value != "" {
+				_, err := envs.ParseLanguage(c.value)
+				if err != nil {
+					return errors.Errorf("'%s' is not a valid language code", c.value)
+				}
+			}
+		}
+	}
+
+	return nil
+}
 
 // Evaluate evaluates this condition against the queryable contact
 func (c *Condition) Evaluate(env envs.Environment, queryable Queryable) (bool, error) {
@@ -84,9 +160,9 @@ func (c *Condition) Evaluate(env envs.Environment, queryable Queryable) (bool, e
 
 	// is this an existence check?
 	if c.value == "" {
-		if c.comparator == "=" {
+		if c.comparator == ComparatorEqual {
 			return len(vals) == 0, nil // x = "" is true if x doesn't exist
-		} else if c.comparator == "!=" {
+		} else if c.comparator == ComparatorNotEqual {
 			return len(vals) > 0, nil // x != "" is false if x doesn't exist (i.e. true if x does exist)
 		}
 	}
@@ -96,24 +172,36 @@ func (c *Condition) Evaluate(env envs.Environment, queryable Queryable) (bool, e
 		return false, nil
 	}
 
-	// check each resolved value
+	// evaluate condition against each resolved value
+	anyTrue := false
+	allTrue := true
 	for _, val := range vals {
 		res, err := c.evaluateValue(env, val)
 		if err != nil {
 			return false, err
 		}
 		if res {
-			return true, nil
+			anyTrue = true
+		} else {
+			allTrue = false
 		}
 	}
 
-	return false, nil
+	// foo != x is only true if all values of foo are not x
+	if c.comparator == ComparatorNotEqual {
+		return allTrue, nil
+	}
+
+	// foo = x is true if any value of foo is x
+	return anyTrue, nil
 }
 
 func (c *Condition) evaluateValue(env envs.Environment, val interface{}) (bool, error) {
 	switch val.(type) {
 	case string:
-		return textComparison(val.(string), c.comparator, c.value)
+		isName := c.propKey == AttributeName // needs to be handled as special case
+
+		return textComparison(val.(string), c.comparator, c.value, isName)
 
 	case decimal.Decimal:
 		asDecimal, err := decimal.NewFromString(c.value)
@@ -135,13 +223,14 @@ func (c *Condition) evaluateValue(env envs.Environment, val interface{}) (bool, 
 }
 
 func (c *Condition) String() string {
-	var value string
-	if c.value == "" {
-		value = `""`
-	} else {
-		value = c.value
+	value := c.value
+
+	if !isNumberRegex.MatchString(value) {
+		// if not a decimal then quote
+		value = strconv.Quote(value)
 	}
-	return fmt.Sprintf("%s%s%s", c.propKey, c.comparator, value)
+
+	return fmt.Sprintf(`%s %s %s`, c.propKey, c.comparator, value)
 }
 
 // BoolCombination is a AND or OR combination of multiple conditions
@@ -194,27 +283,46 @@ func (b *BoolCombination) String() string {
 	for i := range b.children {
 		children[i] = b.children[i].String()
 	}
-	return fmt.Sprintf("%s(%s)", strings.ToUpper(string(b.op)), strings.Join(children, ", "))
+	return fmt.Sprintf("(%s)", strings.Join(children, fmt.Sprintf(" %s ", strings.ToUpper(string(b.op)))))
 }
 
+// ContactQuery is a parsed contact QL query
 type ContactQuery struct {
 	root QueryNode
 }
 
+// Root returns the root node of this query
 func (q *ContactQuery) Root() QueryNode { return q.root }
 
+// Evaluate returns whether the given queryable matches this query
 func (q *ContactQuery) Evaluate(env envs.Environment, queryable Queryable) (bool, error) {
 	return q.root.Evaluate(env, queryable)
 }
 
+// String returns the pretty formatted version of this query
 func (q *ContactQuery) String() string {
-	return q.root.String()
+	s := q.root.String()
+
+	// strip extra parentheses if not needed
+	if strings.HasPrefix(s, "(") && strings.HasSuffix(s, ")") {
+		s = s[1 : len(s)-1]
+	}
+	return s
 }
 
 // ParseQuery parses a ContactQL query from the given input
-func ParseQuery(text string, redaction envs.RedactionPolicy, fieldResolver FieldResolverFunc) (*ContactQuery, error) {
-	errListener := NewErrorListener()
+func ParseQuery(text string, redaction envs.RedactionPolicy, country envs.Country, resolver Resolver) (*ContactQuery, error) {
+	// preprocess text before parsing
+	text = strings.TrimSpace(text)
 
+	// if query is a valid number, rewrite as a tel = query
+	if redaction != envs.RedactionPolicyURNs {
+		if number := utils.ParsePhoneNumber(text, string(country)); number != "" {
+			text = fmt.Sprintf(`tel = %s`, number)
+		}
+	}
+
+	errListener := NewErrorListener()
 	input := antlr.NewInputStream(text)
 	lexer := gen.NewContactQLLexer(input)
 	stream := antlr.NewCommonTokenStream(lexer, 0)
@@ -228,7 +336,7 @@ func ParseQuery(text string, redaction envs.RedactionPolicy, fieldResolver Field
 		return nil, errListener.Error()
 	}
 
-	visitor := newVisitor(redaction, fieldResolver)
+	visitor := newVisitor(redaction, resolver)
 	rootNode := visitor.Visit(tree).(QueryNode)
 
 	if len(visitor.errors) > 0 {
@@ -258,4 +366,14 @@ func (l *errorListener) Error() error {
 
 func (l *errorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
 	l.messages = append(l.messages, msg)
+}
+
+func tokenizeNameValue(value string) []string {
+	tokens := make([]string, 0)
+	for _, token := range utils.TokenizeStringByUnicodeSeg(value) {
+		if len(token) >= minNameTokenContainsLength {
+			tokens = append(tokens, token)
+		}
+	}
+	return tokens
 }

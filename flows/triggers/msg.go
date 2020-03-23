@@ -5,10 +5,12 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/flows/inputs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
@@ -18,7 +20,7 @@ func init() {
 // TypeMsg is the type for message triggered sessions
 const TypeMsg string = "msg"
 
-// MsgTrigger is used when a session was triggered by a message being recieved by the caller
+// MsgTrigger is used when a session was triggered by a message being received by the caller
 //
 //   {
 //     "type": "msg",
@@ -92,6 +94,20 @@ func (t *MsgTrigger) InitializeRun(run flows.FlowRun, logEvent flows.EventCallba
 	return t.baseTrigger.InitializeRun(run, logEvent)
 }
 
+// Context for msg triggers additionally exposes the keyword match
+func (t *MsgTrigger) Context(env envs.Environment) map[string]types.XValue {
+	var keyword types.XValue
+	if t.match != nil {
+		keyword = types.NewXText(t.match.Keyword)
+	}
+
+	return map[string]types.XValue{
+		"type":    types.NewXText(t.type_),
+		"params":  t.params,
+		"keyword": keyword,
+	}
+}
+
 var _ flows.Trigger = (*MsgTrigger)(nil)
 
 //------------------------------------------------------------------------------------------
@@ -133,5 +149,5 @@ func (t *MsgTrigger) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

@@ -10,13 +10,45 @@ import (
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+
+	"github.com/pkg/errors"
 )
 
 var debug = false
 
-// Do makes the given HTTP request using the current requestor
-func Do(client *http.Client, request *http.Request) (*http.Response, error) {
-	return currentRequestor.Do(client, request)
+// Do makes the given HTTP request using the current requestor and retry config
+func Do(client *http.Client, request *http.Request, retries *RetryConfig, access *AccessConfig) (*http.Response, error) {
+	if access != nil {
+		allowed, err := access.Allow(request)
+		if err != nil {
+			return nil, err
+		}
+		if !allowed {
+			return nil, errors.Errorf("request to %s denied", request.URL.Hostname())
+		}
+	}
+
+	var response *http.Response
+	var err error
+	retry := 0
+
+	for {
+		response, err = currentRequestor.Do(client, request)
+
+		if retries != nil && retry < retries.MaxRetries() {
+			backoff := retries.Backoff(retry)
+
+			if retries.ShouldRetry(request, response, backoff) {
+				time.Sleep(backoff)
+				retry++
+				continue
+			}
+		}
+
+		break
+	}
+
+	return response, err
 }
 
 // Trace holds the complete trace of an HTTP request/response
@@ -40,16 +72,7 @@ func (t *Trace) String() string {
 }
 
 // DoTrace makes the given request saving traces of the complete request and response
-func DoTrace(client *http.Client, method string, url string, body io.Reader, headers map[string]string) (*Trace, error) {
-	request, err := http.NewRequest(method, url, body)
-	if err != nil {
-		return nil, err
-	}
-
-	for key, value := range headers {
-		request.Header.Set(key, value)
-	}
-
+func DoTrace(client *http.Client, request *http.Request, retries *RetryConfig, access *AccessConfig, maxBodyBytes int) (*Trace, error) {
 	requestTrace, err := httputil.DumpRequestOut(request, true)
 	if err != nil {
 		return nil, err
@@ -61,29 +84,30 @@ func DoTrace(client *http.Client, method string, url string, body io.Reader, hea
 		StartTime:    dates.Now(),
 	}
 
-	response, err := Do(client, request)
+	response, err := Do(client, request, retries, access)
 	trace.EndTime = dates.Now()
 
 	if err != nil {
 		return trace, err
 	}
 
+	trace.Response = response
+
 	// save response trace without body which will be parsed separately
 	responseTrace, err := httputil.DumpResponse(response, false)
 	if err != nil {
-		return nil, err
+		return trace, err
 	}
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	trace.ResponseTrace = responseTrace
+
+	responseBody, err := readBody(response, maxBodyBytes)
 	if err != nil {
-		return nil, err
+		return trace, err
 	}
 
 	// add read body to response trace
-	responseTrace = append(responseTrace, responseBody...)
-
-	trace.Response = response
-	trace.ResponseTrace = responseTrace
+	trace.ResponseTrace = append(trace.ResponseTrace, responseBody...)
 	trace.ResponseBody = responseBody
 
 	if debug {
@@ -91,6 +115,45 @@ func DoTrace(client *http.Client, method string, url string, body io.Reader, hea
 	}
 
 	return trace, nil
+}
+
+// NewTrace makes the given request saving traces of the complete request and response
+func NewTrace(client *http.Client, method string, url string, body io.Reader, headers map[string]string, retries *RetryConfig, access *AccessConfig) (*Trace, error) {
+	request, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	for key, value := range headers {
+		request.Header.Set(key, value)
+	}
+
+	return DoTrace(client, request, retries, access, -1)
+}
+
+// attempts to read the body of an HTTP response
+func readBody(response *http.Response, maxBodyBytes int) ([]byte, error) {
+	defer response.Body.Close()
+
+	if maxBodyBytes > 0 {
+		// we will only read up to our max body bytes limit
+		bodyReader := io.LimitReader(response.Body, int64(maxBodyBytes)+1)
+
+		bodyBytes, err := ioutil.ReadAll(bodyReader)
+		if err != nil {
+			return nil, err
+		}
+
+		// if we have no remaining bytes, error because the body was too big
+		if bodyReader.(*io.LimitedReader).N <= 0 {
+			return nil, errors.Errorf("webhook response body exceeds %d bytes limit", maxBodyBytes)
+		}
+
+		return bodyBytes, nil
+	}
+
+	// if there is no limit, read the entire body
+	return ioutil.ReadAll(response.Body)
 }
 
 // Requestor is anything that can make an HTTP request with a client
@@ -113,6 +176,7 @@ func SetRequestor(requestor Requestor) {
 	currentRequestor = requestor
 }
 
+// SetDebug enables debugging
 func SetDebug(enabled bool) {
 	debug = enabled
 }

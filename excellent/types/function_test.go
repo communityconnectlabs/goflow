@@ -1,11 +1,11 @@
 package types_test
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,7 +22,7 @@ func TestXFunction(t *testing.T) {
 	assert.Equal(t, `XFunction`, func1.String())
 	assert.Equal(t, `function`, func1.Describe())
 
-	marshaled, err := json.Marshal(func1)
+	marshaled, err := jsonx.Marshal(func1)
 	assert.NoError(t, err)
 	assert.Equal(t, `null`, string(marshaled))
 

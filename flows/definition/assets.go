@@ -5,6 +5,7 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
 )
 
 // implemention of FlowAssets which provides lazy loading and validation of flows
@@ -13,13 +14,16 @@ type flowAssets struct {
 
 	mutex  sync.Mutex
 	source assets.Source
+
+	migrationConfig *migrations.Config
 }
 
 // NewFlowAssets creates a new flow assets
-func NewFlowAssets(source assets.Source) flows.FlowAssets {
+func NewFlowAssets(source assets.Source, migrationConfig *migrations.Config) flows.FlowAssets {
 	return &flowAssets{
-		byUUID: make(map[assets.FlowUUID]flows.Flow),
-		source: source,
+		byUUID:          make(map[assets.FlowUUID]flows.Flow),
+		source:          source,
+		migrationConfig: migrationConfig,
 	}
 }
 
@@ -38,7 +42,7 @@ func (a *flowAssets) Get(uuid assets.FlowUUID) (flows.Flow, error) {
 		return nil, err
 	}
 
-	flow, err = ReadFlow(asset.Definition())
+	flow, err = ReadFlow(asset.Definition(), a.migrationConfig)
 	if err != nil {
 		return nil, err
 	}
