@@ -2,13 +2,14 @@ package legacy
 
 import (
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/definition/legacy/expressions"
-	"github.com/nyaruka/goflow/utils/uuids"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition/legacy/expressions"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/shopspring/decimal"
+	"github.com/greatnonprofits-nfp/goflow/flows/actions"
 )
 
 // template that matches the JSON payload sent by legacy webhooks
@@ -298,6 +299,50 @@ func newCallWebhookAction(uuid uuids.UUID, method string, url string, headers ma
 	if body != "" {
 		d["body"] = body
 	}
+	if resultName != "" {
+		d["result_name"] = resultName
+	}
+
+	return migratedAction(d)
+}
+
+func newCallLookupAction(uuid uuids.UUID, lookupDb map[string]string, lookupQueries []actions.LookupQuery, resultName string) migratedAction {
+	d := map[string]interface{}{
+		"uuid":           uuid,
+		"type":           "call_lookup",
+		"lookup_queries": lookupQueries,
+		"lookup_db":      lookupDb,
+	}
+
+	if resultName != "" {
+		d["result_name"] = resultName
+	}
+
+	return migratedAction(d)
+}
+
+func newCallGiftcardAction(uuid uuids.UUID, giftcardDb map[string]string, giftcardType string, resultName string) migratedAction {
+	d := map[string]interface{}{
+		"uuid":          uuid,
+		"type":          "call_giftcard",
+		"giftcard_type": giftcardType,
+		"giftcard_db":   giftcardDb,
+	}
+
+	if resultName != "" {
+		d["result_name"] = resultName
+	}
+
+	return migratedAction(d)
+}
+
+func newCallShortenURLAction(uuid uuids.UUID, shortenURL map[string]string, resultName string) migratedAction {
+	d := map[string]interface{}{
+		"uuid":        uuid,
+		"type":        "call_shorten_url",
+		"shorten_url": shortenURL,
+	}
+
 	if resultName != "" {
 		d["result_name"] = resultName
 	}

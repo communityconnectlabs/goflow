@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"github.com/nyaruka/goflow/utils/uuids"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/Masterminds/semver"
 )

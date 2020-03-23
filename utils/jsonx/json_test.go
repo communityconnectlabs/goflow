@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/nyaruka/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/stretchr/testify/assert"
 )

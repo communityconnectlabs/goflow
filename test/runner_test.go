@@ -23,7 +23,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/utils/dates"
 	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
 	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/nyaruka/goflow/utils/smtpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/smtpx"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"

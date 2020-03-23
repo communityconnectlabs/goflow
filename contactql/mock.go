@@ -3,7 +3,7 @@ package contactql
 import (
 	"strings"
 
-	"github.com/nyaruka/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets"
 )
 
 type mockResolver struct {

@@ -20,6 +20,7 @@ import (
 	"github.com/buger/jsonparser"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
+	"github.com/greatnonprofits-nfp/goflow/flows/actions"
 )
 
 //------------------------------------------------------------------------------------------
@@ -169,13 +170,13 @@ type FlowReference struct {
 
 // RulesetConfig holds the config dictionary for a legacy ruleset
 type RulesetConfig struct {
-	Flow           *FlowReference  `json:"flow"`
-	FieldDelimiter string          `json:"field_delimiter"`
-	FieldIndex     int             `json:"field_index"`
-	Webhook        string          `json:"webhook"`
-	WebhookAction  string          `json:"webhook_action"`
-	WebhookHeaders []WebhookHeader `json:"webhook_headers"`
-	Resthook       string          `json:"resthook"`
+	Flow           *FlowReference        `json:"flow"`
+	FieldDelimiter string                `json:"field_delimiter"`
+	FieldIndex     int                   `json:"field_index"`
+	Webhook        string                `json:"webhook"`
+	WebhookAction  string                `json:"webhook_action"`
+	WebhookHeaders []WebhookHeader       `json:"webhook_headers"`
+	Resthook       string                `json:"resthook"`
 	LookupDb       map[string]string     `json:"lookup_db"`
 	LookupQueries  []actions.LookupQuery `json:"lookup_queries"`
 	GiftcardDb     map[string]string     `json:"giftcard_db"`
@@ -595,24 +596,34 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 			}
 		}
 
-		newActions = []flows.Action{
-			actions.NewCallLookupAction(flows.ActionUUID(utils.NewUUID()), config.LookupDb, config.LookupQueries, resultName),
+		newActions = []migratedAction{
+			newCallLookupAction(uuids.New(), config.LookupDb, config.LookupQueries, resultName),
 		}
 
 		// lookup rulesets operate on the webhook status, saved as category
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
-		router = routers.NewSwitch(nil, "", categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
 		uiType = UINodeTypeSplitByLookup
 
 	case "giftcard":
-		newActions = []flows.Action{
-			actions.NewCallGiftcardAction(flows.ActionUUID(utils.NewUUID()), config.GiftcardDb, config.GiftcardType, resultName),
+		newActions = []migratedAction{
+			newCallGiftcardAction(uuids.New(), config.GiftcardDb, config.GiftcardType, resultName),
 		}
 
 		// lookup rulesets operate on the webhook status, saved as category
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
-		router = routers.NewSwitch(nil, "", categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
 		uiType = UINodeTypeSplitByGiftcard
+
+	case "shorten_url":
+		newActions = []migratedAction{
+			newCallShortenURLAction(uuids.New(), config.ShortenURL, resultName),
+		}
+
+		// lookup rulesets operate on the webhook status, saved as category
+		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		uiType = UINodeTypeSplitByShortenURL
 
 	case "resthook":
 		newActions = []migratedAction{
@@ -623,16 +634,6 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
 		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
 		uiType = UINodeTypeSplitByResthook
-
-	case "shorten_url":
-		newActions = []flows.Action{
-			actions.NewCallShortenURLAction(flows.ActionUUID(utils.NewUUID()), config.ShortenURL, resultName),
-		}
-
-		// lookup rulesets operate on the webhook status, saved as category
-		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
-		router = routers.NewSwitch(nil, "", categories, operand, cases, defaultCategory)
-		uiType = UINodeTypeSplitByShortenURL
 
 	case "form_field":
 		operand, _ := expressions.MigrateTemplate(r.Operand, nil)

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/nyaruka/goflow/utils/dates"
-	"github.com/nyaruka/goflow/utils/random"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/random"
 )
 
 // RetryConfig configures if and how retrying of requests happens

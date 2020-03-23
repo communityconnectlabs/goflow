@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/nyaruka/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/pkg/errors"
 )
 

@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/nyaruka/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets"
 )
 
 // Global is a JSON serializable implementation of a global asset

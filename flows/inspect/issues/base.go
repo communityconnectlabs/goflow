@@ -3,8 +3,8 @@ package issues
 import (
 	"sort"
 
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 type reportFunc func(flows.SessionAssets, flows.Flow, []flows.ExtractedTemplate, []flows.ExtractedReference, func(flows.Issue))

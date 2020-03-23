@@ -3,7 +3,7 @@ package mobile
 // To build an Android Archive:
 //
 // go get golang.org/x/mobile/cmd/gomobile
-// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/nyaruka/goflow/mobile
+// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/greatnonprofits-nfp/goflow/mobile
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits"
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/nyaruka/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/Masterminds/semver"
 )

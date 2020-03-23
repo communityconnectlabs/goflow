@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nyaruka/goflow/utils/dates"
-	"github.com/nyaruka/goflow/utils/httpx"
-	"github.com/nyaruka/goflow/utils/random"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/random"
 
 	"github.com/stretchr/testify/assert"
 )

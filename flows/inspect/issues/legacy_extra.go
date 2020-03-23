@@ -3,9 +3,9 @@ package issues
 import (
 	"strings"
 
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/excellent/tools"
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/excellent/tools"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 func init() {
