@@ -1,10 +1,12 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 // XDate is a Gregorian calendar date value.
@@ -15,11 +17,11 @@ import (
 //
 // @type date
 type XDate struct {
-	native utils.Date
+	native dates.Date
 }
 
 // NewXDate creates a new date
-func NewXDate(value utils.Date) XDate {
+func NewXDate(value dates.Date) XDate {
 	return XDate{native: value}
 }
 
@@ -35,14 +37,14 @@ func (x XDate) Truthy() bool {
 func (x XDate) Render() string { return x.Native().String() }
 
 // Format returns the pretty text representation
-func (x XDate) Format(env utils.Environment) string {
+func (x XDate) Format(env envs.Environment) string {
 	formatted, _ := x.FormatCustom(env.DateFormat())
 	return formatted
 }
 
 // FormatCustom provides customised formatting
-func (x XDate) FormatCustom(format utils.DateFormat) (string, error) {
-	goFormat, err := utils.ToGoDateFormat(string(format), utils.DateOnlyFormatting)
+func (x XDate) FormatCustom(format envs.DateFormat) (string, error) {
+	goFormat, err := envs.ToGoDateFormat(string(format), envs.DateOnlyFormatting)
 	if err != nil {
 		return "", err
 	}
@@ -51,7 +53,7 @@ func (x XDate) FormatCustom(format utils.DateFormat) (string, error) {
 
 // MarshalJSON is called when a struct containing this type is marshaled
 func (x XDate) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.Native().String())
+	return jsonx.Marshal(x.Native().String())
 }
 
 // String returns the native string representation of this type
@@ -60,7 +62,7 @@ func (x XDate) String() string {
 }
 
 // Native returns the native value of this type
-func (x XDate) Native() utils.Date { return x.native }
+func (x XDate) Native() dates.Date { return x.native }
 
 // Equals determines equality for this type
 func (x XDate) Equals(other XDate) bool {
@@ -73,11 +75,11 @@ func (x XDate) Compare(other XDate) int {
 }
 
 // XDateZero is the zero time value
-var XDateZero = NewXDate(utils.ZeroDate)
+var XDateZero = NewXDate(dates.ZeroDate)
 var _ XValue = XDateZero
 
 // ToXDate converts the given value to a time or returns an error if that isn't possible
-func ToXDate(env utils.Environment, x XValue) (XDate, XError) {
+func ToXDate(env envs.Environment, x XValue) (XDate, XError) {
 	if !utils.IsNil(x) {
 		switch typed := x.(type) {
 		case XError:
@@ -87,7 +89,7 @@ func ToXDate(env utils.Environment, x XValue) (XDate, XError) {
 		case XDateTime:
 			return typed.In(env.Timezone()).Date(), nil
 		case XText:
-			parsed, err := utils.DateFromString(env, typed.Native())
+			parsed, err := envs.DateFromString(env, typed.Native())
 			if err == nil {
 				return NewXDate(parsed), nil
 			}

@@ -75,7 +75,7 @@
                         {
                             "type": "call_webhook",
                             "headers": {},
-                            "url": "http://localhost/?cmd=success",
+                            "url": "http://localhost/?cmd=extra",
                             "uuid": "881c9b75-d426-4f57-8562-d32bdc75b524",
                             "method": "GET",
                             "result_name": "webhook"
@@ -146,14 +146,15 @@
         {
             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
             "name": "Android Channel",
-            "address": "+12345671111",
+            "address": "+17036975131",
             "schemes": [
                 "tel"
             ],
             "roles": [
                 "send",
                 "receive"
-            ]
+            ],
+            "country": "US"
         }
     ]
 }

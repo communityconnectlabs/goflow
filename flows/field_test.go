@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/test"
@@ -14,7 +15,7 @@ import (
 )
 
 func TestFieldValues(t *testing.T) {
-	session, _, err := test.CreateTestSession("http://localhost", nil)
+	session, _, err := test.CreateTestSession("http://localhost", envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	env := session.Environment()

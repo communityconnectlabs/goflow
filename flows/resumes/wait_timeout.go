@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
-	RegisterType(TypeWaitTimeout, readWaitTimeoutResume)
+	registerType(TypeWaitTimeout, readWaitTimeoutResume)
 }
 
 // TypeWaitTimeout is the type for resuming a session when a wait has timed out
@@ -36,8 +38,8 @@ type WaitTimeoutResume struct {
 	baseResume
 }
 
-// NewWaitTimeoutResume creates a new timeout resume with the passed in values
-func NewWaitTimeoutResume(env utils.Environment, contact *flows.Contact) *WaitTimeoutResume {
+// NewWaitTimeout creates a new timeout resume with the passed in values
+func NewWaitTimeout(env envs.Environment, contact *flows.Contact) *WaitTimeoutResume {
 	return &WaitTimeoutResume{
 		baseResume: newBaseResume(TypeWaitTimeout, env, contact),
 	}
@@ -47,7 +49,7 @@ func NewWaitTimeoutResume(env utils.Environment, contact *flows.Contact) *WaitTi
 func (r *WaitTimeoutResume) Apply(run flows.FlowRun, logEvent flows.EventCallback) error {
 	// clear the last input
 	run.Session().SetInput(nil)
-	logEvent(events.NewWaitTimedOutEvent())
+	logEvent(events.NewWaitTimedOut())
 
 	return r.baseResume.Apply(run, logEvent)
 }
@@ -81,5 +83,5 @@ func (r *WaitTimeoutResume) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

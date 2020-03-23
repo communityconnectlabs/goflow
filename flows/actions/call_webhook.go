@@ -2,6 +2,7 @@ package actions
 
 import (
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/greatnonprofits-nfp/goflow/flows"
@@ -11,8 +12,10 @@ import (
 	"golang.org/x/net/http/httpguts"
 )
 
+func isValidURL(u string) bool { _, err := url.Parse(u); return err == nil }
+
 func init() {
-	RegisterType(TypeCallWebhook, func() flows.Action { return &CallWebhookAction{} })
+	registerType(TypeCallWebhook, func() flows.Action { return &CallWebhookAction{} })
 }
 
 // TypeCallWebhook is the type for the call webhook action
@@ -28,7 +31,7 @@ const TypeCallWebhook string = "call_webhook"
 //     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
 //     "type": "call_webhook",
 //     "method": "GET",
-//     "url": "http://localhost/?cmd=success",
+//     "url": "http://localhost:49998/?cmd=success",
 //     "headers": {
 //       "Authorization": "Token AAFFZZHH"
 //     },
@@ -37,20 +40,20 @@ const TypeCallWebhook string = "call_webhook"
 //
 // @action call_webhook
 type CallWebhookAction struct {
-	BaseAction
+	baseAction
 	onlineAction
 
 	Method     string            `json:"method" validate:"required,http_method"`
-	URL        string            `json:"url" validate:"required"`
-	Headers    map[string]string `json:"headers,omitempty"`
-	Body       string            `json:"body,omitempty"`
+	URL        string            `json:"url" validate:"required" engine:"evaluated"`
+	Headers    map[string]string `json:"headers,omitempty" engine:"evaluated"`
+	Body       string            `json:"body,omitempty" engine:"evaluated"`
 	ResultName string            `json:"result_name,omitempty"`
 }
 
-// NewCallWebhookAction creates a new call webhook action
-func NewCallWebhookAction(uuid flows.ActionUUID, method string, url string, headers map[string]string, body string, resultName string) *CallWebhookAction {
+// NewCallWebhook creates a new call webhook action
+func NewCallWebhook(uuid flows.ActionUUID, method string, url string, headers map[string]string, body string, resultName string) *CallWebhookAction {
 	return &CallWebhookAction{
-		BaseAction: NewBaseAction(TypeCallWebhook, uuid),
+		baseAction: newBaseAction(TypeCallWebhook, uuid),
 		Method:     method,
 		URL:        url,
 		Headers:    headers,
@@ -61,10 +64,6 @@ func NewCallWebhookAction(uuid flows.ActionUUID, method string, url string, head
 
 // Validate validates our action is valid
 func (a *CallWebhookAction) Validate() error {
-	if a.Body != "" && a.Method == "GET" {
-		return errors.Errorf("can't specify body if method is GET")
-	}
-
 	for key := range a.Headers {
 		if !httpguts.ValidHeaderFieldName(key) {
 			return errors.Errorf("header '%s' is not a valid HTTP header", key)
@@ -80,10 +79,14 @@ func (a *CallWebhookAction) Execute(run flows.FlowRun, step flows.Step, logModif
 	// substitute any variables in our url
 	url, err := run.EvaluateTemplate(a.URL)
 	if err != nil {
-		logEvent(events.NewErrorEvent(err))
+		logEvent(events.NewError(err))
 	}
 	if url == "" {
-		logEvent(events.NewErrorEventf("call_webhook URL evaluated to empty string, skipping"))
+		logEvent(events.NewErrorf("webhook URL evaluated to empty string"))
+		return nil
+	}
+	if !isValidURL(url) {
+		logEvent(events.NewErrorf("webhook URL evaluated to an invalid URL: '%s'", url))
 		return nil
 	}
 
@@ -92,12 +95,18 @@ func (a *CallWebhookAction) Execute(run flows.FlowRun, step flows.Step, logModif
 
 	// substitute any body variables
 	if body != "" {
-		body, err = run.EvaluateTemplate(body)
+		// webhook bodies aren't truncated like other templates
+		body, err = run.EvaluateTemplateText(body, nil, false)
 		if err != nil {
-			logEvent(events.NewErrorEvent(err))
+			logEvent(events.NewError(err))
 		}
 	}
 
+	return a.call(run, step, url, method, body, logEvent)
+}
+
+// Execute runs this action
+func (a *CallWebhookAction) call(run flows.FlowRun, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
@@ -108,41 +117,56 @@ func (a *CallWebhookAction) Execute(run flows.FlowRun, step flows.Step, logModif
 	for key, value := range a.Headers {
 		headerValue, err := run.EvaluateTemplate(value)
 		if err != nil {
-			logEvent(events.NewErrorEvent(err))
+			logEvent(events.NewError(err))
 		}
 
 		req.Header.Add(key, headerValue)
 	}
 
-	webhook, err := flows.MakeWebhookCall(run.Session(), req, "")
+	svc, err := run.Session().Engine().Services().Webhook(run.Session())
+	if err != nil {
+		logEvent(events.NewError(err))
+		return nil
+	}
+
+	call, err := svc.Call(run.Session(), req)
 
 	if err != nil {
-		logEvent(events.NewErrorEvent(err))
-	} else {
-		logEvent(events.NewWebhookCalledEvent(webhook))
+		logEvent(events.NewError(err))
+	}
+	if call != nil {
+		a.updateWebhook(run, call)
+
+		status := callStatus(call, err, false)
+
+		logEvent(events.NewWebhookCalled(call, status, ""))
+
 		if a.ResultName != "" {
-			a.saveWebhookResult(run, step, a.ResultName, webhook, logEvent)
+			a.saveWebhookResult(run, step, a.ResultName, call, status, logEvent)
 		}
 	}
 
 	return nil
 }
 
-// Inspect inspects this object and any children
-func (a *CallWebhookAction) Inspect(inspect func(flows.Inspectable)) {
-	inspect(a)
-}
-
-// EnumerateTemplates enumerates all expressions on this object and its children
-func (a *CallWebhookAction) EnumerateTemplates(include flows.TemplateIncluder) {
-	include.String(&a.URL)
-	include.String(&a.Body)
-	include.Map(a.Headers)
-}
-
-// EnumerateResults enumerates all potential results on this object
-func (a *CallWebhookAction) EnumerateResults(node flows.Node, include func(*flows.ResultInfo)) {
+// Results enumerates any results generated by this flow object
+func (a *CallWebhookAction) Results(include func(*flows.ResultInfo)) {
 	if a.ResultName != "" {
-		include(flows.NewResultInfo(a.ResultName, webhookCategories, node))
+		include(flows.NewResultInfo(a.ResultName, webhookCategories))
 	}
+}
+
+// determines the webhook status from the HTTP status code
+func callStatus(call *flows.WebhookCall, err error, isResthook bool) flows.CallStatus {
+	if call.Response == nil || err != nil {
+		return flows.CallStatusConnectionError
+	}
+	if isResthook && call.Response.StatusCode == http.StatusGone {
+		// https://zapier.com/developer/documentation/v2/rest-hooks/
+		return flows.CallStatusSubscriberGone
+	}
+	if call.Response.StatusCode/100 == 2 {
+		return flows.CallStatusSuccess
+	}
+	return flows.CallStatusResponseError
 }

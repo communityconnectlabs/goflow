@@ -2,9 +2,11 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"reflect"
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 	"github.com/pkg/errors"
 	validator "gopkg.in/go-playground/validator.v9"
 )
@@ -21,6 +23,8 @@ func init() {
 		}
 		return name
 	})
+
+	Validator.RegisterAlias("http_method", "eq=GET|eq=HEAD|eq=POST|eq=PUT|eq=PATCH|eq=DELETE")
 }
 
 // ValidationErrors combines multiple validation errors as a single error
@@ -98,6 +102,8 @@ func Validate(obj interface{}) error {
 			problem = fmt.Sprintf("is mutually exclusive with '%s'", fieldErr.Param())
 		case "http_method":
 			problem = "is not a valid HTTP method"
+		case "msg_topic":
+			problem = "is not a valid message topic"
 		case "date_format":
 			problem = "is not a valid date format"
 		case "time_format":
@@ -113,4 +119,22 @@ func Validate(obj interface{}) error {
 		newErrors[i] = errors.Errorf("field '%s' %s", location, problem)
 	}
 	return ValidationErrors(newErrors)
+}
+
+// UnmarshalAndValidate is a convenience function to unmarshal an object and validate it
+func UnmarshalAndValidate(data []byte, obj interface{}) error {
+	err := jsonx.Unmarshal(data, obj)
+	if err != nil {
+		return err
+	}
+
+	return Validate(obj)
+}
+
+// UnmarshalAndValidateWithLimit unmarshals a struct with a limit on how many bytes can be read from the given reader
+func UnmarshalAndValidateWithLimit(reader io.ReadCloser, s interface{}, limit int64) error {
+	if err := jsonx.UnmarshalWithLimit(reader, s, limit); err != nil {
+		return err
+	}
+	return Validate(s)
 }

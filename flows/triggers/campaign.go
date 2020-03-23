@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
-	RegisterType(TypeCampaign, readCampaignTrigger)
+	registerType(TypeCampaign, readCampaignTrigger)
 }
 
 // TypeCampaign is the type for sessions triggered by campaign events
@@ -60,8 +62,8 @@ type CampaignTrigger struct {
 	event *CampaignEvent
 }
 
-// NewCampaignTrigger creates a new campaign trigger with the passed in values
-func NewCampaignTrigger(env utils.Environment, flow *assets.FlowReference, contact *flows.Contact, event *CampaignEvent) *CampaignTrigger {
+// NewCampaign creates a new campaign trigger with the passed in values
+func NewCampaign(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, event *CampaignEvent) *CampaignTrigger {
 	return &CampaignTrigger{
 		baseTrigger: newBaseTrigger(TypeCampaign, env, flow, contact, nil, nil),
 		event:       event,
@@ -105,5 +107,5 @@ func (t *CampaignTrigger) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

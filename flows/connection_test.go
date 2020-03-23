@@ -1,7 +1,6 @@
 package flows_test
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/nyaruka/gocommon/urns"
@@ -9,6 +8,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,7 +21,7 @@ func TestConnection(t *testing.T) {
 	)
 
 	// test marshaling our connection
-	marshaled, err := json.Marshal(connection)
+	marshaled, err := jsonx.Marshal(connection)
 	require.NoError(t, err)
 
 	test.AssertEqualJSON(t, []byte(`{

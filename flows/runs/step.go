@@ -1,12 +1,13 @@
 package runs
 
 import (
-	"encoding/json"
 	"time"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
 type step struct {
@@ -19,7 +20,7 @@ type step struct {
 // NewStep creates a new step
 func NewStep(node flows.Node, arrivedOn time.Time) flows.Step {
 	return &step{
-		stepUUID:  flows.StepUUID(utils.NewUUID()),
+		stepUUID:  flows.StepUUID(uuids.New()),
 		nodeUUID:  node.UUID(),
 		arrivedOn: arrivedOn,
 	}
@@ -35,7 +36,7 @@ func (s *step) Leave(exit flows.ExitUUID) {
 }
 
 // Context returns the properties available in expressions
-func (s *step) Context(env utils.Environment) map[string]types.XValue {
+func (s *step) Context(env envs.Environment) map[string]types.XValue {
 	return map[string]types.XValue{
 		"uuid":       types.NewXText(string(s.UUID())),
 		"node_uuid":  types.NewXText(string(s.NodeUUID())),
@@ -50,7 +51,7 @@ var _ flows.Step = (*step)(nil)
 type Path []flows.Step
 
 // ToXValue returns a representation of this object for use in expressions
-func (p Path) ToXValue(env utils.Environment) types.XValue {
+func (p Path) ToXValue(env envs.Environment) types.XValue {
 	array := make([]types.XValue, len(p))
 	for i, step := range p {
 		array[i] = flows.Context(env, step)
@@ -74,7 +75,7 @@ func (s *step) UnmarshalJSON(data []byte) error {
 	var se stepEnvelope
 	var err error
 
-	err = json.Unmarshal(data, &se)
+	err = jsonx.Unmarshal(data, &se)
 	if err != nil {
 		return err
 	}
@@ -88,7 +89,7 @@ func (s *step) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON marshals this run step into JSON
 func (s *step) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&stepEnvelope{
+	return jsonx.Marshal(&stepEnvelope{
 		UUID:      s.stepUUID,
 		NodeUUID:  s.nodeUUID,
 		ExitUUID:  s.exitUUID,

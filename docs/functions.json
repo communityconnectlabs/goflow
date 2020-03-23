@@ -509,7 +509,7 @@
                 "output": "2010 5 10 14:50"
             },
             {
-                "template": "@(format_datetime(\"2010-05-10T19:50:00.000000Z\", \"YYYY-MM-DD tt:mm AA\", \"America/Los_Angeles\"))",
+                "template": "@(format_datetime(\"2010-05-10T19:50:00.000000Z\", \"YYYY-MM-DD hh:mm AA\", \"America/Los_Angeles\"))",
                 "output": "2010-05-10 12:50 PM"
             },
             {
@@ -606,11 +606,11 @@
             },
             {
                 "template": "@(format_urn(contact.urn))",
-                "output": "(206) 555-1212"
+                "output": "(202) 456-1111"
             },
             {
                 "template": "@(format_urn(urns.tel))",
-                "output": "(206) 555-1212"
+                "output": "(202) 456-1111"
             },
             {
                 "template": "@(format_urn(urns.mailto))",
@@ -944,11 +944,11 @@
         "examples": [
             {
                 "template": "@(rand())",
-                "output": "0.3849275689214193274523267973563633859157562255859375"
+                "output": "0.607552015674623913099594574305228888988494873046875"
             },
             {
                 "template": "@(rand())",
-                "output": "0.607552015674623913099594574305228888988494873046875"
+                "output": "0.484677570947340263796121462291921488940715789794921875"
             }
         ]
     },
@@ -959,11 +959,11 @@
         "examples": [
             {
                 "template": "@(rand_between(1, 10))",
-                "output": "5"
+                "output": "10"
             },
             {
                 "template": "@(rand_between(1, 10))",
-                "output": "10"
+                "output": "2"
             }
         ]
     },
@@ -1179,12 +1179,12 @@
         ]
     },
     {
-        "signature": "split(text, delimiters)",
-        "summary": "Splits `text` based on the given characters in `delimiters`.",
-        "detail": "Empty values are removed from the returned list.",
+        "signature": "split(text, [,delimiters])",
+        "summary": "Splits `text` into an array of separated words.",
+        "detail": "Empty values are removed from the returned list. There is an optional final parameter `delimiters` which\nis string of characters used to split the text into words.",
         "examples": [
             {
-                "template": "@(split(\"a b c\", \" \"))",
+                "template": "@(split(\"a b c\"))",
                 "output": "[a, b, c]"
             },
             {
@@ -1358,6 +1358,51 @@
         ]
     },
     {
+        "signature": "trim(text, [,chars])",
+        "summary": "Removes whitespace from either end of `text`.",
+        "detail": "There is an optional final parameter `chars` which is string of characters to be removed instead of whitespace.",
+        "examples": [
+            {
+                "template": "@(trim(\" hello world    \"))",
+                "output": "hello world"
+            },
+            {
+                "template": "@(trim(\"+123157568\", \"+\"))",
+                "output": "123157568"
+            }
+        ]
+    },
+    {
+        "signature": "trim_left(text, [,chars])",
+        "summary": "Removes whitespace from the start of `text`.",
+        "detail": "There is an optional final parameter `chars` which is string of characters to be removed instead of whitespace.",
+        "examples": [
+            {
+                "template": "@(\"*\" & trim_left(\" hello world   \") & \"*\")",
+                "output": "*hello world   *"
+            },
+            {
+                "template": "@(trim_left(\"+12345+\", \"+\"))",
+                "output": "12345+"
+            }
+        ]
+    },
+    {
+        "signature": "trim_right(text, [,chars])",
+        "summary": "Removes whitespace from the end of `text`.",
+        "detail": "There is an optional final parameter `chars` which is string of characters to be removed instead of whitespace.",
+        "examples": [
+            {
+                "template": "@(\"*\" & trim_right(\" hello world   \") & \"*\")",
+                "output": "* hello world*"
+            },
+            {
+                "template": "@(trim_right(\"+12345+\", \"+\"))",
+                "output": "+12345"
+            }
+        ]
+    },
+    {
         "signature": "tz(date)",
         "summary": "Returns the name of the timezone of `date`.",
         "detail": "If no timezone information is present in the date, then the current timezone will be returned.",
@@ -1405,7 +1450,7 @@
     },
     {
         "signature": "upper(text)",
-        "summary": "Converts `text` to lowercase.",
+        "summary": "Converts `text` to uppercase.",
         "detail": "",
         "examples": [
             {
@@ -1445,6 +1490,29 @@
             {
                 "template": "@(urn_parts(\"twitterid:3263621177#bobby\"))",
                 "output": "{display: bobby, path: 3263621177, scheme: twitterid}"
+            },
+            {
+                "template": "@(urn_parts(\"not a urn\"))",
+                "output": "ERROR"
+            }
+        ]
+    },
+    {
+        "signature": "week_number(date)",
+        "summary": "Returns the week number (1-54) of `date`.",
+        "detail": "The week is considered to start on Sunday and week containing Jan 1st is week number 1.",
+        "examples": [
+            {
+                "template": "@(week_number(\"2019-01-01\"))",
+                "output": "1"
+            },
+            {
+                "template": "@(week_number(\"2019-07-23T16:56:59.000000Z\"))",
+                "output": "30"
+            },
+            {
+                "template": "@(week_number(\"xx\"))",
+                "output": "ERROR"
             }
         ]
     },

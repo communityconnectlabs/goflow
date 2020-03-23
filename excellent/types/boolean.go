@@ -1,10 +1,11 @@
 package types
 
 import (
-	"encoding/json"
 	"strconv"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 // XBoolean is a boolean `true` or `false`.
@@ -36,13 +37,13 @@ func (x XBoolean) Render() string {
 }
 
 // Format returns the pretty text representation
-func (x XBoolean) Format(env utils.Environment) string {
+func (x XBoolean) Format(env envs.Environment) string {
 	return x.Render()
 }
 
 // MarshalJSON is called when a struct containing this type is marshaled
 func (x XBoolean) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.Native())
+	return jsonx.Marshal(x.Native())
 }
 
 // String returns the native string representation of this type for debugging
@@ -70,7 +71,7 @@ func (x XBoolean) Compare(other XBoolean) int {
 
 // UnmarshalJSON is called when a struct containing this type is unmarshaled
 func (x *XBoolean) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &x.native)
+	return jsonx.Unmarshal(data, &x.native)
 }
 
 // XBooleanFalse is the false boolean value

@@ -3,11 +3,13 @@ package assets
 import (
 	"encoding/json"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
 // ChannelUUID is the UUID of a channel
-type ChannelUUID utils.UUID
+type ChannelUUID uuids.UUID
 
 // ChannelRole is a role that a channel can perform
 type ChannelRole string
@@ -40,9 +42,33 @@ type Channel interface {
 	Schemes() []string
 	Roles() []ChannelRole
 	Parent() *ChannelReference
-	Country() string
+	Country() envs.Country
 	MatchPrefixes() []string
+	AllowInternational() bool
 }
+
+// ClassifierUUID is the UUID of an NLU classifier
+type ClassifierUUID uuids.UUID
+
+// Classifier is an NLU classifier.
+//
+//   {
+//     "uuid": "37657cf7-5eab-4286-9cb0-bbf270587bad",
+//     "name": "Booking",
+//     "type": "wit",
+//     "intents": ["book_flight", "book_hotel"]
+//   }
+//
+// @asset classifier
+type Classifier interface {
+	UUID() ClassifierUUID
+	Name() string
+	Type() string
+	Intents() []string
+}
+
+// FieldUUID is the UUID of a field
+type FieldUUID uuids.UUID
 
 // FieldType is the data type of values for each field
 type FieldType string
@@ -60,6 +86,7 @@ const (
 // Field is a custom contact property.
 //
 //   {
+//     "uuid": "d66a7823-eada-40e5-9a3a-57239d4690bf",
 //     "key": "gender",
 //     "name": "Gender",
 //     "type": "text"
@@ -67,13 +94,14 @@ const (
 //
 // @asset field
 type Field interface {
+	UUID() FieldUUID
 	Key() string
 	Name() string
 	Type() FieldType
 }
 
 // FlowUUID is the UUID of a flow
-type FlowUUID utils.UUID
+type FlowUUID uuids.UUID
 
 // Flow is graph of nodes with actions and routers.
 //
@@ -92,8 +120,23 @@ type Flow interface {
 	Definition() json.RawMessage
 }
 
+// Global is a named constant.
+//
+//   {
+//     "key": "organization_name",
+//     "name": "Organization Name",
+//     "value": "U-Report"
+//   }
+//
+// @asset global
+type Global interface {
+	Key() string
+	Name() string
+	Value() string
+}
+
 // GroupUUID is the UUID of a group
-type GroupUUID utils.UUID
+type GroupUUID uuids.UUID
 
 // Group is a set of contacts which can be static or dynamic (i.e. based on a query).
 //
@@ -111,7 +154,7 @@ type Group interface {
 }
 
 // LabelUUID is the UUID of a label
-type LabelUUID utils.UUID
+type LabelUUID uuids.UUID
 
 // Label is an organizational tag that can be applied to a message.
 //
@@ -126,7 +169,7 @@ type Label interface {
 	Name() string
 }
 
-// LocationHierarchy is a searchable hierachy of locations.
+// LocationHierarchy is a searchable hierarchy of locations.
 //
 //   {
 //     "name": "Rwanda",
@@ -182,7 +225,7 @@ type Resthook interface {
 	Subscribers() []string
 }
 
-type TemplateUUID utils.UUID
+type TemplateUUID uuids.UUID
 
 // Template is a message template, currently only used by WhatsApp channels
 //
@@ -219,16 +262,18 @@ type Template interface {
 // TemplateTranslation represents a single translation for a specific template and channel
 type TemplateTranslation interface {
 	Content() string
-	Language() utils.Language
+	Language() envs.Language
 	VariableCount() int
 	Channel() ChannelReference
 }
 
-// AssetSource is a source of assets
-type AssetSource interface {
+// Source is a source of assets
+type Source interface {
 	Channels() ([]Channel, error)
+	Classifiers() ([]Classifier, error)
 	Fields() ([]Field, error)
 	Flow(FlowUUID) (Flow, error)
+	Globals() ([]Global, error)
 	Groups() ([]Group, error)
 	Labels() ([]Label, error)
 	Locations() ([]LocationHierarchy, error)

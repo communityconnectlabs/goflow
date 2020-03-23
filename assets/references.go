@@ -6,6 +6,8 @@ import (
 	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
 func init() {
@@ -25,7 +27,7 @@ type Reference interface {
 // UUIDReference is interface for all reference types that contain a UUID
 type UUIDReference interface {
 	Reference
-	GenericUUID() utils.UUID
+	GenericUUID() uuids.UUID
 }
 
 // ChannelReference is used to reference a channel
@@ -45,8 +47,8 @@ func (r *ChannelReference) Type() string {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *ChannelReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *ChannelReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset
@@ -65,11 +67,48 @@ func (r *ChannelReference) String() string {
 
 var _ UUIDReference = (*ChannelReference)(nil)
 
+// ClassifierReference is used to reference a classifier
+type ClassifierReference struct {
+	UUID ClassifierUUID `json:"uuid" validate:"required,uuid"`
+	Name string         `json:"name"`
+}
+
+// NewClassifierReference creates a new classifier reference with the given UUID and name
+func NewClassifierReference(uuid ClassifierUUID, name string) *ClassifierReference {
+	return &ClassifierReference{UUID: uuid, Name: name}
+}
+
+// Type returns the name of the asset type
+func (r *ClassifierReference) Type() string {
+	return "classifier"
+}
+
+// GenericUUID returns the untyped UUID
+func (r *ClassifierReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
+}
+
+// Identity returns the unique identity of the asset
+func (r *ClassifierReference) Identity() string {
+	return string(r.UUID)
+}
+
+// Variable returns whether this a variable (vs concrete) reference
+func (r *ClassifierReference) Variable() bool {
+	return false
+}
+
+func (r *ClassifierReference) String() string {
+	return fmt.Sprintf("%s[uuid=%s,name=%s]", r.Type(), r.Identity(), r.Name)
+}
+
+var _ UUIDReference = (*ClassifierReference)(nil)
+
 // GroupReference is used to reference a group
 type GroupReference struct {
 	UUID      GroupUUID `json:"uuid,omitempty" validate:"omitempty,uuid4"`
 	Name      string    `json:"name,omitempty"`
-	NameMatch string    `json:"name_match,omitempty"`
+	NameMatch string    `json:"name_match,omitempty" engine:"evaluated"`
 }
 
 // NewGroupReference creates a new group reference with the given UUID and name
@@ -88,8 +127,8 @@ func (r *GroupReference) Type() string {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *GroupReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *GroupReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset
@@ -108,13 +147,13 @@ func (r *GroupReference) String() string {
 
 var _ UUIDReference = (*GroupReference)(nil)
 
-// FieldReference is a reference to field
+// FieldReference is a reference to a field
 type FieldReference struct {
 	Key  string `json:"key" validate:"required"`
 	Name string `json:"name"`
 }
 
-// NewFieldReference creates a new field reference with the given key and label
+// NewFieldReference creates a new field reference with the given key and name
 func NewFieldReference(key string, name string) *FieldReference {
 	return &FieldReference{Key: key, Name: name}
 }
@@ -157,8 +196,8 @@ func (r *FlowReference) Type() string {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *FlowReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *FlowReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset
@@ -177,11 +216,43 @@ func (r *FlowReference) String() string {
 
 var _ UUIDReference = (*FlowReference)(nil)
 
+// GlobalReference is a reference to a global
+type GlobalReference struct {
+	Key  string `json:"key" validate:"required"`
+	Name string `json:"name"`
+}
+
+// NewGlobalReference creates a new global reference with the given key and name
+func NewGlobalReference(key string, name string) *GlobalReference {
+	return &GlobalReference{Key: key, Name: name}
+}
+
+// Type returns the name of the asset type
+func (r *GlobalReference) Type() string {
+	return "global"
+}
+
+// Identity returns the unique identity of the asset
+func (r *GlobalReference) Identity() string {
+	return string(r.Key)
+}
+
+// Variable returns whether this a variable (vs concrete) reference
+func (r *GlobalReference) Variable() bool {
+	return false
+}
+
+func (r *GlobalReference) String() string {
+	return fmt.Sprintf("%s[key=%s,name=%s]", r.Type(), r.Identity(), r.Name)
+}
+
+var _ Reference = (*GlobalReference)(nil)
+
 // LabelReference is used to reference a label
 type LabelReference struct {
 	UUID      LabelUUID `json:"uuid,omitempty" validate:"omitempty,uuid4"`
 	Name      string    `json:"name,omitempty"`
-	NameMatch string    `json:"name_match,omitempty"`
+	NameMatch string    `json:"name_match,omitempty" engine:"evaluated"`
 }
 
 // NewLabelReference creates a new label reference with the given UUID and name
@@ -200,8 +271,8 @@ func (r *LabelReference) Type() string {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *LabelReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *LabelReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset
@@ -232,8 +303,8 @@ func NewTemplateReference(uuid TemplateUUID, name string) *TemplateReference {
 }
 
 // GenericUUID returns the untyped UUID
-func (r *TemplateReference) GenericUUID() utils.UUID {
-	return utils.UUID(r.UUID)
+func (r *TemplateReference) GenericUUID() uuids.UUID {
+	return uuids.UUID(r.UUID)
 }
 
 // Identity returns the unique identity of the asset
@@ -297,4 +368,20 @@ func LabelReferenceValidation(sl validator.StructLevel) {
 // utility method which returns true if both string values or neither string values is defined
 func neitherOrBoth(s1 string, s2 string) bool {
 	return (len(s1) > 0) == (len(s2) > 0)
+}
+
+// TypedReference is a utility struct for when we need to serialize a reference with a type
+type TypedReference struct {
+	Reference Reference `json:"-"`
+	Type      string    `json:"type"`
+}
+
+// NewTypedReference creates a new typed reference
+func NewTypedReference(r Reference) TypedReference {
+	return TypedReference{Reference: r, Type: r.Type()}
+}
+
+func (r TypedReference) MarshalJSON() ([]byte, error) {
+	type typed TypedReference // need to alias type to avoid circular calls to this method
+	return jsonx.MarshalMerged(r.Reference, typed(r))
 }

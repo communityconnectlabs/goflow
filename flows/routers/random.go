@@ -5,12 +5,14 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/random"
 
 	"github.com/shopspring/decimal"
 )
 
 func init() {
-	RegisterType(TypeRandom, readRandomRouter)
+	registerType(TypeRandom, readRandomRouter)
 }
 
 // TypeRandom is the type for a random router
@@ -18,11 +20,11 @@ const TypeRandom string = "random"
 
 // RandomRouter is a router which will exit out a random exit
 type RandomRouter struct {
-	BaseRouter
+	baseRouter
 }
 
-// NewRandomRouter creates a new random router
-func NewRandomRouter(wait flows.Wait, resultName string, categories []*Category) *RandomRouter {
+// NewRandom creates a new random router
+func NewRandom(wait flows.Wait, resultName string, categories []*Category) *RandomRouter {
 	return &RandomRouter{newBaseRouter(TypeRandom, wait, resultName, categories)}
 }
 
@@ -34,17 +36,12 @@ func (r *RandomRouter) Validate(exits []flows.Exit) error {
 // Route determines which exit to take from a node
 func (r *RandomRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.EventCallback) (flows.ExitUUID, error) {
 	// pick a random category
-	rand := utils.RandDecimal()
+	rand := random.Decimal()
 	categoryNum := rand.Mul(decimal.New(int64(len(r.categories)), 0)).IntPart()
 	categoryUUID := r.categories[categoryNum].UUID()
 
 	// TODO should raw rand value be iput and category number the match ?
 	return r.routeToCategory(run, step, categoryUUID, rand.String(), "", nil, logEvent)
-}
-
-// Inspect inspects this object and any children
-func (r *RandomRouter) Inspect(inspect func(flows.Inspectable)) {
-	inspect(r)
 }
 
 //------------------------------------------------------------------------------------------
@@ -74,5 +71,5 @@ func (r *RandomRouter) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

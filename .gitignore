@@ -31,6 +31,7 @@ debug
 dist/
 .idea/
 
+fabric
 fabfile.*
 fabconfig.*
 

@@ -4,14 +4,18 @@ import (
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 func init() {
-	RegisterType(TypeWebhookCalled, func() flows.Event { return &WebhookCalledEvent{} })
+	registerType(TypeWebhookCalled, func() flows.Event { return &WebhookCalledEvent{} })
 }
 
 // TypeWebhookCalled is the type for our webhook events
 const TypeWebhookCalled string = "webhook_called"
+
+// trim request and response traces to 10K chars to avoid bloating serialized sessions
+const trimTracesTo = 10000
 
 // WebhookCalledEvent events are created when a webhook is called. The event contains
 // the URL and the status of the response, as well as a full dump of the
@@ -30,29 +34,34 @@ const TypeWebhookCalled string = "webhook_called"
 //
 // @event webhook_called
 type WebhookCalledEvent struct {
-	BaseEvent
+	baseEvent
 
-	URL         string              `json:"url" validate:"required"`
-	Resthook    string              `json:"resthook,omitempty"`
-	Status      flows.WebhookStatus `json:"status" validate:"required"`
-	StatusCode  int                 `json:"status_code,omitempty"`
-	ElapsedMS   int                 `json:"elapsed_ms"`
-	Request     string              `json:"request" validate:"required"`
-	Response    string              `json:"response,omitempty"`
-	BodyIgnored bool                `json:"body_ignored,omitempty"`
+	URL         string           `json:"url" validate:"required"`
+	Status      flows.CallStatus `json:"status" validate:"required"`
+	Request     string           `json:"request" validate:"required"`
+	Response    string           `json:"response"`
+	ElapsedMS   int              `json:"elapsed_ms"`
+	Resthook    string           `json:"resthook,omitempty"`
+	StatusCode  int              `json:"status_code,omitempty"`
+	BodyIgnored bool             `json:"body_ignored,omitempty"`
 }
 
-// NewWebhookCalledEvent returns a new webhook called event
-func NewWebhookCalledEvent(webhook *flows.WebhookCall) *WebhookCalledEvent {
+// NewWebhookCalled returns a new webhook called event
+func NewWebhookCalled(call *flows.WebhookCall, status flows.CallStatus, resthook string) *WebhookCalledEvent {
+	statusCode := 0
+	if call.Response != nil {
+		statusCode = call.Response.StatusCode
+	}
+
 	return &WebhookCalledEvent{
-		BaseEvent:   NewBaseEvent(TypeWebhookCalled),
-		URL:         webhook.URL(),
-		Resthook:    webhook.Resthook(),
-		Status:      webhook.Status(),
-		StatusCode:  webhook.StatusCode(),
-		ElapsedMS:   int(webhook.TimeTaken() / time.Millisecond),
-		Request:     webhook.Request(),
-		Response:    webhook.Response(),
-		BodyIgnored: webhook.BodyIgnored(),
+		baseEvent:   newBaseEvent(TypeWebhookCalled),
+		URL:         call.Request.URL.String(),
+		Status:      status,
+		Request:     utils.TruncateEllipsis(string(call.RequestTrace), trimTracesTo),
+		Response:    utils.TruncateEllipsis(string(call.ResponseTrace), trimTracesTo),
+		ElapsedMS:   int((call.EndTime.Sub(call.StartTime)) / time.Millisecond),
+		Resthook:    resthook,
+		StatusCode:  statusCode,
+		BodyIgnored: call.BodyIgnored,
 	}
 }

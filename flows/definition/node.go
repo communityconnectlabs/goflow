@@ -4,10 +4,14 @@ import (
 	"encoding/json"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/actions"
+	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
 	"github.com/greatnonprofits-nfp/goflow/flows/routers"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
 )
@@ -34,7 +38,7 @@ func (n *node) Actions() []flows.Action { return n.actions }
 func (n *node) Router() flows.Router    { return n.router }
 func (n *node) Exits() []flows.Exit     { return n.exits }
 
-func (n *node) Validate(flow flows.Flow, seenUUIDs map[utils.UUID]bool) error {
+func (n *node) Validate(flow flows.Flow, seenUUIDs map[uuids.UUID]bool) error {
 	// validate all the node's actions
 	for _, action := range n.Actions() {
 
@@ -50,11 +54,11 @@ func (n *node) Validate(flow flows.Flow, seenUUIDs map[utils.UUID]bool) error {
 			return errors.Errorf("action type '%s' is not allowed in a flow of type '%s'", action.Type(), flow.Type())
 		}
 
-		uuidAlreadySeen := seenUUIDs[utils.UUID(action.UUID())]
+		uuidAlreadySeen := seenUUIDs[uuids.UUID(action.UUID())]
 		if uuidAlreadySeen {
 			return errors.Errorf("action UUID %s isn't unique", action.UUID())
 		}
-		seenUUIDs[utils.UUID(action.UUID())] = true
+		seenUUIDs[uuids.UUID(action.UUID())] = true
 
 		if err := action.Validate(); err != nil {
 			return errors.Wrapf(err, "invalid action[uuid=%s, type=%s]", action.UUID(), action.Type())
@@ -70,11 +74,11 @@ func (n *node) Validate(flow flows.Flow, seenUUIDs map[utils.UUID]bool) error {
 
 	// check every exit has a unique UUID and valid destination
 	for _, exit := range n.Exits() {
-		uuidAlreadySeen := seenUUIDs[utils.UUID(exit.UUID())]
+		uuidAlreadySeen := seenUUIDs[uuids.UUID(exit.UUID())]
 		if uuidAlreadySeen {
 			return errors.Errorf("exit UUID %s isn't unique", exit.UUID())
 		}
-		seenUUIDs[utils.UUID(exit.UUID())] = true
+		seenUUIDs[uuids.UUID(exit.UUID())] = true
 
 		if exit.DestinationUUID() != "" && flow.GetNode(exit.DestinationUUID()) == nil {
 			return errors.Errorf("destination %s of exit[uuid=%s] isn't a known node", exit.DestinationUUID(), exit.UUID())
@@ -84,27 +88,50 @@ func (n *node) Validate(flow flows.Flow, seenUUIDs map[utils.UUID]bool) error {
 	return nil
 }
 
-func (n *node) Inspect(inspect func(flows.Inspectable)) {
-	inspect(n)
-
-	for _, a := range n.Actions() {
-		a.Inspect(inspect)
+// EnumerateTemplates enumerates all expressions on this object
+func (n *node) EnumerateTemplates(localization flows.Localization, include func(flows.Action, flows.Router, envs.Language, string)) {
+	for _, action := range n.actions {
+		inspect.Templates(action, localization, func(l envs.Language, t string) {
+			include(action, nil, l, t)
+		})
 	}
 
-	if n.Router() != nil {
-		n.Router().Inspect(inspect)
+	if n.router != nil {
+		n.router.EnumerateTemplates(localization, func(l envs.Language, t string) {
+			include(nil, n.router, l, t)
+		})
 	}
 }
 
-// EnumerateTemplates enumerates all expressions on this object
-func (n *node) EnumerateTemplates(include flows.TemplateIncluder) {}
-
 // EnumerateDependencies enumerates all dependencies on this object
-func (n *node) EnumerateDependencies(localization flows.Localization, include func(assets.Reference)) {
+func (n *node) EnumerateDependencies(localization flows.Localization, include func(flows.Action, flows.Router, envs.Language, assets.Reference)) {
+	for _, action := range n.actions {
+		inspect.Dependencies(action, localization, func(l envs.Language, r assets.Reference) {
+			include(action, nil, l, r)
+		})
+	}
+
+	if n.router != nil {
+		n.router.EnumerateDependencies(localization, func(l envs.Language, r assets.Reference) {
+			include(nil, n.router, l, r)
+		})
+	}
 }
 
 // EnumerateResults enumerates all potential results on this object
-func (n *node) EnumerateResults(node flows.Node, include func(*flows.ResultInfo)) {}
+func (n *node) EnumerateResults(include func(flows.Action, flows.Router, *flows.ResultInfo)) {
+	for _, action := range n.actions {
+		inspect.Results(action, func(r *flows.ResultInfo) {
+			include(action, nil, r)
+		})
+	}
+
+	if n.router != nil {
+		n.router.EnumerateResults(func(r *flows.ResultInfo) {
+			include(nil, n.router, r)
+		})
+	}
+}
 
 //------------------------------------------------------------------------------------------
 // JSON Encoding / Decoding
@@ -163,14 +190,14 @@ func (n *node) MarshalJSON() ([]byte, error) {
 
 	e.Actions = make([]json.RawMessage, len(n.actions))
 	for i := range n.actions {
-		e.Actions[i], err = json.Marshal(n.actions[i])
+		e.Actions[i], err = jsonx.Marshal(n.actions[i])
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if n.router != nil {
-		e.Router, err = json.Marshal(n.router)
+		e.Router, err = jsonx.Marshal(n.router)
 		if err != nil {
 			return nil, err
 		}
@@ -181,5 +208,5 @@ func (n *node) MarshalJSON() ([]byte, error) {
 		e.Exits[i] = n.exits[i].(*exit)
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

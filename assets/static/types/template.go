@@ -1,10 +1,9 @@
 package types
 
 import (
-	"encoding/json"
-
 	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 // Template is a JSON serializable implementation of a template asset
@@ -41,23 +40,23 @@ func (t *Template) Translations() []assets.TemplateTranslation {
 }
 
 // UnmarshalJSON is our unmarshaller for json data
-func (t *Template) UnmarshalJSON(data []byte) error { return json.Unmarshal(data, &t.t) }
+func (t *Template) UnmarshalJSON(data []byte) error { return jsonx.Unmarshal(data, &t.t) }
 
 // MarshalJSON is our marshaller for json data
-func (t *Template) MarshalJSON() ([]byte, error) { return json.Marshal(t.t) }
+func (t *Template) MarshalJSON() ([]byte, error) { return jsonx.Marshal(t.t) }
 
 // TemplateTranslation represents a single template translation
 type TemplateTranslation struct {
 	t struct {
 		Channel       assets.ChannelReference `json:"channel"         validate:"required"`
 		Content       string                  `json:"content"         validate:"required"`
-		Language      utils.Language          `json:"language"        validate:"required"`
+		Language      envs.Language           `json:"language"        validate:"required"`
 		VariableCount int                     `json:"variable_count"`
 	}
 }
 
 // NewTemplateTranslation creates a new template translation
-func NewTemplateTranslation(channel assets.ChannelReference, language utils.Language, content string, variableCount int) *TemplateTranslation {
+func NewTemplateTranslation(channel assets.ChannelReference, language envs.Language, content string, variableCount int) *TemplateTranslation {
 	t := &TemplateTranslation{}
 	t.t.Channel = channel
 	t.t.Content = content
@@ -70,7 +69,7 @@ func NewTemplateTranslation(channel assets.ChannelReference, language utils.Lang
 func (t *TemplateTranslation) Content() string { return t.t.Content }
 
 // Language returns the language this translation is in
-func (t *TemplateTranslation) Language() utils.Language { return t.t.Language }
+func (t *TemplateTranslation) Language() envs.Language { return t.t.Language }
 
 // VariableCount returns the number of variables in this template
 func (t *TemplateTranslation) VariableCount() int { return t.t.VariableCount }
@@ -79,7 +78,7 @@ func (t *TemplateTranslation) VariableCount() int { return t.t.VariableCount }
 func (t *TemplateTranslation) Channel() assets.ChannelReference { return t.t.Channel }
 
 // UnmarshalJSON is our unmarshaller for json data
-func (t *TemplateTranslation) UnmarshalJSON(data []byte) error { return json.Unmarshal(data, &t.t) }
+func (t *TemplateTranslation) UnmarshalJSON(data []byte) error { return jsonx.Unmarshal(data, &t.t) }
 
 // MarshalJSON is our marshaller for json data
-func (t *TemplateTranslation) MarshalJSON() ([]byte, error) { return json.Marshal(t.t) }
+func (t *TemplateTranslation) MarshalJSON() ([]byte, error) { return jsonx.Marshal(t.t) }

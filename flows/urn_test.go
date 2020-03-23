@@ -6,36 +6,39 @@ import (
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestContactURN(t *testing.T) {
+	env := envs.NewBuilder().Build()
+
 	source, err := static.NewSource([]byte(`{
         "channels": [
             {
                 "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                 "name": "Android Channel",
-				"address": "+12345671111",
+				"address": "+17036975131",
 				"schemes": [
 					"tel"
 				],
 				"roles": [
 					"send",
 					"receive"
-				]
+				],
+				"country": "US"
             }
         ]
     }`))
 	require.NoError(t, err)
 
-	sessionAssets, err := engine.NewSessionAssets(source)
+	sessionAssets, err := engine.NewSessionAssets(env, source, nil)
 	require.NoError(t, err)
 
 	channels := sessionAssets.Channels()
@@ -55,12 +58,11 @@ func TestContactURN(t *testing.T) {
 	assert.False(t, urn.Equal(urn3))
 
 	// check using URN in expressions
-	env := utils.NewEnvironmentBuilder().Build()
 	assert.Equal(t, types.NewXText("tel:+250781234567"), urn.ToXValue(env))
 
 	// check when URNs have to be redacted
-	env = utils.NewEnvironmentBuilder().WithRedactionPolicy(utils.RedactionPolicyURNs).Build()
-	assert.Equal(t, types.NewXText("********"), urn.ToXValue(env))
+	env = envs.NewBuilder().WithRedactionPolicy(envs.RedactionPolicyURNs).Build()
+	assert.Equal(t, types.NewXText("tel:********"), urn.ToXValue(env))
 
 	// we can clear the channel affinity
 	urn.SetChannel(nil)
@@ -79,7 +81,7 @@ func TestURNList(t *testing.T) {
 	urn3 := flows.NewContactURN("tel:+250781111222", nil)
 	urnList := flows.URNList{urn1, urn2, urn3}
 
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	// check equality
 	assert.True(t, urnList.Equal(flows.URNList{urn1, urn2, urn3}))

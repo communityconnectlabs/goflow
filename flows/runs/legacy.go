@@ -6,8 +6,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
@@ -27,11 +29,10 @@ type legacyExtra struct {
 func newLegacyExtra(run flows.FlowRun) *legacyExtra {
 	e := &legacyExtra{values: make(map[string]types.XValue)}
 
-	// if trigger params is a JSON object, we include it in @extra
+	// if trigger params is set, we include it in @extra
 	triggerParams := run.Session().Trigger().Params()
-	object, isObject := triggerParams.(*types.XObject)
-	if isObject && object != nil {
-		e.addValues(object)
+	if triggerParams != nil {
+		e.addValues(triggerParams)
 	}
 
 	// if trigger has results (i.e. a flow_action type trigger with a parent run) use them too
@@ -45,7 +46,7 @@ func newLegacyExtra(run flows.FlowRun) *legacyExtra {
 	return e
 }
 
-func (e *legacyExtra) ToXValue(env utils.Environment) types.XValue {
+func (e *legacyExtra) ToXValue(env envs.Environment) types.XValue {
 	return types.NewXObject(e.values)
 }
 
@@ -94,4 +95,25 @@ func arrayToObject(array *types.XArray) *types.XObject {
 		properties[strconv.Itoa(i)] = array.Get(i)
 	}
 	return types.NewXObject(properties)
+}
+
+// finds the last webhook response that was saved as extra on a result
+func lastWebhookSavedAsExtra(r *flowRun) types.XValue {
+	for i := len(r.events) - 1; i >= 0; i-- {
+		switch typed := r.events[i].(type) {
+		case *events.WebhookCalledEvent:
+			// look for a run result changed event on the same step
+			resultEvent := r.findEvent(typed.StepUUID(), events.TypeRunResultChanged)
+
+			if resultEvent != nil {
+				asResultEvent := resultEvent.(*events.RunResultChangedEvent)
+				if asResultEvent.Extra != nil {
+					return types.JSONToXValue([]byte(asResultEvent.Extra))
+				}
+			}
+		default:
+			continue
+		}
+	}
+	return nil
 }

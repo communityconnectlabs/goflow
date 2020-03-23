@@ -4,8 +4,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -27,7 +29,7 @@ func TestXValue(t *testing.T) {
 		"bar": types.NewXNumberFromInt(456),
 	})
 
-	env := utils.NewEnvironmentBuilder().WithDateFormat(utils.DateFormatDayMonthYear).Build()
+	env := envs.NewBuilder().WithDateFormat(envs.DateFormatDayMonthYear).Build()
 
 	tests := []struct {
 		value     types.XValue
@@ -180,12 +182,12 @@ func TestXValue(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		marshaled, _ := utils.JSONMarshal(test.value)
+		marshaled, _ := jsonx.Marshal(test.value)
 		rendered, _ := types.ToXText(env, test.value)
 		formatted := types.Format(env, test.value)
 		asBool, _ := types.ToXBoolean(test.value)
 
-		assert.Equal(t, test.marshaled, string(marshaled), "json.Marshal mismatch for %T{%s}", test.value, test.value)
+		assert.Equal(t, test.marshaled, string(marshaled), "jsonx.Marshal mismatch for %T{%s}", test.value, test.value)
 		assert.Equal(t, types.NewXText(test.rendered), rendered, "ToXText mismatch for %T{%s}", test.value, test.value)
 		assert.Equal(t, test.formatted, formatted, "Format mismatch for %T{%s}", test.value, test.value)
 		assert.Equal(t, types.NewXBoolean(test.asBool), asBool, "ToXBool mismatch for %T{%s}", test.value, test.value)
@@ -218,8 +220,8 @@ func TestEquals(t *testing.T) {
 		{types.XBooleanFalse, types.XBooleanFalse, true},
 		{types.XBooleanTrue, types.XBooleanFalse, false},
 
-		{types.NewXDate(utils.NewDate(2018, 4, 9)), types.NewXDate(utils.NewDate(2018, 4, 9)), true},
-		{types.NewXDate(utils.NewDate(2019, 4, 9)), types.NewXDate(utils.NewDate(2018, 4, 10)), false},
+		{types.NewXDate(dates.NewDate(2018, 4, 9)), types.NewXDate(dates.NewDate(2018, 4, 9)), true},
+		{types.NewXDate(dates.NewDate(2019, 4, 9)), types.NewXDate(dates.NewDate(2018, 4, 10)), false},
 
 		{types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)), types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)), true},
 		{types.NewXDateTime(time.Date(2019, 4, 9, 17, 1, 30, 0, time.UTC)), types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)), false},
@@ -256,8 +258,8 @@ func TestEquals(t *testing.T) {
 		{types.NewXText("bob"), types.NewXText("bob"), true},
 		{types.NewXText("bob"), types.NewXText("abc"), false},
 
-		{types.NewXTime(utils.NewTimeOfDay(10, 30, 0, 123456789)), types.NewXTime(utils.NewTimeOfDay(10, 30, 0, 123456789)), true},
-		{types.NewXTime(utils.NewTimeOfDay(10, 30, 0, 123456789)), types.NewXTime(utils.NewTimeOfDay(10, 30, 0, 987654321)), false},
+		{types.NewXTime(dates.NewTimeOfDay(10, 30, 0, 123456789)), types.NewXTime(dates.NewTimeOfDay(10, 30, 0, 123456789)), true},
+		{types.NewXTime(dates.NewTimeOfDay(10, 30, 0, 123456789)), types.NewXTime(dates.NewTimeOfDay(10, 30, 0, 987654321)), false},
 
 		{types.NewXNumberFromInt(123), types.NewXNumberFromInt(123), true},
 		{types.NewXNumberFromInt(123), types.NewXNumberFromInt(124), false},

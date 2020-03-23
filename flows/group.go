@@ -5,27 +5,12 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/contactql"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
 // Group represents a grouping of contacts. It can be static (contacts are added and removed manually through
-// [actions](#action:add_contact_groups)) or dynamic (contacts are added automatically by a query). It renders as its name in a
-// template, and has the following properties which can be accessed:
-//
-//  * `uuid` the UUID of the group
-//  * `name` the name of the group
-//
-// Examples:
-//
-//   @(foreach(contact.groups, extract, "name")) -> [Testers, Males]
-//   @(contact.groups[0].uuid) -> b7cf0d83-f1c9-411c-96fd-c511a4cfa86d
-//   @(contact.groups[1].name) -> Males
-//   @(json(contact.groups[1])) -> {"name":"Males","uuid":"4f1f98fc-27a7-4a69-bbdb-24744ba739a9"}
-//
-// @context group
+// [actions](#action:add_contact_groups)) or dynamic (contacts are added automatically by a query).
 type Group struct {
 	assets.Group
 
@@ -33,38 +18,32 @@ type Group struct {
 }
 
 // NewGroup returns a new group object from the given group asset
-func NewGroup(asset assets.Group) *Group {
-	return &Group{Group: asset}
+func NewGroup(env envs.Environment, fields *FieldAssets, asset assets.Group) (*Group, error) {
+	if asset.Query() != "" {
+		query, err := contactql.ParseQuery(asset.Query(), env.RedactionPolicy(), env.DefaultCountry(), fields)
+		if err != nil {
+			return nil, err
+		}
+
+		return &Group{Group: asset, parsedQuery: query}, nil
+	}
+
+	return &Group{Group: asset}, nil
 }
 
 // Asset returns the underlying asset
 func (g *Group) Asset() assets.Group { return g.Group }
 
-// ParsedQuery returns the parsed query of a dynamic group (cached)
-func (g *Group) ParsedQuery() (*contactql.ContactQuery, error) {
-	if g.Query() != "" && g.parsedQuery == nil {
-		var err error
-		if g.parsedQuery, err = contactql.ParseQuery(g.Query()); err != nil {
-			return nil, err
-		}
-	}
-	return g.parsedQuery, nil
-}
-
 // IsDynamic returns whether this group is dynamic
 func (g *Group) IsDynamic() bool { return g.Query() != "" }
 
 // CheckDynamicMembership returns whether the given contact belongs in this dynamic group
-func (g *Group) CheckDynamicMembership(env utils.Environment, contact *Contact) (bool, error) {
+func (g *Group) CheckDynamicMembership(env envs.Environment, contact *Contact) (bool, error) {
 	if !g.IsDynamic() {
-		return false, errors.Errorf("can't check membership on a non-dynamic group")
-	}
-	parsedQuery, err := g.ParsedQuery()
-	if err != nil {
-		return false, err
+		panic("can't check membership on a non-dynamic group")
 	}
 
-	return contactql.EvaluateQuery(env, parsedQuery, contact)
+	return contactql.EvaluateQuery(env, g.parsedQuery, contact)
 }
 
 // Reference returns a reference to this group
@@ -76,7 +55,12 @@ func (g *Group) Reference() *assets.GroupReference {
 }
 
 // ToXValue returns a representation of this object for use in expressions
-func (g *Group) ToXValue(env utils.Environment) types.XValue {
+//
+//   uuid:text -> the UUID of the group
+//   name:text -> the name of the group
+//
+// @context group
+func (g *Group) ToXValue(env envs.Environment) types.XValue {
 	return types.NewXObject(map[string]types.XValue{
 		"uuid": types.NewXText(string(g.UUID())),
 		"name": types.NewXText(g.Name()),
@@ -89,29 +73,25 @@ type GroupList struct {
 }
 
 // NewGroupList creates a new group list
-func NewGroupList(groups []*Group) *GroupList {
-	return &GroupList{groups: groups}
-}
+func NewGroupList(a SessionAssets, refs []*assets.GroupReference, missing assets.MissingCallback) *GroupList {
+	groups := make([]*Group, 0, len(refs))
 
-// NewGroupListFromAssets creates a new group list
-func NewGroupListFromAssets(a SessionAssets, groupAssets []assets.Group) (*GroupList, error) {
-	groups := make([]*Group, len(groupAssets))
-
-	for i, asset := range groupAssets {
-		group := a.Groups().Get(asset.UUID())
+	for _, ref := range refs {
+		group := a.Groups().Get(ref.UUID)
 		if group == nil {
-			return nil, errors.Errorf("no such group: %s", asset.UUID())
+			missing(ref, nil)
+		} else {
+			groups = append(groups, group)
 		}
-		groups[i] = group
 	}
-	return &GroupList{groups: groups}, nil
+	return &GroupList{groups: groups}
 }
 
 // Clone returns a clone of this group list
 func (l *GroupList) clone() *GroupList {
 	groups := make([]*Group, len(l.groups))
 	copy(groups, l.groups)
-	return NewGroupList(groups)
+	return &GroupList{groups: groups}
 }
 
 // FindByUUID returns the group with the passed in UUID or nil if not found
@@ -155,7 +135,7 @@ func (l *GroupList) Count() int {
 }
 
 // ToXValue returns a representation of this object for use in expressions
-func (l GroupList) ToXValue(env utils.Environment) types.XValue {
+func (l GroupList) ToXValue(env envs.Environment) types.XValue {
 	array := make([]types.XValue, len(l.groups))
 	for i, group := range l.groups {
 		array[i] = group.ToXValue(env)
@@ -170,17 +150,22 @@ type GroupAssets struct {
 }
 
 // NewGroupAssets creates a new set of group assets
-func NewGroupAssets(groups []assets.Group) *GroupAssets {
+func NewGroupAssets(env envs.Environment, fields *FieldAssets, groups []assets.Group) (*GroupAssets, []assets.Group) {
+	broken := make([]assets.Group, 0)
 	s := &GroupAssets{
-		all:    make([]*Group, len(groups)),
+		all:    make([]*Group, 0, len(groups)),
 		byUUID: make(map[assets.GroupUUID]*Group, len(groups)),
 	}
-	for i, asset := range groups {
-		group := NewGroup(asset)
-		s.all[i] = group
-		s.byUUID[group.UUID()] = group
+	for _, asset := range groups {
+		group, err := NewGroup(env, fields, asset)
+		if err != nil {
+			broken = append(broken, asset)
+		} else {
+			s.all = append(s.all, group)
+			s.byUUID[group.UUID()] = group
+		}
 	}
-	return s
+	return s, broken
 }
 
 // All returns all the groups

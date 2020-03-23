@@ -1,10 +1,10 @@
 package routers
 
 import (
-	"encoding/json"
-
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
 )
@@ -25,7 +25,7 @@ func (c *Category) Name() string             { return c.name }
 func (c *Category) ExitUUID() flows.ExitUUID { return c.exitUUID }
 
 // LocalizationUUID gets the UUID which identifies this object for localization
-func (c *Category) LocalizationUUID() utils.UUID { return utils.UUID(c.uuid) }
+func (c *Category) LocalizationUUID() uuids.UUID { return uuids.UUID(c.uuid) }
 
 //------------------------------------------------------------------------------------------
 // JSON Encoding / Decoding
@@ -53,7 +53,7 @@ func (c *Category) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON marshals this node category into JSON
 func (c *Category) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&categoryEnvelope{
+	return jsonx.Marshal(&categoryEnvelope{
 		c.uuid,
 		c.name,
 		c.exitUUID,

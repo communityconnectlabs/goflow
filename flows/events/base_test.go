@@ -2,30 +2,39 @@ package events_test
 
 import (
 	"encoding/json"
+	"errors"
+	"net/http"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
+	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestEventMarshaling(t *testing.T) {
-	utils.SetTimeSource(test.NewFixedTimeSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
-	defer utils.SetTimeSource(utils.DefaultTimeSource)
+	defer dates.SetNowSource(dates.DefaultNowSource)
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
 
-	utils.SetUUIDGenerator(test.NewSeededUUIDGenerator(12345))
-	defer utils.SetUUIDGenerator(utils.DefaultUUIDGenerator)
+	dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
+	uuids.SetGenerator(uuids.NewSeededGenerator(12345))
 
-	session, _, err := test.CreateTestSession("", nil)
+	session, _, err := test.CreateTestSession("", envs.RedactionPolicyNone)
 	require.NoError(t, err)
 
 	tz, _ := time.LoadLocation("Africa/Kigali")
@@ -37,19 +46,59 @@ func TestEventMarshaling(t *testing.T) {
 		marshaled string
 	}{
 		{
-			events.NewBroadcastCreatedEvent(
-				map[utils.Language]*events.BroadcastTranslation{
+			events.NewAirtimeTransferred(
+				&flows.AirtimeTransfer{
+					Sender:        urns.URN("tel:+593979099111"),
+					Recipient:     urns.URN("tel:+593979099222"),
+					Currency:      "USD",
+					DesiredAmount: decimal.RequireFromString("1.20"),
+					ActualAmount:  decimal.RequireFromString("1.00"),
+				},
+				[]*flows.HTTPLog{
+					&flows.HTTPLog{
+						CreatedOn: dates.Now(),
+						ElapsedMS: 12,
+						Request:   "POST /topup HTTP/1.1\r\nHost: send.money.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+						Response:  "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"errors\":[]}",
+						Status:    flows.CallStatusSuccess,
+						URL:       "https://send.money.com/topup",
+					},
+				},
+			),
+			`{
+				"actual_amount": 1,
+        	    "created_on": "2018-10-18T14:20:30.000123456Z",
+        	    "currency": "USD",
+        	    "desired_amount": 1.2,
+				"http_logs": [
+					{
+						"created_on": "2018-10-18T14:20:30.000123456Z",
+						"elapsed_ms": 12,
+						"request": "POST /topup HTTP/1.1\r\nHost: send.money.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+						"response": "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"errors\":[]}",
+						"status": "success",
+						"url": "https://send.money.com/topup"
+					}
+				],
+				"recipient": "tel:+593979099222",
+        	    "sender": "tel:+593979099111",
+				"type": "airtime_transferred"
+			}`,
+		},
+		{
+			events.NewBroadcastCreated(
+				map[envs.Language]*events.BroadcastTranslation{
 					"eng": {Text: "Hello", Attachments: nil, QuickReplies: nil},
 					"spa": {Text: "Hola", Attachments: nil, QuickReplies: nil},
 				},
-				utils.Language("eng"),
-				[]urns.URN{urns.URN("tel:+12345678900")},
-				[]*flows.ContactReference{
-					flows.NewContactReference(flows.ContactUUID("b2aaf598-1bb3-4c7d-b6bb-1f8dbe2ac16f"), "Jim"),
-				},
+				envs.Language("eng"),
 				[]*assets.GroupReference{
 					assets.NewGroupReference(assets.GroupUUID("5f9fd4f7-4b0f-462a-a598-18bfc7810412"), "Supervisors"),
 				},
+				[]*flows.ContactReference{
+					flows.NewContactReference(flows.ContactUUID("b2aaf598-1bb3-4c7d-b6bb-1f8dbe2ac16f"), "Jim"),
+				},
+				[]urns.URN{urns.URN("tel:+12345678900")},
 			),
 			`{
 				"base_language": "eng",
@@ -81,7 +130,40 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewContactFieldChangedEvent(
+			events.NewClassifierCalled(
+				assets.NewClassifierReference(assets.ClassifierUUID("4b937f49-7fb7-43a5-8e57-14e2f028a471"), "Booking"),
+				[]*flows.HTTPLog{
+					&flows.HTTPLog{
+						CreatedOn: dates.Now(),
+						ElapsedMS: 12,
+						Request:   "GET /message?v=20170307&q=hello HTTP/1.1\r\nHost: api.wit.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+						Response:  "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
+						Status:    flows.CallStatusSuccess,
+						URL:       "https://api.wit.ai/message?v=20170307&q=hello",
+					},
+				},
+			),
+			`{
+				"classifier": {
+					"uuid": "4b937f49-7fb7-43a5-8e57-14e2f028a471",
+					"name": "Booking"
+				},
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"http_logs": [
+					{
+						"created_on": "2018-10-18T14:20:30.000123456Z",
+						"elapsed_ms": 12,
+						"request": "GET /message?v=20170307&q=hello HTTP/1.1\r\nHost: api.wit.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+						"response": "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
+						"status": "success",
+						"url": "https://api.wit.ai/message?v=20170307&q=hello"
+					}
+				],
+				"type": "classifier_called"
+			}`,
+		},
+		{
+			events.NewContactFieldChanged(
 				gender,
 				flows.NewValue(types.NewXText("male"), nil, nil, "", "", ""),
 			),
@@ -98,7 +180,7 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewContactFieldChangedEvent(
+			events.NewContactFieldChanged(
 				gender,
 				nil, // value being cleared
 			),
@@ -113,7 +195,7 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewContactGroupsChangedEvent(
+			events.NewContactGroupsChanged(
 				[]*flows.Group{session.Assets().Groups().FindByName("Customers")},
 				nil,
 			),
@@ -129,7 +211,7 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewContactLanguageChangedEvent(utils.Language("fra")),
+			events.NewContactLanguageChanged(envs.Language("fra")),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"language": "fra",
@@ -137,7 +219,7 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewContactRefreshedEvent(session.Contact()),
+			events.NewContactRefreshed(session.Contact()),
 			`{
 				"contact": {
 					"created_on": "2018-06-20T11:40:30.123456789Z",
@@ -172,7 +254,7 @@ func TestEventMarshaling(t *testing.T) {
 					"name": "Ryan Lewis",
 					"timezone": "America/Guayaquil",
 					"urns": [
-						"tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
+						"tel:+12024561111?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
 						"twitterid:54784326227#nyaruka",
 						"mailto:foo@bar.com"
 					],
@@ -183,7 +265,7 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewContactNameChangedEvent("Bryan"),
+			events.NewContactNameChanged("Bryan"),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"name": "Bryan",
@@ -191,7 +273,7 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewContactTimezoneChangedEvent(tz),
+			events.NewContactTimezoneChanged(tz),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"timezone": "Africa/Kigali",
@@ -199,7 +281,7 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewContactURNsChangedEvent([]urns.URN{
+			events.NewContactURNsChanged([]urns.URN{
 				urns.URN("tel:+12345678900"),
 				urns.URN("twitterid:8764843252522#bob"),
 			}),
@@ -213,7 +295,17 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewEnvironmentRefreshedEvent(session.Environment()),
+			events.NewEmailSent([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Update", "Flows are great!"),
+			`{
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"type": "email_sent",
+				"to": ["bob@nyaruka.com", "jim@nyaruka.com"],
+				"subject": "Update",
+				"body": "Flows are great!"
+			}`,
+		},
+		{
+			events.NewEnvironmentRefreshed(session.Environment()),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"environment": {
@@ -236,14 +328,33 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewIVRCreatedEvent(
+			events.NewError(errors.New("I'm an error")),
+			`{
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"text": "I'm an error",
+				"type": "error"
+			}`,
+		},
+		{
+			events.NewDependencyError(assets.NewFieldReference("age", "Age")),
+			`{
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"text": "missing dependency: field[key=age,name=Age]",
+				"type": "error"
+			}`,
+		},
+		{
+			events.NewIVRCreated(
 				flows.NewMsgOut(
 					urns.URN("tel:+12345678900"),
 					assets.NewChannelReference(assets.ChannelUUID("57f1078f-88aa-46f4-a59a-948a5739c03d"), "My Android Phone"),
 					"Hi there",
 					nil,
 					nil,
-					nil)),
+					nil,
+					flows.NilMsgTopic,
+				),
+			),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"msg": {
@@ -253,7 +364,7 @@ func TestEventMarshaling(t *testing.T) {
 					},
 					"text": "Hi there",
 					"urn": "tel:+12345678900",
-					"uuid": "08d3c3e2-f1ea-4b52-97e4-99d56e963fc9"
+					"uuid": "20cc4181-48cf-4344-9751-99419796decd"
 				},
 				"type": "ivr_created"
 			}`,
@@ -268,16 +379,17 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewSessionTriggeredEvent(
+			events.NewSessionTriggered(
 				assets.NewFlowReference(assets.FlowUUID("e4d441f0-24e3-4627-85fb-1e99e733baf0"), "Collect Age"),
-				[]urns.URN{urns.URN("tel:+12345678900")},
-				[]*flows.ContactReference{
-					flows.NewContactReference(flows.ContactUUID("b2aaf598-1bb3-4c7d-b6bb-1f8dbe2ac16f"), "Jim"),
-				},
 				[]*assets.GroupReference{
 					assets.NewGroupReference(assets.GroupUUID("5f9fd4f7-4b0f-462a-a598-18bfc7810412"), "Supervisors"),
 				},
+				[]*flows.ContactReference{
+					flows.NewContactReference(flows.ContactUUID("b2aaf598-1bb3-4c7d-b6bb-1f8dbe2ac16f"), "Jim"),
+				},
+				"age > 20",
 				false,
+				[]urns.URN{urns.URN("tel:+12345678900")},
 				json.RawMessage(`{"uuid": "779eaf3f-1c59-4374-a7cb-0eae9c5e8800"}`),
 			),
 			`{
@@ -287,6 +399,7 @@ func TestEventMarshaling(t *testing.T) {
 						"uuid": "b2aaf598-1bb3-4c7d-b6bb-1f8dbe2ac16f"
 					}
 				],
+				"contact_query": "age > 20",
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"flow": {
 					"name": "Collect Age",
@@ -310,7 +423,7 @@ func TestEventMarshaling(t *testing.T) {
 	}
 
 	for _, tc := range eventTests {
-		eventJSON, err := json.Marshal(tc.event)
+		eventJSON, err := jsonx.Marshal(tc.event)
 		assert.NoError(t, err)
 
 		test.AssertEqualJSON(t, []byte(tc.marshaled), eventJSON, "event JSON mismatch")
@@ -329,4 +442,28 @@ func TestReadEvent(t *testing.T) {
 	// error if we don't recognize action type
 	_, err = events.ReadEvent([]byte(`{"type": "do_the_foo", "foo": "bar"}`))
 	assert.EqualError(t, err, "unknown type: 'do_the_foo'")
+}
+
+func TestWebhookCalledEventTrimming(t *testing.T) {
+	defer httpx.SetRequestor(httpx.DefaultRequestor)
+
+	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
+		"http://temba.io/": []httpx.MockResponse{
+			httpx.NewMockResponse(200, nil, "Y", 20000),
+		},
+	}))
+
+	request, _ := http.NewRequest("GET", "http://temba.io/", strings.NewReader(strings.Repeat("X", 20000)))
+
+	svc := webhooks.NewService(http.DefaultClient, nil, nil, nil, 1024*1024)
+	call, err := svc.Call(nil, request)
+	require.NoError(t, err)
+
+	event := events.NewWebhookCalled(call, flows.CallStatusSuccess, "")
+
+	assert.Equal(t, "http://temba.io/", event.URL)
+	assert.Equal(t, 10000, len(event.Request))
+	assert.Equal(t, "XXXXXXX...", event.Request[9990:])
+	assert.Equal(t, 10000, len(event.Response))
+	assert.Equal(t, "YYYYYYY...", event.Response[9990:])
 }

@@ -3,7 +3,25 @@ package flows
 import (
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+)
+
+func init() {
+	utils.Validator.RegisterAlias("msg_topic", "eq=event|eq=account|eq=purchase|eq=agent")
+}
+
+// MsgTopic is the topic, as required by some channel types
+type MsgTopic string
+
+// possible msg topic values
+const (
+	NilMsgTopic      MsgTopic = ""
+	MsgTopicEvent    MsgTopic = "event"
+	MsgTopicAccount  MsgTopic = "account"
+	MsgTopicPurchase MsgTopic = "purchase"
+	MsgTopicAgent    MsgTopic = "agent"
 )
 
 // BaseMsg represents a incoming or outgoing message with the session contact
@@ -29,6 +47,7 @@ type MsgOut struct {
 
 	QuickReplies_ []string       `json:"quick_replies,omitempty"`
 	Templating_   *MsgTemplating `json:"templating,omitempty"`
+	Topic_        MsgTopic       `json:"topic,omitempty"`
 }
 
 // NewMsgIn creates a new incoming message
@@ -45,10 +64,10 @@ func NewMsgIn(uuid MsgUUID, urn urns.URN, channel *assets.ChannelReference, text
 }
 
 // NewMsgOut creates a new outgoing message
-func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment, quickReplies []string, templating *MsgTemplating) *MsgOut {
+func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment, quickReplies []string, templating *MsgTemplating, topic MsgTopic) *MsgOut {
 	return &MsgOut{
 		BaseMsg: BaseMsg{
-			UUID_:        MsgUUID(utils.NewUUID()),
+			UUID_:        MsgUUID(uuids.New()),
 			URN_:         urn,
 			Channel_:     channel,
 			Text_:        text,
@@ -56,6 +75,7 @@ func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, atta
 		},
 		QuickReplies_: quickReplies,
 		Templating_:   templating,
+		Topic_:        topic,
 	}
 }
 
@@ -70,6 +90,9 @@ func (m *BaseMsg) SetID(id MsgID) { m.ID_ = id }
 
 // URN returns the URN of this message
 func (m *BaseMsg) URN() urns.URN { return m.URN_ }
+
+// SetURN returns the URN of this message
+func (m *BaseMsg) SetURN(urn urns.URN) { m.URN_ = urn }
 
 // Channel returns the channel of this message
 func (m *BaseMsg) Channel() *assets.ChannelReference { return m.Channel_ }
@@ -92,10 +115,13 @@ func (m *MsgOut) QuickReplies() []string { return m.QuickReplies_ }
 // Templating returns the templating to use to send this message (if any)
 func (m *MsgOut) Templating() *MsgTemplating { return m.Templating_ }
 
+// Topic returns the topic to use to send this message (if any)
+func (m *MsgOut) Topic() MsgTopic { return m.Topic_ }
+
 // MsgTemplating represents any substituted message template that should be applied when sending this message
 type MsgTemplating struct {
 	Template_  *assets.TemplateReference `json:"template"`
-	Language_  utils.Language            `json:"language"`
+	Language_  envs.Language             `json:"language"`
 	Variables_ []string                  `json:"variables,omitempty"`
 }
 
@@ -103,13 +129,13 @@ type MsgTemplating struct {
 func (t MsgTemplating) Template() *assets.TemplateReference { return t.Template_ }
 
 // Language returns the language that should be used for the template
-func (t MsgTemplating) Language() utils.Language { return t.Language_ }
+func (t MsgTemplating) Language() envs.Language { return t.Language_ }
 
 // Variables returns the variables that should be substituted in the template
 func (t MsgTemplating) Variables() []string { return t.Variables_ }
 
 // NewMsgTemplating creates and returns a new msg template
-func NewMsgTemplating(template *assets.TemplateReference, language utils.Language, variables []string) *MsgTemplating {
+func NewMsgTemplating(template *assets.TemplateReference, language envs.Language, variables []string) *MsgTemplating {
 	return &MsgTemplating{
 		Template_:  template,
 		Language_:  language,

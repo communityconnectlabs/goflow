@@ -3,8 +3,8 @@ package operators
 import (
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // Concatenate joins two text values together.
@@ -12,8 +12,8 @@ import (
 //   @("hello" & " " & "bar") -> hello bar
 //   @("hello" & null) -> hello
 //
-// @operator concatenate
-var Concatenate = textualBinary(func(env utils.Environment, text1 types.XText, text2 types.XText) types.XValue {
+// @operator concatenate "&"
+var Concatenate = textualBinary(func(env envs.Environment, text1 types.XText, text2 types.XText) types.XValue {
 	var buffer strings.Builder
 	buffer.WriteString(text1.Native())
 	buffer.WriteString(text2.Native())
@@ -26,8 +26,8 @@ var Concatenate = textualBinary(func(env utils.Environment, text1 types.XText, t
 //   @("hello" = "bar") -> false
 //   @(1 = 1) -> true
 //
-// @operator equal
-var Equal = textualBinary(func(env utils.Environment, text1 types.XText, text2 types.XText) types.XValue {
+// @operator equal "="
+var Equal = textualBinary(func(env envs.Environment, text1 types.XText, text2 types.XText) types.XValue {
 	return types.NewXBoolean(text1.Equals(text2))
 })
 
@@ -37,8 +37,8 @@ var Equal = textualBinary(func(env utils.Environment, text1 types.XText, text2 t
 //   @("hello" != "bar") -> true
 //   @(1 != 2) -> true
 //
-// @operator notequal
-var NotEqual = textualBinary(func(env utils.Environment, text1 types.XText, text2 types.XText) types.XValue {
+// @operator notequal "!="
+var NotEqual = textualBinary(func(env envs.Environment, text1 types.XText, text2 types.XText) types.XValue {
 	return types.NewXBoolean(!text1.Equals(text2))
 })
 
@@ -46,8 +46,8 @@ var NotEqual = textualBinary(func(env utils.Environment, text1 types.XText, text
 //
 //   @(-fields.age) -> -23
 //
-// @operator negate
-var Negate = numericalUnary(func(env utils.Environment, num types.XNumber) types.XValue {
+// @operator negate "- (unary)"
+var Negate = numericalUnary(func(env envs.Environment, num types.XNumber) types.XValue {
 	return types.NewXNumber(num.Native().Neg())
 })
 
@@ -56,8 +56,8 @@ var Negate = numericalUnary(func(env utils.Environment, num types.XNumber) types
 //   @(2 + 3) -> 5
 //   @(fields.age + 10) -> 33
 //
-// @operator add
-var Add = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
+// @operator add "+"
+var Add = numericalBinary(func(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
 	return types.NewXNumber(num1.Native().Add(num2.Native()))
 })
 
@@ -66,8 +66,8 @@ var Add = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 t
 //   @(3 - 2) -> 1
 //   @(2 - 3) -> -1
 //
-// @operator subtract
-var Subtract = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
+// @operator subtract "- (binary)"
+var Subtract = numericalBinary(func(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
 	return types.NewXNumber(num1.Native().Sub(num2.Native()))
 })
 
@@ -76,8 +76,8 @@ var Subtract = numericalBinary(func(env utils.Environment, num1 types.XNumber, n
 //   @(3 * 2) -> 6
 //   @(fields.age * 3) -> 69
 //
-// @operator multiply
-var Multiply = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
+// @operator multiply "*"
+var Multiply = numericalBinary(func(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
 	return types.NewXNumber(num1.Native().Mul(num2.Native()))
 })
 
@@ -88,8 +88,8 @@ var Multiply = numericalBinary(func(env utils.Environment, num1 types.XNumber, n
 //   @(46 / fields.age) -> 2
 //   @(3 / 0) -> ERROR
 //
-// @operator divide
-var Divide = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
+// @operator divide "/"
+var Divide = numericalBinary(func(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
 	if num2.Equals(types.XNumberZero) {
 		return types.NewXErrorf("division by zero")
 	}
@@ -101,8 +101,8 @@ var Divide = numericalBinary(func(env utils.Environment, num1 types.XNumber, num
 //
 //   @(2 ^ 8) -> 256
 //
-// @operator exponent
-var Exponent = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
+// @operator exponent "^"
+var Exponent = numericalBinary(func(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
 	return types.NewXNumber(num1.Native().Pow(num2.Native()))
 })
 
@@ -112,8 +112,8 @@ var Exponent = numericalBinary(func(env utils.Environment, num1 types.XNumber, n
 //   @(3 < 3) -> false
 //   @(4 < 3) -> false
 //
-// @operator lessthan
-var LessThan = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
+// @operator lessthan "<"
+var LessThan = numericalBinary(func(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
 	return types.NewXBoolean(num1.Compare(num2) < 0)
 })
 
@@ -123,8 +123,8 @@ var LessThan = numericalBinary(func(env utils.Environment, num1 types.XNumber, n
 //   @(3 <= 3) -> true
 //   @(4 <= 3) -> false
 //
-// @operator lessthanorequal
-var LessThanOrEqual = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
+// @operator lessthanorequal "<="
+var LessThanOrEqual = numericalBinary(func(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
 	return types.NewXBoolean(num1.Compare(num2) <= 0)
 })
 
@@ -134,8 +134,8 @@ var LessThanOrEqual = numericalBinary(func(env utils.Environment, num1 types.XNu
 //   @(3 > 3) -> false
 //   @(4 > 3) -> true
 //
-// @operator greaterthan
-var GreaterThan = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
+// @operator greaterthan ">"
+var GreaterThan = numericalBinary(func(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
 	return types.NewXBoolean(num1.Compare(num2) > 0)
 })
 
@@ -145,7 +145,7 @@ var GreaterThan = numericalBinary(func(env utils.Environment, num1 types.XNumber
 //   @(3 >= 3) -> true
 //   @(4 >= 3) -> true
 //
-// @operator greaterthanorequal
-var GreaterThanOrEqual = numericalBinary(func(env utils.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
+// @operator greaterthanorequal ">="
+var GreaterThanOrEqual = numericalBinary(func(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XValue {
 	return types.NewXBoolean(num1.Compare(num2) >= 0)
 })

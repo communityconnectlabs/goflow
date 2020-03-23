@@ -3,13 +3,13 @@ package actions
 import (
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 func init() {
-	RegisterType(TypeSendBroadcast, func() flows.Action { return &SendBroadcastAction{} })
+	registerType(TypeSendBroadcast, func() flows.Action { return &SendBroadcastAction{} })
 }
 
 // TypeSendBroadcast is the type for the send broadcast action
@@ -30,16 +30,16 @@ const TypeSendBroadcast string = "send_broadcast"
 //
 // @action send_broadcast
 type SendBroadcastAction struct {
-	BaseAction
+	baseAction
 	onlineAction
 	otherContactsAction
 	createMsgAction
 }
 
-// NewSendBroadcastAction creates a new send broadcast action
-func NewSendBroadcastAction(uuid flows.ActionUUID, text string, attachments []string, quickReplies []string, urns []urns.URN, contacts []*flows.ContactReference, groups []*assets.GroupReference, legacyVars []string) *SendBroadcastAction {
+// NewSendBroadcast creates a new send broadcast action
+func NewSendBroadcast(uuid flows.ActionUUID, text string, attachments []string, quickReplies []string, urns []urns.URN, contacts []*flows.ContactReference, groups []*assets.GroupReference, legacyVars []string) *SendBroadcastAction {
 	return &SendBroadcastAction{
-		BaseAction: NewBaseAction(TypeSendBroadcast, uuid),
+		baseAction: newBaseAction(TypeSendBroadcast, uuid),
 		otherContactsAction: otherContactsAction{
 			URNs:       urns,
 			Contacts:   contacts,
@@ -56,17 +56,17 @@ func NewSendBroadcastAction(uuid flows.ActionUUID, text string, attachments []st
 
 // Execute runs this action
 func (a *SendBroadcastAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
-	urnList, contactRefs, groupRefs, err := a.resolveRecipients(run, a.URNs, a.Contacts, a.Groups, a.LegacyVars, logEvent)
+	groupRefs, contactRefs, _, urnList, err := a.resolveRecipients(run, logEvent)
 	if err != nil {
 		return err
 	}
 
-	translations := make(map[utils.Language]*events.BroadcastTranslation)
-	languages := append([]utils.Language{run.Flow().Language()}, run.Flow().Localization().Languages()...)
+	translations := make(map[envs.Language]*events.BroadcastTranslation)
+	languages := append([]envs.Language{run.Flow().Language()}, run.Flow().Localization().Languages()...)
 
 	// evaluate the broadcast in each language we have translations for
 	for _, language := range languages {
-		languages := []utils.Language{language, run.Flow().Language()}
+		languages := []envs.Language{language, run.Flow().Language()}
 
 		evaluatedText, evaluatedAttachments, evaluatedQuickReplies := a.evaluateMessage(run, languages, a.Text, a.Attachments, a.QuickReplies, logEvent)
 		translations[language] = &events.BroadcastTranslation{
@@ -78,31 +78,8 @@ func (a *SendBroadcastAction) Execute(run flows.FlowRun, step flows.Step, logMod
 
 	// if we have any recipients, log an event
 	if len(urnList) > 0 || len(contactRefs) > 0 || len(groupRefs) > 0 {
-		logEvent(events.NewBroadcastCreatedEvent(translations, run.Flow().Language(), urnList, contactRefs, groupRefs))
+		logEvent(events.NewBroadcastCreated(translations, run.Flow().Language(), groupRefs, contactRefs, urnList))
 	}
 
 	return nil
-}
-
-// Inspect inspects this object and any children
-func (a *SendBroadcastAction) Inspect(inspect func(flows.Inspectable)) {
-	inspect(a)
-
-	for _, g := range a.Groups {
-		flows.InspectReference(g, inspect)
-	}
-	for _, c := range a.Contacts {
-		flows.InspectReference(c, inspect)
-	}
-}
-
-// EnumerateTemplates enumerates all expressions on this object and its children
-func (a *SendBroadcastAction) EnumerateTemplates(include flows.TemplateIncluder) {
-	include.String(&a.Text)
-	include.Slice(a.Attachments)
-	include.Slice(a.QuickReplies)
-	include.Translations(a, "text")
-	include.Translations(a, "attachments")
-	include.Translations(a, "quick_replies")
-	include.Slice(a.LegacyVars)
 }

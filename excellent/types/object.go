@@ -6,7 +6,11 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+
+	"github.com/pkg/errors"
 )
 
 const serializeDefaultAs = "__default__"
@@ -24,9 +28,10 @@ type XObject struct {
 	XValue
 	XCountable
 
-	def    XValue
-	props  map[string]XValue
-	source func() map[string]XValue
+	def            XValue
+	props          map[string]XValue
+	source         func() map[string]XValue
+	marshalDefault bool
 }
 
 // NewXObject returns a new object with the given properties
@@ -68,7 +73,7 @@ func (x *XObject) Render() string {
 }
 
 // Format returns the pretty text representation
-func (x *XObject) Format(env utils.Environment) string {
+func (x *XObject) Format(env envs.Environment) string {
 	if x.hasDefault() {
 		return Format(env, x.Default())
 	}
@@ -96,7 +101,28 @@ func (x *XObject) MarshalJSON() ([]byte, error) {
 			marshaled[p] = json.RawMessage(asJSON.Native())
 		}
 	}
-	return json.Marshal(marshaled)
+
+	if x.hasDefault() && x.marshalDefault {
+		asJSON, err := ToXJSON(x.def)
+		if err == nil {
+			marshaled[serializeDefaultAs] = json.RawMessage(asJSON.Native())
+		}
+	}
+
+	return jsonx.Marshal(marshaled)
+}
+
+// ReadXObject reads an instance of this type from JSON
+func ReadXObject(data []byte) (*XObject, error) {
+	v := JSONToXValue(data)
+	switch typed := v.(type) {
+	case *XObject:
+		return typed, nil
+	case XError:
+		return nil, typed
+	default:
+		return nil, errors.New("JSON doesn't contain an object")
+	}
 }
 
 // String returns the native string representation of this type for debugging
@@ -179,6 +205,10 @@ func (x *XObject) Default() XValue {
 	return x.def
 }
 
+func (x *XObject) SetMarshalDefault(marshal bool) {
+	x.marshalDefault = marshal
+}
+
 // Default returns the default value for this
 func (x *XObject) hasDefault() bool {
 	return x.Default() != x
@@ -206,7 +236,7 @@ var XObjectEmpty = NewXObject(map[string]XValue{})
 var _ json.Marshaler = (*XObject)(nil)
 
 // ToXObject converts the given value to an object
-func ToXObject(env utils.Environment, x XValue) (*XObject, XError) {
+func ToXObject(env envs.Environment, x XValue) (*XObject, XError) {
 	if utils.IsNil(x) {
 		return XObjectEmpty, nil
 	}

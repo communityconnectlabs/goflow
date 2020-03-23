@@ -10,19 +10,23 @@ import (
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/actions/modifiers"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestModifierTypes(t *testing.T) {
-	assets, err := test.LoadSessionAssets("testdata/_assets.json")
+	env := envs.NewBuilder().Build()
+	assets, err := test.LoadSessionAssets(env, "testdata/_assets.json")
 	require.NoError(t, err)
 
 	for typeName := range modifiers.RegisteredTypes {
@@ -31,26 +35,28 @@ func TestModifierTypes(t *testing.T) {
 }
 
 func testModifierType(t *testing.T, sessionAssets flows.SessionAssets, typeName string) {
-	testFile, err := ioutil.ReadFile(fmt.Sprintf("testdata/%s.json", typeName))
+	testPath := fmt.Sprintf("testdata/%s.json", typeName)
+	testFile, err := ioutil.ReadFile(testPath)
 	require.NoError(t, err)
 
 	tests := []struct {
-		Description   string            `json:"description"`
-		ContactBefore json.RawMessage   `json:"contact_before"`
-		Modifier      json.RawMessage   `json:"modifier"`
-		ContactAfter  json.RawMessage   `json:"contact_after"`
-		Events        []json.RawMessage `json:"events"`
+		Description   string          `json:"description"`
+		ContactBefore json.RawMessage `json:"contact_before"`
+		Modifier      json.RawMessage `json:"modifier"`
+
+		ContactAfter json.RawMessage `json:"contact_after"`
+		Events       json.RawMessage `json:"events"`
 	}{}
 
-	err = json.Unmarshal(testFile, &tests)
+	err = jsonx.Unmarshal(testFile, &tests)
 	require.NoError(t, err)
 
-	defer utils.SetTimeSource(utils.DefaultTimeSource)
-	defer utils.SetUUIDGenerator(utils.DefaultUUIDGenerator)
+	defer dates.SetNowSource(dates.DefaultNowSource)
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
 
-	for _, tc := range tests {
-		utils.SetTimeSource(test.NewFixedTimeSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
-		utils.SetUUIDGenerator(test.NewSeededUUIDGenerator(12345))
+	for i, tc := range tests {
+		dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 10, 18, 14, 20, 30, 123456, time.UTC)))
+		uuids.SetGenerator(uuids.NewSeededGenerator(12345))
 
 		testName := fmt.Sprintf("test '%s' for modifier type '%s'", tc.Description, typeName)
 
@@ -64,27 +70,48 @@ func testModifierType(t *testing.T, sessionAssets flows.SessionAssets, typeName 
 		require.NoError(t, err, "error loading contact_before in %s", testName)
 
 		// apply the modifier
-		logEvent := make([]flows.Event, 0)
-		modifier.Apply(utils.NewEnvironmentBuilder().Build(), sessionAssets, contact, func(e flows.Event) { logEvent = append(logEvent, e) })
+		eventLog := test.NewEventLog()
+		modifier.Apply(envs.NewBuilder().Build(), sessionAssets, contact, eventLog.Log)
 
-		// check contact is in the expected state
-		contactJSON, _ := json.Marshal(contact)
-		test.AssertEqualJSON(t, tc.ContactAfter, contactJSON, "contact mismatch in %s", testName)
+		// clone test case and populate with actual values
+		actual := tc
 
-		// check events are what we expected
-		actualEventsJSON, _ := json.Marshal(logEvent)
-		expectedEventsJSON, _ := json.Marshal(tc.Events)
-		test.AssertEqualJSON(t, expectedEventsJSON, actualEventsJSON, "events mismatch in %s", testName)
-
-		// try marshaling the modifier back to JSON
-		modifierJSON, err := json.Marshal(modifier)
+		// re-marshal the modifier
+		actual.Modifier, err = jsonx.Marshal(modifier)
 		require.NoError(t, err)
-		test.AssertEqualJSON(t, tc.Modifier, modifierJSON, "marshal mismatch in %s", testName)
+
+		// and the contact
+		actual.ContactAfter, _ = jsonx.Marshal(contact)
+
+		// and the events
+		actual.Events, _ = jsonx.Marshal(eventLog.Events)
+
+		if !test.UpdateSnapshots {
+			// check the modifier marshaled correctly
+			test.AssertEqualJSON(t, tc.Modifier, actual.Modifier, "marshal mismatch in %s", testName)
+
+			// check contact is in the expected state
+			test.AssertEqualJSON(t, tc.ContactAfter, actual.ContactAfter, "contact mismatch in %s", testName)
+
+			// check events are what we expected
+			test.AssertEqualJSON(t, tc.Events, actual.Events, "events mismatch in %s", testName)
+		} else {
+			tests[i] = actual
+		}
+	}
+
+	if test.UpdateSnapshots {
+		actualJSON, err := jsonx.MarshalPretty(tests)
+		require.NoError(t, err)
+
+		err = ioutil.WriteFile(testPath, actualJSON, 0666)
+		require.NoError(t, err)
 	}
 }
 
 func TestConstructors(t *testing.T) {
-	assets, err := test.LoadSessionAssets("testdata/_assets.json")
+	env := envs.NewBuilder().Build()
+	assets, err := test.LoadSessionAssets(env, "testdata/_assets.json")
 	require.NoError(t, err)
 
 	nexmo := assets.Channels().Get("3a05eaf5-cb1b-4246-bef1-f277419c83a7")
@@ -98,7 +125,7 @@ func TestConstructors(t *testing.T) {
 		json     string
 	}{
 		{
-			modifiers.NewChannelModifier(nexmo),
+			modifiers.NewChannel(nexmo),
 			`{
 				"type": "channel",
 				"channel": {
@@ -108,7 +135,7 @@ func TestConstructors(t *testing.T) {
 			}`,
 		},
 		{
-			modifiers.NewFieldModifier(age, flows.NewValue(types.NewXText("37 years"), nil, &ageValue, "", "", "")),
+			modifiers.NewField(age, flows.NewValue(types.NewXText("37 years"), nil, &ageValue, "", "", "")),
 			`{
 				"type": "field",
 				"field": {
@@ -122,7 +149,7 @@ func TestConstructors(t *testing.T) {
 			}`,
 		},
 		{
-			modifiers.NewGroupsModifier([]*flows.Group{testers}, modifiers.GroupsAdd),
+			modifiers.NewGroups([]*flows.Group{testers}, modifiers.GroupsAdd),
 			`{
 				"type": "groups",
 				"groups": [
@@ -135,28 +162,28 @@ func TestConstructors(t *testing.T) {
 			}`,
 		},
 		{
-			modifiers.NewLanguageModifier(utils.Language("fra")),
+			modifiers.NewLanguage(envs.Language("fra")),
 			`{
 				"type": "language",
 				"language": "fra"
 			}`,
 		},
 		{
-			modifiers.NewNameModifier("Bob"),
+			modifiers.NewName("Bob"),
 			`{
 				"type": "name",
 				"name": "Bob"
 			}`,
 		},
 		{
-			modifiers.NewTimezoneModifier(la),
+			modifiers.NewTimezone(la),
 			`{
 				"type": "timezone",
 				"timezone": "America/Los_Angeles"
 			}`,
 		},
 		{
-			modifiers.NewURNModifier(urns.URN("tel:+1234567890"), modifiers.URNAppend),
+			modifiers.NewURN(urns.URN("tel:+1234567890"), modifiers.URNAppend),
 			`{
 				"type": "urn",
 				"urn": "tel:+1234567890",
@@ -166,17 +193,18 @@ func TestConstructors(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		modifierJSON, err := json.Marshal(tc.modifier)
+		modifierJSON, err := jsonx.Marshal(tc.modifier)
 		require.NoError(t, err)
 		test.AssertEqualJSON(t, []byte(tc.json), modifierJSON, "marshal mismatch for modifier %s", string(modifierJSON))
 	}
 }
 
 func TestReadModifier(t *testing.T) {
+	env := envs.NewBuilder().Build()
 	missingAssets := make([]assets.Reference, 0)
 	missing := func(a assets.Reference, err error) { missingAssets = append(missingAssets, a) }
 
-	sessionAssets, err := engine.NewSessionAssets(static.NewEmptySource())
+	sessionAssets, err := engine.NewSessionAssets(env, static.NewEmptySource(), nil)
 	require.NoError(t, err)
 
 	// error if no type field
@@ -211,7 +239,7 @@ func TestReadModifier(t *testing.T) {
 			{"uuid": "4349cdd6-5385-46f3-8e55-5750dd4f35fb", "name": "Winners"}
 		]
 	}`))
-	sessionAssets, err = engine.NewSessionAssets(source)
+	sessionAssets, err = engine.NewSessionAssets(env, source, nil)
 	require.NoError(t, err)
 
 	mod, err = modifiers.ReadModifier(sessionAssets, []byte(`{"type": "groups", "modification": "add", "groups": [{"uuid": "cd1a2aa6-0d9d-4a8c-b32d-ca5de9c43bdb", "name": "Losers"}, {"uuid": "4349cdd6-5385-46f3-8e55-5750dd4f35fb", "name": "Winners"}]}`), missing)

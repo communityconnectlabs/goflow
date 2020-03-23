@@ -3,8 +3,10 @@ package definition
 import (
 	"encoding/json"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
 // the translations for a specific item, e.g.
@@ -22,10 +24,10 @@ type itemTranslations map[string][]string
 //   },
 //   "7a1aec43-f3e1-42f0-b967-0ee75e725e3a": { ... }
 // }
-type languageTranslations map[utils.UUID]itemTranslations
+type languageTranslations map[uuids.UUID]itemTranslations
 
 // GetTextArray returns the requested item translation
-func (t languageTranslations) GetTextArray(uuid utils.UUID, property string) []string {
+func (t languageTranslations) GetTextArray(uuid uuids.UUID, property string) []string {
 	item, found := t[uuid]
 	if found {
 		translation, found := item[property]
@@ -37,7 +39,7 @@ func (t languageTranslations) GetTextArray(uuid utils.UUID, property string) []s
 }
 
 // SetTextArray updates the requested item translation
-func (t languageTranslations) SetTextArray(uuid utils.UUID, property string, translated []string) {
+func (t languageTranslations) SetTextArray(uuid uuids.UUID, property string, translated []string) {
 	_, found := t[uuid]
 	if !found {
 		t[uuid] = make(itemTranslations)
@@ -47,15 +49,16 @@ func (t languageTranslations) SetTextArray(uuid utils.UUID, property string, tra
 }
 
 // our top level container for all the translations for all languages
-type localization map[utils.Language]languageTranslations
+type localization map[envs.Language]languageTranslations
 
+// NewLocalization creates a new empty localization
 func NewLocalization() flows.Localization {
 	return make(localization)
 }
 
 // Languages gets the list of languages included in this localization
-func (l localization) Languages() []utils.Language {
-	languages := make([]utils.Language, 0, len(l))
+func (l localization) Languages() []envs.Language {
+	languages := make([]envs.Language, 0, len(l))
 	for lang := range l {
 		languages = append(languages, lang)
 	}
@@ -63,7 +66,7 @@ func (l localization) Languages() []utils.Language {
 }
 
 // AddItemTranslation adds a new item translation
-func (l localization) AddItemTranslation(lang utils.Language, itemUUID utils.UUID, property string, translated []string) {
+func (l localization) AddItemTranslation(lang envs.Language, itemUUID uuids.UUID, property string, translated []string) {
 	_, found := l[lang]
 	if !found {
 		l[lang] = make(languageTranslations)
@@ -72,14 +75,14 @@ func (l localization) AddItemTranslation(lang utils.Language, itemUUID utils.UUI
 }
 
 // GetTranslations returns the translations for the given language
-func (l localization) GetTranslations(lang utils.Language) flows.Translations {
+func (l localization) GetTranslations(lang envs.Language) flows.Translations {
 	return l[lang]
 }
 
 // ReadLocalization reads entire localization flow segment
 func ReadLocalization(data json.RawMessage) (flows.Localization, error) {
 	translations := &localization{}
-	if err := json.Unmarshal(data, translations); err != nil {
+	if err := jsonx.Unmarshal(data, translations); err != nil {
 		return nil, err
 	}
 	return translations, nil

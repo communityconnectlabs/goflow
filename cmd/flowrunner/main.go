@@ -6,24 +6,29 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	_ "github.com/greatnonprofits-nfp/goflow/extensions/transferto"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
+	"github.com/greatnonprofits-nfp/goflow/services/classification/wit"
+	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
 )
 
-var contactJSON = `{
+const contactJSON = `{
 	"uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
 	"id": 1234567,
 	"name": "Ben Haggerty",
@@ -38,14 +43,15 @@ var contactJSON = `{
 }
 `
 
-var usage = `usage: flowrunner [flags] <assets.json> <flow_uuid>`
+const usage = `usage: flowrunner [flags] <assets.json> <flow_uuid>`
 
 func main() {
-	var initialMsg, contactLang string
+	var initialMsg, contactLang, witToken string
 	var printRepro bool
 	flags := flag.NewFlagSet("", flag.ExitOnError)
 	flags.StringVar(&initialMsg, "msg", "", "initial message to trigger session with")
 	flags.StringVar(&contactLang, "lang", "eng", "initial language of the contact")
+	flags.StringVar(&witToken, "wit.token", "", "access token for wit.ai")
 	flags.BoolVar(&printRepro, "repro", false, "print repro afterwards")
 	flags.Parse(os.Args[1:])
 	args := flags.Args()
@@ -59,7 +65,9 @@ func main() {
 	assetsPath := args[0]
 	flowUUID := assets.FlowUUID(args[1])
 
-	repro, err := RunFlow(assetsPath, flowUUID, initialMsg, utils.Language(contactLang), os.Stdin, os.Stdout)
+	engine := createEngine(witToken)
+
+	repro, err := RunFlow(engine, assetsPath, flowUUID, initialMsg, envs.Language(contactLang), os.Stdin, os.Stdout)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -68,29 +76,41 @@ func main() {
 
 	if printRepro {
 		fmt.Println("---------------------------------------")
-		marshaledRepro, _ := utils.JSONMarshalPretty(repro)
+		marshaledRepro, _ := jsonx.MarshalPretty(repro)
 		fmt.Println(string(marshaledRepro))
 	}
 }
 
+func createEngine(witToken string) flows.Engine {
+	builder := engine.NewBuilder().
+		WithWebhookServiceFactory(webhooks.NewServiceFactory(http.DefaultClient, nil, nil, map[string]string{"User-Agent": "goflow-runner"}, 10000))
+
+	if witToken != "" {
+		builder.WithClassificationServiceFactory(func(session flows.Session, classifier *flows.Classifier) (flows.ClassificationService, error) {
+			if classifier.Type() == "wit" {
+				return wit.NewService(http.DefaultClient, nil, classifier, witToken), nil
+			}
+			return nil, errors.New("only classifiers of type wit supported")
+		})
+	}
+
+	return builder.Build()
+}
+
 // RunFlow steps through a flow
-func RunFlow(assetsPath string, flowUUID assets.FlowUUID, initialMsg string, contactLang utils.Language, in io.Reader, out io.Writer) (*Repro, error) {
+func RunFlow(eng flows.Engine, assetsPath string, flowUUID assets.FlowUUID, initialMsg string, contactLang envs.Language, in io.Reader, out io.Writer) (*Repro, error) {
 	source, err := static.LoadSource(assetsPath)
 	if err != nil {
 		return nil, err
 	}
 
-	sa, err := engine.NewSessionAssets(source)
+	sa, err := engine.NewSessionAssets(envs.NewBuilder().Build(), source, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error parsing assets")
 	}
 
 	flow, err := sa.Flows().Get(flowUUID)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := flow.ValidateRecursive(sa, nil); err != nil {
 		return nil, err
 	}
 
@@ -102,20 +122,18 @@ func RunFlow(assetsPath string, flowUUID assets.FlowUUID, initialMsg string, con
 
 	// create our environment
 	la, _ := time.LoadLocation("America/Los_Angeles")
-	languages := []utils.Language{flow.Language(), contact.Language()}
-	env := utils.NewEnvironmentBuilder().WithTimezone(la).WithAllowedLanguages(languages).Build()
+	languages := []envs.Language{flow.Language(), contact.Language()}
+	env := envs.NewBuilder().WithTimezone(la).WithAllowedLanguages(languages).Build()
 
 	repro := &Repro{}
 
 	if initialMsg != "" {
 		msg := createMessage(contact, initialMsg)
-		repro.Trigger = triggers.NewMsgTrigger(env, flow.Reference(), contact, msg, nil)
+		repro.Trigger = triggers.NewMsg(env, flow.Reference(), contact, msg, nil)
 	} else {
-		repro.Trigger = triggers.NewManualTrigger(env, flow.Reference(), contact, nil)
+		repro.Trigger = triggers.NewManual(env, flow.Reference(), contact, nil)
 	}
 	fmt.Fprintf(out, "Starting flow '%s'....\n---------------------------------------\n", flow.Name())
-
-	eng := engine.NewBuilder().WithDefaultUserAgent("goflow-flowrunner").Build()
 
 	// start our session
 	session, sprint, err := eng.NewSession(sa, repro.Trigger)
@@ -137,10 +155,10 @@ func RunFlow(assetsPath string, flowUUID assets.FlowUUID, initialMsg string, con
 
 		// create our resume
 		if text == "/timeout" {
-			resume = resumes.NewWaitTimeoutResume(nil, nil)
+			resume = resumes.NewWaitTimeout(nil, nil)
 		} else {
 			msg := createMessage(contact, scanner.Text())
-			resume = resumes.NewMsgResume(nil, nil, msg)
+			resume = resumes.NewMsg(nil, nil, msg)
 		}
 
 		repro.Resumes = append(repro.Resumes, resume)
@@ -157,7 +175,7 @@ func RunFlow(assetsPath string, flowUUID assets.FlowUUID, initialMsg string, con
 }
 
 func createMessage(contact *flows.Contact, text string) *flows.MsgIn {
-	return flows.NewMsgIn(flows.MsgUUID(utils.NewUUID()), contact.URNs()[0].URN(), nil, text, []utils.Attachment{})
+	return flows.NewMsgIn(flows.MsgUUID(uuids.New()), contact.URNs()[0].URN(), nil, text, []utils.Attachment{})
 }
 
 func printEvents(log []flows.Event, out io.Writer) {
@@ -167,6 +185,8 @@ func printEvents(log []flows.Event, out io.Writer) {
 		case *events.BroadcastCreatedEvent:
 			text := typed.Translations[typed.BaseLanguage].Text
 			msg = fmt.Sprintf("🔉 broadcasted '%s' to ...", text)
+		case *events.ClassifierCalledEvent:
+			msg = fmt.Sprintf("👁️‍🗨️ NLU classifier '%s' called", typed.Classifier.Name)
 		case *events.ContactFieldChangedEvent:
 			var action string
 			if typed.Value != nil {
@@ -200,10 +220,14 @@ func printEvents(log []flows.Event, out io.Writer) {
 			msg = "👤 contact refreshed on resume"
 		case *events.ContactTimezoneChangedEvent:
 			msg = fmt.Sprintf("🕑 timezone changed to '%s'", typed.Timezone)
+		case *events.EmailSentEvent:
+			msg = fmt.Sprintf("✉️ email sent with subject '%s'", typed.Subject)
 		case *events.EnvironmentRefreshedEvent:
 			msg = "⚙️ environment refreshed on resume"
 		case *events.ErrorEvent:
 			msg = fmt.Sprintf("⚠️ %s", typed.Text)
+		case *events.FailureEvent:
+			msg = fmt.Sprintf("🛑 %s", typed.Text)
 		case *events.FlowEnteredEvent:
 			msg = fmt.Sprintf("↪️ entered flow '%s'", typed.Flow.Name)
 		case *events.InputLabelsAddedEvent:
@@ -227,7 +251,7 @@ func printEvents(log []flows.Event, out io.Writer) {
 		case *events.RunExpiredEvent:
 			msg = "📆 exiting due to expiration"
 		case *events.RunResultChangedEvent:
-			msg = fmt.Sprintf("📈 run result '%s' changed to '%s'", typed.Name, typed.Value)
+			msg = fmt.Sprintf("📈 run result '%s' changed to '%s' with category '%s'", typed.Name, typed.Value, typed.Category)
 		case *events.SessionTriggeredEvent:
 			msg = fmt.Sprintf("🏁 session triggered for '%s'", typed.Flow.Name)
 		case *events.WaitTimedOutEvent:

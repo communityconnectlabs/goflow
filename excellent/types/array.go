@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 // XArray is an array of items.
@@ -65,7 +67,7 @@ func (x *XArray) Render() string {
 }
 
 // Format returns the pretty text representation
-func (x *XArray) Format(env utils.Environment) string {
+func (x *XArray) Format(env envs.Environment) string {
 	parts := make([]string, x.Count())
 	multiline := false
 
@@ -97,7 +99,7 @@ func (x *XArray) MarshalJSON() ([]byte, error) {
 			marshaled[i] = json.RawMessage(asJSON.Native())
 		}
 	}
-	return json.Marshal(marshaled)
+	return jsonx.Marshal(marshaled)
 }
 
 // String returns the native string representation of this type
@@ -134,7 +136,7 @@ func (x *XArray) values() []XValue {
 var XArrayEmpty = NewXArray()
 
 // ToXArray converts the given value to an array
-func ToXArray(env utils.Environment, x XValue) (*XArray, XError) {
+func ToXArray(env envs.Environment, x XValue) (*XArray, XError) {
 	if utils.IsNil(x) {
 		return XArrayEmpty, nil
 	}

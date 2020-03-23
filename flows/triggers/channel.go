@@ -5,19 +5,21 @@ import (
 
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
-	RegisterType(TypeChannel, readChannelTrigger)
+	registerType(TypeChannel, readChannelTrigger)
 }
 
 // TypeChannel is the type for sessions triggered by channel events
 const TypeChannel string = "channel"
 
-// ChannelEventType is the type of event that occured on the channel
+// ChannelEventType is the type of event that occurred on the channel
 type ChannelEventType string
 
 // different channel event types
@@ -60,21 +62,25 @@ type ChannelTrigger struct {
 	event *ChannelEvent
 }
 
-// NewChannelTrigger creates a new channel trigger with the passed in values
-func NewChannelTrigger(env utils.Environment, flow *assets.FlowReference, contact *flows.Contact, event *ChannelEvent, params types.XValue) *ChannelTrigger {
+// NewChannel creates a new channel trigger with the passed in values
+func NewChannel(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, event *ChannelEvent, params *types.XObject) *ChannelTrigger {
+	if params == nil {
+		params = types.XObjectEmpty
+	}
+
 	return &ChannelTrigger{
 		baseTrigger: newBaseTrigger(TypeChannel, env, flow, contact, nil, params),
 		event:       event,
 	}
 }
 
-// NewIncomingCallTrigger creates a new channel trigger with the passed in values
-func NewIncomingCallTrigger(env utils.Environment, flow *assets.FlowReference, contact *flows.Contact, urn urns.URN, channel *assets.ChannelReference) *ChannelTrigger {
+// NewIncomingCall creates a new channel trigger with the passed in values
+func NewIncomingCall(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, urn urns.URN, channel *assets.ChannelReference) *ChannelTrigger {
 	event := NewChannelEvent(ChannelEventTypeIncomingCall, channel)
 	connection := flows.NewConnection(channel, urn)
 
 	return &ChannelTrigger{
-		baseTrigger: newBaseTrigger(TypeChannel, env, flow, contact, connection, nil),
+		baseTrigger: newBaseTrigger(TypeChannel, env, flow, contact, connection, types.XObjectEmpty),
 		event:       event,
 	}
 }
@@ -117,5 +123,5 @@ func (t *ChannelTrigger) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

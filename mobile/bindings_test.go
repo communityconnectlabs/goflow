@@ -6,25 +6,23 @@ import (
 
 	"github.com/greatnonprofits-nfp/goflow/flows/definition"
 	"github.com/greatnonprofits-nfp/goflow/mobile"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestMobileBindings(t *testing.T) {
+	defer uuids.SetGenerator(uuids.DefaultGenerator)
+	uuids.SetGenerator(uuids.NewSeededGenerator(1234))
+
 	assert.Equal(t, definition.CurrentSpecVersion.String(), mobile.CurrentSpecVersion())
 
-	// can handle anything that is this major version
-	assert.True(t, mobile.IsSpecVersionSupported("13"))
-	assert.True(t, mobile.IsSpecVersionSupported("13.3"))
-	assert.True(t, mobile.IsSpecVersionSupported("13.3.7"))
-
-	// currently have no support for major version migrations (may change in future)
-	assert.False(t, mobile.IsSpecVersionSupported("12"))
-	assert.False(t, mobile.IsSpecVersionSupported("12.5"))
-
-	// and obviously can't handle versions from the future
-	assert.False(t, mobile.IsSpecVersionSupported("14.0"))
+	assert.False(t, mobile.IsVersionSupported("x"))
+	assert.True(t, mobile.IsVersionSupported("11.12"))
+	assert.True(t, mobile.IsVersionSupported("13"))
+	assert.True(t, mobile.IsVersionSupported("13.3"))
+	assert.False(t, mobile.IsVersionSupported("14.0"))
 
 	// error if we try to create assets from invalid JSON
 	_, err := mobile.NewAssetsSource("{")
@@ -37,21 +35,21 @@ func TestMobileBindings(t *testing.T) {
 	source, err := mobile.NewAssetsSource(string(assetsJSON))
 	require.NoError(t, err)
 
-	// and create a new session assets
-	sa, err := mobile.NewSessionAssets(source)
-	require.NoError(t, err)
-
 	langs := mobile.NewStringSlice(2)
 	langs.Add("eng")
 	langs.Add("fra")
 	environment, err := mobile.NewEnvironment("DD-MM-YYYY", "tt:mm", "Africa/Kigali", "eng", langs, "RW", "none")
 	require.NoError(t, err)
 
+	// and create a new session assets
+	sa, err := mobile.NewSessionAssets(environment, source)
+	require.NoError(t, err)
+
 	contact := mobile.NewEmptyContact(sa)
 
 	trigger := mobile.NewManualTrigger(environment, contact, mobile.NewFlowReference("7c3db26f-e12a-48af-9673-e2feefdf8516", "Two Questions"))
 
-	eng := mobile.NewEngine("mobile-test")
+	eng := mobile.NewEngine()
 	ss, err := eng.NewSession(sa, trigger)
 	session := ss.Session()
 	sprint := ss.Sprint()
@@ -95,7 +93,7 @@ func TestMobileBindings(t *testing.T) {
 	marshaled, err := session.ToJSON()
 	require.NoError(t, err)
 
-	assert.Equal(t, `{"type":"messaging_offline","environment":{"date_f`, marshaled[:50])
+	assert.Equal(t, `{"uuid":"cdf7ed27-5ad5-4028-b664-880fc7581c77","ty`, marshaled[:50])
 
 	// and try to read it back
 	session2, err := eng.ReadSession(sa, marshaled)

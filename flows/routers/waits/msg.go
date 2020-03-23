@@ -9,12 +9,13 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
 	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 )
 
 func init() {
-	RegisterType(TypeMsg, readMsgWait, readActivatedMsgWait)
+	registerType(TypeMsg, readMsgWait, readActivatedMsgWait)
 }
 
 // TypeMsg is the type of our message wait
@@ -131,12 +132,12 @@ func (w *MsgWait) MarshalJSON() ([]byte, error) {
 
 	var err error
 	if w.hint != nil {
-		if e.Hint, err = json.Marshal(w.hint); err != nil {
+		if e.Hint, err = jsonx.Marshal(w.hint); err != nil {
 			return nil, err
 		}
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }
 
 type activatedMsgWaitEnvelope struct {
@@ -173,10 +174,10 @@ func (w *ActivatedMsgWait) MarshalJSON() ([]byte, error) {
 
 	var err error
 	if w.hint != nil {
-		if e.Hint, err = json.Marshal(w.hint); err != nil {
+		if e.Hint, err = jsonx.Marshal(w.hint); err != nil {
 			return nil, err
 		}
 	}
 
-	return json.Marshal(e)
+	return jsonx.Marshal(e)
 }

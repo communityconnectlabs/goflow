@@ -1,9 +1,8 @@
 package types
 
 import (
-	"encoding/json"
-
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 // XFunction is a callable function.
@@ -13,7 +12,7 @@ import (
 //   @(json(upper)) -> null
 //
 // @type function
-type XFunction func(env utils.Environment, args ...XValue) XValue
+type XFunction func(env envs.Environment, args ...XValue) XValue
 
 // Describe returns a representation of this type for error messages
 func (x XFunction) Describe() string { return "function" }
@@ -27,13 +26,13 @@ func (x XFunction) Render() string {
 }
 
 // Format returns the pretty text representation
-func (x XFunction) Format(env utils.Environment) string {
+func (x XFunction) Format(env envs.Environment) string {
 	return x.Render()
 }
 
 // MarshalJSON converts this type to JSON
 func (x XFunction) MarshalJSON() ([]byte, error) {
-	return json.Marshal(nil)
+	return jsonx.Marshal(nil)
 }
 
 // String returns the native string representation of this type

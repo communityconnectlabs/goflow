@@ -3,10 +3,10 @@ package tools_test
 import (
 	"testing"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent"
 	"github.com/greatnonprofits-nfp/goflow/excellent/tools"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +33,7 @@ func TestRefactorTemplate(t *testing.T) {
 		{`@(1 / ) @(1+2)`, `@(1 / ) @(1 + 2)`, true},
 	}
 
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 	context := types.NewXObject(map[string]types.XValue{
 		"foo": types.NewXObject(map[string]types.XValue{
 			"bar": types.NewXNumberFromInt(123),
@@ -52,8 +52,8 @@ func TestRefactorTemplate(t *testing.T) {
 			assert.NoError(t, err, "unexpected error for template: %s, err: %s", tc.template, err)
 
 			// test that the original and the refactored template evaluate equally
-			originalValue, _ := excellent.EvaluateTemplate(env, context, tc.template)
-			refactoredValue, _ := excellent.EvaluateTemplate(env, context, actual)
+			originalValue, _ := excellent.EvaluateTemplate(env, context, tc.template, nil)
+			refactoredValue, _ := excellent.EvaluateTemplate(env, context, actual, nil)
 
 			assert.Equal(t, originalValue, refactoredValue, "refactoring of template %s gives different value: %s", tc.template, refactoredValue)
 		}

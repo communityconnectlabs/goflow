@@ -1,12 +1,13 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"unicode/utf8"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 // XText is a string of characters.
@@ -38,7 +39,7 @@ func (x XText) Truthy() bool {
 func (x XText) Render() string { return x.Native() }
 
 // Format returns the pretty text representation
-func (x XText) Format(env utils.Environment) string {
+func (x XText) Format(env envs.Environment) string {
 	return x.Render()
 }
 
@@ -72,12 +73,12 @@ func (x XText) Empty() bool { return x.Native() == "" }
 
 // MarshalJSON is called when a struct containing this type is marshaled
 func (x XText) MarshalJSON() ([]byte, error) {
-	return utils.JSONMarshal(x.Native())
+	return jsonx.Marshal(x.Native())
 }
 
 // UnmarshalJSON is called when a struct containing this type is unmarshaled
 func (x *XText) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &x.native)
+	return jsonx.Unmarshal(data, &x.native)
 }
 
 // XTextEmpty is the empty text value
@@ -85,7 +86,7 @@ var XTextEmpty = NewXText("")
 var _ XValue = XTextEmpty
 
 // ToXText converts the given value to a string
-func ToXText(env utils.Environment, x XValue) (XText, XError) {
+func ToXText(env envs.Environment, x XValue) (XText, XError) {
 	if utils.IsNil(x) {
 		return XTextEmpty, nil
 	}

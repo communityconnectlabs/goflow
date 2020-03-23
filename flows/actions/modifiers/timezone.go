@@ -5,13 +5,15 @@ import (
 	"time"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
-	RegisterType(TypeTimezone, readTimezoneModifier)
+	registerType(TypeTimezone, readTimezoneModifier)
 }
 
 // TypeTimezone is the type of our timezone modifier
@@ -24,8 +26,8 @@ type TimezoneModifier struct {
 	timezone *time.Location
 }
 
-// NewTimezoneModifier creates a new timezone modifier
-func NewTimezoneModifier(timezone *time.Location) *TimezoneModifier {
+// NewTimezone creates a new timezone modifier
+func NewTimezone(timezone *time.Location) *TimezoneModifier {
 	return &TimezoneModifier{
 		baseModifier: newBaseModifier(TypeTimezone),
 		timezone:     timezone,
@@ -33,10 +35,10 @@ func NewTimezoneModifier(timezone *time.Location) *TimezoneModifier {
 }
 
 // Apply applies this modification to the given contact
-func (m *TimezoneModifier) Apply(env utils.Environment, assets flows.SessionAssets, contact *flows.Contact, log flows.EventCallback) {
+func (m *TimezoneModifier) Apply(env envs.Environment, assets flows.SessionAssets, contact *flows.Contact, log flows.EventCallback) {
 	if !timezonesEqual(contact.Timezone(), m.timezone) {
 		contact.SetTimezone(m.timezone)
-		log(events.NewContactTimezoneChangedEvent(m.timezone))
+		log(events.NewContactTimezoneChanged(m.timezone))
 		m.reevaluateDynamicGroups(env, assets, contact, log)
 	}
 }
@@ -71,7 +73,7 @@ func readTimezoneModifier(assets flows.SessionAssets, data json.RawMessage, miss
 		}
 	}
 
-	return NewTimezoneModifier(tz), nil
+	return NewTimezone(tz), nil
 }
 
 func (m *TimezoneModifier) MarshalJSON() ([]byte, error) {
@@ -79,5 +81,5 @@ func (m *TimezoneModifier) MarshalJSON() ([]byte, error) {
 	if m.timezone != nil {
 		tzName = m.timezone.String()
 	}
-	return json.Marshal(&timezoneModifierEnvelope{TypedEnvelope: utils.TypedEnvelope{Type: m.Type()}, Timezone: tzName})
+	return jsonx.Marshal(&timezoneModifierEnvelope{TypedEnvelope: utils.TypedEnvelope{Type: m.Type()}, Timezone: tzName})
 }

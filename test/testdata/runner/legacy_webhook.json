@@ -1,5 +1,5 @@
 {
-    "legacy_flows": [
+    "flows": [
         {
             "entry": "30c97f0e-e537-4940-ad1f-85599d3634b3",
             "action_sets": [
@@ -81,7 +81,7 @@
                     "response_type": "",
                     "operand": "@step.value",
                     "config": {
-                        "webhook": "http://localhost/?cmd=echo&content=%7B%22foo%22%3A%22bar%22%7D",
+                        "webhook": "http://localhost/?cmd=foo",
                         "webhook_action": "POST",
                         "webhook_headers": []
                     }
@@ -98,6 +98,5 @@
                 "expires": 10080
             }
         }
-    ],
-    "other_assets": {}
+    ]
 }

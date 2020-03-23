@@ -3,12 +3,13 @@ package events
 import (
 	"encoding/json"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 )
 
 func init() {
-	RegisterType(TypeEnvironmentRefreshed, func() flows.Event { return &EnvironmentRefreshedEvent{} })
+	registerType(TypeEnvironmentRefreshed, func() flows.Event { return &EnvironmentRefreshedEvent{} })
 }
 
 // TypeEnvironmentRefreshed is the type of our environment changed event
@@ -30,16 +31,16 @@ const TypeEnvironmentRefreshed string = "environment_refreshed"
 //
 // @event environment_refreshed
 type EnvironmentRefreshedEvent struct {
-	BaseEvent
+	baseEvent
 
 	Environment json.RawMessage `json:"environment"`
 }
 
-// NewEnvironmentRefreshedEvent creates a new environment changed event
-func NewEnvironmentRefreshedEvent(env utils.Environment) *EnvironmentRefreshedEvent {
-	marshalled, _ := json.Marshal(env)
+// NewEnvironmentRefreshed creates a new environment changed event
+func NewEnvironmentRefreshed(env envs.Environment) *EnvironmentRefreshedEvent {
+	marshalled, _ := jsonx.Marshal(env)
 	return &EnvironmentRefreshedEvent{
-		BaseEvent:   NewBaseEvent(TypeEnvironmentRefreshed),
+		baseEvent:   newBaseEvent(TypeEnvironmentRefreshed),
 		Environment: marshalled,
 	}
 }

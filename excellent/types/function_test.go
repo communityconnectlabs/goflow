@@ -1,20 +1,20 @@
 package types_test
 
 import (
-	"encoding/json"
 	"testing"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestXFunction(t *testing.T) {
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
-	func1 := types.XFunction(func(env utils.Environment, args ...types.XValue) types.XValue { return nil })
-	func2 := types.XFunction(func(env utils.Environment, args ...types.XValue) types.XValue { return nil })
+	func1 := types.XFunction(func(env envs.Environment, args ...types.XValue) types.XValue { return nil })
+	func2 := types.XFunction(func(env envs.Environment, args ...types.XValue) types.XValue { return nil })
 
 	assert.True(t, func1.Truthy())
 	assert.Equal(t, `function`, func1.Render())
@@ -22,7 +22,7 @@ func TestXFunction(t *testing.T) {
 	assert.Equal(t, `XFunction`, func1.String())
 	assert.Equal(t, `function`, func1.Describe())
 
-	marshaled, err := json.Marshal(func1)
+	marshaled, err := jsonx.Marshal(func1)
 	assert.NoError(t, err)
 	assert.Equal(t, `null`, string(marshaled))
 

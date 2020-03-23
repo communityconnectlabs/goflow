@@ -1,10 +1,10 @@
 package definition
 
 import (
-	"encoding/json"
-
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
 )
@@ -23,7 +23,7 @@ func (e *exit) UUID() flows.ExitUUID            { return e.uuid }
 func (e *exit) DestinationUUID() flows.NodeUUID { return e.destination }
 
 // LocalizationUUID gets the UUID which identifies this object for localization
-func (e *exit) LocalizationUUID() utils.UUID { return utils.UUID(e.uuid) }
+func (e *exit) LocalizationUUID() uuids.UUID { return uuids.UUID(e.uuid) }
 
 //------------------------------------------------------------------------------------------
 // JSON Encoding / Decoding
@@ -49,5 +49,5 @@ func (e *exit) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON marshals this node exit into JSON
 func (e *exit) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&exitEnvelope{e.uuid, e.destination})
+	return jsonx.Marshal(&exitEnvelope{e.uuid, e.destination})
 }

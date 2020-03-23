@@ -7,39 +7,22 @@ import (
 	"strings"
 	"time"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // Result describes a value captured during a run's execution. It might have been implicitly created by a router, or explicitly
-// created by a [set_run_result](#action:set_run_result) action. It renders as its value in a template, and has the following
-// properties which can be accessed:
-//
-//  * `value` the value of the result
-//  * `category` the category of the result
-//  * `category_localized` the localized category of the result
-//  * `input` the input associated with the result
-//  * `node_uuid` the UUID of the node where the result was created
-//  * `extra` any additional data associated with this result
-//  * `created_on` the time when the result was created
-//
-// Examples:
-//
-//   @results -> 2Factor: 34634624463525\nFavorite Color: red\nPhone Number: +12344563452\nwebhook: 200
-//   @results.favorite_color -> red
-//   @results.favorite_color.value -> red
-//   @results.favorite_color.category -> Red
-//
-// @context result
+// created by a [set_run_result](#action:set_run_result) action.
 type Result struct {
-	Name              string          `json:"name"`
+	Name              string          `json:"name" validate:"required"`
 	Value             string          `json:"value"`
 	Category          string          `json:"category,omitempty"`
 	CategoryLocalized string          `json:"category_localized,omitempty"`
 	NodeUUID          NodeUUID        `json:"node_uuid"`
 	Input             string          `json:"input,omitempty"`
 	Extra             json.RawMessage `json:"extra,omitempty"`
-	CreatedOn         time.Time       `json:"created_on"`
+	CreatedOn         time.Time       `json:"created_on" validate:"required"`
 }
 
 // NewResult creates a new result
@@ -57,7 +40,19 @@ func NewResult(name string, value string, category string, categoryLocalized str
 }
 
 // Context returns the properties available in expressions
-func (r *Result) Context(env utils.Environment) map[string]types.XValue {
+//
+//   __default__:text -> the value
+//   name:text -> the name of the result
+//   value:text -> the value of the result
+//   category:text -> the category of the result
+//   category_localized:text -> the localized category of the result
+//   input:text -> the input of the result
+//   extra:any -> the extra data of the result such as a webhook response
+//   node_uuid:text -> the UUID of the node in the flow that generated the result
+//   created_on:datetime -> the creation date of the result
+//
+// @context result
+func (r *Result) Context(env envs.Environment) map[string]types.XValue {
 	categoryLocalized := r.CategoryLocalized
 	if categoryLocalized == "" {
 		categoryLocalized = r.Category
@@ -107,7 +102,7 @@ func (r Results) Get(key string) *Result {
 }
 
 // Context returns the properties available in expressions
-func (r Results) Context(env utils.Environment) map[string]types.XValue {
+func (r Results) Context(env envs.Environment) map[string]types.XValue {
 	entries := make(map[string]types.XValue, len(r)+1)
 	entries["__default__"] = types.NewXText(r.format())
 

@@ -7,10 +7,11 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 )
 
 func init() {
-	RegisterType(TypePlayAudio, func() flows.Action { return &PlayAudioAction{} })
+	registerType(TypePlayAudio, func() flows.Action { return &PlayAudioAction{} })
 }
 
 // TypePlayAudio is the type for the play audio action
@@ -28,16 +29,16 @@ const TypePlayAudio string = "play_audio"
 //
 // @action play_audio
 type PlayAudioAction struct {
-	BaseAction
+	baseAction
 	voiceAction
 
-	AudioURL string `json:"audio_url" validate:"required"`
+	AudioURL string `json:"audio_url" validate:"required" engine:"localized,evaluated"`
 }
 
-// NewPlayAudioAction creates a new play message action
-func NewPlayAudioAction(uuid flows.ActionUUID, audioURL string) *PlayAudioAction {
+// NewPlayAudio creates a new play message action
+func NewPlayAudio(uuid flows.ActionUUID, audioURL string) *PlayAudioAction {
 	return &PlayAudioAction{
-		BaseAction: NewBaseAction(TypePlayAudio, uuid),
+		baseAction: newBaseAction(TypePlayAudio, uuid),
 		AudioURL:   audioURL,
 	}
 }
@@ -45,16 +46,16 @@ func NewPlayAudioAction(uuid flows.ActionUUID, audioURL string) *PlayAudioAction
 // Execute runs this action
 func (a *PlayAudioAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	// localize and evaluate audio URL
-	localizedAudioURL := run.GetText(utils.UUID(a.UUID()), "audio_url", a.AudioURL)
+	localizedAudioURL := run.GetText(uuids.UUID(a.UUID()), "audio_url", a.AudioURL)
 	evaluatedAudioURL, err := run.EvaluateTemplate(localizedAudioURL)
 	if err != nil {
-		logEvent(events.NewErrorEvent(err))
+		logEvent(events.NewError(err))
 		return nil
 	}
 
 	evaluatedAudioURL = strings.TrimSpace(evaluatedAudioURL)
 	if evaluatedAudioURL == "" {
-		logEvent(events.NewErrorEventf("audio URL evaluated to empty, skipping"))
+		logEvent(events.NewErrorf("audio URL evaluated to empty, skipping"))
 		return nil
 	}
 
@@ -63,19 +64,8 @@ func (a *PlayAudioAction) Execute(run flows.FlowRun, step flows.Step, logModifie
 
 	// if we have an audio URL, turn it into a message
 	attachments := []utils.Attachment{utils.Attachment(fmt.Sprintf("audio:%s", evaluatedAudioURL))}
-	msg := flows.NewMsgOut(connection.URN(), connection.Channel(), "", attachments, nil, nil)
-	logEvent(events.NewIVRCreatedEvent(msg))
+	msg := flows.NewMsgOut(connection.URN(), connection.Channel(), "", attachments, nil, nil, flows.NilMsgTopic)
+	logEvent(events.NewIVRCreated(msg))
 
 	return nil
-}
-
-// Inspect inspects this object and any children
-func (a *PlayAudioAction) Inspect(inspect func(flows.Inspectable)) {
-	inspect(a)
-}
-
-// EnumerateTemplates enumerates all expressions on this object and its children
-func (a *PlayAudioAction) EnumerateTemplates(include flows.TemplateIncluder) {
-	include.String(&a.AudioURL)
-	include.Translations(a, "audio_url")
 }

@@ -5,11 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/cases"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -22,6 +23,7 @@ var xi = types.NewXNumberFromInt
 var xd = types.NewXDateTime
 var xt = types.NewXTime
 var xa = types.NewXArray
+var xj = func(s string) types.XValue { return types.JSONToXValue([]byte(s)) }
 var result = cases.NewTrueResult
 var resultWithExtra = cases.NewTrueResultWithExtra
 var falseResult = cases.FalseResult
@@ -103,6 +105,9 @@ var testTests = []struct {
 	{"has_pattern", []types.XValue{xs("12345"), xs(`\A\d{5}\z`)}, resultWithExtra(xs("12345"), types.NewXObject(map[string]types.XValue{"0": xs("12345")}))},
 	{"has_pattern", []types.XValue{xs("12345 "), xs(`\A\d{5}\z`)}, falseResult},
 	{"has_pattern", []types.XValue{xs(" 12345"), xs(`\A\d{5}\z`)}, falseResult},
+	{"has_pattern", []types.XValue{xs(`hi there 😀`), xs("[\U0001F600-\U0001F64F]")}, resultWithExtra(xs("😀"), types.NewXObject(map[string]types.XValue{"0": xs("😀")}))},
+	{"has_pattern", []types.XValue{xs(`hi there`), xs("[\U0001F600-\U0001F64F]")}, falseResult},
+	{"has_pattern", []types.XValue{xs(`hi there 😂`), xs("[😀-🙏]")}, resultWithExtra(xs("😂"), types.NewXObject(map[string]types.XValue{"0": xs("😂")}))},
 	{"has_pattern", []types.XValue{xs("<html>x</html>"), xs(`[`)}, ERROR},
 	{"has_pattern", []types.XValue{}, ERROR},
 
@@ -199,14 +204,14 @@ var testTests = []struct {
 	{"has_date_gt", []types.XValue{xs("too"), xs("many"), xs("args")}, ERROR},
 	{"has_date_gt", []types.XValue{}, ERROR},
 
-	{"has_time", []types.XValue{xs("last time was 10:30")}, result(xt(utils.NewTimeOfDay(10, 30, 0, 0)))},
+	{"has_time", []types.XValue{xs("last time was 10:30")}, result(xt(dates.NewTimeOfDay(10, 30, 0, 0)))},
 	{"has_time", []types.XValue{xs("this isn't a valid time 59:77")}, falseResult},
 	{"has_time", []types.XValue{xs("no time at all")}, falseResult},
 	{"has_time", []types.XValue{xs("too"), xs("many"), xs("args")}, ERROR},
 	{"has_time", []types.XValue{}, ERROR},
 
 	{"has_email", []types.XValue{xs("my email is foo@bar.com.")}, result(xs("foo@bar.com"))},
-	{"has_email", []types.XValue{xs("my email is <foo1@bar-2.com>")}, result(xs("foo1@bar-2.com"))},
+	{"has_email", []types.XValue{xs("my email is <foo~$1+spam@bar-2.com>")}, result(xs("foo~$1+spam@bar-2.com"))},
 	{"has_email", []types.XValue{xs("FOO@bar.whatzit")}, result(xs("FOO@bar.whatzit"))},
 	{"has_email", []types.XValue{xs("FOO@βήτα.whatzit")}, result(xs("FOO@βήτα.whatzit"))},
 	{"has_email", []types.XValue{xs("email is foo @ bar . com")}, falseResult},
@@ -227,30 +232,175 @@ var testTests = []struct {
 	{
 		"has_group",
 		[]types.XValue{
-			xa(
-				types.NewXObject(map[string]types.XValue{"uuid": xs("group-uuid-1"), "name": xs("Testers")}),
-				types.NewXObject(map[string]types.XValue{"uuid": xs("group-uuid-2"), "name": xs("Customers")}),
-			),
+			xj(`[{"uuid": "group-uuid-1", "name": "Testers"}, {"uuid": "group-uuid-2", "name": "Customers"}]`),
 			xs("group-uuid-2"),
 		},
-		result(types.NewXObject(map[string]types.XValue{"uuid": xs("group-uuid-2"), "name": xs("Customers")})),
+		result(xj(`{"uuid": "group-uuid-2", "name": "Customers"}`)),
 	},
 	{"has_group", []types.XValue{xa(ERROR), xs("group-uuid-2")}, ERROR},
 	{"has_group", []types.XValue{xa(), xs("group-uuid-1")}, falseResult},
 	{"has_group", []types.XValue{ERROR, xs("group-uuid-1")}, ERROR},
 	{"has_group", []types.XValue{xa(), ERROR}, ERROR},
 	{"has_group", []types.XValue{}, ERROR},
+
+	{
+		"has_category",
+		[]types.XValue{
+			xj(`{
+				"name": "Response 1",
+				"value": "hi",
+				"category": "Other",
+				"input": "hello",
+				"node_uuid": "0faca870-aca4-469d-89e2-a70df468ac68",
+				"created_on": "2018-07-06T12:30:06.123456789Z"
+			}`),
+			xs("Chicken"),
+			xs("Other"),
+		},
+		result(xs("Other")),
+	},
+	{
+		"has_category",
+		[]types.XValue{
+			xj(`{
+				"name": "Response 1",
+				"value": "hi",
+				"category": "All Responses",
+				"input": "hello",
+				"node_uuid": "0faca870-aca4-469d-89e2-a70df468ac68",
+				"created_on": "2018-07-06T12:30:06.123456789Z"
+			}`),
+			xs("Chicken"),
+		},
+		falseResult,
+	},
+	{
+		"has_category",
+		[]types.XValue{
+			xj(`{}`), // not a result
+			xs("Chicken"),
+		},
+		ERROR,
+	},
+
+	{
+		"has_intent",
+		[]types.XValue{
+			xj(`{
+				"name": "Intention",
+				"value": "0.92",
+				"category": "success",
+				"input": "book me a flight to Quito!",
+				"node_uuid": "0faca870-aca4-469d-89e2-a70df468ac68",
+				"created_on": "2018-07-06T12:30:06.123456789Z",
+				"extra": {
+					"intents": [
+						{"name": "book_flight", "confidence": 0.7},
+						{"name": "book_hotel", "confidence": 0.3}
+					],
+					"entities": {
+						"location": [
+							{"value": "Quito", "confidence": 1.0},
+							{"value": "Cuenca", "confidence": 0.1} 
+						],
+						"date": [
+							{"value": "May 21", "confidence": 0.6}
+						]
+					}
+				}
+			}`),
+			xs("book_hotel"),
+			xn("0.2"),
+		},
+		resultWithExtra(
+			xs("book_hotel"),
+			xj(`{"location": "Quito", "date": "May 21"}`).(*types.XObject),
+		),
+	},
+	{
+		"has_intent",
+		[]types.XValue{
+			xj(`{}`), // not a result
+			xs("book_flight"),
+			xn("0.5"),
+		},
+		ERROR,
+	},
+	{"has_intent", []types.XValue{}, ERROR},
+
+	{
+		"has_top_intent",
+		[]types.XValue{
+			xj(`{
+				"name": "Intention",
+				"value": "0.92",
+				"category": "success",
+				"input": "book me a flight to Quito!",
+				"node_uuid": "0faca870-aca4-469d-89e2-a70df468ac68",
+				"created_on": "2018-07-06T12:30:06.123456789Z",
+				"extra": {
+					"intents": [
+						{"name": "book_flight", "confidence": 0.7},
+						{"name": "book_hotel", "confidence": 0.3}
+					],
+					"entities": {
+						"location": [
+							{"value": "Quito", "confidence": 1.0},
+							{"value": "Cuenca", "confidence": 0.1} 
+						],
+						"date": [
+							{"value": "May 21", "confidence": 0.6}
+						]
+					}
+				}
+			}`),
+			xs("book_flight"),
+			xn("0.5"),
+		},
+		resultWithExtra(
+			xs("book_flight"),
+			xj(`{"location": "Quito", "date": "May 21"}`).(*types.XObject),
+		),
+	},
+	{
+		"has_top_intent",
+		[]types.XValue{
+			xj(`{
+				"name": "Intention",
+				"created_on": "2018-07-06T12:30:06.123456789Z",
+				"extra": {
+					"intents": [
+						{"name": "book_flight", "confidence": 0.7},
+						{"name": "book_hotel", "confidence": 0.3}
+					]
+				}
+			}`),
+			xs("book_flight"),
+			xn("0.8"), // higher than the extracted confidence of book_flight
+		},
+		falseResult,
+	},
+	{
+		"has_top_intent",
+		[]types.XValue{
+			xj(`{}`), // not a result
+			xs("book_flight"),
+			xn("0.5"),
+		},
+		ERROR,
+	},
+	{"has_top_intent", []types.XValue{}, ERROR},
 }
 
 func TestTests(t *testing.T) {
-	utils.SetTimeSource(test.NewFixedTimeSource(time.Date(2018, 4, 11, 13, 24, 30, 123456000, time.UTC)))
-	defer utils.SetTimeSource(utils.DefaultTimeSource)
+	dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 4, 11, 13, 24, 30, 123456000, time.UTC)))
+	defer dates.SetNowSource(dates.DefaultNowSource)
 
-	env := utils.NewEnvironmentBuilder().
-		WithDateFormat(utils.DateFormatDayMonthYear).
-		WithTimeFormat(utils.TimeFormatHourMinuteSecond).
+	env := envs.NewBuilder().
+		WithDateFormat(envs.DateFormatDayMonthYear).
+		WithTimeFormat(envs.TimeFormatHourMinuteSecond).
 		WithTimezone(kgl).
-		WithDefaultCountry(utils.Country("RW")).
+		WithDefaultCountry(envs.Country("RW")).
 		Build()
 
 	for _, tc := range testTests {
@@ -296,9 +446,9 @@ func TestEvaluateTemplate(t *testing.T) {
 		{"@(has_error(1 / 0).match)", "division by zero", false},
 	}
 
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 	for _, test := range evalTests {
-		eval, err := excellent.EvaluateTemplate(env, vars, test.template)
+		eval, err := excellent.EvaluateTemplate(env, vars, test.template, nil)
 
 		if test.hasError {
 			assert.Error(t, err, "expected error evaluating template '%s'", test.template)
@@ -334,7 +484,7 @@ func TestHasPhone(t *testing.T) {
 		{"12067799294", "BW", ""},
 	}
 
-	env := utils.NewEnvironmentBuilder().WithDefaultCountry(utils.Country("RW")).Build()
+	env := envs.NewBuilder().WithDefaultCountry(envs.Country("RW")).Build()
 
 	for _, tc := range tests {
 		var actual, expected types.XValue
@@ -358,14 +508,14 @@ func TestParseDecimalFuzzy(t *testing.T) {
 	parseTests := []struct {
 		input    string
 		expected decimal.Decimal
-		format   *utils.NumberFormat
+		format   *envs.NumberFormat
 	}{
-		{"1234", decimal.RequireFromString("1234"), utils.DefaultNumberFormat},
-		{"1,234.567", decimal.RequireFromString("1234.567"), utils.DefaultNumberFormat},
-		{"1.234,567", decimal.RequireFromString("1234.567"), &utils.NumberFormat{DecimalSymbol: ",", DigitGroupingSymbol: "."}},
-		{".1234", decimal.RequireFromString("0.1234"), utils.DefaultNumberFormat},
-		{" .1234", decimal.RequireFromString("0.1234"), utils.DefaultNumberFormat},
-		{"100.00", decimal.RequireFromString("100.00"), utils.DefaultNumberFormat},
+		{"1234", decimal.RequireFromString("1234"), envs.DefaultNumberFormat},
+		{"1,234.567", decimal.RequireFromString("1234.567"), envs.DefaultNumberFormat},
+		{"1.234,567", decimal.RequireFromString("1234.567"), &envs.NumberFormat{DecimalSymbol: ",", DigitGroupingSymbol: "."}},
+		{".1234", decimal.RequireFromString("0.1234"), envs.DefaultNumberFormat},
+		{" .1234", decimal.RequireFromString("0.1234"), envs.DefaultNumberFormat},
+		{"100.00", decimal.RequireFromString("100.00"), envs.DefaultNumberFormat},
 	}
 
 	for _, test := range parseTests {

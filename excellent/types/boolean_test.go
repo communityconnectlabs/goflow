@@ -1,17 +1,17 @@
 package types_test
 
 import (
-	"encoding/json"
 	"testing"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestXBoolean(t *testing.T) {
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	// test equality
 	assert.True(t, types.XBooleanFalse.Equals(types.XBooleanFalse))
@@ -48,7 +48,7 @@ func TestXBoolean(t *testing.T) {
 
 	// unmarshal
 	var val types.XBoolean
-	err := json.Unmarshal([]byte(`true`), &val)
+	err := jsonx.Unmarshal([]byte(`true`), &val)
 	assert.NoError(t, err)
 	assert.Equal(t, types.XBooleanTrue, val)
 }

@@ -1,11 +1,12 @@
 package types
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,9 +16,9 @@ func TestTemplate(t *testing.T) {
 		UUID: assets.ChannelUUID("ffffffff-9b24-92e1-ffff-ffffb207cdb4"),
 	}
 
-	translation := NewTemplateTranslation(channel, utils.Language("eng"), "Hello {{1}}", 1)
+	translation := NewTemplateTranslation(channel, envs.Language("eng"), "Hello {{1}}", 1)
 	assert.Equal(t, channel, translation.Channel())
-	assert.Equal(t, utils.Language("eng"), translation.Language())
+	assert.Equal(t, envs.Language("eng"), translation.Language())
 	assert.Equal(t, "Hello {{1}}", translation.Content())
 	assert.Equal(t, 1, translation.VariableCount())
 
@@ -27,11 +28,11 @@ func TestTemplate(t *testing.T) {
 	assert.Equal(t, 1, len(template.Translations()))
 
 	// test json and back
-	asJSON, err := json.Marshal(template)
+	asJSON, err := jsonx.Marshal(template)
 	assert.NoError(t, err)
 
 	copy := Template{}
-	err = json.Unmarshal(asJSON, &copy)
+	err = jsonx.Unmarshal(asJSON, &copy)
 
 	assert.Equal(t, copy.Name(), template.Name())
 	assert.Equal(t, copy.UUID(), template.UUID())

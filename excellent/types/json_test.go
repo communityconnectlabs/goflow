@@ -3,10 +3,10 @@ package types_test
 import (
 	"testing"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -55,6 +55,7 @@ func TestXJSONResolve(t *testing.T) {
 		{[]byte(`["foo", 1.23]`), "j[1]", types.RequireXNumberFromString("1.23"), false},
 		{[]byte(`["foo", true]`), "j[1]", types.NewXBoolean(true), false},
 		{[]byte(`["foo", null]`), "j[1]", nil, false},
+		{[]byte(`["foo", "one"]`), "j.1", types.NewXText("one"), false},
 
 		{[]byte(`["one", "two", "three"]`), "j[0]", types.NewXText("one"), false},
 		{[]byte(`["escaped \"string\""]`), "j[0]", types.NewXText(`escaped "string"`), false},
@@ -69,11 +70,11 @@ func TestXJSONResolve(t *testing.T) {
 
 		// resolve errors
 		{[]byte(`{"foo": "x", "bar": "one"}`), "j.zed", nil, true},
-		{[]byte(`["foo", null]`), "j.0", nil, true},
+		{[]byte(`["foo", null]`), "j.3", nil, true},
 		{[]byte(`["foo", null]`), "j[3]", nil, true},
 	}
 
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 	for _, tc := range jsonTests {
 		fragment := types.JSONToXValue(tc.JSON)
 		context := types.NewXObject(map[string]types.XValue{"j": fragment})

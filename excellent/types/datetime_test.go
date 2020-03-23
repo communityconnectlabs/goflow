@@ -1,20 +1,20 @@
 package types_test
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
 
+	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestXDateTime(t *testing.T) {
-	env := utils.NewEnvironmentBuilder().WithDateFormat(utils.DateFormatDayMonthYear).Build()
+	env := envs.NewBuilder().WithDateFormat(envs.DateFormatDayMonthYear).Build()
 
 	assert.True(t, types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 123456789, time.UTC)).Truthy())
 
@@ -47,7 +47,7 @@ func TestXDateTime(t *testing.T) {
 	formatted, err = d1.FormatCustom("YYYYYY", nil)
 	assert.EqualError(t, err, "invalid date format, invalid count of 'Y' format: 6")
 
-	d2 := d1.ReplaceTime(types.NewXTime(utils.NewTimeOfDay(16, 20, 30, 123456789)))
+	d2 := d1.ReplaceTime(types.NewXTime(dates.NewTimeOfDay(16, 20, 30, 123456789)))
 	assert.Equal(t, 2018, d2.Native().Year())
 	assert.Equal(t, time.Month(4), d2.Native().Month())
 	assert.Equal(t, 9, d2.Native().Day())
@@ -59,12 +59,12 @@ func TestXDateTime(t *testing.T) {
 
 	// test unmarshaling
 	var date types.XDateTime
-	err = json.Unmarshal([]byte(`"2018-04-09T17:01:30Z"`), &date)
+	err = jsonx.Unmarshal([]byte(`"2018-04-09T17:01:30Z"`), &date)
 	assert.NoError(t, err)
 	assert.Equal(t, types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)), date)
 
 	// test marshaling
-	data, err := json.Marshal(types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)))
+	data, err := jsonx.Marshal(types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)))
 	assert.NoError(t, err)
 	assert.Equal(t, `"2018-04-09T17:01:30.000000Z"`, string(data))
 }
@@ -80,7 +80,7 @@ func TestToXDateTime(t *testing.T) {
 		{types.NewXNumberFromInt(123), types.XDateTimeZero, true},
 		{types.NewXText("2018-06-05"), types.NewXDateTime(time.Date(2018, 6, 5, 0, 0, 0, 0, time.UTC)), false},
 		{types.NewXText("wha?"), types.XDateTimeZero, true},
-		{types.NewXDate(utils.NewDate(2018, 4, 9)), types.NewXDateTime(time.Date(2018, 4, 9, 0, 0, 0, 0, time.UTC)), false},
+		{types.NewXDate(dates.NewDate(2018, 4, 9)), types.NewXDateTime(time.Date(2018, 4, 9, 0, 0, 0, 0, time.UTC)), false},
 		{types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)), types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)), false},
 		{types.NewXObject(map[string]types.XValue{
 			"__default__": types.NewXText("2018-06-05"), // should use default
@@ -88,7 +88,7 @@ func TestToXDateTime(t *testing.T) {
 		}), types.NewXDateTime(time.Date(2018, 6, 5, 0, 0, 0, 0, time.UTC)), false},
 	}
 
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 
 	for _, test := range tests {
 		result, err := types.ToXDateTime(env, test.value)
@@ -103,10 +103,10 @@ func TestToXDateTime(t *testing.T) {
 }
 
 func TestToXDateTimeWithTimeFill(t *testing.T) {
-	utils.SetTimeSource(test.NewFixedTimeSource(time.Date(2018, 9, 13, 13, 36, 30, 123456789, time.UTC)))
-	defer utils.SetTimeSource(utils.DefaultTimeSource)
+	dates.SetNowSource(dates.NewFixedNowSource(time.Date(2018, 9, 13, 13, 36, 30, 123456789, time.UTC)))
+	defer dates.SetNowSource(dates.DefaultNowSource)
 
-	env := utils.NewEnvironmentBuilder().Build()
+	env := envs.NewBuilder().Build()
 	result, err := types.ToXDateTimeWithTimeFill(env, types.NewXText("2018/12/20"))
 	assert.NoError(t, err)
 	assert.Equal(t, types.NewXDateTime(time.Date(2018, 12, 20, 13, 36, 30, 123456789, time.UTC)), result)
