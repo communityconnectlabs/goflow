@@ -32,8 +32,6 @@ const (
 	envVarServerUrl      = "MAILROOM_PARSE_SERVER_URL"
 	giftcardCheckType    = "GIFTCARD_CHECK"
 	envVarShortenURLPing = "MAILROOM_SHORTEN_URL_PING"
-	envVarFDLDefaultURL  = "MAILROOM_FDL_DEFAULT_URL"
-	envVarFDLKey         = "MAILROOM_FDL_KEY"
 )
 
 // Get environment variables passing a default value

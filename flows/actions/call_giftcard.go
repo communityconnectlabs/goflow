@@ -88,12 +88,6 @@ func (a *CallGiftcardAction) Execute(run flows.FlowRun, step flows.Step, logModi
 	body["db"] = a.DB["id"]
 	body["urn"] = contact_urn.URN().Path()
 
-	fdlDefaultURL := getEnv(envVarFDLDefaultURL, "")
-	fdlKey := getEnv(envVarFDLKey, "")
-
-	body["fdl_default_url"] = fdlDefaultURL
-	body["fdl_key"] = fdlKey
-
 	b, _ := json.Marshal(body)
 
 	return a.call(run, step, url, method, string(b), logEvent)
