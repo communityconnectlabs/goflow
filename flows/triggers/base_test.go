@@ -188,6 +188,7 @@ func TestTriggerMarshaling(t *testing.T) {
 				flow,
 				contact,
 				triggers.NewCampaignEvent("8d339613-f0be-48b7-92ee-155f4c7576f8", triggers.NewCampaignReference("8cd472c4-bb85-459a-8c9a-c04708af799e", "Reminders")),
+				nil,
 			),
 			`{
 				"contact": {
