@@ -202,7 +202,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 					"audio/mp3:http://s3.amazon.com/bucket/test.mp3",
 				},
 			)
-			trigger = triggers.NewMsg(env, flow.Reference(), contact, msg, nil)
+			trigger = triggers.NewMsg(env, flow.Reference(), contact, msg, nil, nil)
 			ignoreEventCount = 1 // need to ignore the msg_received event this trigger creates
 		}
 

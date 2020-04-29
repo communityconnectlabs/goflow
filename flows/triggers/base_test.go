@@ -437,6 +437,7 @@ func TestTriggerMarshaling(t *testing.T) {
 				contact,
 				flows.NewMsgIn(flows.MsgUUID("c8005ee3-4628-4d76-be66-906352cb1935"), urns.URN("tel:+1234567890"), channel, "Hi there", nil),
 				triggers.NewKeywordMatch(triggers.KeywordMatchTypeFirstWord, "hi"),
+				nil,
 			),
 			`{
 				"contact": {
