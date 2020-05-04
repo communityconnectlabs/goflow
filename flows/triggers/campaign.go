@@ -8,6 +8,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 )
 
 func init() {
@@ -63,9 +64,9 @@ type CampaignTrigger struct {
 }
 
 // NewCampaign creates a new campaign trigger with the passed in values
-func NewCampaign(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, event *CampaignEvent) *CampaignTrigger {
+func NewCampaign(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, event *CampaignEvent, params *types.XObject) *CampaignTrigger {
 	return &CampaignTrigger{
-		baseTrigger: newBaseTrigger(TypeCampaign, env, flow, contact, nil, nil),
+		baseTrigger: newBaseTrigger(TypeCampaign, env, flow, contact, nil, params),
 		event:       event,
 	}
 }
