@@ -343,7 +343,16 @@ func migrateAction(baseLanguage envs.Language, a Action, localization migratedLo
 			migratedEmails[i], _ = expressions.MigrateTemplate(email, nil)
 		}
 
-		return newSendEmailAction(a.UUID, migratedEmails, migratedSubject, migratedBody), nil
+		media := make(map[string]utils.Attachment)
+		if a.Media != nil {
+			err := jsonx.Unmarshal(a.Media, &media)
+			if err != nil {
+				return nil, err
+			}
+		}
+		attachments := []utils.Attachment{media["base"]}
+
+		return newSendEmailAction(a.UUID, migratedEmails, migratedSubject, migratedBody, attachments), nil
 
 	case "lang":
 		return newSetContactLanguageAction(a.UUID, string(a.Language)), nil

@@ -10,6 +10,7 @@ import (
 
 	"github.com/shopspring/decimal"
 	"github.com/greatnonprofits-nfp/goflow/flows/actions"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // template that matches the JSON payload sent by legacy webhooks
@@ -427,13 +428,14 @@ func newSendBroadcastAction(uuid uuids.UUID, text string, attachments []string, 
 	return migratedAction(d)
 }
 
-func newSendEmailAction(uuid uuids.UUID, addresses []string, subject string, body string) migratedAction {
+func newSendEmailAction(uuid uuids.UUID, addresses []string, subject string, body string, attachments []utils.Attachment) migratedAction {
 	return migratedAction(map[string]interface{}{
-		"uuid":      uuid,
-		"type":      "send_email",
-		"addresses": addresses,
-		"subject":   subject,
-		"body":      body,
+		"uuid":        uuid,
+		"type":        "send_email",
+		"addresses":   addresses,
+		"subject":     subject,
+		"body":        body,
+		"attachments": attachments,
 	})
 }
 
