@@ -8,6 +8,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 	"github.com/pkg/errors"
+	"fmt"
 )
 
 func init() {
@@ -35,18 +36,20 @@ type SendEmailAction struct {
 	baseAction
 	onlineAction
 
-	Addresses []string `json:"addresses" validate:"required,min=1" engine:"evaluated"`
-	Subject   string   `json:"subject" validate:"required" engine:"localized,evaluated"`
-	Body      string   `json:"body" validate:"required" engine:"localized,evaluated"`
+	Addresses   []string `json:"addresses" validate:"required,min=1" engine:"evaluated"`
+	Subject     string   `json:"subject" validate:"required" engine:"localized,evaluated"`
+	Body        string   `json:"body" validate:"required" engine:"localized,evaluated"`
+	Attachments []string `json:"attachments"`
 }
 
 // NewSendEmail creates a new send email action
-func NewSendEmail(uuid flows.ActionUUID, addresses []string, subject string, body string) *SendEmailAction {
+func NewSendEmail(uuid flows.ActionUUID, addresses []string, subject string, body string, attachments []string) *SendEmailAction {
 	return &SendEmailAction{
-		baseAction: newBaseAction(TypeSendEmail, uuid),
-		Addresses:  addresses,
-		Subject:    subject,
-		Body:       body,
+		baseAction:  newBaseAction(TypeSendEmail, uuid),
+		Addresses:   addresses,
+		Subject:     subject,
+		Body:        body,
+		Attachments: attachments,
 	}
 }
 
@@ -100,6 +103,10 @@ func (a *SendEmailAction) Execute(run flows.FlowRun, step flows.Step, logModifie
 	// nothing to do if there are no addresses
 	if len(evaluatedAddresses) == 0 {
 		return nil
+	}
+
+	for _, fileUrl := range a.Attachments {
+		fmt.Printf("%s", fileUrl)
 	}
 
 	svc, err := run.Session().Engine().Services().Email(run.Session())
