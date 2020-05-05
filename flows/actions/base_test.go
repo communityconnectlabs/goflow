@@ -505,6 +505,7 @@ func TestConstructors(t *testing.T) {
 				[]string{"bob@example.com"},
 				"Hi there",
 				"So I was thinking...",
+				nil,
 			),
 			`{
 			"type": "send_email",
