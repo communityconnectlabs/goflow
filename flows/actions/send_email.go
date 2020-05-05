@@ -9,6 +9,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 	"github.com/pkg/errors"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"os"
 )
 
 func init() {
@@ -125,7 +126,12 @@ func (a *SendEmailAction) Execute(run flows.FlowRun, step flows.Step, logModifie
 	if err != nil {
 		logEvent(events.NewError(errors.Wrap(err, "unable to send email")))
 	} else {
-		logEvent(events.NewEmailSent(evaluatedAddresses, evaluatedSubject, evaluatedBody))
+		logEvent(events.NewEmailSent(evaluatedAddresses, evaluatedSubject, evaluatedBody, a.Attachments))
+	}
+
+	// Removing tmp files created after email sent
+	for _, attachpath := range attachments {
+		os.Remove(attachpath)
 	}
 
 	return nil

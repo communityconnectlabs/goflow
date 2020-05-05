@@ -295,7 +295,7 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewEmailSent([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Update", "Flows are great!"),
+			events.NewEmailSent([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Update", "Flows are great!", nil),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"type": "email_sent",
