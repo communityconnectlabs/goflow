@@ -15,7 +15,7 @@ func TestService(t *testing.T) {
 	smtpx.SetSender(sender)
 
 	svc := NewService("mail.temba.io", 255, "leah", "pass123", "updates@temba.io")
-	err := svc.Send(nil, []string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great week")
+	err := svc.Send(nil, []string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great week", nil)
 
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"HELO localhost\nMAIL FROM:<updates@temba.io>\nRCPT TO:<bob@nyaruka.com>\nRCPT TO:<jim@nyaruka.com>\nDATA\nHave a great week\n.\nQUIT\n"}, sender.Logs())
