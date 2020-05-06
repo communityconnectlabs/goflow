@@ -73,6 +73,8 @@ var XTESTS = map[string]types.XFunction{
 	"has_state":    functions.OneTextFunction(HasState),
 	"has_district": functions.MinAndMaxArgsCheck(1, 2, HasDistrict),
 	"has_ward":     HasWard,
+
+	"has_image": functions.OneTextFunction(HasImage),
 }
 
 //------------------------------------------------------------------------------------------
@@ -512,6 +514,16 @@ func HasTime(env envs.Environment, text types.XText) types.XValue {
 		return NewTrueResult(t)
 	}
 
+	return FalseResult
+}
+
+// HasImage tests whether `text` is an URL image file.
+//
+//   @(has_image("https://example.com/image.jpg")) -> true
+//   @(has_image("https://example.com/audio.mp3")) -> false
+//
+// @test has_image(text)
+func HasImage(env envs.Environment, text types.XText) types.XValue {
 	return FalseResult
 }
 
