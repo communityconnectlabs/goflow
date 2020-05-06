@@ -524,6 +524,7 @@ func HasTime(env envs.Environment, text types.XText) types.XValue {
 //
 // @test has_image(text)
 func HasImage(env envs.Environment, text types.XText) types.XValue {
+	fmt.Println(text)
 	return FalseResult
 }
 
