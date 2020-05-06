@@ -74,7 +74,7 @@ var XTESTS = map[string]types.XFunction{
 	"has_district": functions.MinAndMaxArgsCheck(1, 2, HasDistrict),
 	"has_ward":     HasWard,
 
-	"has_image": functions.OneTextFunction(HasImage),
+	"has_image": functions.OneArgFunction(HasImage),
 }
 
 //------------------------------------------------------------------------------------------
@@ -523,8 +523,8 @@ func HasTime(env envs.Environment, text types.XText) types.XValue {
 //   @(has_image("https://example.com/audio.mp3")) -> false
 //
 // @test has_image(text)
-func HasImage(env envs.Environment, text types.XText) types.XValue {
-	fmt.Println(text)
+func HasImage(env envs.Environment, value types.XValue) types.XValue {
+	fmt.Println(value)
 	return FalseResult
 }
 
