@@ -20,7 +20,7 @@ func (s *MockSender) Logs() []string {
 	return s.logs
 }
 
-func (s *MockSender) Send(host string, port int, username, password, from string, recipients []string, subject, body string) error {
+func (s *MockSender) Send(host string, port int, username, password, from string, recipients []string, subject, body string, attachments []string) error {
 	if s.err != "" {
 		return errors.New(s.err)
 	}

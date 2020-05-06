@@ -2,6 +2,7 @@ package events
 
 import (
 	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 func init() {
@@ -18,24 +19,27 @@ const TypeEmailSent string = "email_sent"
 //     "created_on": "2006-01-02T15:04:05Z",
 //     "to": ["foo@bar.com"],
 //     "subject": "Your activation token",
-//     "body": "Your activation token is AAFFKKEE"
+//     "body": "Your activation token is AAFFKKEE",
+//     "attachments": ["image/jpeg:http://example.com/image.jpeg"]
 //   }
 //
 // @event email_sent
 type EmailSentEvent struct {
 	baseEvent
 
-	To      []string `json:"to" validate:"required,min=1"`
-	Subject string   `json:"subject" validate:"required"`
-	Body    string   `json:"body"`
+	To          []string           `json:"to" validate:"required,min=1"`
+	Subject     string             `json:"subject" validate:"required"`
+	Body        string             `json:"body"`
+	Attachments []utils.Attachment `json:"attachments"`
 }
 
 // NewEmailSent returns a new email event with the passed in subject, body and emails
-func NewEmailSent(to []string, subject string, body string) *EmailSentEvent {
+func NewEmailSent(to []string, subject string, body string, attachments []utils.Attachment) *EmailSentEvent {
 	return &EmailSentEvent{
-		baseEvent: newBaseEvent(TypeEmailSent),
-		To:        to,
-		Subject:   subject,
-		Body:      body,
+		baseEvent:   newBaseEvent(TypeEmailSent),
+		To:          to,
+		Subject:     subject,
+		Body:        body,
+		Attachments: attachments,
 	}
 }

@@ -8,6 +8,8 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 	"github.com/pkg/errors"
+	"github.com/greatnonprofits-nfp/goflow/utils"
+	"os"
 )
 
 func init() {
@@ -35,18 +37,20 @@ type SendEmailAction struct {
 	baseAction
 	onlineAction
 
-	Addresses []string `json:"addresses" validate:"required,min=1" engine:"evaluated"`
-	Subject   string   `json:"subject" validate:"required" engine:"localized,evaluated"`
-	Body      string   `json:"body" validate:"required" engine:"localized,evaluated"`
+	Addresses   []string           `json:"addresses" validate:"required,min=1" engine:"evaluated"`
+	Subject     string             `json:"subject" validate:"required" engine:"localized,evaluated"`
+	Body        string             `json:"body" validate:"required" engine:"localized,evaluated"`
+	Attachments []utils.Attachment `json:"attachments"`
 }
 
 // NewSendEmail creates a new send email action
-func NewSendEmail(uuid flows.ActionUUID, addresses []string, subject string, body string) *SendEmailAction {
+func NewSendEmail(uuid flows.ActionUUID, addresses []string, subject string, body string, attachments []utils.Attachment) *SendEmailAction {
 	return &SendEmailAction{
-		baseAction: newBaseAction(TypeSendEmail, uuid),
-		Addresses:  addresses,
-		Subject:    subject,
-		Body:       body,
+		baseAction:  newBaseAction(TypeSendEmail, uuid),
+		Addresses:   addresses,
+		Subject:     subject,
+		Body:        body,
+		Attachments: attachments,
 	}
 }
 
@@ -102,17 +106,32 @@ func (a *SendEmailAction) Execute(run flows.FlowRun, step flows.Step, logModifie
 		return nil
 	}
 
+	var attachments []string
+	for _, fileURL := range a.Attachments {
+		errAttach, filepath := fileURL.DownloadFile()
+		if errAttach != nil {
+			logEvent(events.NewError(errAttach))
+			continue
+		}
+		attachments = append(attachments, filepath)
+	}
+
 	svc, err := run.Session().Engine().Services().Email(run.Session())
 	if err != nil {
 		logEvent(events.NewError(err))
 		return nil
 	}
 
-	err = svc.Send(run.Session(), evaluatedAddresses, evaluatedSubject, evaluatedBody)
+	err = svc.Send(run.Session(), evaluatedAddresses, evaluatedSubject, evaluatedBody, attachments)
 	if err != nil {
 		logEvent(events.NewError(errors.Wrap(err, "unable to send email")))
 	} else {
-		logEvent(events.NewEmailSent(evaluatedAddresses, evaluatedSubject, evaluatedBody))
+		logEvent(events.NewEmailSent(evaluatedAddresses, evaluatedSubject, evaluatedBody, a.Attachments))
+	}
+
+	// Removing tmp files created after email sent
+	for _, attachpath := range attachments {
+		os.Remove(attachpath)
 	}
 
 	return nil

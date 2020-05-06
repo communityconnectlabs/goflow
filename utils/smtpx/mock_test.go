@@ -15,9 +15,9 @@ func TestMockSender(t *testing.T) {
 	sender := smtpx.NewMockSender("")
 	smtpx.SetSender(sender)
 
-	err := smtpx.Send("mail.temba.io", 255, "leah", "pass123", "updates@temba.io", []string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great week")
+	err := smtpx.Send("mail.temba.io", 255, "leah", "pass123", "updates@temba.io", []string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great week", nil)
 	assert.NoError(t, err)
-	err = smtpx.Send("mail.temba.io", 255, "leah", "pass123", "updates@temba.io", []string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great weekend")
+	err = smtpx.Send("mail.temba.io", 255, "leah", "pass123", "updates@temba.io", []string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great weekend", nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, []string{
@@ -29,7 +29,7 @@ func TestMockSender(t *testing.T) {
 	sender = smtpx.NewMockSender("oops can't send")
 	smtpx.SetSender(sender)
 
-	err = smtpx.Send("mail.temba.io", 25, "leah", "pass123", "updates@temba.io", []string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great week")
+	err = smtpx.Send("mail.temba.io", 25, "leah", "pass123", "updates@temba.io", []string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great week", nil)
 
 	assert.EqualError(t, err, "oops can't send")
 	assert.Equal(t, 0, len(sender.Logs()))

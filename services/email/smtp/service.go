@@ -67,6 +67,6 @@ func NewServiceFromURL(connectionURL string) (flows.EmailService, error) {
 	return NewService(host, port, username, password, from), nil
 }
 
-func (s *service) Send(session flows.Session, addresses []string, subject, body string) error {
-	return smtpx.Send(s.host, s.port, s.username, s.password, s.from, addresses, subject, body)
+func (s *service) Send(session flows.Session, addresses []string, subject, body string, attachments []string) error {
+	return smtpx.Send(s.host, s.port, s.username, s.password, s.from, addresses, subject, body, attachments)
 }

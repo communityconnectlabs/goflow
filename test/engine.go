@@ -39,7 +39,7 @@ func newEmailService() *emailService {
 	return &emailService{}
 }
 
-func (s *emailService) Send(session flows.Session, addresses []string, subject, body string) error {
+func (s *emailService) Send(session flows.Session, addresses []string, subject, body string, attachments []string) error {
 	return nil
 }
 
