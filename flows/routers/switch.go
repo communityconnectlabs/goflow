@@ -149,6 +149,8 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		categoryUUID = r.default_
 	}
 
+	fmt.Println(input)
+
 	return r.routeToCategory(run, step, categoryUUID, match, input, extra, logEvent)
 }
 

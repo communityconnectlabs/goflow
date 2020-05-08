@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/greatnonprofits-nfp/goflow/flows"
-	"fmt"
 )
 
 func init() {
@@ -43,9 +42,6 @@ type RunResultChangedEvent struct {
 
 // NewRunResultChanged returns a new save result event for the passed in values
 func NewRunResultChanged(result *flows.Result) *RunResultChangedEvent {
-	fmt.Println(result.Value)
-	fmt.Println(result.Input)
-	fmt.Println(result.Category)
 	return &RunResultChangedEvent{
 		baseEvent:         newBaseEvent(TypeRunResultChanged),
 		Name:              result.Name,
