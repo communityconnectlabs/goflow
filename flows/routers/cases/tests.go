@@ -74,7 +74,7 @@ var XTESTS = map[string]types.XFunction{
 	"has_district": functions.MinAndMaxArgsCheck(1, 2, HasDistrict),
 	"has_ward":     HasWard,
 
-	"has_image": HasImage,
+	"has_image": functions.OneTextFunction(HasImage),
 }
 
 //------------------------------------------------------------------------------------------
@@ -523,8 +523,19 @@ func HasTime(env envs.Environment, text types.XText) types.XValue {
 //   @(has_image("https://example.com/audio.mp3")) -> false
 //
 // @test has_image(text)
-func HasImage(env envs.Environment, args ...types.XValue) types.XValue {
-	fmt.Println(args)
+func HasImage(env envs.Environment, text types.XText) types.XValue {
+	extensionAllowed := []string{"jpeg", "jpg", "png", "gif"}
+	url := text.Native()
+	urlSplitted := strings.Split(url, "/")
+	filename := urlSplitted[len(urlSplitted) - 1]
+	filenameSplitted := strings.Split(filename, ".")
+	extension := filenameSplitted[len(filenameSplitted) - 1]
+
+	for _, ext := range extensionAllowed {
+		if extension == ext {
+			return NewTrueResult(types.NewXText(url))
+		}
+	}
 	return FalseResult
 }
 
