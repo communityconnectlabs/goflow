@@ -312,6 +312,7 @@ var testTypeMappings = map[string]string{
 	"starts":               "has_beginning",
 	"state":                "has_state",
 	"ward":                 "has_ward",
+	"image":                "has_image",
 }
 
 // migrates the given legacy action to a new action
@@ -896,7 +897,7 @@ func migrateRule(baseLanguage envs.Language, r Rule, category migratedCategory, 
 	switch r.Test.Type {
 
 	// tests that take no arguments
-	case "date", "has_email", "not_empty", "number", "phone", "state":
+	case "date", "has_email", "not_empty", "number", "phone", "state", "image":
 		arguments = []string{}
 
 	// tests against a single numeric value
