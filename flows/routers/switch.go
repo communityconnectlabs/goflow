@@ -118,6 +118,9 @@ func (r *SwitchRouter) Validate(exits []flows.Exit) error {
 func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.EventCallback) (flows.ExitUUID, error) {
 	env := run.Environment()
 
+	fmt.Printf("R Operand")
+	fmt.Println(r.operand)
+
 	// first evaluate our operand
 	operand, err := run.EvaluateTemplateValue(r.operand)
 	if err != nil {
