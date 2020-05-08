@@ -124,6 +124,9 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		run.LogError(step, err)
 	}
 
+	fmt.Printf("Operand")
+	fmt.Println(operand)
+
 	var input string
 
 	if operand != nil {
@@ -131,7 +134,7 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		input = asText.Native()
 	}
 
-	fmt.Println(operand)
+	fmt.Printf("Input")
 	fmt.Println(input)
 
 	// find first matching case
@@ -148,6 +151,7 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			run.LogError(step, xerr)
 		}
 
+		fmt.Printf("Value")
 		fmt.Println(value)
 
 		match = value.Native()
