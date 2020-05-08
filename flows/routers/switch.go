@@ -131,6 +131,9 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		input = asText.Native()
 	}
 
+	fmt.Println(operand)
+	fmt.Println(input)
+
 	// find first matching case
 	match, categoryUUID, extra, err := r.matchCase(run, step, operand)
 	if err != nil {
@@ -150,8 +153,6 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		match = value.Native()
 		categoryUUID = r.default_
 	}
-
-	fmt.Println(input)
 
 	return r.routeToCategory(run, step, categoryUUID, match, input, extra, logEvent)
 }
