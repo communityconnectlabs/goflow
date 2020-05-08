@@ -145,6 +145,8 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			run.LogError(step, xerr)
 		}
 
+		fmt.Println(value)
+
 		match = value.Native()
 		categoryUUID = r.default_
 	}
