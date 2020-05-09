@@ -687,10 +687,6 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 		}
 
 		hint, operand := migrateWaitingRuleset(r)
-
-		println(operand)
-		println(r.Rules)
-
 		wait = newMsgWait(timeout, hint)
 		uiType = UINodeTypeWaitForResponse
 

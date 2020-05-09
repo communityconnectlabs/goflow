@@ -118,6 +118,10 @@ func (r *SwitchRouter) Validate(exits []flows.Exit) error {
 func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.EventCallback) (flows.ExitUUID, error) {
 	env := run.Environment()
 
+	if r.operand == "@input.text" {
+		r.operand = "@input"
+	}
+
 	// first evaluate our operand
 	operand, err := run.EvaluateTemplateValue(r.operand)
 	if err != nil {
