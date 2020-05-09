@@ -118,20 +118,11 @@ func (r *SwitchRouter) Validate(exits []flows.Exit) error {
 func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.EventCallback) (flows.ExitUUID, error) {
 	env := run.Environment()
 
-	fmt.Printf("R Operand")
-	fmt.Println(r.operand)
-	if r.operand == "@input.text" {
-		r.operand = "@input"
-	}
-
 	// first evaluate our operand
 	operand, err := run.EvaluateTemplateValue(r.operand)
 	if err != nil {
 		run.LogError(step, err)
 	}
-
-	fmt.Printf("Operand")
-	fmt.Println(operand)
 
 	var input string
 
@@ -139,9 +130,6 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		asText, _ := types.ToXText(env, operand)
 		input = asText.Native()
 	}
-
-	fmt.Printf("Input")
-	fmt.Println(input)
 
 	// find first matching case
 	match, categoryUUID, extra, err := r.matchCase(run, step, operand)
@@ -156,9 +144,6 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		if xerr != nil {
 			run.LogError(step, xerr)
 		}
-
-		fmt.Printf("Value")
-		fmt.Println(value)
 
 		match = value.Native()
 		categoryUUID = r.default_
