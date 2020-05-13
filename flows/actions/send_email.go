@@ -111,11 +111,14 @@ func (a *SendEmailAction) Execute(run flows.FlowRun, step flows.Step, logModifie
 	for _, fileURL := range a.Attachments {
 		contentType := fileURL.ContentType()
 		if contentType == "image" {
-			_, url := fileURL.ToParts()
+			url := fileURL.URL()
+			fmt.Printf("URL \n")
+			fmt.Println(url)
 			replacedURL, _ := run.EvaluateTemplate(url)
+			fmt.Printf("Replaced URL \n")
+			fmt.Println(replacedURL)
 			fileURL = utils.Attachment(fmt.Sprintf("image:%s", replacedURL))
 		}
-		fmt.Println(fileURL)
 		errAttach, filepath := fileURL.DownloadFile()
 		if errAttach != nil {
 			logEvent(events.NewError(errAttach))
