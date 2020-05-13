@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 	"os"
+	"fmt"
 )
 
 func init() {
@@ -108,6 +109,7 @@ func (a *SendEmailAction) Execute(run flows.FlowRun, step flows.Step, logModifie
 
 	var attachments []string
 	for _, fileURL := range a.Attachments {
+		fmt.Println(fileURL)
 		errAttach, filepath := fileURL.DownloadFile()
 		if errAttach != nil {
 			logEvent(events.NewError(errAttach))
