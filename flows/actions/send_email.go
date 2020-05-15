@@ -114,6 +114,12 @@ func (a *SendEmailAction) Execute(run flows.FlowRun, step flows.Step, logModifie
 			replacedURL, _ := run.EvaluateTemplate(fileURL.URL())
 			fileURL = utils.Attachment(fmt.Sprintf("image:%s", replacedURL))
 		}
+
+		if fileURL.URL() == "" {
+			logEvent(events.NewErrorf("file url evaluated to empty string, skipping"))
+			continue
+		}
+
 		errAttach, filepath := fileURL.DownloadFile()
 		if errAttach != nil {
 			logEvent(events.NewError(errAttach))
