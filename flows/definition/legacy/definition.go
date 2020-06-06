@@ -344,14 +344,38 @@ func migrateAction(baseLanguage envs.Language, a Action, localization migratedLo
 			migratedEmails[i], _ = expressions.MigrateTemplate(email, nil)
 		}
 
-		media := make(map[string]utils.Attachment)
+		media := make(Translations)
 		if a.Media != nil {
 			err := jsonx.Unmarshal(a.Media, &media)
 			if err != nil {
 				return nil, err
 			}
 		}
-		attachments := []utils.Attachment{media["base"]}
+
+		for lang, attachment := range media {
+			parts := strings.SplitN(attachment, ":", 2)
+			var mediaType, mediaURL string
+			if len(parts) == 2 {
+				mediaType = parts[0]
+				mediaURL = parts[1]
+			} else {
+				// no media type defaults to image
+				mediaType = "image"
+				mediaURL = parts[0]
+			}
+
+			// attachment is a real upload and not just an expression, need to make it absolute
+			if !strings.Contains(mediaURL, "@") {
+				media[lang] = fmt.Sprintf("%s:%s", mediaType, URLJoin(baseMediaURL, mediaURL))
+			}
+		}
+
+		migratedMedia := localization.addTranslationMap(baseLanguage, media, uuids.UUID(a.UUID), "attachments")
+
+		attachments := make([]utils.Attachment, 0)
+		if migratedMedia != "" {
+			attachments = append(attachments, utils.Attachment(migratedMedia))
+		}
 
 		return newSendEmailAction(a.UUID, migratedEmails, migratedSubject, migratedBody, attachments), nil
 
