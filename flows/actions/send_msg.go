@@ -102,16 +102,18 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 	text := evaluatedText
 
-	fmt.Println(yoURLsHost)
-	fmt.Println(yoURLsLogin)
-	fmt.Println(yoURLsPassword)
-
 	// Whether we don't have the YoURLs credentials, should be skipped
-	if yoURLsHost != "" || yoURLsLogin != "" || yoURLsPassword != "" {
+	if yoURLsHost != "" && yoURLsLogin != "" && yoURLsPassword != "" && mailroomDomain != "" {
+
+		fmt.Println(yoURLsHost)
+		fmt.Println(yoURLsLogin)
+		fmt.Println(yoURLsPassword)
 
 		// splitting the text as array for analyzing and replace if it's the case
 		re := regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?!&//=]*)`)
-		textSplitted := re.FindAllString(evaluatedText, -1)
+		textSplitted := re.FindAllString(text, -1)
+
+		fmt.Println(textSplitted)
 
 		for i := range textSplitted {
 			d := textSplitted[i]
