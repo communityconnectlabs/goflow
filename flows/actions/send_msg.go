@@ -102,6 +102,10 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 	text := evaluatedText
 
+	fmt.Println(yoURLsHost)
+	fmt.Println(yoURLsLogin)
+	fmt.Println(yoURLsPassword)
+
 	// Whether we don't have the YoURLs credentials, should be skipped
 	if yoURLsHost != "" || yoURLsLogin != "" || yoURLsPassword != "" {
 
@@ -122,6 +126,11 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 			if destUUID == "" || destLink == "" {
 				continue
 			}
+
+			fmt.Println(destUUID)
+			fmt.Println(destLink)
+
+			fmt.Println(string(run.Contact().UUID()))
 
 			if string(run.Contact().UUID()) != "" {
 				yourlsURL := fmt.Sprintf("%s/yourls-api.php", yoURLsHost)
@@ -158,6 +167,9 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 				// replacing the link for the YoURLs generated link
 				shortLink, _ := jsonparser.GetString(content, "shorturl")
 				text = strings.Replace(text, d, shortLink, -1)
+
+				fmt.Println(text)
+
 			}
 
 		}
