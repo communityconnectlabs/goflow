@@ -37,6 +37,7 @@ type Environment interface {
 	NumberFormat() *NumberFormat
 	RedactionPolicy() RedactionPolicy
 	MaxValueLength() int
+	Links() []string
 
 	// Convenience method to get the current time in the env timezone
 	Now() time.Time
@@ -54,6 +55,7 @@ type environment struct {
 	numberFormat     *NumberFormat
 	redactionPolicy  RedactionPolicy
 	maxValueLength   int
+	links            []string
 }
 
 func (e *environment) DateFormat() DateFormat           { return e.dateFormat }
@@ -65,6 +67,7 @@ func (e *environment) DefaultCountry() Country          { return e.defaultCountr
 func (e *environment) NumberFormat() *NumberFormat      { return e.numberFormat }
 func (e *environment) RedactionPolicy() RedactionPolicy { return e.redactionPolicy }
 func (e *environment) MaxValueLength() int              { return e.maxValueLength }
+func (e *environment) Links() []string                  { return e.links }
 
 func (e *environment) Now() time.Time { return dates.Now().In(e.Timezone()) }
 
@@ -89,6 +92,7 @@ type envEnvelope struct {
 	DefaultCountry   Country         `json:"default_country,omitempty" validate:"omitempty,country"`
 	RedactionPolicy  RedactionPolicy `json:"redaction_policy" validate:"omitempty,eq=none|eq=urns"`
 	MaxValuelength   int             `json:"max_value_length"`
+	Links            []string        `json:"links"`
 }
 
 // ReadEnvironment reads an environment from the given JSON
@@ -109,6 +113,7 @@ func ReadEnvironment(data json.RawMessage) (Environment, error) {
 	env.numberFormat = envelope.NumberFormat
 	env.redactionPolicy = envelope.RedactionPolicy
 	env.maxValueLength = envelope.MaxValuelength
+	env.links = envelope.Links
 
 	tz, err := time.LoadLocation(envelope.Timezone)
 	if err != nil {
@@ -130,6 +135,7 @@ func (e *environment) toEnvelope() *envEnvelope {
 		NumberFormat:     e.numberFormat,
 		RedactionPolicy:  e.redactionPolicy,
 		MaxValuelength:   e.maxValueLength,
+		Links:            e.links,
 	}
 }
 
@@ -160,6 +166,7 @@ func NewBuilder() *EnvironmentBuilder {
 			numberFormat:     DefaultNumberFormat,
 			maxValueLength:   640,
 			redactionPolicy:  RedactionPolicyNone,
+			links:            []string{""},
 		},
 	}
 }
