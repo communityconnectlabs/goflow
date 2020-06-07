@@ -387,7 +387,6 @@ func ReadAction(data json.RawMessage) (flows.Action, error) {
 func findDestinationInLinks(dest string, links []string) (string, string) {
 	for _, link := range links {
 		linkSplitted := strings.SplitN(link, ":", 2)
-		fmt.Println(linkSplitted)
 		if linkSplitted[1] == dest {
 			return linkSplitted[0], linkSplitted[1]
 		}

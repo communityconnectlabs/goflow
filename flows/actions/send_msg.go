@@ -118,14 +118,9 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 			destUUID, destLink := findDestinationInLinks(d, orgLinks)
 
-			fmt.Println(destUUID)
-			fmt.Println(destLink)
-
 			if destUUID == "" || destLink == "" {
 				continue
 			}
-
-			fmt.Println(string(run.Contact().UUID()))
 
 			if string(run.Contact().UUID()) != "" {
 				yourlsURL := fmt.Sprintf("%s/yourls-api.php", yoURLsHost)
@@ -162,9 +157,6 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 				// replacing the link for the YoURLs generated link
 				shortLink, _ := jsonparser.GetString(content, "shorturl")
 				text = strings.Replace(text, d, shortLink, -1)
-
-				fmt.Println(text)
-
 			}
 
 		}
@@ -196,12 +188,12 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 					evaluatedVariables[i] = sub
 				}
 
-				evaluatedText = translation.Substitute(evaluatedVariables)
+				text = translation.Substitute(evaluatedVariables)
 				templating = flows.NewMsgTemplating(a.Templating.Template, translation.Language(), evaluatedVariables)
 			}
 		}
 
-		msg := flows.NewMsgOut(dest.URN.URN(), channelRef, evaluatedText, evaluatedAttachments, evaluatedQuickReplies, templating, a.Topic)
+		msg := flows.NewMsgOut(dest.URN.URN(), channelRef, text, evaluatedAttachments, evaluatedQuickReplies, templating, a.Topic)
 		logEvent(events.NewMsgCreated(msg))
 	}
 
