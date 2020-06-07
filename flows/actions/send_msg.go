@@ -105,18 +105,15 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 	// Whether we don't have the YoURLs credentials, should be skipped
 	if yoURLsHost != "" && yoURLsLogin != "" && yoURLsPassword != "" && mailroomDomain != "" {
 
-		fmt.Println(yoURLsHost)
-		fmt.Println(yoURLsLogin)
-		fmt.Println(yoURLsPassword)
-
 		// splitting the text as array for analyzing and replace if it's the case
 		re := regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?!&//=]*)`)
-		textSplitted := re.FindAllString(text, -1)
+		linksFound := re.FindAllString(text, -1)
 
-		fmt.Println(textSplitted)
+		for i := range linksFound {
+			d := linksFound[i]
 
-		for i := range textSplitted {
-			d := textSplitted[i]
+			fmt.Println(d)
+			fmt.Println(isValidURL(d))
 
 			// checking if the text is a valid URL
 			if !isValidURL(d) {
@@ -125,12 +122,12 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 			destUUID, destLink := findDestinationInLinks(d, orgLinks)
 
+			fmt.Println(destUUID)
+			fmt.Println(destLink)
+
 			if destUUID == "" || destLink == "" {
 				continue
 			}
-
-			fmt.Println(destUUID)
-			fmt.Println(destLink)
 
 			fmt.Println(string(run.Contact().UUID()))
 
