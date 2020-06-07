@@ -100,13 +100,15 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 	yoURLsPassword := getEnv(envVarYoURLsPassword, "")
 	mailroomDomain := getEnv(envVarMailroomDomain, "")
 
+	text := evaluatedText
+
 	// Whether we don't have the YoURLs credentials, should be skipped
 	if yoURLsHost != "" || yoURLsLogin != "" || yoURLsPassword != "" {
 
 		// splitting the text as array for analyzing and replace if it's the case
 		re := regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?!&//=]*)`)
 		textSplitted := re.FindAllString(evaluatedText, -1)
-		text := evaluatedText
+
 		for i := range textSplitted {
 			d := textSplitted[i]
 
@@ -199,7 +201,7 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 	// if we couldn't find a destination, create a msg without a URN or channel and it's up to the caller
 	// to handle that as they want
 	if len(destinations) == 0 {
-		msg := flows.NewMsgOut(urns.NilURN, nil, evaluatedText, evaluatedAttachments, evaluatedQuickReplies, nil, flows.NilMsgTopic)
+		msg := flows.NewMsgOut(urns.NilURN, nil, text, evaluatedAttachments, evaluatedQuickReplies, nil, flows.NilMsgTopic)
 		logEvent(events.NewMsgCreated(msg))
 	}
 
