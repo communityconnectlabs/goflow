@@ -7,13 +7,6 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
-	"fmt"
-	"net/url"
-	"net/http"
-	"strings"
-	"io/ioutil"
-	"github.com/buger/jsonparser"
-	"regexp"
 )
 
 func init() {
@@ -95,73 +88,7 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 	orgLinks := run.Environment().Links()
 
-	yoURLsHost := getEnv(envVarYoURLsHost, "")
-	yoURLsLogin := getEnv(envVarYoURLsLogin, "")
-	yoURLsPassword := getEnv(envVarYoURLsPassword, "")
-	mailroomDomain := getEnv(envVarMailroomDomain, "")
-
-	text := evaluatedText
-
-	// Whether we don't have the YoURLs credentials, should be skipped
-	if yoURLsHost != "" && yoURLsLogin != "" && yoURLsPassword != "" && mailroomDomain != "" {
-
-		// splitting the text as array for analyzing and replace if it's the case
-		re := regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?!&//=]*)`)
-		linksFound := re.FindAllString(text, -1)
-
-		for _, d := range linksFound {
-
-			// checking if the text is a valid URL
-			if !isValidURL(d) {
-				continue
-			}
-
-			destUUID, destLink := findDestinationInLinks(d, orgLinks)
-
-			if destUUID == "" || destLink == "" {
-				continue
-			}
-
-			if string(run.Contact().UUID()) != "" {
-				yourlsURL := fmt.Sprintf("%s/yourls-api.php", yoURLsHost)
-				handleURL := fmt.Sprintf("https://%s/link/handler/%s", mailroomDomain, destUUID)
-				longURL := fmt.Sprintf("%s?contact=%s", handleURL, string(run.Contact().UUID()))
-
-				// creating the payload
-				payload := url.Values{}
-				payload.Add("url", longURL)
-				payload.Add("format", "json")
-				payload.Add("action", "shorturl")
-				payload.Add("username", yoURLsLogin)
-				payload.Add("password", yoURLsPassword)
-
-				// build our request
-				method := "GET"
-				yourlsURL = fmt.Sprintf("%s?%s", yourlsURL, payload.Encode())
-				req, errReq := http.NewRequest(method, yourlsURL, strings.NewReader(""))
-				if errReq != nil {
-					continue
-				}
-
-				req.Header.Add("Content-Type", "multipart/form-data")
-
-				resp, errHttp := http.DefaultClient.Do(req)
-				if errHttp != nil {
-					continue
-				}
-				content, errRead := ioutil.ReadAll(resp.Body)
-				if errRead != nil {
-					continue
-				}
-
-				// replacing the link for the YoURLs generated link
-				shortLink, _ := jsonparser.GetString(content, "shorturl")
-				text = strings.Replace(text, d, shortLink, -1)
-			}
-
-		}
-
-	}
+	text := generateTextWithShortenLinks(evaluatedText, orgLinks, string(run.Contact().UUID()))
 
 	// create a new message for each URN+channel destination
 	for _, dest := range destinations {

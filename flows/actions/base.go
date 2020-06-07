@@ -19,6 +19,10 @@ import (
 
 	"github.com/pkg/errors"
 	"strings"
+	"net/url"
+	"net/http"
+	"io/ioutil"
+	"github.com/buger/jsonparser"
 )
 
 // max number of bytes to be saved to extra on a result
@@ -392,4 +396,76 @@ func findDestinationInLinks(dest string, links []string) (string, string) {
 		}
 	}
 	return "", ""
+}
+
+func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID string) string {
+	yoURLsHost := getEnv(envVarYoURLsHost, "")
+	yoURLsLogin := getEnv(envVarYoURLsLogin, "")
+	yoURLsPassword := getEnv(envVarYoURLsPassword, "")
+	mailroomDomain := getEnv(envVarMailroomDomain, "")
+
+	generatedText := text
+
+	// Whether we don't have the YoURLs credentials, should be skipped
+	if yoURLsHost == "" || yoURLsLogin == "" || yoURLsPassword == "" ||  mailroomDomain == "" {
+		return generatedText
+	}
+
+	// splitting the text as array for analyzing and replace if it's the case
+	re := regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?!&//=]*)`)
+	linksFound := re.FindAllString(text, -1)
+
+	for _, d := range linksFound {
+		// checking if the text is a valid URL
+		if !isValidURL(d) {
+			continue
+		}
+
+		destUUID, destLink := findDestinationInLinks(d, orgLinks)
+
+		if destUUID == "" || destLink == "" {
+			continue
+		}
+
+		if contactUUID != "" {
+			yourlsURL := fmt.Sprintf("%s/yourls-api.php", yoURLsHost)
+			handleURL := fmt.Sprintf("https://%s/link/handler/%s", mailroomDomain, destUUID)
+			longURL := fmt.Sprintf("%s?contact=%s", handleURL, contactUUID)
+
+			// creating the payload
+			payload := url.Values{}
+			payload.Add("url", longURL)
+			payload.Add("format", "json")
+			payload.Add("action", "shorturl")
+			payload.Add("username", yoURLsLogin)
+			payload.Add("password", yoURLsPassword)
+
+			// build our request
+			method := "GET"
+			yourlsURL = fmt.Sprintf("%s?%s", yourlsURL, payload.Encode())
+			req, errReq := http.NewRequest(method, yourlsURL, strings.NewReader(""))
+			if errReq != nil {
+				continue
+			}
+
+			req.Header.Add("Content-Type", "multipart/form-data")
+
+			resp, errHttp := http.DefaultClient.Do(req)
+			if errHttp != nil {
+				continue
+			}
+			content, errRead := ioutil.ReadAll(resp.Body)
+			if errRead != nil {
+				continue
+			}
+
+			// replacing the link for the YoURLs generated link
+			shortLink, _ := jsonparser.GetString(content, "shorturl")
+			generatedText = strings.Replace(generatedText, d, shortLink, -1)
+		}
+
+	}
+
+	return generatedText
+
 }

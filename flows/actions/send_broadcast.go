@@ -64,13 +64,18 @@ func (a *SendBroadcastAction) Execute(run flows.FlowRun, step flows.Step, logMod
 	translations := make(map[envs.Language]*events.BroadcastTranslation)
 	languages := append([]envs.Language{run.Flow().Language()}, run.Flow().Localization().Languages()...)
 
+	orgLinks := run.Environment().Links()
+
 	// evaluate the broadcast in each language we have translations for
 	for _, language := range languages {
 		languages := []envs.Language{language, run.Flow().Language()}
 
 		evaluatedText, evaluatedAttachments, evaluatedQuickReplies := a.evaluateMessage(run, languages, a.Text, a.Attachments, a.QuickReplies, logEvent)
+
+		text := generateTextWithShortenLinks(evaluatedText, orgLinks, string(run.Contact().UUID()))
+
 		translations[language] = &events.BroadcastTranslation{
-			Text:         evaluatedText,
+			Text:         text,
 			Attachments:  evaluatedAttachments,
 			QuickReplies: evaluatedQuickReplies,
 		}
