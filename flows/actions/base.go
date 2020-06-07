@@ -18,6 +18,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
+	"strings"
 )
 
 // max number of bytes to be saved to extra on a result
@@ -32,6 +33,10 @@ const (
 	envVarServerUrl      = "MAILROOM_PARSE_SERVER_URL"
 	giftcardCheckType    = "GIFTCARD_CHECK"
 	envVarShortenURLPing = "MAILROOM_SHORTEN_URL_PING"
+	envVarYoURLsHost     = "MAILROOM_YOURLS_HOST"
+	envVarYoURLsLogin    = "MAILROOM_YOURLS_LOGIN"
+	envVarYoURLsPassword = "MAILROOM_YOURLS_PASSWORD"
+	envVarMailroomDomain = "MAILROOM_DOMAIN"
 )
 
 // Get environment variables passing a default value
@@ -377,4 +382,14 @@ func ReadAction(data json.RawMessage) (flows.Action, error) {
 
 	action := f()
 	return action, utils.UnmarshalAndValidate(data, action)
+}
+
+func findDestinationInLinks(dest string, links []string) (string, string) {
+	for _, link := range links {
+		link := strings.SplitN(link, ":", 1)
+		if link[1] == dest {
+			return link[0], link[1]
+		}
+	}
+	return "", ""
 }
