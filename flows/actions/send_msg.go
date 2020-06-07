@@ -109,11 +109,7 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 		re := regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?!&//=]*)`)
 		linksFound := re.FindAllString(text, -1)
 
-		for i := range linksFound {
-			d := linksFound[i]
-
-			fmt.Println(d)
-			fmt.Println(isValidURL(d))
+		for _, d := range linksFound {
 
 			// checking if the text is a valid URL
 			if !isValidURL(d) {
