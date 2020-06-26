@@ -133,6 +133,11 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 	if operand != nil {
 		asText, _ := types.ToXText(env, operand)
 		input = asText.Native()
+
+		// TODO Spell checker here, probably
+		fmt.Println(input)
+		fmt.Println(operand)
+
 	}
 
 	// find first matching case
