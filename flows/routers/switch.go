@@ -78,15 +78,17 @@ type SwitchRouter struct {
 	operand  string
 	cases    []*Case
 	default_ flows.CategoryUUID
+	config   *SwitchRouterConfig
 }
 
 // NewSwitch creates a new switch router
-func NewSwitch(wait flows.Wait, resultName string, categories []*Category, operand string, cases []*Case, defaultCategory flows.CategoryUUID) *SwitchRouter {
+func NewSwitch(wait flows.Wait, resultName string, categories []*Category, operand string, cases []*Case, defaultCategory flows.CategoryUUID, config *SwitchRouterConfig) *SwitchRouter {
 	return &SwitchRouter{
 		baseRouter: newBaseRouter(TypeSwitch, wait, resultName, categories),
 		default_:   defaultCategory,
 		operand:    operand,
 		cases:      cases,
+		config:     config,
 	}
 }
 
@@ -133,6 +135,10 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 	if operand != nil {
 		asText, _ := types.ToXText(env, operand)
 		input = asText.Native()
+
+		if r.config.EnabledSpell {
+			fmt.Printf("Enabled")
+		}
 
 		// TODO Spell checker here, probably
 		fmt.Println(input)
@@ -235,12 +241,18 @@ func (r *SwitchRouter) EnumerateDependencies(localization flows.Localization, in
 // JSON Encoding / Decoding
 //------------------------------------------------------------------------------------------
 
+type SwitchRouterConfig struct {
+	EnabledSpell     bool   `json:"spell_checker"`
+	SpellSensitivity string `json:"spelling_correction_sensitivity"`
+}
+
 type switchRouterEnvelope struct {
 	baseRouterEnvelope
 
-	Operand string             `json:"operand"               validate:"required"`
-	Cases   []*Case            `json:"cases"`
-	Default flows.CategoryUUID `json:"default_category_uuid" validate:"omitempty,uuid4"`
+	Operand string              `json:"operand"               validate:"required"`
+	Cases   []*Case             `json:"cases"`
+	Default flows.CategoryUUID  `json:"default_category_uuid" validate:"omitempty,uuid4"`
+	Config  *SwitchRouterConfig `json:"config"`
 }
 
 func readSwitchRouter(data json.RawMessage) (flows.Router, error) {
@@ -253,6 +265,7 @@ func readSwitchRouter(data json.RawMessage) (flows.Router, error) {
 		operand:  e.Operand,
 		cases:    e.Cases,
 		default_: e.Default,
+		config:   e.Config,
 	}
 
 	if err := r.unmarshal(&e.baseRouterEnvelope); err != nil {
@@ -268,6 +281,7 @@ func (r *SwitchRouter) MarshalJSON() ([]byte, error) {
 		Operand: r.operand,
 		Cases:   r.cases,
 		Default: r.default_,
+		Config:  r.config,
 	}
 
 	if err := r.marshal(&e.baseRouterEnvelope); err != nil {
