@@ -159,8 +159,6 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			sensitivityConfig, _ := strconv.ParseFloat(r.config.SpellSensitivity, 32)
 			spellingCorrectionSensitivity := sensitivityConfig / 100
 
-			fmt.Printf("%d\n", len(input))
-
 			// It only calls Bing Spell Checker if the text has more than 5 characters
 			if len(input) > 5 {
 
@@ -178,8 +176,11 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 
 				resp, _ := http.DefaultClient.Do(spellCheckerReq)
 
+				fmt.Printf("%v\n", resp.StatusCode)
 				testContent, _ := ioutil.ReadAll(resp.Body)
-				fmt.Printf("%v\n", testContent)
+				testFlaggedTokens, _ := jsonparser.GetString(testContent, "flaggedTokens")
+
+				fmt.Println(testFlaggedTokens)
 
 				if resp.StatusCode == 200 {
 					content, _ := ioutil.ReadAll(resp.Body)
