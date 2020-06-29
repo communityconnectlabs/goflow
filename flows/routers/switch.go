@@ -16,6 +16,11 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
+	"strconv"
+	"net/http"
+	"io/ioutil"
+	"github.com/buger/jsonparser"
+	"github.com/greatnonprofits-nfp/goflow/flows/actions"
 )
 
 func init() {
@@ -131,18 +136,61 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 	}
 
 	var input string
+	var corrected string
 
 	if operand != nil {
 		asText, _ := types.ToXText(env, operand)
 		input = asText.Native()
 
-		if r.config.EnabledSpell {
-			fmt.Printf("Enabled")
-		}
-
 		// TODO Spell checker here, probably
-		fmt.Println(input)
-		fmt.Println(operand)
+		if r.config.EnabledSpell {
+			defaultLangSpellChecker := "en-US"
+			spellCheckerLangs := map[string]string{
+				"spa": "es-US",
+				"vie": "vi",
+				"kor": "ko-KR",
+				"chi": "zh-hans",
+				"por": "pt-BR",
+			}
+			spellCheckerLangCode := spellCheckerLangs[string(run.Contact().Language())]
+			if spellCheckerLangCode == "" {
+				spellCheckerLangCode = defaultLangSpellChecker
+			}
+			sensitivityConfig, _ := strconv.ParseFloat(r.config.SpellSensitivity, 32)
+			spellingCorrectionSensitivity := sensitivityConfig / 100
+
+			// It only calls Bing Spell Checker if the text has more than 5 characters
+			if len(input) > 5 {
+				spellCheckerPayload := make(map[string]interface{})
+				spellCheckerPayload["text"] = input
+				payload, _ := json.Marshal(spellCheckerPayload)
+
+				spellCheckerAPIKey := utils.GetEnv(utils.MailroomSpellCheckerKey, "")
+
+				spellCheckerURL := fmt.Sprintf("https://api.cognitive.microsoft.com/bing/v7.0/SpellCheck/?mkt=%s&mode=spell", spellCheckerLangCode)
+
+				spellCheckerReq, _ := http.NewRequest("POST", spellCheckerURL, strings.NewReader(string(payload)))
+				spellCheckerReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+				spellCheckerReq.Header.Add("Ocp-Apim-Subscription-Key", spellCheckerAPIKey)
+
+				resp, _ := http.DefaultClient.Do(spellCheckerReq)
+
+				if resp.StatusCode == 200 {
+					content, _ := ioutil.ReadAll(resp.Body)
+
+					// getting flaggedTokens from the JSON response
+					flaggedTokens, _ := jsonparser.GetString(content, "flaggedTokens")
+					for token := range flaggedTokens {
+						fmt.Printf("%v\n", token)
+					}
+
+					fmt.Println(spellingCorrectionSensitivity)
+
+				}
+
+			}
+
+		}
 
 	}
 
@@ -164,7 +212,7 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		categoryUUID = r.default_
 	}
 
-	return r.routeToCategory(run, step, categoryUUID, match, input, extra, logEvent)
+	return r.routeToCategory(run, step, categoryUUID, match, input, extra, logEvent, corrected)
 }
 
 func (r *SwitchRouter) matchCase(run flows.FlowRun, step flows.Step, operand types.XValue) (string, flows.CategoryUUID, *types.XObject, error) {

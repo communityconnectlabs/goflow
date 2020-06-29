@@ -137,10 +137,10 @@ func (r *baseRouter) RouteTimeout(run flows.FlowRun, step flows.Step, logEvent f
 		}
 	}
 
-	return r.routeToCategory(run, step, r.wait.Timeout().CategoryUUID(), dates.FormatISO(timedOutOn), "", nil, logEvent)
+	return r.routeToCategory(run, step, r.wait.Timeout().CategoryUUID(), dates.FormatISO(timedOutOn), "", nil, logEvent, "")
 }
 
-func (r *baseRouter) routeToCategory(run flows.FlowRun, step flows.Step, categoryUUID flows.CategoryUUID, match string, input string, extra *types.XObject, logEvent flows.EventCallback) (flows.ExitUUID, error) {
+func (r *baseRouter) routeToCategory(run flows.FlowRun, step flows.Step, categoryUUID flows.CategoryUUID, match string, input string, extra *types.XObject, logEvent flows.EventCallback, corrected string) (flows.ExitUUID, error) {
 	// router failed to pick a category
 	if categoryUUID == "" {
 		return "", nil
@@ -168,7 +168,7 @@ func (r *baseRouter) routeToCategory(run flows.FlowRun, step flows.Step, categor
 		if extra != nil {
 			extraJSON, _ = jsonx.Marshal(extra)
 		}
-		result := flows.NewResult(r.resultName, match, category.Name(), localizedCategory, step.NodeUUID(), input, extraJSON, dates.Now())
+		result := flows.NewResult(r.resultName, match, category.Name(), localizedCategory, step.NodeUUID(), input, extraJSON, dates.Now(), corrected)
 		run.SaveResult(result)
 		logEvent(events.NewRunResultChanged(result))
 	}

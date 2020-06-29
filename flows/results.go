@@ -23,10 +23,11 @@ type Result struct {
 	Input             string          `json:"input,omitempty"`
 	Extra             json.RawMessage `json:"extra,omitempty"`
 	CreatedOn         time.Time       `json:"created_on" validate:"required"`
+	Corrected         string          `json:"corrected"`
 }
 
 // NewResult creates a new result
-func NewResult(name string, value string, category string, categoryLocalized string, nodeUUID NodeUUID, input string, extra json.RawMessage, createdOn time.Time) *Result {
+func NewResult(name string, value string, category string, categoryLocalized string, nodeUUID NodeUUID, input string, extra json.RawMessage, createdOn time.Time, corrected string) *Result {
 	return &Result{
 		Name:              name,
 		Value:             value,
@@ -36,6 +37,7 @@ func NewResult(name string, value string, category string, categoryLocalized str
 		Input:             input,
 		Extra:             extra,
 		CreatedOn:         createdOn,
+		Corrected:         corrected,
 	}
 }
 

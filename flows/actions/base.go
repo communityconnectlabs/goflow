@@ -3,7 +3,6 @@ package actions
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 
@@ -29,28 +28,6 @@ import (
 const resultExtraMaxBytes = 10000
 
 // common category names
-const (
-	xParseApplicationId  = "X-Parse-Application-Id"
-	xParseMasterKey      = "X-Parse-Master-Key"
-	envVarAppId          = "MAILROOM_PARSE_SERVER_APP_ID"
-	envVarMasterKey      = "MAILROOM_PARSE_SERVER_MASTER_KEY"
-	envVarServerUrl      = "MAILROOM_PARSE_SERVER_URL"
-	giftcardCheckType    = "GIFTCARD_CHECK"
-	envVarShortenURLPing = "MAILROOM_SHORTEN_URL_PING"
-	envVarYoURLsHost     = "MAILROOM_YOURLS_HOST"
-	envVarYoURLsLogin    = "MAILROOM_YOURLS_LOGIN"
-	envVarYoURLsPassword = "MAILROOM_YOURLS_PASSWORD"
-	envVarMailroomDomain = "MAILROOM_DOMAIN"
-)
-
-// Get environment variables passing a default value
-func getEnv(key string, defaultValue string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return defaultValue
-}
-
 const (
 	CategorySuccess = "Success"
 	CategorySkipped = "Skipped"
@@ -146,7 +123,7 @@ func (a *baseAction) evaluateMessage(run flows.FlowRun, languages []envs.Languag
 
 // helper to save a run result and log it as an event
 func (a *baseAction) saveResult(run flows.FlowRun, step flows.Step, name, value, category, categoryLocalized string, input string, extra json.RawMessage, logEvent flows.EventCallback) {
-	result := flows.NewResult(name, value, category, categoryLocalized, step.NodeUUID(), input, extra, dates.Now())
+	result := flows.NewResult(name, value, category, categoryLocalized, step.NodeUUID(), input, extra, dates.Now(), "")
 	run.SaveResult(result)
 	logEvent(events.NewRunResultChanged(result))
 }
@@ -399,15 +376,15 @@ func findDestinationInLinks(dest string, links []string) (string, string) {
 }
 
 func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID string) string {
-	yoURLsHost := getEnv(envVarYoURLsHost, "")
-	yoURLsLogin := getEnv(envVarYoURLsLogin, "")
-	yoURLsPassword := getEnv(envVarYoURLsPassword, "")
-	mailroomDomain := getEnv(envVarMailroomDomain, "")
+	yoURLsHost := utils.GetEnv(utils.YoURLsHost, "")
+	yoURLsLogin := utils.GetEnv(utils.YoURLsLogin, "")
+	yoURLsPassword := utils.GetEnv(utils.YoURLsPassword, "")
+	mailroomDomain := utils.GetEnv(utils.MailroomDomain, "")
 
 	generatedText := text
 
 	// Whether we don't have the YoURLs credentials, should be skipped
-	if yoURLsHost == "" || yoURLsLogin == "" || yoURLsPassword == "" ||  mailroomDomain == "" {
+	if yoURLsHost == "" || yoURLsLogin == "" || yoURLsPassword == "" || mailroomDomain == "" {
 		return generatedText
 	}
 

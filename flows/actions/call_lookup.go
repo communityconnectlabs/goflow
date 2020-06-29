@@ -6,6 +6,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
 	"net/http"
 	"strings"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 func init() {
@@ -69,7 +70,7 @@ func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifi
 	method := "POST"
 
 	// substitute any variables in our url
-	parseUrl := getEnv(envVarServerUrl, "http://localhost:9090/parse")
+	parseUrl := utils.GetEnv(utils.ParseServerUrl, "http://localhost:9090/parse")
 	url := parseUrl + "/functions/lookup"
 
 	if parseUrl == "" {
@@ -115,12 +116,12 @@ func (a *CallLookupAction) call(run flows.FlowRun, step flows.Step, url, method,
 		return err
 	}
 
-	appId := getEnv(envVarAppId, "myAppId")
-	masterKey := getEnv(envVarMasterKey, "myMasterKey")
+	appId := utils.GetEnv(utils.ParseAppId, "myAppId")
+	masterKey := utils.GetEnv(utils.ParseMasterKey, "myMasterKey")
 
 	// add the custom headers, substituting any template vars
-	req.Header.Add(xParseApplicationId, appId)
-	req.Header.Add(xParseMasterKey, masterKey)
+	req.Header.Add(utils.XParseApplicationId, appId)
+	req.Header.Add(utils.XParseMasterKey, masterKey)
 	req.Header.Add("Content-Type", "application/json")
 
 	svc, err := run.Session().Engine().Services().Webhook(run.Session())
