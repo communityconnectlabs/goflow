@@ -20,7 +20,6 @@ import (
 	"net/http"
 	"io/ioutil"
 	"github.com/buger/jsonparser"
-	"github.com/greatnonprofits-nfp/goflow/flows/actions"
 )
 
 func init() {
