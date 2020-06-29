@@ -158,6 +158,8 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			sensitivityConfig, _ := strconv.ParseFloat(r.config.SpellSensitivity, 32)
 			spellingCorrectionSensitivity := sensitivityConfig / 100
 
+			fmt.Printf("%d\n", len(input))
+
 			// It only calls Bing Spell Checker if the text has more than 5 characters
 			if len(input) > 5 {
 				spellCheckerPayload := make(map[string]interface{})
@@ -173,6 +175,9 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 				spellCheckerReq.Header.Add("Ocp-Apim-Subscription-Key", spellCheckerAPIKey)
 
 				resp, _ := http.DefaultClient.Do(spellCheckerReq)
+
+				fmt.Printf("%s\n", spellCheckerAPIKey)
+				fmt.Printf("%d\n", resp.StatusCode)
 
 				if resp.StatusCode == 200 {
 					content, _ := ioutil.ReadAll(resp.Body)
