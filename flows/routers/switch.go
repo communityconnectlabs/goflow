@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"io/ioutil"
 	"github.com/buger/jsonparser"
+	"net/url"
 )
 
 func init() {
@@ -162,22 +163,23 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 
 			// It only calls Bing Spell Checker if the text has more than 5 characters
 			if len(input) > 5 {
-				spellCheckerPayload := make(map[string]interface{})
-				spellCheckerPayload["text"] = input
-				payload, _ := json.Marshal(spellCheckerPayload)
 
 				spellCheckerAPIKey := utils.GetEnv(utils.MailroomSpellCheckerKey, "")
 
-				spellCheckerURL := fmt.Sprintf("https://api.cognitive.microsoft.com/bing/v7.0/SpellCheck/?mkt=%s&mode=spell", spellCheckerLangCode)
+				spellCheckerURL := "https://api.cognitive.microsoft.com/bing/v7.0/SpellCheck/"
+				spellCheckerPayloadpayload := url.Values{}
+				spellCheckerPayloadpayload.Add("text", input)
+				spellCheckerPayloadpayload.Add("mkt", spellCheckerLangCode)
+				spellCheckerPayloadpayload.Add("mode", "spell")
 
-				spellCheckerReq, _ := http.NewRequest("POST", spellCheckerURL, strings.NewReader(string(payload)))
-				spellCheckerReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+				spellCheckerURL = fmt.Sprintf("%s?%s", spellCheckerURL, spellCheckerPayloadpayload.Encode())
+				spellCheckerReq, _ := http.NewRequest("GET", spellCheckerURL, strings.NewReader(""))
 				spellCheckerReq.Header.Add("Ocp-Apim-Subscription-Key", spellCheckerAPIKey)
 
 				resp, _ := http.DefaultClient.Do(spellCheckerReq)
 
-				fmt.Printf("%s\n", spellCheckerAPIKey)
-				fmt.Printf("%d\n", resp.StatusCode)
+				testContent, _ := ioutil.ReadAll(resp.Body)
+				fmt.Printf("%v\n", testContent)
 
 				if resp.StatusCode == 200 {
 					content, _ := ioutil.ReadAll(resp.Body)
