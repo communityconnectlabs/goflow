@@ -178,6 +178,8 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			var bodyResp SpellCheckerPayload
 			err = json.Unmarshal(content, &bodyResp)
 
+			fmt.Println(bodyResp)
+
 			if resp.StatusCode == 200 && err == nil {
 				flaggedTokens := bodyResp.FlaggedTokens
 				for _, token := range flaggedTokens {
@@ -187,11 +189,13 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 						}
 					}
 				}
+				fmt.Println(input)
+				fmt.Println(corrected)
 			}
+
+			fmt.Println(corrected)
 		}
 	}
-
-	fmt.Println(corrected)
 
 	// find first matching case
 	match, categoryUUID, extra, err := r.matchCase(run, step, operand)
