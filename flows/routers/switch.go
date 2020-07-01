@@ -135,7 +135,7 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 	}
 
 	var input string
-	var corrected string
+	corrected := input
 
 	if operand != nil {
 		asText, _ := types.ToXText(env, operand)
