@@ -143,7 +143,8 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		input = asText.Native()
 
 		// TODO Spell checker here, probably
-		if r.config.EnabledSpell {
+		// It only calls Bing Spell Checker if the text has more than 5 characters
+		if r.config.EnabledSpell && len(input) > 5 {
 			defaultLangSpellChecker := "en-US"
 			spellCheckerLangs := map[string]string{
 				"spa": "es-US",
@@ -159,42 +160,31 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			sensitivityConfig, _ := strconv.ParseFloat(r.config.SpellSensitivity, 32)
 			spellingCorrectionSensitivity := sensitivityConfig / 100
 
-			// It only calls Bing Spell Checker if the text has more than 5 characters
-			if len(input) > 5 {
+			spellCheckerAPIKey := utils.GetEnv(utils.MailroomSpellCheckerKey, "")
 
-				spellCheckerAPIKey := utils.GetEnv(utils.MailroomSpellCheckerKey, "")
+			spellCheckerURL := "https://api.cognitive.microsoft.com/bing/v7.0/SpellCheck/"
+			spellCheckerPayloadpayload := url.Values{}
+			spellCheckerPayloadpayload.Add("text", input)
+			spellCheckerPayloadpayload.Add("mkt", spellCheckerLangCode)
+			spellCheckerPayloadpayload.Add("mode", "spell")
 
-				spellCheckerURL := "https://api.cognitive.microsoft.com/bing/v7.0/SpellCheck/"
-				spellCheckerPayloadpayload := url.Values{}
-				spellCheckerPayloadpayload.Add("text", input)
-				spellCheckerPayloadpayload.Add("mkt", spellCheckerLangCode)
-				spellCheckerPayloadpayload.Add("mode", "spell")
+			spellCheckerURL = fmt.Sprintf("%s?%s", spellCheckerURL, spellCheckerPayloadpayload.Encode())
+			spellCheckerReq, _ := http.NewRequest("GET", spellCheckerURL, strings.NewReader(""))
+			spellCheckerReq.Header.Add("Ocp-Apim-Subscription-Key", spellCheckerAPIKey)
 
-				spellCheckerURL = fmt.Sprintf("%s?%s", spellCheckerURL, spellCheckerPayloadpayload.Encode())
-				spellCheckerReq, _ := http.NewRequest("GET", spellCheckerURL, strings.NewReader(""))
-				spellCheckerReq.Header.Add("Ocp-Apim-Subscription-Key", spellCheckerAPIKey)
+			resp, _ := http.DefaultClient.Do(spellCheckerReq)
 
-				resp, _ := http.DefaultClient.Do(spellCheckerReq)
+			if resp.StatusCode == 200 {
+				content, _ := ioutil.ReadAll(resp.Body)
 
-				fmt.Printf("%v\n", resp.StatusCode)
-				testContent, _ := ioutil.ReadAll(resp.Body)
-				testFlaggedTokens, _ := jsonparser.GetString(testContent, "flaggedTokens")
-
-				fmt.Println(testFlaggedTokens)
-
-				if resp.StatusCode == 200 {
-					content, _ := ioutil.ReadAll(resp.Body)
-
-					// getting flaggedTokens from the JSON response
-					flaggedTokens, _ := jsonparser.GetString(content, "flaggedTokens")
-					for token := range flaggedTokens {
-						fmt.Printf("%v\n", token)
-					}
-
-					fmt.Println(spellingCorrectionSensitivity)
-
+				// getting flaggedTokens from the JSON response
+				flaggedTokens, _ := jsonparser.GetString(content, "flaggedTokens")
+				fmt.Printf("%v", flaggedTokens)
+				for token := range flaggedTokens {
+					fmt.Printf("%v\n", token)
 				}
 
+				fmt.Println(spellingCorrectionSensitivity)
 			}
 
 		}
