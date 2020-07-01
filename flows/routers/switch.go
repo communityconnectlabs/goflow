@@ -141,7 +141,6 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		asText, _ := types.ToXText(env, operand)
 		input = asText.Native()
 
-		// TODO Spell checker here, probably
 		// It only calls Bing Spell Checker if the text has more than 5 characters
 		if r.config.EnabledSpell && len(input) > 5 {
 			defaultLangSpellChecker := "en-US"
@@ -174,22 +173,22 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			resp, _ := http.DefaultClient.Do(spellCheckerReq)
 			defer resp.Body.Close()
 
-			if resp.StatusCode == 200 {
-				content, _ := ioutil.ReadAll(resp.Body)
+			content, _ := ioutil.ReadAll(resp.Body)
 
-				var bodyResp map[string]interface{}
-				err = json.Unmarshal(content, &bodyResp)
-				if err != nil {
-					fmt.Println(err)
+			var bodyResp SpellCheckerPayload
+			err = json.Unmarshal(content, &bodyResp)
+
+			if resp.StatusCode == 200 && err == nil {
+				flaggedTokens := bodyResp.FlaggedTokens
+				for _, token := range flaggedTokens {
+					for _, suggestion := range token.Suggestions {
+						if suggestion.Score >= spellingCorrectionSensitivity {
+							corrected = strings.Replace(corrected, token.Token, suggestion.Suggestion, -1)
+						}
+					}
 				}
-
-				fmt.Println(bodyResp)
-				fmt.Println(bodyResp["flaggedTokens"])
-				fmt.Println(spellingCorrectionSensitivity)
 			}
-
 		}
-
 	}
 
 	// find first matching case
@@ -290,6 +289,24 @@ func (r *SwitchRouter) EnumerateDependencies(localization flows.Localization, in
 type SwitchRouterConfig struct {
 	EnabledSpell     bool   `json:"spell_checker"`
 	SpellSensitivity string `json:"spelling_correction_sensitivity"`
+}
+
+type SpellCheckerPayload struct {
+	Type           string                     `json:"_type"`
+	FlaggedTokens  []SpellCheckerFlaggedToken `json:"flaggedTokens"`
+	CorrectionType string                     `json:"correctionType"`
+}
+
+type SpellCheckerFlaggedToken struct {
+	Offset      int                      `json:"offset"`
+	Token       string                   `json:"token"`
+	Type        string                   `json:"type"`
+	Suggestions []SpellCheckerSuggestion `json:"suggestions"`
+}
+
+type SpellCheckerSuggestion struct {
+	Suggestion string  `json:"suggestion"`
+	Score      float64 `json:"score"`
 }
 
 type switchRouterEnvelope struct {
