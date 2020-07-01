@@ -25,7 +25,8 @@ const TypeRunResultChanged string = "run_result_changed"
 //     "category": "Male",
 //     "category_localized": "Homme",
 //     "node_uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
-//     "input": "M"
+//     "input": "M",
+//     "corrected": "",
 //   }
 //
 // @event run_result_changed
@@ -38,6 +39,7 @@ type RunResultChangedEvent struct {
 	CategoryLocalized string          `json:"category_localized,omitempty"`
 	Input             string          `json:"input,omitempty"`
 	Extra             json.RawMessage `json:"extra,omitempty"`
+	Corrected         string          `json:"corrected"`
 }
 
 // NewRunResultChanged returns a new save result event for the passed in values
@@ -50,5 +52,6 @@ func NewRunResultChanged(result *flows.Result) *RunResultChangedEvent {
 		CategoryLocalized: result.CategoryLocalized,
 		Input:             result.Input,
 		Extra:             result.Extra,
+		Corrected:         result.Corrected,
 	}
 }

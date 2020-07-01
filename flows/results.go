@@ -49,6 +49,7 @@ func NewResult(name string, value string, category string, categoryLocalized str
 //   category:text -> the category of the result
 //   category_localized:text -> the localized category of the result
 //   input:text -> the input of the result
+//   corrected:text -> the input corrected by Bing Spell Checker
 //   extra:any -> the extra data of the result such as a webhook response
 //   node_uuid:text -> the UUID of the node in the flow that generated the result
 //   created_on:datetime -> the creation date of the result
@@ -70,6 +71,7 @@ func (r *Result) Context(env envs.Environment) map[string]types.XValue {
 		"category_localized":   types.NewXText(categoryLocalized),
 		"categories_localized": types.NewXArray(types.NewXText(categoryLocalized)),
 		"input":                types.NewXText(r.Input),
+		"corrected":            types.NewXText(r.Corrected),
 		"extra":                types.JSONToXValue(r.Extra),
 		"node_uuid":            types.NewXText(string(r.NodeUUID)),
 		"created_on":           types.NewXDateTime(r.CreatedOn),
