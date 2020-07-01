@@ -19,7 +19,6 @@ import (
 	"strconv"
 	"net/http"
 	"io/ioutil"
-	"github.com/buger/jsonparser"
 	"net/url"
 )
 
@@ -173,25 +172,19 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			spellCheckerReq.Header.Add("Ocp-Apim-Subscription-Key", spellCheckerAPIKey)
 
 			resp, _ := http.DefaultClient.Do(spellCheckerReq)
+			defer resp.Body.Close()
 
 			if resp.StatusCode == 200 {
-				content, readErr := ioutil.ReadAll(resp.Body)
+				content, _ := ioutil.ReadAll(resp.Body)
 
-				if readErr != nil {
-					fmt.Println(readErr)
+				var bodyResp map[string]interface{}
+				err = json.Unmarshal(content, &bodyResp)
+				if err != nil {
+					fmt.Println(err)
 				}
 
-				fmt.Println(content)
-
-				// getting flaggedTokens from the JSON response
-				flaggedTokens, parseErr := jsonparser.GetString(content, "flaggedTokens")
-				if parseErr != nil {
-					fmt.Println(parseErr)
-				}
-				for token := range flaggedTokens {
-					fmt.Printf("%v\n", token)
-				}
-
+				fmt.Println(bodyResp)
+				fmt.Println(bodyResp["flaggedTokens"])
 				fmt.Println(spellingCorrectionSensitivity)
 			}
 
