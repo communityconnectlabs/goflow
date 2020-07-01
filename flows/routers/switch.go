@@ -156,6 +156,7 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			if spellCheckerLangCode == "" {
 				spellCheckerLangCode = defaultLangSpellChecker
 			}
+
 			sensitivityConfig, _ := strconv.ParseFloat(r.config.SpellSensitivity, 32)
 			spellingCorrectionSensitivity := sensitivityConfig / 100
 
@@ -181,11 +182,14 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 
 			if resp.StatusCode == 200 && err == nil {
 				flaggedTokens := bodyResp.FlaggedTokens
+				fmt.Printf("185: %s", corrected)
 				for _, token := range flaggedTokens {
 					for _, suggestion := range token.Suggestions {
 						if suggestion.Score >= spellingCorrectionSensitivity {
+							fmt.Printf("189: %s", corrected)
 							corrected = strings.Replace(corrected, token.Token, suggestion.Suggestion, -1)
 						}
+						fmt.Printf("192: %s", corrected)
 					}
 				}
 			}
