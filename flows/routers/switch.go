@@ -178,22 +178,19 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			var bodyResp SpellCheckerPayload
 			err = json.Unmarshal(content, &bodyResp)
 
-			fmt.Println(bodyResp)
-
 			if resp.StatusCode == 200 && err == nil {
 				flaggedTokens := bodyResp.FlaggedTokens
 				for _, token := range flaggedTokens {
+					fmt.Println(token)
 					for _, suggestion := range token.Suggestions {
+						fmt.Println(suggestion)
 						if suggestion.Score >= spellingCorrectionSensitivity {
+							fmt.Println(suggestion.Score)
 							corrected = strings.Replace(corrected, token.Token, suggestion.Suggestion, -1)
 						}
 					}
 				}
-				fmt.Println(input)
-				fmt.Println(corrected)
 			}
-
-			fmt.Println(corrected)
 		}
 	}
 
