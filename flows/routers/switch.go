@@ -140,7 +140,7 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 	if operand != nil {
 		asText, _ := types.ToXText(env, operand)
 		input = asText.Native()
-		corrected := input
+		corrected = input
 
 		// It only calls Bing Spell Checker if the text has more than 5 characters
 		if r.config.EnabledSpell && len(input) > 5 {
@@ -182,14 +182,11 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 
 			if resp.StatusCode == 200 && err == nil {
 				flaggedTokens := bodyResp.FlaggedTokens
-				fmt.Printf("185: %s", corrected)
 				for _, token := range flaggedTokens {
 					for _, suggestion := range token.Suggestions {
 						if suggestion.Score >= spellingCorrectionSensitivity {
-							fmt.Printf("189: %s", corrected)
 							corrected = strings.Replace(corrected, token.Token, suggestion.Suggestion, -1)
 						}
-						fmt.Printf("192: %s", corrected)
 					}
 				}
 			}
