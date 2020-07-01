@@ -175,11 +175,19 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 			resp, _ := http.DefaultClient.Do(spellCheckerReq)
 
 			if resp.StatusCode == 200 {
-				content, _ := ioutil.ReadAll(resp.Body)
+				content, readErr := ioutil.ReadAll(resp.Body)
+
+				if readErr != nil {
+					fmt.Println(readErr)
+				}
+
+				fmt.Println(content)
 
 				// getting flaggedTokens from the JSON response
-				flaggedTokens, _ := jsonparser.GetString(content, "flaggedTokens")
-				fmt.Printf("%v", flaggedTokens)
+				flaggedTokens, parseErr := jsonparser.GetString(content, "flaggedTokens")
+				if parseErr != nil {
+					fmt.Println(parseErr)
+				}
 				for token := range flaggedTokens {
 					fmt.Printf("%v\n", token)
 				}
