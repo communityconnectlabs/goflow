@@ -191,6 +191,8 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		}
 	}
 
+	fmt.Println(corrected)
+
 	// find first matching case
 	match, categoryUUID, extra, err := r.matchCase(run, step, operand)
 	if err != nil {

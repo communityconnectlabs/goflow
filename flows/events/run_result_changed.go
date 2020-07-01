@@ -26,7 +26,7 @@ const TypeRunResultChanged string = "run_result_changed"
 //     "category_localized": "Homme",
 //     "node_uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
 //     "input": "M",
-//     "corrected": "",
+//     "corrected": "M",
 //   }
 //
 // @event run_result_changed
