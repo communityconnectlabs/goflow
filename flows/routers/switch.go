@@ -227,6 +227,8 @@ func (r *SwitchRouter) matchCase(run flows.FlowRun, step flows.Step, operand typ
 		// build our argument list which starts with the operand
 		args := []types.XValue{operand}
 
+		fmt.Println(args)
+
 		localizedArgs := run.GetTextArray(c.UUID, "arguments", c.Arguments)
 		for i := range c.Arguments {
 			test := localizedArgs[i]
@@ -234,8 +236,6 @@ func (r *SwitchRouter) matchCase(run flows.FlowRun, step flows.Step, operand typ
 			if err != nil {
 				run.LogError(step, err)
 			}
-			fmt.Printf("%s \n", arg)
-			fmt.Printf("%s \n", test)
 			args = append(args, arg)
 		}
 
