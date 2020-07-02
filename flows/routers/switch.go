@@ -145,7 +145,7 @@ func (r *SwitchRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 		corrected = input
 
 		// It only calls Bing Spell Checker if the text has more than 5 characters
-		if r.config.EnabledSpell && len(input) > 5 {
+		if r.config != nil && r.config.EnabledSpell && len(input) > 5 {
 			defaultLangSpellChecker := "en-US"
 			spellCheckerLangs := map[string]string{
 				"spa": "es-US",
@@ -240,7 +240,7 @@ func (r *SwitchRouter) matchCase(run flows.FlowRun, step flows.Step, operand typ
 		}
 
 		// Checking the args to make it works with the corrected input value if it's enabled
-		if r.config.EnabledSpell {
+		if r.config != nil && r.config.EnabledSpell {
 			for idx, itemArg := range args {
 				var msgInput flows.MsgIn
 				itemJSON, _ := itemArg.MarshalJSON()
@@ -335,7 +335,7 @@ type switchRouterEnvelope struct {
 	Operand string              `json:"operand"               validate:"required"`
 	Cases   []*Case             `json:"cases"`
 	Default flows.CategoryUUID  `json:"default_category_uuid" validate:"omitempty,uuid4"`
-	Config  *SwitchRouterConfig `json:"config"`
+	Config  *SwitchRouterConfig `json:"config" validate:"omitempty"`
 }
 
 func readSwitchRouter(data json.RawMessage) (flows.Router, error) {
