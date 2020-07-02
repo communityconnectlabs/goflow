@@ -20,6 +20,8 @@ import (
 	"net/http"
 	"io/ioutil"
 	"net/url"
+	"github.com/greatnonprofits-nfp/goflow/flows/inputs"
+	"time"
 )
 
 func init() {
@@ -227,9 +229,6 @@ func (r *SwitchRouter) matchCase(run flows.FlowRun, step flows.Step, operand typ
 		// build our argument list which starts with the operand
 		args := []types.XValue{operand}
 
-		fmt.Println(args)
-		fmt.Printf("\n %v \n", operand)
-
 		localizedArgs := run.GetTextArray(c.UUID, "arguments", c.Arguments)
 		for i := range c.Arguments {
 			test := localizedArgs[i]
@@ -238,6 +237,22 @@ func (r *SwitchRouter) matchCase(run flows.FlowRun, step flows.Step, operand typ
 				run.LogError(step, err)
 			}
 			args = append(args, arg)
+		}
+
+		// Checking the args to make it works with the corrected input value if it's enabled
+		if r.config.EnabledSpell {
+			for idx, itemArg := range args {
+				var msgInput flows.MsgIn
+				itemJSON, _ := itemArg.MarshalJSON()
+				err := json.Unmarshal(itemJSON, &msgInput)
+				if err != nil {
+					continue
+				}
+
+				newMsgIn := flows.NewMsgIn(msgInput.UUID_, msgInput.URN_, msgInput.Channel_, corrected, msgInput.Attachments_)
+				newMsgInput, _ := inputs.NewMsg(run.Session().Assets(), newMsgIn, time.Now())
+				args[idx] = types.NewXObject(newMsgInput.Context(run.Environment()))
+			}
 		}
 
 		// call our function
