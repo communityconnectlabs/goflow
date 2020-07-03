@@ -47,6 +47,7 @@ func init() {
 		{re(`^flow\.(\w+)\.value$`), `results.$1.value`, false},
 		{re(`^flow\.(\w+)\.category$`), `results.$1.category_localized`, false},
 		{re(`^flow\.(\w+)\.text$`), `results.$1.input`, false},
+		{re(`^flow\.(\w+)\.corrected$`), `results.$1.corrected`, false},
 		{re(`^flow\.(\w+)\.time$`), `results.$1.created_on`, false},
 
 		{re(`^child$`), `child.results`, false},
