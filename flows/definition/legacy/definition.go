@@ -170,18 +170,20 @@ type FlowReference struct {
 
 // RulesetConfig holds the config dictionary for a legacy ruleset
 type RulesetConfig struct {
-	Flow           *FlowReference        `json:"flow"`
-	FieldDelimiter string                `json:"field_delimiter"`
-	FieldIndex     int                   `json:"field_index"`
-	Webhook        string                `json:"webhook"`
-	WebhookAction  string                `json:"webhook_action"`
-	WebhookHeaders []WebhookHeader       `json:"webhook_headers"`
-	Resthook       string                `json:"resthook"`
-	LookupDb       map[string]string     `json:"lookup_db"`
-	LookupQueries  []actions.LookupQuery `json:"lookup_queries"`
-	GiftcardDb     map[string]string     `json:"giftcard_db"`
-	GiftcardType   string                `json:"giftcard_type"`
-	ShortenURL     map[string]string     `json:"shorten_url"`
+	Flow             *FlowReference        `json:"flow"`
+	FieldDelimiter   string                `json:"field_delimiter"`
+	FieldIndex       int                   `json:"field_index"`
+	Webhook          string                `json:"webhook"`
+	WebhookAction    string                `json:"webhook_action"`
+	WebhookHeaders   []WebhookHeader       `json:"webhook_headers"`
+	Resthook         string                `json:"resthook"`
+	LookupDb         map[string]string     `json:"lookup_db"`
+	LookupQueries    []actions.LookupQuery `json:"lookup_queries"`
+	GiftcardDb       map[string]string     `json:"giftcard_db"`
+	GiftcardType     string                `json:"giftcard_type"`
+	ShortenURL       map[string]string     `json:"shorten_url"`
+	EnabledSpell     bool                  `json:"spell_checker"`
+	SpellSensitivity string                `json:"spelling_correction_sensitivity"`
 }
 
 type WebhookHeader struct {
@@ -589,7 +591,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 		}
 
 		// subflow rulesets operate on the child flow status
-		router = newSwitchRouter(nil, resultName, categories, "@child.status", cases, defaultCategory)
+		router = newSwitchRouter(nil, resultName, categories, "@child.status", cases, defaultCategory, &config)
 		uiType = UINodeTypeSplitBySubflow
 
 	case "webhook":
@@ -619,7 +621,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 
 		// webhook rulesets operate on the webhook status, saved as category
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
-		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory, &config)
 		uiType = UINodeTypeSplitByWebhook
 
 	case "lookup":
@@ -636,7 +638,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 
 		// lookup rulesets operate on the webhook status, saved as category
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
-		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory, &config)
 		uiType = UINodeTypeSplitByLookup
 
 	case "giftcard":
@@ -646,7 +648,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 
 		// lookup rulesets operate on the webhook status, saved as category
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
-		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory, &config)
 		uiType = UINodeTypeSplitByGiftcard
 
 	case "shorten_url":
@@ -656,7 +658,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 
 		// lookup rulesets operate on the webhook status, saved as category
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
-		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory, &config)
 		uiType = UINodeTypeSplitByShortenURL
 
 	case "resthook":
@@ -666,13 +668,13 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 
 		// resthook rulesets operate on the webhook status, saved as category
 		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
-		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory, &config)
 		uiType = UINodeTypeSplitByResthook
 
 	case "form_field":
 		operand, _ := expressions.MigrateTemplate(r.Operand, nil)
 		operand = fmt.Sprintf("@(field(%s, %d, \"%s\"))", operand[1:], config.FieldIndex, config.FieldDelimiter)
-		router = newSwitchRouter(nil, resultName, categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(nil, resultName, categories, operand, cases, defaultCategory, &config)
 
 		lastDot := strings.LastIndex(r.Operand, ".")
 		if lastDot > -1 {
@@ -687,7 +689,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 
 	case "group":
 		// in legacy flows these rulesets have their operand as @step.value but it's not used
-		router = newSwitchRouter(nil, resultName, categories, "@contact.groups", cases, defaultCategory)
+		router = newSwitchRouter(nil, resultName, categories, "@contact.groups", cases, defaultCategory, &config)
 		uiType = UINodeTypeSplitByGroups
 
 	case "wait_message", "wait_audio", "wait_video", "wait_photo", "wait_gps", "wait_recording", "wait_digit", "wait_digits":
@@ -714,7 +716,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 		wait = newMsgWait(timeout, hint)
 		uiType = UINodeTypeWaitForResponse
 
-		router = newSwitchRouter(wait, resultName, categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(wait, resultName, categories, operand, cases, defaultCategory, &config)
 	case "flow_field", "contact_field", "expression":
 		// unlike other templates, operands for expression rulesets need to be wrapped in such a way that if
 		// they error, they evaluate to the original expression
@@ -766,7 +768,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 			operand = "@input"
 		}
 
-		router = newSwitchRouter(wait, resultName, categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(wait, resultName, categories, operand, cases, defaultCategory, &config)
 	case "random":
 		router = newRandomRouter(resultName, categories)
 		uiType = UINodeTypeSplitByRandom
@@ -795,7 +797,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 		}
 
 		operand := fmt.Sprintf("@results.%s", utils.Snakify(resultName))
-		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory)
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory, &config)
 		uiType = UINodeTypeSplitByAirtime
 
 	default:

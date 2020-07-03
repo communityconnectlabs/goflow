@@ -213,7 +213,7 @@ func newMsgWait(timeout migratedTimeout, hint migratedHint) migratedWait {
 
 type migratedRouter map[string]interface{}
 
-func newSwitchRouter(wait migratedWait, resultName string, categories []migratedCategory, operand string, cases []migratedCase, defaultCategory uuids.UUID) migratedRouter {
+func newSwitchRouter(wait migratedWait, resultName string, categories []migratedCategory, operand string, cases []migratedCase, defaultCategory uuids.UUID, config *RulesetConfig) migratedRouter {
 	d := map[string]interface{}{
 		"type":                  "switch",
 		"categories":            categories,
@@ -221,6 +221,14 @@ func newSwitchRouter(wait migratedWait, resultName string, categories []migrated
 		"cases":                 cases,
 		"default_category_uuid": defaultCategory,
 	}
+
+	if config != nil {
+		d["config"] = map[string]interface{}{
+			"spell_checker":                   config.EnabledSpell,
+			"spelling_correction_sensitivity": config.SpellSensitivity,
+		}
+	}
+
 	if wait != nil {
 		d["wait"] = wait
 	}
