@@ -140,8 +140,6 @@ func (a *CallLookupAction) call(run flows.FlowRun, step flows.Step, url, method,
 
 		status := callStatus(call, err, false)
 
-		logEvent(events.NewLookupCalled(call, status, ""))
-
 		if a.ResultName != "" {
 			a.saveWebhookResult(run, step, a.ResultName, call, status, logEvent)
 		}

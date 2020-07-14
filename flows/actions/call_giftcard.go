@@ -126,8 +126,6 @@ func (a *CallGiftcardAction) call(run flows.FlowRun, step flows.Step, url, metho
 
 		status := callStatus(call, err, false)
 
-		logEvent(events.NewGiftcardCalled(call, status, ""))
-
 		if a.ResultName != "" {
 			a.saveWebhookResult(run, step, a.ResultName, call, status, logEvent)
 		}
