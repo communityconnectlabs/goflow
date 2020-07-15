@@ -81,6 +81,9 @@ func init() {
 
 		{re(`^extra$`), `legacy_extra`, false},
 		{re(`^extra\.([\w\.]+)$`), `legacy_extra.${1}`, false},
+
+		{re(`^embed\.([\w\.]+)$`), `trigger.params.${1}`, false},
+
 	}
 }
 
