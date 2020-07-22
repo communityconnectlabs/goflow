@@ -44,6 +44,7 @@ func TestParseQuery(t *testing.T) {
 
 		// explicit conditions on name
 		{`Name=will`, `name = "will"`, "", envs.RedactionPolicyNone},
+		{`Name=O'Shea`, `name = "O'Shea"`, "", envs.RedactionPolicyNone},
 		{`Name ~ "felix"`, `name ~ "felix"`, "", envs.RedactionPolicyNone},
 		{`Name HAS "Felix"`, `name ~ "Felix"`, "", envs.RedactionPolicyNone},
 		{`name is ""`, `name = ""`, "", envs.RedactionPolicyNone},            // is not set
@@ -67,6 +68,12 @@ func TestParseQuery(t *testing.T) {
 		{`URN=ewok`, `urn = "ewok"`, "", envs.RedactionPolicyNone},
 
 		// explicit conditions on URN with URN redaction
+		{`tel=""`, `tel = ""`, "", envs.RedactionPolicyURNs},
+		{`tel!=""`, `tel != ""`, "", envs.RedactionPolicyURNs},
+		{`mailto=""`, `mailto = ""`, "", envs.RedactionPolicyURNs},
+		{`mailto!=""`, `mailto != ""`, "", envs.RedactionPolicyURNs},
+		{`urn=""`, `urn = ""`, "", envs.RedactionPolicyURNs},
+		{`urn!=""`, `urn != ""`, "", envs.RedactionPolicyURNs},
 		{`tel = 233`, ``, "cannot query on redacted URNs", envs.RedactionPolicyURNs},
 		{`tel ~ 233`, ``, "cannot query on redacted URNs", envs.RedactionPolicyURNs},
 		{`mailto = user@example.com`, ``, "cannot query on redacted URNs", envs.RedactionPolicyURNs},
@@ -120,6 +127,7 @@ func TestParseQuery(t *testing.T) {
 		{`name = "O\"Leary"`, `name = "O\"Leary"`, "", envs.RedactionPolicyNone}, // string unquoting
 
 		// = supported for everything
+		{`uuid = f81d1eb5-215d-4ae8-90fa-38b3f2d6e328`, `uuid = "f81d1eb5-215d-4ae8-90fa-38b3f2d6e328"`, "", envs.RedactionPolicyNone},
 		{`id = 02352`, `id = 02352`, "", envs.RedactionPolicyNone},
 		{`name = felix`, `name = "felix"`, "", envs.RedactionPolicyNone},
 		{`language = eng`, `language = "eng"`, "", envs.RedactionPolicyNone},
@@ -133,6 +141,7 @@ func TestParseQuery(t *testing.T) {
 		{`state = Pichincha`, `state = "Pichincha"`, "", envs.RedactionPolicyNone},
 
 		// != supported for everything
+		{`uuid != f81d1eb5-215d-4ae8-90fa-38b3f2d6e328`, `uuid != "f81d1eb5-215d-4ae8-90fa-38b3f2d6e328"`, "", envs.RedactionPolicyNone},
 		{`id != 02352`, `id != 02352`, "", envs.RedactionPolicyNone},
 		{`name != felix`, `name != "felix"`, "", envs.RedactionPolicyNone},
 		{`language != eng`, `language != "eng"`, "", envs.RedactionPolicyNone},
@@ -146,6 +155,7 @@ func TestParseQuery(t *testing.T) {
 		{`state != Pichincha`, `state != "Pichincha"`, "", envs.RedactionPolicyNone},
 
 		// = "" supported for name, language, fields and urns
+		{`uuid = ""`, ``, "can't check whether 'uuid' is set or not set", envs.RedactionPolicyNone},
 		{`id = ""`, ``, "can't check whether 'id' is set or not set", envs.RedactionPolicyNone},
 		{`name = ""`, `name = ""`, "", envs.RedactionPolicyNone},
 		{`language = ""`, `language = ""`, "", envs.RedactionPolicyNone},
@@ -159,6 +169,7 @@ func TestParseQuery(t *testing.T) {
 		{`state = ""`, `state = ""`, "", envs.RedactionPolicyNone},
 
 		// ~ only supported for name and URNs
+		{`uuid ~ 02352`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
 		{`id ~ 02352`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
 		{`name ~ felix`, `name ~ "felix"`, "", envs.RedactionPolicyNone},
 		{`language ~ eng`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
@@ -172,6 +183,7 @@ func TestParseQuery(t *testing.T) {
 		{`state ~ Pichincha`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
 
 		// > >= < <= only supported for numeric or date fields
+		{`uuid > 02352`, ``, "comparisons with > can only be used with date and number fields", envs.RedactionPolicyNone},
 		{`id > 02352`, ``, "comparisons with > can only be used with date and number fields", envs.RedactionPolicyNone},
 		{`name > felix`, ``, "comparisons with > can only be used with date and number fields", envs.RedactionPolicyNone},
 		{`language > eng`, ``, "comparisons with > can only be used with date and number fields", envs.RedactionPolicyNone},

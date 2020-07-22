@@ -80,6 +80,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		NoURNs       bool                 `json:"no_urns,omitempty"`
 		NoInput      bool                 `json:"no_input,omitempty"`
 		RedactURNs   bool                 `json:"redact_urns,omitempty"`
+		AsBatch      bool                 `json:"as_batch,omitempty"`
 		Action       json.RawMessage      `json:"action"`
 		Localization json.RawMessage      `json:"localization,omitempty"`
 		InFlowType   flows.FlowType       `json:"in_flow_type,omitempty"`
@@ -91,6 +92,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		Webhook           json.RawMessage `json:"webhook,omitempty"`
 		ContactAfter      json.RawMessage `json:"contact_after,omitempty"`
 		Templates         []string        `json:"templates,omitempty"`
+		LocalizedText     []string        `json:"localizables,omitempty"`
 		Inspection        json.RawMessage `json:"inspection,omitempty"`
 	}{}
 
@@ -182,15 +184,15 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 
 		var trigger flows.Trigger
 		ignoreEventCount := 0
-		if tc.NoInput {
-			var connection *flows.Connection
+		if tc.NoInput || tc.AsBatch {
+			tb := triggers.NewBuilder(env, flow.Reference(), contact).Manual().AsBatch()
+
 			if flow.Type() == flows.FlowTypeVoice {
 				channel := sa.Channels().Get("57f1078f-88aa-46f4-a59a-948a5739c03d")
-				connection = flows.NewConnection(channel.Reference(), urns.URN("tel:+12065551212"))
-				trigger = triggers.NewManualVoice(env, flow.Reference(), contact, connection, nil)
-			} else {
-				trigger = triggers.NewManual(env, flow.Reference(), contact, nil)
+				tb = tb.WithConnection(channel.Reference(), urns.URN("tel:+12065551212"))
 			}
+
+			trigger = tb.Build()
 		} else {
 			msg := flows.NewMsgIn(
 				flows.MsgUUID("aa90ce99-3b4d-44ba-b0ca-79e63d9ed842"),
@@ -202,7 +204,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 					"audio/mp3:http://s3.amazon.com/bucket/test.mp3",
 				},
 			)
-			trigger = triggers.NewMsg(env, flow.Reference(), contact, msg, nil)
+			trigger = triggers.NewBuilder(env, flow.Reference(), contact).Msg(msg).Build()
 			ignoreEventCount = 1 // need to ignore the msg_received event this trigger creates
 		}
 
@@ -217,6 +219,9 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 					return wit.NewService(http.DefaultClient, nil, c, "123456789"), nil
 				}
 				return nil, errors.Errorf("no classification service available for %s", c.Reference())
+			}).
+			WithTicketServiceFactory(func(s flows.Session, t *flows.Ticketer) (flows.TicketService, error) {
+				return test.NewTicketService(t), nil
 			}).
 			WithAirtimeServiceFactory(func(flows.Session) (flows.AirtimeService, error) {
 				return dtone.NewService(http.DefaultClient, nil, "nyaruka", "123456789", "RWF"), nil
@@ -254,6 +259,9 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		if tc.Templates != nil {
 			actual.Templates = flow.ExtractTemplates()
 		}
+		if tc.LocalizedText != nil {
+			actual.LocalizedText = flow.ExtractLocalizables()
+		}
 		if tc.Inspection != nil {
 			actual.Inspection, _ = jsonx.Marshal(flow.Inspect(sa))
 		}
@@ -278,6 +286,11 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 			// check extracted templates
 			if tc.Templates != nil {
 				assert.Equal(t, tc.Templates, actual.Templates, "extracted templates mismatch in %s", testName)
+			}
+
+			// check extracted localized text
+			if tc.LocalizedText != nil {
+				assert.Equal(t, tc.LocalizedText, actual.LocalizedText, "extracted localized text mismatch in %s", testName)
 			}
 
 			// check inspection results
@@ -417,15 +430,35 @@ func TestConstructors(t *testing.T) {
 		}`,
 		},
 		{
+			actions.NewOpenTicket(
+				actionUUID,
+				assets.NewTicketerReference(assets.TicketerUUID("0baee364-07a7-4c93-9778-9f55a35903bb"), "Support Tickets"),
+				"Need help",
+				"Where are my cookies?",
+				"Ticket",
+			),
+			`{
+				"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
+				"type": "open_ticket",
+				"ticketer": {
+					"uuid": "0baee364-07a7-4c93-9778-9f55a35903bb",
+					"name": "Support Tickets"
+				},
+				"subject": "Need help",
+				"body": "Where are my cookies?",
+				"result_name": "Ticket"
+			}`,
+		},
+		{
 			actions.NewPlayAudio(
 				actionUUID,
 				"http://uploads.temba.io/2353262.m4a",
 			),
 			`{
-			"type": "play_audio",
-			"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-			"audio_url": "http://uploads.temba.io/2353262.m4a"
-		}`,
+				"type": "play_audio",
+				"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
+				"audio_url": "http://uploads.temba.io/2353262.m4a"
+			}`,
 		},
 		{
 			actions.NewSayMsg(
@@ -698,124 +731,8 @@ func TestResthookPayload(t *testing.T) {
 	payload, err := run.EvaluateTemplate(actions.ResthookPayload)
 	require.NoError(t, err)
 
-	test.AssertEqualJSON(t, []byte(`{
-		"channel": {
-			"address": "+17036975131",
-			"name": "My Android Phone",
-			"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
-		},
-		"contact": {
-			"name": "Ryan Lewis",
-			"urn": "tel:+12024561111",
-			"uuid": "5d76d86b-3bb9-4d5a-b822-c9d86f5d8e4f"
-		},
-		"flow": {
-			"name": "Registration",
-			"revision": 123,
-			"uuid": "50c3706e-fedb-42c0-8eab-dda3335714b7"
-		},
-		"input": {
-			"attachments": [
-				{
-					"content_type": "image/jpeg",
-					"url": "http://s3.amazon.com/bucket/test.jpg"
-				},
-				{
-					"content_type": "audio/mp3",
-					"url": "http://s3.amazon.com/bucket/test.mp3"
-				}
-			],
-			"channel": {
-				"address": "+17036975131",
-				"name": "My Android Phone",
-				"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
-			},
-			"created_on": "2017-12-31T11:35:10.035757-02:00",
-			"text": "Hi there",
-			"type": "msg",
-			"urn": {
-				"display": "(206) 555-1212",
-				"path": "+12065551212",
-				"scheme": "tel"
-			},
-			"uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5"
-		},
-		"path": [
-			{
-				"arrived_on": "2018-07-06T12:30:03.123456Z",
-				"exit_uuid": "d7a36118-0a38-4b35-a7e4-ae89042f0d3c",
-				"node_uuid": "72a1f5df-49f9-45df-94c9-d86f7ea064e5",
-				"uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
-			},
-			{
-				"arrived_on": "2018-07-06T12:30:19.123456Z",
-				"exit_uuid": "100f2d68-2481-4137-a0a3-177620ba3c5f",
-				"node_uuid": "3dcccbb4-d29c-41dd-a01f-16d814c9ab82",
-				"uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
-			},
-			{
-				"arrived_on": "2018-07-06T12:30:28.123456Z",
-				"exit_uuid": "d898f9a4-f0fc-4ac4-a639-c98c602bb511",
-				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
-				"uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
-			},
-			{
-				"arrived_on": "2018-07-06T12:30:55.123456Z",
-				"exit_uuid": "9fc5f8b4-2247-43db-b899-ab1ac50ba06c",
-				"node_uuid": "c0781400-737f-4940-9a6c-1ec1c3df0325",
-				"uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
-			}
-		],
-		"results": {
-			"2factor": {
-				"category": "",
-				"category_localized": "",
-				"created_on": "2018-07-06T12:30:37.123456Z",
-				"input": "",
-				"name": "2Factor",
-				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
-				"value": "34634624463525"
-			},
-			"favorite_color": {
-				"category": "Red",
-				"category_localized": "Red",
-				"created_on": "2018-07-06T12:30:33.123456Z",
-				"input": "",
-				"name": "Favorite Color",
-				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
-				"value": "red"
-			},
-			"intent": {
-				"category": "Success",
-				"category_localized": "Success",
-				"created_on": "2018-07-06T12:30:51.123456Z",
-				"input": "Hi there",
-				"name": "intent",
-				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
-				"value": "book_flight"
-			},
-			"phone_number": {
-				"category": "",
-				"category_localized": "",
-				"created_on": "2018-07-06T12:30:29.123456Z",
-				"input": "",
-				"name": "Phone Number",
-				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
-				"value": "+12344563452"
-			},
-			"webhook": {
-				"category": "Success",
-				"category_localized": "Success",
-				"created_on": "2018-07-06T12:30:45.123456Z",
-				"input": "GET http://127.0.0.1:49999/?content=%7B%22results%22%3A%5B%7B%22state%22%3A%22WA%22%7D%2C%7B%22state%22%3A%22IN%22%7D%5D%7D",
-				"name": "webhook",
-				"node_uuid": "f5bb9b7a-7b5e-45c3-8f0e-61b4e95edf03",
-				"value": "200"
-			}
-		},
-		"run": {
-			"created_on": "2018-07-06T12:30:00.123456Z",
-			"uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
-		}
-	}`), []byte(payload), "payload mismatch")
+	pretty, err := jsonx.MarshalPretty(json.RawMessage(payload))
+	require.NoError(t, err)
+
+	test.AssertSnapshot(t, "resthook_payload", string(pretty))
 }

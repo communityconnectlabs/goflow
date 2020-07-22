@@ -52,6 +52,13 @@ var sessionAssets = `{
             "intents": ["book_flight", "book_hotel"]
         }
     ],
+    "ticketers": [
+        {
+            "uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
+            "name": "Support Tickets",
+            "type": "mailgun"
+        }
+    ],
     "flows": [
         {
             "uuid": "50c3706e-fedb-42c0-8eab-dda3335714b7",
@@ -141,7 +148,7 @@ var sessionAssets = `{
                                 "name": "Booking"
                             },
                             "input": "@input.text",
-                            "result_name": "intent"
+                            "result_name": "Intent"
                         }
                     ],
                     "exits": [
@@ -340,6 +347,7 @@ var sessionTrigger = `{
             "eng", 
             "spa"
         ],
+        "default_country": "US",
         "redaction_policy": "none",
         "time_format": "tt:mm",
         "timezone": "America/Guayaquil"
@@ -555,7 +563,7 @@ func CreateSession(assetsJSON json.RawMessage, flowUUID assets.FlowUUID) (flows.
 
 	env := envs.NewBuilder().Build()
 	contact := flows.NewEmptyContact(sa, "Bob", envs.NilLanguage, nil)
-	trigger := triggers.NewManual(env, flow.Reference(), contact, nil)
+	trigger := triggers.NewBuilder(env, flow.Reference(), contact).Manual().Build()
 	eng := engine.NewBuilder().Build()
 
 	return eng.NewSession(sa, trigger)
