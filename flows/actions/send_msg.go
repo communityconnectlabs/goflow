@@ -36,7 +36,8 @@ const TypeSendMsg string = "send_msg"
 //       },
 //       "variables": ["@contact.name"]
 //     },
-//     "topic": "event"
+//     "topic": "event",
+//     "receive_attachment": "image"
 //   }
 //
 // @action send_msg
@@ -45,9 +46,10 @@ type SendMsgAction struct {
 	universalAction
 	createMsgAction
 
-	AllURNs    bool           `json:"all_urns,omitempty"`
-	Templating *Templating    `json:"templating,omitempty" validate:"omitempty,dive"`
-	Topic      flows.MsgTopic `json:"topic,omitempty" validate:"omitempty,msg_topic"`
+	AllURNs           bool           `json:"all_urns,omitempty"`
+	Templating        *Templating    `json:"templating,omitempty" validate:"omitempty,dive"`
+	Topic             flows.MsgTopic `json:"topic,omitempty" validate:"omitempty,msg_topic"`
+	ReceiveAttachment string         `json:"receive_attachment,omitempty"`
 }
 
 // Templating represents the templating that should be used if possible
@@ -120,14 +122,14 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 			}
 		}
 
-		msg := flows.NewMsgOut(dest.URN.URN(), channelRef, text, evaluatedAttachments, evaluatedQuickReplies, templating, a.Topic)
+		msg := flows.NewMsgOut(dest.URN.URN(), channelRef, text, evaluatedAttachments, evaluatedQuickReplies, templating, a.Topic, a.ReceiveAttachment)
 		logEvent(events.NewMsgCreated(msg))
 	}
 
 	// if we couldn't find a destination, create a msg without a URN or channel and it's up to the caller
 	// to handle that as they want
 	if len(destinations) == 0 {
-		msg := flows.NewMsgOut(urns.NilURN, nil, text, evaluatedAttachments, evaluatedQuickReplies, nil, flows.NilMsgTopic)
+		msg := flows.NewMsgOut(urns.NilURN, nil, text, evaluatedAttachments, evaluatedQuickReplies, nil, flows.NilMsgTopic, a.ReceiveAttachment)
 		logEvent(events.NewMsgCreated(msg))
 	}
 

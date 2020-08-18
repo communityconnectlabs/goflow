@@ -45,9 +45,10 @@ type MsgIn struct {
 type MsgOut struct {
 	BaseMsg
 
-	QuickReplies_ []string       `json:"quick_replies,omitempty"`
-	Templating_   *MsgTemplating `json:"templating,omitempty"`
-	Topic_        MsgTopic       `json:"topic,omitempty"`
+	QuickReplies_      []string       `json:"quick_replies,omitempty"`
+	Templating_        *MsgTemplating `json:"templating,omitempty"`
+	Topic_             MsgTopic       `json:"topic,omitempty"`
+	ReceiveAttachment_ string         `json:"receive_attachment,omitempty"`
 }
 
 // NewMsgIn creates a new incoming message
@@ -64,7 +65,7 @@ func NewMsgIn(uuid MsgUUID, urn urns.URN, channel *assets.ChannelReference, text
 }
 
 // NewMsgOut creates a new outgoing message
-func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment, quickReplies []string, templating *MsgTemplating, topic MsgTopic) *MsgOut {
+func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment, quickReplies []string, templating *MsgTemplating, topic MsgTopic, receiveAttachment string) *MsgOut {
 	return &MsgOut{
 		BaseMsg: BaseMsg{
 			UUID_:        MsgUUID(uuids.New()),
@@ -73,9 +74,10 @@ func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, atta
 			Text_:        text,
 			Attachments_: attachments,
 		},
-		QuickReplies_: quickReplies,
-		Templating_:   templating,
-		Topic_:        topic,
+		QuickReplies_:      quickReplies,
+		Templating_:        templating,
+		Topic_:             topic,
+		ReceiveAttachment_: receiveAttachment,
 	}
 }
 
@@ -117,6 +119,9 @@ func (m *MsgOut) Templating() *MsgTemplating { return m.Templating_ }
 
 // Topic returns the topic to use to send this message (if any)
 func (m *MsgOut) Topic() MsgTopic { return m.Topic_ }
+
+// ReceiveAttachment returns the receive attachment option to use to mount a component to send a file on WebChat
+func (m *MsgOut) ReceiveAttachment() string { return m.ReceiveAttachment_ }
 
 // MsgTemplating represents any substituted message template that should be applied when sending this message
 type MsgTemplating struct {
