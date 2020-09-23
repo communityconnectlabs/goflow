@@ -354,6 +354,7 @@ func TestEventMarshaling(t *testing.T) {
 					nil,
 					flows.NilMsgTopic,
 					"",
+					flows.ShareableIconsConfig{},
 				),
 			),
 			`{

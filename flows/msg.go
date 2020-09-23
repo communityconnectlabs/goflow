@@ -45,10 +45,24 @@ type MsgIn struct {
 type MsgOut struct {
 	BaseMsg
 
-	QuickReplies_      []string       `json:"quick_replies,omitempty"`
-	Templating_        *MsgTemplating `json:"templating,omitempty"`
-	Topic_             MsgTopic       `json:"topic,omitempty"`
-	ReceiveAttachment_ string         `json:"receive_attachment,omitempty"`
+	QuickReplies_      []string             `json:"quick_replies,omitempty"`
+	Templating_        *MsgTemplating       `json:"templating,omitempty"`
+	Topic_             MsgTopic             `json:"topic,omitempty"`
+	ReceiveAttachment_ string               `json:"receive_attachment,omitempty"`
+	SharingConfig_     ShareableIconsConfig `json:"sharing_config,omitempty"`
+}
+
+type ShareableIconsConfig struct {
+	Text      string   `json:"text,omitempty"`
+	Hashtags  []string `json:"hashtags,omitempty"`
+	Email     bool     `json:"email,omitempty"`
+	Facebook  bool     `json:"facebook,omitempty"`
+	WhatsApp  bool     `json:"whatsapp,omitempty"`
+	Pinterest bool     `json:"pinterest,omitempty"`
+	Download  bool     `json:"download,omitempty"`
+	Twitter   bool     `json:"twitter,omitempty"`
+	Telegram  bool     `json:"telegram,omitempty"`
+	Line      bool     `json:"line,omitempty"`
 }
 
 // NewMsgIn creates a new incoming message
@@ -65,7 +79,7 @@ func NewMsgIn(uuid MsgUUID, urn urns.URN, channel *assets.ChannelReference, text
 }
 
 // NewMsgOut creates a new outgoing message
-func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment, quickReplies []string, templating *MsgTemplating, topic MsgTopic, receiveAttachment string) *MsgOut {
+func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment, quickReplies []string, templating *MsgTemplating, topic MsgTopic, receiveAttachment string, sharingConfig ShareableIconsConfig) *MsgOut {
 	return &MsgOut{
 		BaseMsg: BaseMsg{
 			UUID_:        MsgUUID(uuids.New()),
@@ -78,6 +92,7 @@ func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, atta
 		Templating_:        templating,
 		Topic_:             topic,
 		ReceiveAttachment_: receiveAttachment,
+		SharingConfig_:     sharingConfig,
 	}
 }
 
@@ -122,6 +137,9 @@ func (m *MsgOut) Topic() MsgTopic { return m.Topic_ }
 
 // ReceiveAttachment returns the receive attachment option to use to mount a component to send a file on WebChat
 func (m *MsgOut) ReceiveAttachment() string { return m.ReceiveAttachment_ }
+
+// SharingConfig returns the configuration for sharing images feature used to mount a component to share image files on WebChat
+func (m *MsgOut) SharingConfig() ShareableIconsConfig { return m.SharingConfig_ }
 
 // MsgTemplating represents any substituted message template that should be applied when sending this message
 type MsgTemplating struct {
