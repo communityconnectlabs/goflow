@@ -5,14 +5,14 @@ import (
 
 	validator "gopkg.in/go-playground/validator.v9"
 
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/utils"
-	"github.com/nyaruka/goflow/utils/jsonx"
-	"github.com/nyaruka/goflow/utils/uuids"
 )
 
 func init() {
-	utils.Validator.RegisterStructValidation(GroupReferenceValidation, GroupReference{})
-	utils.Validator.RegisterStructValidation(LabelReferenceValidation, LabelReference{})
+	utils.RegisterStructValidator(GroupReferenceValidation, GroupReference{})
+	utils.RegisterStructValidator(LabelReferenceValidation, LabelReference{})
 }
 
 // Reference is interface for all reference types

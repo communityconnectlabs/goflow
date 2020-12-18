@@ -9,7 +9,11 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
@@ -18,10 +22,6 @@ import (
 	"github.com/nyaruka/goflow/flows/routers/waits/hints"
 	"github.com/nyaruka/goflow/services/webhooks"
 	"github.com/nyaruka/goflow/test"
-	"github.com/nyaruka/goflow/utils/dates"
-	"github.com/nyaruka/goflow/utils/httpx"
-	"github.com/nyaruka/goflow/utils/jsonx"
-	"github.com/nyaruka/goflow/utils/uuids"
 	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/assert"
@@ -277,6 +277,7 @@ func TestEventMarshaling(t *testing.T) {
 					],
 					"id": 1234567,
 					"language": "eng",
+					"last_seen_on": "2017-12-31T11:35:10.035757258-02:00",
 					"name": "Ryan Lewis",
 					"status": "active",
 					"timezone": "America/Guayaquil",
@@ -434,6 +435,7 @@ func TestEventMarshaling(t *testing.T) {
 				false,
 				[]urns.URN{urns.URN("tel:+12345678900")},
 				json.RawMessage(`{"uuid": "779eaf3f-1c59-4374-a7cb-0eae9c5e8800"}`),
+				&flows.SessionHistory{ParentUUID: "418a704c-f33e-4924-a00e-1763d1498a13", Ancestors: 2, AncestorsSinceInput: 0},
 			),
 			`{
 				"contacts": [
@@ -456,6 +458,11 @@ func TestEventMarshaling(t *testing.T) {
 				],
 				"run_summary": {
 					"uuid": "779eaf3f-1c59-4374-a7cb-0eae9c5e8800"
+				},
+				"history": {
+					"parent_uuid": "418a704c-f33e-4924-a00e-1763d1498a13",
+					"ancestors": 2,
+					"ancestors_since_input": 0
 				},
 				"type": "session_triggered",
 				"urns": [
@@ -602,4 +609,30 @@ func TestWebhookCalledEventBadUTF8(t *testing.T) {
 	assert.Equal(t, "http://temba.io/", event.URL)
 	assert.Equal(t, "HTTP/1.0 200 OK\r\nContent-Length: 2\r\n\r\n...", event.Response)
 	assert.True(t, utf8.ValidString(event.Response))
+}
+
+func TestDeprecatedEvents(t *testing.T) {
+	eventJSON := []byte(`{
+		"type": "classifier_called",
+		"created_on": "2006-01-02T15:04:05Z",
+		"classifier": {"uuid": "1c06c884-39dd-4ce4-ad9f-9a01cbe6c000", "name": "Booking"},
+		"http_logs": [
+		{
+			"url": "https://api.wit.ai/message?v=20170307&q=hello",
+			"status": "success",
+			"request": "GET /message?v=20170307&q=hello HTTP/1.1",
+			"response": "HTTP/1.1 200 OK\r\n\r\n{\"intents\":[]}",
+			"created_on": "2006-01-02T15:04:05Z",
+			"elapsed_ms": 123
+		}
+		]
+	}`)
+
+	e, err := events.ReadEvent(eventJSON)
+	assert.NoError(t, err)
+	assert.Equal(t, events.TypeClassifierCalled, e.Type())
+
+	marshaled, err := jsonx.Marshal(e)
+	assert.NoError(t, err)
+	test.AssertEqualJSON(t, eventJSON, marshaled, "marshal event mismatch")
 }

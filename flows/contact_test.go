@@ -6,7 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/assets/static"
 	"github.com/nyaruka/goflow/contactql"
@@ -16,8 +18,6 @@ import (
 	"github.com/nyaruka/goflow/flows/engine"
 	"github.com/nyaruka/goflow/flows/triggers"
 	"github.com/nyaruka/goflow/test"
-	"github.com/nyaruka/goflow/utils/jsonx"
-	"github.com/nyaruka/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -48,24 +48,40 @@ func TestContact(t *testing.T) {
 	uuids.SetGenerator(uuids.NewSeededGenerator(1234))
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
 
-	contact, _ := flows.NewContact(
-		sa, flows.ContactUUID(uuids.New()), flows.ContactID(12345), "Joe Bloggs", envs.Language("eng"), flows.ContactStatusActive,
-		nil, time.Now(), nil, nil, nil, assets.PanicOnMissing,
+	tz, _ := time.LoadLocation("America/Bogota")
+
+	contact, err := flows.NewContact(
+		sa,
+		flows.ContactUUID(uuids.New()),
+		flows.ContactID(12345),
+		"Joe Bloggs",
+		envs.Language("eng"),
+		flows.ContactStatusActive,
+		tz,
+		time.Date(2017, 12, 15, 10, 0, 0, 0, time.UTC),
+		nil,
+		nil,
+		nil,
+		nil,
+		assets.PanicOnMissing,
 	)
+	require.NoError(t, err)
 
 	assert.Equal(t, flows.URNList{}, contact.URNs())
 	assert.Equal(t, flows.ContactStatusActive, contact.Status())
+	assert.Nil(t, contact.LastSeenOn())
 	assert.Nil(t, contact.PreferredChannel())
 
-	contact.SetTimezone(env.Timezone())
-	contact.SetCreatedOn(time.Date(2017, 12, 15, 10, 0, 0, 0, time.UTC))
+	contact.SetLastSeenOn(time.Date(2018, 12, 15, 10, 0, 0, 0, time.UTC))
+	assert.Equal(t, time.Date(2018, 12, 15, 10, 0, 0, 0, time.UTC), *contact.LastSeenOn())
+
 	contact.AddURN(urns.URN("tel:+12024561111?channel=294a14d4-c998-41e5-a314-5941b97b89d7"), nil)
 	contact.AddURN(urns.URN("twitter:joey"), nil)
 	contact.AddURN(urns.URN("whatsapp:235423721788"), nil)
 
 	assert.Equal(t, "Joe Bloggs", contact.Name())
 	assert.Equal(t, flows.ContactID(12345), contact.ID())
-	assert.Equal(t, env.Timezone(), contact.Timezone())
+	assert.Equal(t, tz, contact.Timezone())
 	assert.Equal(t, envs.Language("eng"), contact.Language())
 	assert.Equal(t, android, contact.PreferredChannel())
 	assert.Equal(t, envs.Country("US"), contact.Country())
@@ -90,27 +106,29 @@ func TestContact(t *testing.T) {
 	assert.False(t, contact.RemoveURN("whatsapp:235423721788")) // no longer has URN
 
 	test.AssertXEqual(t, types.NewXObject(map[string]types.XValue{
-		"ext":       nil,
-		"facebook":  nil,
-		"fcm":       nil,
-		"freshchat": nil,
-		"jiochat":   nil,
-		"line":      nil,
-		"mailto":    nil,
-		"tel":       flows.NewContactURN(urns.URN("tel:+12024561111?channel=294a14d4-c998-41e5-a314-5941b97b89d7"), nil).ToXValue(env),
-		"telegram":  nil,
-		"twitter":   flows.NewContactURN(urns.URN("twitter:joey"), nil).ToXValue(env),
-		"twitterid": nil,
-		"viber":     nil,
-		"vk":        nil,
-		"wechat":    nil,
-		"whatsapp":  nil,
+		"discord":    nil,
+		"ext":        nil,
+		"facebook":   nil,
+		"fcm":        nil,
+		"freshchat":  nil,
+		"jiochat":    nil,
+		"line":       nil,
+		"mailto":     nil,
+		"rocketchat": nil,
+		"tel":        flows.NewContactURN(urns.URN("tel:+12024561111?channel=294a14d4-c998-41e5-a314-5941b97b89d7"), nil).ToXValue(env),
+		"telegram":   nil,
+		"twitter":    flows.NewContactURN(urns.URN("twitter:joey"), nil).ToXValue(env),
+		"twitterid":  nil,
+		"viber":      nil,
+		"vk":         nil,
+		"wechat":     nil,
+		"whatsapp":   nil,
 	}), flows.ContextFunc(env, contact.URNs().MapContext))
 
 	clone := contact.Clone()
 	assert.Equal(t, "Joe Bloggs", clone.Name())
 	assert.Equal(t, flows.ContactID(12345), clone.ID())
-	assert.Equal(t, env.Timezone(), clone.Timezone())
+	assert.Equal(t, tz, clone.Timezone())
 	assert.Equal(t, envs.Language("eng"), clone.Language())
 	assert.Equal(t, android, contact.PreferredChannel())
 
@@ -119,24 +137,45 @@ func TestContact(t *testing.T) {
 	assert.Nil(t, mrNil.Clone())
 
 	test.AssertXEqual(t, types.NewXObject(map[string]types.XValue{
-		"__default__": types.NewXText("Joe Bloggs"),
-		"channel":     flows.Context(env, android),
-		"created_on":  types.NewXDateTime(contact.CreatedOn()),
-		"fields":      flows.Context(env, contact.Fields()),
-		"first_name":  types.NewXText("Joe"),
-		"groups":      contact.Groups().ToXValue(env),
-		"id":          types.NewXText("12345"),
-		"language":    types.NewXText("eng"),
-		"name":        types.NewXText("Joe Bloggs"),
-		"timezone":    types.NewXText("UTC"),
-		"urn":         contact.URNs()[0].ToXValue(env),
-		"urns":        contact.URNs().ToXValue(env),
-		"uuid":        types.NewXText(string(contact.UUID())),
+		"__default__":  types.NewXText("Joe Bloggs"),
+		"channel":      flows.Context(env, android),
+		"created_on":   types.NewXDateTime(contact.CreatedOn()),
+		"last_seen_on": types.NewXDateTime(*contact.LastSeenOn()),
+		"fields":       flows.Context(env, contact.Fields()),
+		"first_name":   types.NewXText("Joe"),
+		"groups":       contact.Groups().ToXValue(env),
+		"id":           types.NewXText("12345"),
+		"language":     types.NewXText("eng"),
+		"name":         types.NewXText("Joe Bloggs"),
+		"timezone":     types.NewXText("America/Bogota"),
+		"urn":          contact.URNs()[0].ToXValue(env),
+		"urns":         contact.URNs().ToXValue(env),
+		"uuid":         types.NewXText(string(contact.UUID())),
 	}), flows.Context(env, contact))
 
 	assert.True(t, contact.ClearURNs()) // did have URNs
 	assert.False(t, contact.ClearURNs())
 	assert.Equal(t, flows.URNList{}, contact.URNs())
+}
+
+func TestReadContact(t *testing.T) {
+	source, err := static.NewSource([]byte(`{}`))
+	require.NoError(t, err)
+
+	env := envs.NewBuilder().Build()
+
+	sa, err := engine.NewSessionAssets(env, source, nil)
+	require.NoError(t, err)
+
+	// read minimal contact
+	contact, err := flows.ReadContact(sa, []byte(`{"uuid": "a20f7948-e497-4a4a-be3c-b17f79f7ab7d", "created_on": "2020-07-22T13:50:30.123456789Z"}`), assets.PanicOnMissing)
+	assert.NoError(t, err)
+	assert.Equal(t, flows.ContactUUID("a20f7948-e497-4a4a-be3c-b17f79f7ab7d"), contact.UUID())
+	assert.Equal(t, flows.ContactStatusActive, contact.Status())
+
+	// read invalid contact
+	_, err = flows.ReadContact(sa, []byte(`{"uuid": "a20f7948-e497-4a4a-be3c-b17f79f7ab7d", "status": "drunk", "created_on": "2020-07-22T13:50:30.123456789Z"}`), assets.PanicOnMissing)
+	assert.EqualError(t, err, "unable to read contact: field 'status' is not a valid contact status")
 }
 
 func TestContactFormat(t *testing.T) {
@@ -150,8 +189,19 @@ func TestContactFormat(t *testing.T) {
 
 	// if not we fallback to URN
 	contact, _ = flows.NewContact(
-		sa, flows.ContactUUID(uuids.New()), flows.ContactID(1234), "", envs.NilLanguage, flows.ContactStatusActive, nil, time.Now(),
-		nil, nil, nil, assets.PanicOnMissing,
+		sa,
+		flows.ContactUUID(uuids.New()),
+		flows.ContactID(1234),
+		"",
+		envs.NilLanguage,
+		flows.ContactStatusActive,
+		nil,
+		time.Now(),
+		nil,
+		nil,
+		nil,
+		nil,
+		assets.PanicOnMissing,
 	)
 	contact.AddURN(urns.URN("twitter:joey"), nil)
 	assert.Equal(t, "joey", contact.Format(env))
@@ -170,8 +220,10 @@ func TestContactSetPreferredChannel(t *testing.T) {
 	env := envs.NewBuilder().Build()
 	sa, _ := engine.NewSessionAssets(env, static.NewEmptySource(), nil)
 	roles := []assets.ChannelRole{assets.ChannelRoleSend}
+	receive_roles := []assets.ChannelRole{assets.ChannelRoleReceive}
 
 	android := test.NewTelChannel("Android", "+250961111111", roles, nil, "RW", nil, false)
+	android2 := test.NewTelChannel("Android", "+250961111112", receive_roles, nil, "RW", nil, false)
 	twitter1 := test.NewChannel("Twitter", "nyaruka", []string{"twitter", "twitterid"}, roles, nil)
 	twitter2 := test.NewChannel("Twitter", "nyaruka", []string{"twitter", "twitterid"}, roles, nil)
 
@@ -203,10 +255,17 @@ func TestContactSetPreferredChannel(t *testing.T) {
 
 	assert.Equal(t, urns.URN("twitter:joey?channel="+string(twitter1.UUID())), contact.URNs()[0].URN())
 	assert.Equal(t, twitter1, contact.URNs()[0].Channel())
+
+	contact.UpdatePreferredChannel(android2)
+
+	for _, urn := range contact.URNs() {
+		assert.NotEqual(t, android2, urn.Channel())
+	}
+
 }
 
-func TestReevaluateDynamicGroups(t *testing.T) {
-	source, err := static.LoadSource("testdata/dynamic_groups.assets.json")
+func TestReevaluateQueryBasedGroups(t *testing.T) {
+	source, err := static.LoadSource("testdata/smart_groups.assets.json")
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -216,7 +275,7 @@ func TestReevaluateDynamicGroups(t *testing.T) {
 		ContactAfter  json.RawMessage `json:"contact_after"`
 	}{}
 
-	testFile, err := ioutil.ReadFile("testdata/dynamic_groups.json")
+	testFile, err := ioutil.ReadFile("testdata/smart_groups.json")
 	require.NoError(t, err)
 	err = jsonx.Unmarshal(testFile, &tests)
 	require.NoError(t, err)
@@ -301,7 +360,8 @@ func TestContactQuery(t *testing.T) {
 		"id": 1234567,
 		"name": "Ben Haggerty",
 		"fields": {
-			"gender": {"text": "Male"}
+			"gender": {"text": "Male"},
+			"age": {"text": "39!", "number": 39}
 		},
 		"groups": [
 			{"uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d", "name": "Testers"},
@@ -314,7 +374,8 @@ func TestContactQuery(t *testing.T) {
 			"tel:+12065551313", 
 			"twitter:ewok"
 		],
-		"created_on": "2020-01-24T13:24:30.000000000-00:00"
+		"created_on": "2020-01-24T13:24:30Z",
+		"last_seen_on": "2020-08-06T15:41:30Z"
 	}`)
 
 	contact, err := flows.ReadContact(session.Assets(), contactJSON, assets.PanicOnMissing)
@@ -347,8 +408,17 @@ func TestContactQuery(t *testing.T) {
 
 		{`created_on = 24-01-2020`, envs.RedactionPolicyNone, true, ""},
 		{`created_on = 25-01-2020`, envs.RedactionPolicyNone, false, ""},
+		{`created_on != 24-01-2020`, envs.RedactionPolicyNone, false, ""},
+		{`created_on != 25-01-2020`, envs.RedactionPolicyNone, true, ""},
 		{`created_on > 22-01-2020`, envs.RedactionPolicyNone, true, ""},
 		{`created_on > 26-01-2020`, envs.RedactionPolicyNone, false, ""},
+
+		{`last_seen_on = 06-08-2020`, envs.RedactionPolicyNone, true, ""},
+		{`last_seen_on = 07-08-2020`, envs.RedactionPolicyNone, false, ""},
+		{`last_seen_on > 05-08-2020`, envs.RedactionPolicyNone, true, ""},
+		{`last_seen_on > 08-08-2020`, envs.RedactionPolicyNone, false, ""},
+		{`last_seen_on != ""`, envs.RedactionPolicyNone, true, ""},
+		{`last_seen_on = ""`, envs.RedactionPolicyNone, false, ""},
 
 		{`tel = +12065551212`, envs.RedactionPolicyNone, true, ""},
 		{`tel = +12065551313`, envs.RedactionPolicyNone, true, ""},
@@ -394,19 +464,24 @@ func TestContactQuery(t *testing.T) {
 		{`group != testers`, envs.RedactionPolicyNone, false, ""},
 		{`group = customers`, envs.RedactionPolicyNone, false, ""},
 		{`group != customers`, envs.RedactionPolicyNone, true, ""},
+
+		{`age = 39`, envs.RedactionPolicyNone, true, ""},
+		{`age != 39`, envs.RedactionPolicyNone, false, ""},
+		{`age = 60`, envs.RedactionPolicyNone, false, ""},
+		{`age != 60`, envs.RedactionPolicyNone, true, ""},
 	}
 
 	doQuery := func(q string, redaction envs.RedactionPolicy) (bool, error) {
-		query, err := contactql.ParseQuery(q, redaction, "US", session.Assets())
-		if err != nil {
-			return false, err
-		}
-
 		var env envs.Environment
 		if redaction == envs.RedactionPolicyURNs {
 			env = envs.NewBuilder().WithRedactionPolicy(envs.RedactionPolicyURNs).Build()
 		} else {
 			env = session.Environment()
+		}
+
+		query, err := contactql.ParseQuery(env, q, session.Assets())
+		if err != nil {
+			return false, err
 		}
 
 		return contactql.EvaluateQuery(env, query, contact)

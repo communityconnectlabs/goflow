@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/assets/static"
@@ -21,7 +22,6 @@ import (
 	"github.com/nyaruka/goflow/flows/routers/waits"
 	"github.com/nyaruka/goflow/flows/triggers"
 	"github.com/nyaruka/goflow/utils"
-	"github.com/nyaruka/goflow/utils/jsonx"
 
 	"github.com/Masterminds/semver"
 )
@@ -137,7 +137,7 @@ func (m *MsgIn) Text() string {
 
 func (m *MsgIn) Attachments() *StringSlice {
 	attachments := NewStringSlice(len(m.target.Attachments()))
-	for attachment := range m.target.Attachments() {
+	for _, attachment := range m.target.Attachments() {
 		attachments.Add(string(attachment))
 	}
 	return attachments

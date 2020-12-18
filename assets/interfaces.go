@@ -3,8 +3,8 @@ package assets
 import (
 	"encoding/json"
 
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/utils/uuids"
 )
 
 // ChannelUUID is the UUID of a channel
@@ -137,7 +137,7 @@ type Global interface {
 // GroupUUID is the UUID of a group
 type GroupUUID uuids.UUID
 
-// Group is a set of contacts which can be static or dynamic (i.e. based on a query).
+// Group is a set of contacts which can be added to and removed from manually, or based on a query.
 //
 //   {
 //     "uuid": "14782905-81a6-4910-bc9f-93ad287b23c3",

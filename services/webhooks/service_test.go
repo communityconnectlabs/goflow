@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/httpx"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/services/webhooks"
 	"github.com/nyaruka/goflow/test"
-	"github.com/nyaruka/goflow/utils/dates"
-	"github.com/nyaruka/goflow/utils/httpx"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -191,7 +191,7 @@ func TestRetries(t *testing.T) {
 
 func TestAccessRestrictions(t *testing.T) {
 	retries := httpx.NewFixedRetries(5, 10)
-	access := httpx.NewAccessConfig(10, []net.IP{net.IPv4(127, 0, 0, 1)})
+	access := httpx.NewAccessConfig(10, []net.IP{net.IPv4(127, 0, 0, 1)}, nil)
 
 	factory := webhooks.NewServiceFactory(http.DefaultClient, retries, access, map[string]string{"User-Agent": "Foo"}, 12345)
 	svc, err := factory(nil)

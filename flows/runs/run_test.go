@@ -5,6 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
@@ -12,9 +15,6 @@ import (
 	"github.com/nyaruka/goflow/flows/runs"
 	"github.com/nyaruka/goflow/flows/triggers"
 	"github.com/nyaruka/goflow/test"
-	"github.com/nyaruka/goflow/utils/dates"
-	"github.com/nyaruka/goflow/utils/jsonx"
-	"github.com/nyaruka/goflow/utils/uuids"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -131,6 +131,7 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, 10, len(r.Events()))
 		assert.Equal(t, "Parent", r.Parent().Flow().Name())
 		assert.Equal(t, 0, len(r.Ancestors())) // no parent runs within this session
+		assert.True(t, r.ReceivedInput())
 	}
 
 	checkRun(run)
@@ -193,7 +194,7 @@ func TestRunContext(t *testing.T) {
 		},
 		{
 			`@(json(urns))`,
-			`{"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":"mailto:foo@bar.com","tel":"tel:+12024561111","telegram":null,"twitter":null,"twitterid":"twitterid:54784326227#nyaruka","viber":null,"vk":null,"wechat":null,"whatsapp":null}`,
+			`{"discord":null,"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":"mailto:foo@bar.com","rocketchat":null,"tel":"tel:+12024561111","telegram":null,"twitter":null,"twitterid":"twitterid:54784326227#nyaruka","viber":null,"vk":null,"wechat":null,"whatsapp":null}`,
 		},
 		{
 			`@(json(results.favorite_color))`,
@@ -209,7 +210,7 @@ func TestRunContext(t *testing.T) {
 		},
 		{
 			`@(json(parent.urns))`,
-			`{"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":null,"tel":"tel:+12024562222","telegram":null,"twitter":null,"twitterid":null,"viber":null,"vk":null,"wechat":null,"whatsapp":null}`,
+			`{"discord":null,"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":null,"rocketchat":null,"tel":"tel:+12024562222","telegram":null,"twitter":null,"twitterid":null,"viber":null,"vk":null,"wechat":null,"whatsapp":null}`,
 		},
 		{
 			`@(json(parent.fields))`,

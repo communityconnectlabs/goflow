@@ -3,12 +3,12 @@ package triggers
 import (
 	"encoding/json"
 
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/utils"
-	"github.com/nyaruka/goflow/utils/jsonx"
 )
 
 func init() {
@@ -71,7 +71,7 @@ type ChannelBuilder struct {
 func (b *Builder) Channel(channel *assets.ChannelReference, eventType ChannelEventType) *ChannelBuilder {
 	return &ChannelBuilder{
 		t: &ChannelTrigger{
-			baseTrigger: newBaseTrigger(TypeChannel, b.environment, b.flow, b.contact, nil, false, types.XObjectEmpty),
+			baseTrigger: newBaseTrigger(TypeChannel, b.environment, b.flow, b.contact, nil, false, nil),
 			event:       &ChannelEvent{Type: eventType, Channel: channel},
 		},
 	}

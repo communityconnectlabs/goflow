@@ -3,13 +3,13 @@ package waits
 import (
 	"encoding/json"
 
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/resumes"
 	"github.com/nyaruka/goflow/flows/routers/waits/hints"
 	"github.com/nyaruka/goflow/flows/triggers"
 	"github.com/nyaruka/goflow/utils"
-	"github.com/nyaruka/goflow/utils/jsonx"
 
 	"github.com/pkg/errors"
 )
@@ -42,6 +42,11 @@ func NewMsgWait(timeout *Timeout, hint flows.Hint) *MsgWait {
 
 // Hint returns the hint (optional)
 func (w *MsgWait) Hint() flows.Hint { return w.hint }
+
+// AllowedFlowTypes returns the flow types which this wait is allowed to occur in
+func (w *MsgWait) AllowedFlowTypes() []flows.FlowType {
+	return []flows.FlowType{flows.FlowTypeMessaging, flows.FlowTypeMessagingOffline, flows.FlowTypeVoice}
+}
 
 // Begin beings waiting at this wait
 func (w *MsgWait) Begin(run flows.FlowRun, log flows.EventCallback) flows.ActivatedWait {

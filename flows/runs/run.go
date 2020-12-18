@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent"
@@ -11,9 +14,6 @@ import (
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/utils"
-	"github.com/nyaruka/goflow/utils/dates"
-	"github.com/nyaruka/goflow/utils/jsonx"
-	"github.com/nyaruka/goflow/utils/uuids"
 
 	"github.com/pkg/errors"
 )
@@ -21,7 +21,7 @@ import (
 type flowRun struct {
 	uuid        flows.RunUUID
 	session     flows.Session
-	environment *runEnvironment
+	environment envs.Environment
 
 	flow    flows.Flow
 	flowRef *assets.FlowReference
@@ -91,7 +91,13 @@ func (r *flowRun) Exit(status flows.RunStatus) {
 
 	r.status = status
 	r.exitedOn = &now
+	r.expiresOn = nil
 	r.modifiedOn = now
+
+	// if we have a parent, it's expiration should no longer include our expiration
+	if r.ParentInSession() != nil {
+		r.ParentInSession().ResetExpiration(nil)
+	}
 }
 func (r *flowRun) Status() flows.RunStatus { return r.status }
 func (r *flowRun) SetStatus(status flows.RunStatus) {
@@ -153,11 +159,15 @@ func (r *flowRun) LogError(step flows.Step, err error) {
 // find the first event matching the given step UUID and type
 func (r *flowRun) findEvent(stepUUID flows.StepUUID, eType string) flows.Event {
 	for _, e := range r.events {
-		if e.StepUUID() == stepUUID && e.Type() == eType {
+		if (stepUUID == "" || e.StepUUID() == stepUUID) && e.Type() == eType {
 			return e
 		}
 	}
 	return nil
+}
+
+func (r *flowRun) ReceivedInput() bool {
+	return r.findEvent("", events.TypeMsgReceived) != nil
 }
 
 func (r *flowRun) Path() []flows.Step { return r.path }
@@ -311,24 +321,17 @@ func (r *flowRun) EvaluateTemplate(template string) (string, error) {
 
 // get the ordered list of languages to be used for localization in this run
 func (r *flowRun) getLanguages() []envs.Language {
-	// TODO cache this this?
-
-	contact := r.Contact()
 	languages := make([]envs.Language, 0, 3)
 
-	// if contact has a allowed language, it takes priority
-	if contact != nil && contact.Language() != envs.NilLanguage {
-		for _, l := range r.Environment().AllowedLanguages() {
-			if l == contact.Language() {
-				languages = append(languages, contact.Language())
-				break
-			}
-		}
+	// if contact has an allowed language, it takes priority
+	contactLanguage := r.Environment().DefaultLanguage()
+	if contactLanguage != envs.NilLanguage {
+		languages = append(languages, contactLanguage)
 	}
 
 	// next we include the default language if it's different to the contact language
-	defaultLanguage := r.Environment().DefaultLanguage()
-	if defaultLanguage != envs.NilLanguage && defaultLanguage != contact.Language() {
+	defaultLanguage := r.Session().Environment().DefaultLanguage()
+	if defaultLanguage != envs.NilLanguage && defaultLanguage != contactLanguage {
 		languages = append(languages, defaultLanguage)
 	}
 

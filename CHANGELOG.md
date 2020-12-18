@@ -1,3 +1,127 @@
+v0.107.1
+----------
+ * Add float64 workaround for exponent expressions with non-integer exponents
+
+v0.107.0
+----------
+ * Add new flow type for passive messaging flows
+ * Update to gocommon v1.7.1 to get fix for phone number parsing
+
+v0.106.3
+----------
+ * Engine evaluator for contact sql should support != x for number and datetime values
+
+v0.106.2
+----------
+ * Update to latest gocommon
+
+v0.106.1
+----------
+ * URN and channel modifiers should error with invalid URNs and channels
+
+v0.106.0
+----------
+ * Getting channel for URN should always consider the role on the channels
+ * Update to latest gocommon which adds rocketchat scheme
+ * SetPreferredChannel only when the channel has the send role
+
+v0.105.5
+----------
+ * Support sorting contacts by last seen on attribute
+
+v0.105.4
+----------
+ * Add support for Bengali numerals in number tests
+
+v0.105.3
+----------
+ * Add support for Eastern Arabic numerals in number tests
+
+v0.105.2
+----------
+ * Clear a run's expiration when it exits
+ * Unwind accumulated run expirations as child runs complete
+ * Include country in msg templating on msg_created events
+
+v0.105.1
+----------
+ * Update to latest gocommon v1.5.3
+
+v0.105.0
+----------
+ * Bump some deps, test on go 1.15 and fix bug found by 1.15 compiler
+
+v0.104.1
+----------
+ * Update to gocommon v1.5.1
+
+v0.104.0
+----------
+ * Use dummy value to avoid sending empty emails
+ * Rework smtpx package for sending emails in places besides flows
+ * Don't parse numbers in scientific notation
+
+v0.103.1
+----------
+ * Update to latest gocommon v1.5.0
+ * Run environment's DefaultLanguage and DefaultLocale methods should use contact language
+
+v0.103.0
+----------
+ * Update to latest gocommon
+ * Update terminology around groups with queries
+
+v0.102.1
+----------
+ * Add archived contact status
+
+v0.102.0
+----------
+ * Update to latest gocommon
+
+v0.101.2
+----------
+ * Add empty localizations for all the languages used in RapidPro
+
+v0.101.1
+----------
+ * Fix test
+
+v0.101.0
+----------
+ * Use language codes (e.g. en-us) rather than locale names (en_US) for docs directories
+
+v0.100.1
+----------
+ * Add completed pt_BR translation
+
+v0.100.0
+----------
+ * Add last_seen_on to contacts and expose in expressions and queries
+
+v0.99.0
+----------
+ * Rework elastic query generation so that all errors are caught at parsing stage
+ * Allow URN inequality in elastic searches
+
+v0.98.0
+----------
+ * Rework error handling in contactql so more errors are caught during parsing and have associated codes
+
+v0.97.0
+----------
+ * Re-add classifier_called events for backward compatibility
+ * Groups modifier should generate error if asked to operate on blocked or stopped contact
+ * Move modifiers package out of actions package
+ * ContactQL parser errors should contain more info
+
+v0.96.0
+----------
+ * Reorganize validation code so utils doesn't have to know about tags defined higher up
+ * Clone the test session during doc generation so actions always start with the same session
+ * Add action to change contact status
+ * Add historical information to triggers about the session that triggered them and use to prevent looping
+
 v0.95.1
 ----------
  * Improve documentation of call_webhook action
