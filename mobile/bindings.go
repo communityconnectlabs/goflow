@@ -3,25 +3,25 @@ package mobile
 // To build an Android Archive:
 //
 // go get golang.org/x/mobile/cmd/gomobile
-// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/greatnonprofits-nfp/goflow/mobile
+// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/nyaruka/goflow/mobile
 
 import (
 	"encoding/json"
 	"time"
 
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
-	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/nyaruka/goflow/flows/definition/migrations"
+	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/nyaruka/goflow/flows/resumes"
+	"github.com/nyaruka/goflow/flows/routers/waits"
+	"github.com/nyaruka/goflow/flows/triggers"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/Masterminds/semver"
 )
@@ -137,7 +137,7 @@ func (m *MsgIn) Text() string {
 
 func (m *MsgIn) Attachments() *StringSlice {
 	attachments := NewStringSlice(len(m.target.Attachments()))
-	for attachment := range m.target.Attachments() {
+	for _, attachment := range m.target.Attachments() {
 		attachments.Add(string(attachment))
 	}
 	return attachments
@@ -163,7 +163,7 @@ type Trigger struct {
 func NewManualTrigger(environment *Environment, contact *Contact, flow *FlowReference) *Trigger {
 	flowRef := assets.NewFlowReference(assets.FlowUUID(flow.uuid), flow.name)
 	return &Trigger{
-		target: triggers.NewManual(environment.target, flowRef, contact.target, nil),
+		target: triggers.NewBuilder(environment.target, flowRef, contact.target).Manual().Build(),
 	}
 }
 

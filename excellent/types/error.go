@@ -3,8 +3,8 @@ package types
 import (
 	"fmt"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/envs"
 )
 
 // XError is an error

@@ -1,6 +1,6 @@
 package main
 
-// go install github.com/greatnonprofits-nfp/goflow/cmd/flowmigrate
+// go install github.com/nyaruka/goflow/cmd/flowmigrate
 // cat legacy_flow.json | flowmigrate
 // cat legacy_export.json | jq '.flows[0]' | flowmigrate
 
@@ -13,9 +13,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/greatnonprofits-nfp/goflow/flows/definition"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/nyaruka/goflow/flows/definition/migrations"
 
 	"github.com/Masterminds/semver"
 )

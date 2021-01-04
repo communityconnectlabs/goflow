@@ -3,6 +3,7 @@ package functions
 import (
 	"bytes"
 	"fmt"
+	"html"
 	"math"
 	"net/url"
 	"regexp"
@@ -11,12 +12,12 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/random"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/random"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/shopspring/decimal"
 )
@@ -61,6 +62,7 @@ func init() {
 		"upper":             OneTextFunction(Upper),
 		"percent":           OneNumberFunction(Percent),
 		"url_encode":        OneTextFunction(URLEncode),
+		"html_decode":       OneTextFunction(HTMLDecode),
 
 		// bool functions
 		"and": MinArgsCheck(1, And),
@@ -943,6 +945,20 @@ func URLEncode(env envs.Environment, text types.XText) types.XValue {
 	return types.NewXText(encoded)
 }
 
+// HTMLDecode HTML decodes `text`
+//
+//   @(html_decode("Red &amp; Blue")) -> Red & Blue
+//   @(html_decode("5 + 10")) -> 5 + 10
+//
+// @function html_decode(text)
+func HTMLDecode(env envs.Environment, text types.XText) types.XValue {
+	decoded := html.UnescapeString(text.Native())
+
+	// the common nbsp; turns into a unicode non breaking space, convert to a normal space
+	decoded = strings.ReplaceAll(decoded, "\U000000A0", " ")
+	return types.NewXText(decoded)
+}
+
 //------------------------------------------------------------------------------------------
 // Number Functions
 //------------------------------------------------------------------------------------------
@@ -1110,8 +1126,8 @@ func Mod(env envs.Environment, num1 types.XNumber, num2 types.XNumber) types.XVa
 
 // Rand returns a single random number between [0.0-1.0).
 //
-//   @(rand()) -> 0.607552015674623913099594574305228888988494873046875
-//   @(rand()) -> 0.484677570947340263796121462291921488940715789794921875
+//   @(rand()) -> 0.6075520156746239
+//   @(rand()) -> 0.48467757094734026
 //
 // @function rand()
 func Rand(env envs.Environment) types.XValue {
@@ -1683,7 +1699,7 @@ func FormatDate(env envs.Environment, args ...types.XValue) types.XValue {
 // * `DD`        - day of month, zero padded 0-31
 // * `h`         - hour of the day 1-12
 // * `hh`        - hour of the day 01-12
-// * `tt`        - twenty four hour of the day 01-23
+// * `tt`        - twenty four hour of the day 00-23
 // * `m`         - minute 0-59
 // * `mm`        - minute 00-59
 // * `s`         - second 0-59
@@ -1756,7 +1772,7 @@ func FormatDateTime(env envs.Environment, args ...types.XValue) types.XValue {
 //
 // * `h`         - hour of the day 1-12
 // * `hh`        - hour of the day 01-12
-// * `tt`        - twenty four hour of the day 01-23
+// * `tt`        - twenty four hour of the day 00-23
 // * `m`         - minute 0-59
 // * `mm`        - minute 00-59
 // * `s`         - second 0-59
@@ -1908,14 +1924,18 @@ func Count(env envs.Environment, value types.XValue) types.XValue {
 //   @(default(undeclared.var, "default_value")) -> default_value
 //   @(default("10", "20")) -> 10
 //   @(default("", "value")) -> value
-//   @(default(array(1, 2), "value")) -> [1, 2]
-//   @(default(array(), "value")) -> value
+//   @(default("  ", "value")) -> \x20\x20
 //   @(default(datetime("invalid-date"), "today")) -> today
 //   @(default(format_urn("invalid-urn"), "ok")) -> ok
 //
 // @function default(value, default)
 func Default(env envs.Environment, value types.XValue, def types.XValue) types.XValue {
-	if types.IsEmpty(value) || types.IsXError(value) {
+	asText, xerr := types.ToXText(env, value)
+	if xerr != nil {
+		return def
+	}
+
+	if len(asText.Native()) == 0 {
 		return def
 	}
 

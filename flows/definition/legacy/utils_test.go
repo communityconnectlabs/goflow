@@ -3,9 +3,9 @@ package legacy_test
 import (
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition/legacy"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows/definition/legacy"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

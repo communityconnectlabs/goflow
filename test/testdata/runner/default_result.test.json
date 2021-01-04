@@ -37,6 +37,7 @@
                     "id": 1234567,
                     "language": "eng",
                     "name": "Ben Haggerty",
+                    "status": "active",
                     "timezone": "America/Guayaquil",
                     "urns": [
                         "tel:+12065551212",
@@ -120,6 +121,7 @@
                         "id": 1234567,
                         "language": "eng",
                         "name": "Ben Haggerty",
+                        "status": "active",
                         "timezone": "America/Guayaquil",
                         "urns": [
                             "tel:+12065551212",
@@ -145,7 +147,7 @@
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:12.123456789Z",
+                    "created_on": "2018-07-06T12:30:13.123456789Z",
                     "msg": {
                         "channel": {
                             "name": "Nexmo",
@@ -214,7 +216,9 @@
                     },
                     "id": 1234567,
                     "language": "eng",
+                    "last_seen_on": "2000-01-01T00:00:00Z",
                     "name": "Ryan Lewis",
+                    "status": "active",
                     "timezone": "America/Guayaquil",
                     "urns": [
                         "tel:+12065551212",
@@ -269,7 +273,7 @@
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:12.123456789Z",
+                                "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Nexmo",
@@ -325,7 +329,7 @@
                             }
                         ],
                         "exited_on": "2018-07-06T12:30:27.123456789Z",
-                        "expires_on": "2018-07-06T12:30:10.123456789Z",
+                        "expires_on": null,
                         "flow": {
                             "name": "Another Flow",
                             "uuid": "c37ae862-4802-447a-a783-1fe029a170e9"
@@ -381,6 +385,7 @@
                         "id": 1234567,
                         "language": "eng",
                         "name": "Ben Haggerty",
+                        "status": "active",
                         "timezone": "America/Guayaquil",
                         "urns": [
                             "tel:+12065551212",
@@ -431,6 +436,7 @@
             "id": 1234567,
             "language": "eng",
             "name": "Ben Haggerty",
+            "status": "active",
             "timezone": "America/Guayaquil",
             "urns": [
                 "tel:+12065551212",

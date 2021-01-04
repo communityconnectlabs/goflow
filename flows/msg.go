@@ -1,15 +1,21 @@
 package flows
 
 import (
+	"fmt"
+
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/utils"
+
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
 func init() {
-	utils.Validator.RegisterAlias("msg_topic", "eq=event|eq=account|eq=purchase|eq=agent")
+	utils.RegisterValidatorAlias("msg_topic", "eq=event|eq=account|eq=purchase|eq=agent", func(validator.FieldError) string {
+		return "is not a valid message topic"
+	})
 }
 
 // MsgTopic is the topic, as required by some channel types
@@ -48,6 +54,7 @@ type MsgOut struct {
 	QuickReplies_      []string             `json:"quick_replies,omitempty"`
 	Templating_        *MsgTemplating       `json:"templating,omitempty"`
 	Topic_             MsgTopic             `json:"topic,omitempty"`
+    TextLanguage       envs.Language        `json:"text_language,omitempty"`
 	ReceiveAttachment_ string               `json:"receive_attachment,omitempty"`
 	SharingConfig_     ShareableIconsConfig `json:"sharing_config,omitempty"`
 }
@@ -64,6 +71,8 @@ type ShareableIconsConfig struct {
 	Telegram  bool     `json:"telegram,omitempty"`
 	Line      bool     `json:"line,omitempty"`
 }
+
+
 
 // NewMsgIn creates a new incoming message
 func NewMsgIn(uuid MsgUUID, urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment) *MsgIn {
@@ -93,6 +102,28 @@ func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, atta
 		Topic_:             topic,
 		ReceiveAttachment_: receiveAttachment,
 		SharingConfig_:     sharingConfig,
+	}
+}
+
+// NewIVRMsgOut creates a new outgoing message for IVR
+func NewIVRMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, textLanguage envs.Language, audioURL string) *MsgOut {
+	var attachments []utils.Attachment
+	if audioURL != "" {
+		attachments = []utils.Attachment{utils.Attachment(fmt.Sprintf("audio:%s", audioURL))}
+	}
+
+	return &MsgOut{
+		BaseMsg: BaseMsg{
+			UUID_:        MsgUUID(uuids.New()),
+			URN_:         urn,
+			Channel_:     channel,
+			Text_:        text,
+			Attachments_: attachments,
+		},
+		QuickReplies_: nil,
+		Templating_:   nil,
+		Topic_:        NilMsgTopic,
+		TextLanguage:  textLanguage,
 	}
 }
 
@@ -145,6 +176,7 @@ func (m *MsgOut) SharingConfig() ShareableIconsConfig { return m.SharingConfig_ 
 type MsgTemplating struct {
 	Template_  *assets.TemplateReference `json:"template"`
 	Language_  envs.Language             `json:"language"`
+	Country_   envs.Country              `json:"country"`
 	Variables_ []string                  `json:"variables,omitempty"`
 }
 
@@ -154,14 +186,18 @@ func (t MsgTemplating) Template() *assets.TemplateReference { return t.Template_
 // Language returns the language that should be used for the template
 func (t MsgTemplating) Language() envs.Language { return t.Language_ }
 
+// Country returns the country that should be used for the template
+func (t MsgTemplating) Country() envs.Country { return t.Country_ }
+
 // Variables returns the variables that should be substituted in the template
 func (t MsgTemplating) Variables() []string { return t.Variables_ }
 
 // NewMsgTemplating creates and returns a new msg template
-func NewMsgTemplating(template *assets.TemplateReference, language envs.Language, variables []string) *MsgTemplating {
+func NewMsgTemplating(template *assets.TemplateReference, language envs.Language, country envs.Country, variables []string) *MsgTemplating {
 	return &MsgTemplating{
 		Template_:  template,
 		Language_:  language,
+		Country_:   country,
 		Variables_: variables,
 	}
 }

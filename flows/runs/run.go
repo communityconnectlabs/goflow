@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 )
@@ -21,7 +21,7 @@ import (
 type flowRun struct {
 	uuid        flows.RunUUID
 	session     flows.Session
-	environment flows.RunEnvironment
+	environment envs.Environment
 
 	flow    flows.Flow
 	flowRef *assets.FlowReference
@@ -66,9 +66,9 @@ func NewRun(session flows.Session, flow flows.Flow, parent flows.FlowRun) flows.
 	return r
 }
 
-func (r *flowRun) UUID() flows.RunUUID               { return r.uuid }
-func (r *flowRun) Session() flows.Session            { return r.session }
-func (r *flowRun) Environment() flows.RunEnvironment { return r.environment }
+func (r *flowRun) UUID() flows.RunUUID           { return r.uuid }
+func (r *flowRun) Session() flows.Session        { return r.session }
+func (r *flowRun) Environment() envs.Environment { return r.environment }
 
 func (r *flowRun) Flow() flows.Flow                     { return r.flow }
 func (r *flowRun) FlowReference() *assets.FlowReference { return r.flowRef }
@@ -78,9 +78,7 @@ func (r *flowRun) Events() []flows.Event                { return r.events }
 func (r *flowRun) Results() flows.Results { return r.results }
 func (r *flowRun) SaveResult(result *flows.Result) {
 	// truncate value if necessary
-	if len(result.Value) > r.Environment().MaxValueLength() {
-		result.Value = result.Value[0:r.Environment().MaxValueLength()]
-	}
+	result.Value = utils.Truncate(result.Value, r.Environment().MaxValueLength())
 
 	r.results.Save(result)
 	r.modifiedOn = dates.Now()
@@ -93,7 +91,13 @@ func (r *flowRun) Exit(status flows.RunStatus) {
 
 	r.status = status
 	r.exitedOn = &now
+	r.expiresOn = nil
 	r.modifiedOn = now
+
+	// if we have a parent, it's expiration should no longer include our expiration
+	if r.ParentInSession() != nil {
+		r.ParentInSession().ResetExpiration(nil)
+	}
 }
 func (r *flowRun) Status() flows.RunStatus { return r.status }
 func (r *flowRun) SetStatus(status flows.RunStatus) {
@@ -155,11 +159,15 @@ func (r *flowRun) LogError(step flows.Step, err error) {
 // find the first event matching the given step UUID and type
 func (r *flowRun) findEvent(stepUUID flows.StepUUID, eType string) flows.Event {
 	for _, e := range r.events {
-		if e.StepUUID() == stepUUID && e.Type() == eType {
+		if (stepUUID == "" || e.StepUUID() == stepUUID) && e.Type() == eType {
 			return e
 		}
 	}
 	return nil
+}
+
+func (r *flowRun) ReceivedInput() bool {
+	return r.findEvent("", events.TypeMsgReceived) != nil
 }
 
 func (r *flowRun) Path() []flows.Step { return r.path }
@@ -313,24 +321,17 @@ func (r *flowRun) EvaluateTemplate(template string) (string, error) {
 
 // get the ordered list of languages to be used for localization in this run
 func (r *flowRun) getLanguages() []envs.Language {
-	// TODO cache this this?
-
-	contact := r.Contact()
 	languages := make([]envs.Language, 0, 3)
 
-	// if contact has a allowed language, it takes priority
-	if contact != nil && contact.Language() != envs.NilLanguage {
-		for _, l := range r.Environment().AllowedLanguages() {
-			if l == contact.Language() {
-				languages = append(languages, contact.Language())
-				break
-			}
-		}
+	// if contact has an allowed language, it takes priority
+	contactLanguage := r.Environment().DefaultLanguage()
+	if contactLanguage != envs.NilLanguage {
+		languages = append(languages, contactLanguage)
 	}
 
 	// next we include the default language if it's different to the contact language
-	defaultLanguage := r.Environment().DefaultLanguage()
-	if defaultLanguage != envs.NilLanguage && defaultLanguage != contact.Language() {
+	defaultLanguage := r.Session().Environment().DefaultLanguage()
+	if defaultLanguage != envs.NilLanguage && defaultLanguage != contactLanguage {
 		languages = append(languages, defaultLanguage)
 	}
 
@@ -340,31 +341,33 @@ func (r *flowRun) getLanguages() []envs.Language {
 }
 
 func (r *flowRun) GetText(uuid uuids.UUID, key string, native string) string {
-	textArray := r.GetTextArray(uuid, key, []string{native})
+	textArray, _ := r.GetTextArray(uuid, key, []string{native})
 	return textArray[0]
 }
 
-func (r *flowRun) GetTextArray(uuid uuids.UUID, key string, native []string) []string {
-	return r.GetTranslatedTextArray(uuid, key, native, r.getLanguages())
+func (r *flowRun) GetTextArray(uuid uuids.UUID, key string, native []string) ([]string, envs.Language) {
+	return r.getTranslatedText(uuid, key, native, r.getLanguages())
 }
 
 func (r *flowRun) GetTranslatedTextArray(uuid uuids.UUID, key string, native []string, languages []envs.Language) []string {
+	texts, _ := r.getTranslatedText(uuid, key, native, languages)
+	return texts
+}
+
+func (r *flowRun) getTranslatedText(uuid uuids.UUID, key string, native []string, languages []envs.Language) ([]string, envs.Language) {
+	nativeLang := r.Flow().Language()
+
 	if languages == nil {
 		languages = r.getLanguages()
 	}
 
 	for _, lang := range languages {
 		if lang == r.Flow().Language() {
-			return native
+			return native, nativeLang
 		}
 
-		translations := r.Flow().Localization().GetTranslations(lang)
-		if translations != nil {
-			textArray := translations.GetTextArray(uuid, key)
-			if textArray == nil {
-				return native
-			}
-
+		textArray := r.Flow().Localization().GetItemTranslation(lang, uuid, key)
+		if textArray != nil {
 			merged := make([]string, len(native))
 			for i := range native {
 				if i < len(textArray) && textArray[i] != "" {
@@ -373,10 +376,10 @@ func (r *flowRun) GetTranslatedTextArray(uuid uuids.UUID, key string, native []s
 					merged[i] = native[i]
 				}
 			}
-			return merged
+			return merged, lang
 		}
 	}
-	return native
+	return native, nativeLang
 }
 
 func (r *flowRun) Snapshot() flows.RunSummary {

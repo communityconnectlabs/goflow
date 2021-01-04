@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static/types"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static/types"
 
 	"github.com/stretchr/testify/assert"
 )

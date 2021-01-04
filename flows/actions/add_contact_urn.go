@@ -1,14 +1,13 @@
 package actions
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/actions/modifiers"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
-
-	"github.com/pkg/errors"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
+	"github.com/nyaruka/goflow/flows/modifiers"
 )
 
 func init() {
@@ -68,13 +67,9 @@ func (a *AddContactURNAction) Execute(run flows.FlowRun, step flows.Step, logMod
 		return nil
 	}
 
-	// if we don't have a valid URN, log error
-	urn, err := urns.NewURNFromParts(a.Scheme, evaluatedPath, "", "")
-	if err != nil {
-		logEvent(events.NewError(errors.Wrapf(err, "unable to add URN '%s:%s'", a.Scheme, evaluatedPath)))
-		return nil
-	}
+	// create URN - modifier will take care of validating it
+	urn := urns.URN(fmt.Sprintf("%s:%s", a.Scheme, evaluatedPath))
 
-	a.applyModifier(run, modifiers.NewURN(urn, modifiers.URNAppend), logModifier, logEvent)
+	a.applyModifier(run, modifiers.NewURNs([]urns.URN{urn}, modifiers.URNsAppend), logModifier, logEvent)
 	return nil
 }

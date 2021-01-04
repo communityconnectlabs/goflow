@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/flows/definition"
-	"github.com/greatnonprofits-nfp/goflow/mobile"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/nyaruka/goflow/mobile"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

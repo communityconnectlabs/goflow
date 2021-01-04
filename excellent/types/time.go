@@ -3,10 +3,10 @@ package types
 import (
 	"fmt"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/utils"
 )
 
 // XTime is a time of day.

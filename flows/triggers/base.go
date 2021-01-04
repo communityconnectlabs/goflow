@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 )
@@ -38,24 +37,37 @@ type baseTrigger struct {
 	flow        *assets.FlowReference
 	contact     *flows.Contact
 	connection  *flows.Connection
+	batch       bool
 	params      *types.XObject
+	history     *flows.SessionHistory
 	triggeredOn time.Time
 }
 
 // create a new base trigger
-func newBaseTrigger(typeName string, env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, connection *flows.Connection, params *types.XObject) baseTrigger {
-	return baseTrigger{type_: typeName, environment: env, flow: flow, contact: contact, connection: connection, params: params, triggeredOn: dates.Now()}
+func newBaseTrigger(typeName string, env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, connection *flows.Connection, batch bool, history *flows.SessionHistory) baseTrigger {
+	return baseTrigger{
+		type_:       typeName,
+		environment: env,
+		flow:        flow,
+		contact:     contact,
+		connection:  connection,
+		batch:       batch,
+		history:     history,
+		triggeredOn: dates.Now(),
+	}
 }
 
 // Type returns the type of this trigger
 func (t *baseTrigger) Type() string { return t.type_ }
 
-func (t *baseTrigger) Environment() envs.Environment { return t.environment }
-func (t *baseTrigger) Flow() *assets.FlowReference   { return t.flow }
-func (t *baseTrigger) Contact() *flows.Contact       { return t.contact }
-func (t *baseTrigger) Connection() *flows.Connection { return t.connection }
-func (t *baseTrigger) Params() *types.XObject        { return t.params }
-func (t *baseTrigger) TriggeredOn() time.Time        { return t.triggeredOn }
+func (t *baseTrigger) Environment() envs.Environment  { return t.environment }
+func (t *baseTrigger) Flow() *assets.FlowReference    { return t.flow }
+func (t *baseTrigger) Contact() *flows.Contact        { return t.contact }
+func (t *baseTrigger) Connection() *flows.Connection  { return t.connection }
+func (t *baseTrigger) Batch() bool                    { return t.batch }
+func (t *baseTrigger) Params() *types.XObject         { return t.params }
+func (t *baseTrigger) History() *flows.SessionHistory { return t.history }
+func (t *baseTrigger) TriggeredOn() time.Time         { return t.triggeredOn }
 
 // Initialize initializes the session
 func (t *baseTrigger) Initialize(session flows.Session, logEvent flows.EventCallback) error {
@@ -80,8 +92,6 @@ func (t *baseTrigger) Initialize(session flows.Session, logEvent flows.EventCall
 
 	if t.contact != nil {
 		session.SetContact(t.contact.Clone())
-
-		EnsureDynamicGroups(session, logEvent)
 	}
 	return nil
 }
@@ -91,34 +101,68 @@ func (t *baseTrigger) InitializeRun(run flows.FlowRun, logEvent flows.EventCallb
 	return nil
 }
 
+//------------------------------------------------------------------------------------------
+// Expressions context
+//------------------------------------------------------------------------------------------
+
+// Context is the schema of trigger objects in the context, across all types
+type Context struct {
+	type_   string
+	params  *types.XObject
+	keyword string
+	user    string
+	origin  string
+}
+
+func (c *Context) asMap() map[string]types.XValue {
+	return map[string]types.XValue{
+		"type":    types.NewXText(c.type_),
+		"params":  c.params,
+		"keyword": types.NewXText(c.keyword),
+		"user":    types.NewXText(c.user),
+		"origin":  types.NewXText(c.origin),
+	}
+}
+
+func (t *baseTrigger) context() *Context {
+	params := t.params
+	if params == nil {
+		params = types.XObjectEmpty
+	}
+
+	return &Context{type_: t.type_, params: params}
+}
+
 // Context returns the properties available in expressions
 //
 //   type:text -> the type of trigger that started this session
 //   params:any -> the parameters passed to the trigger
-//   keyword:any -> the keyword match if this is a keyword trigger
+//   keyword:text -> the keyword match if this is a keyword trigger
+//   user:text -> the user who started this session if this is a manual trigger
+//   origin:text -> the origin of this session if this is a manual trigger
 //
 // @context trigger
 func (t *baseTrigger) Context(env envs.Environment) map[string]types.XValue {
-	return map[string]types.XValue{
-		"type":    types.NewXText(t.type_),
-		"params":  t.params,
-		"keyword": nil,
-	}
+	return t.context().asMap()
 }
 
-// EnsureDynamicGroups ensures that our session contact is in the correct dynamic groups as
-// as far as the engine is concerned
-func EnsureDynamicGroups(session flows.Session, logEvent flows.EventCallback) {
-	added, removed, errors := session.Contact().ReevaluateDynamicGroups(session.Environment())
+//------------------------------------------------------------------------------------------
+// Builder
+//------------------------------------------------------------------------------------------
 
-	// add error event for each group we couldn't re-evaluate
-	for _, err := range errors {
-		logEvent(events.NewError(err))
-	}
+// Builder is a builder for triggers
+type Builder struct {
+	environment envs.Environment
+	flow        *assets.FlowReference
+	contact     *flows.Contact
+}
 
-	// add groups changed event for the groups we were added/removed to/from
-	if len(added) > 0 || len(removed) > 0 {
-		logEvent(events.NewContactGroupsChanged(added, removed))
+// NewBuilder creates a new trigger builder
+func NewBuilder(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact) *Builder {
+	return &Builder{
+		environment: env,
+		flow:        flow,
+		contact:     contact,
 	}
 }
 
@@ -132,7 +176,9 @@ type baseTriggerEnvelope struct {
 	Flow        *assets.FlowReference `json:"flow" validate:"required"`
 	Contact     json.RawMessage       `json:"contact,omitempty"`
 	Connection  *flows.Connection     `json:"connection,omitempty"`
+	Batch       bool                  `json:"batch,omitempty"`
 	Params      json.RawMessage       `json:"params,omitempty"`
+	History     *flows.SessionHistory `json:"history,omitempty"`
 	TriggeredOn time.Time             `json:"triggered_on" validate:"required"`
 }
 
@@ -156,6 +202,8 @@ func (t *baseTrigger) unmarshal(sessionAssets flows.SessionAssets, e *baseTrigge
 	t.type_ = e.Type
 	t.flow = e.Flow
 	t.connection = e.Connection
+	t.batch = e.Batch
+	t.history = e.History
 	t.triggeredOn = e.TriggeredOn
 
 	if e.Environment != nil {
@@ -182,6 +230,8 @@ func (t *baseTrigger) marshal(e *baseTriggerEnvelope) error {
 	e.Type = t.type_
 	e.Flow = t.flow
 	e.Connection = t.connection
+	e.Batch = t.batch
+	e.History = t.history
 	e.TriggeredOn = t.triggeredOn
 
 	if t.environment != nil {

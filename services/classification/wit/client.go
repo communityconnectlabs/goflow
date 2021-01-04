@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
+	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/shopspring/decimal"
 )
@@ -70,7 +70,12 @@ func NewClient(httpClient *http.Client, httpRetries *httpx.RetryConfig, accessTo
 func (c *Client) Message(q string) (*MessageResponse, *httpx.Trace, error) {
 	endpoint := fmt.Sprintf("%s/message?v=%s&q=%s", apiBaseURL, version, url.QueryEscape(q))
 
-	trace, err := httpx.NewTrace(c.httpClient, "GET", endpoint, nil, c.headers, c.httpRetries, nil)
+	request, err := httpx.NewRequest("GET", endpoint, nil, c.headers)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	trace, err := httpx.DoTrace(c.httpClient, request, c.httpRetries, nil, -1)
 	if err != nil {
 		return nil, trace, err
 	}

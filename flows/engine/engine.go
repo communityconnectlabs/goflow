@@ -3,9 +3,9 @@ package engine
 import (
 	"encoding/json"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/flows"
 )
 
 // an instance of the engine
@@ -23,6 +23,7 @@ func (e *engine) NewSession(sa flows.SessionAssets, trigger flows.Trigger) (flow
 		assets:     sa,
 		trigger:    trigger,
 		status:     flows.SessionStatusActive,
+		batchStart: trigger.Batch(),
 		runsByUUID: make(map[flows.RunUUID]flows.FlowRun),
 	}
 
@@ -77,6 +78,12 @@ func (b *Builder) WithWebhookServiceFactory(f WebhookServiceFactory) *Builder {
 // WithClassificationServiceFactory sets the NLU service factory
 func (b *Builder) WithClassificationServiceFactory(f ClassificationServiceFactory) *Builder {
 	b.eng.services.classification = f
+	return b
+}
+
+// WithTicketServiceFactory sets the ticket service factory
+func (b *Builder) WithTicketServiceFactory(f TicketServiceFactory) *Builder {
+	b.eng.services.ticket = f
 	return b
 }
 

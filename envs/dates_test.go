@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/goflow/envs"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

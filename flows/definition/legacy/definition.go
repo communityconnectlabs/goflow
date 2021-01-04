@@ -8,14 +8,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition/legacy/expressions"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/definition/legacy/expressions"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/buger/jsonparser"
 	"github.com/pkg/errors"
@@ -170,13 +170,13 @@ type FlowReference struct {
 
 // RulesetConfig holds the config dictionary for a legacy ruleset
 type RulesetConfig struct {
-	Flow             *FlowReference        `json:"flow"`
-	FieldDelimiter   string                `json:"field_delimiter"`
-	FieldIndex       int                   `json:"field_index"`
-	Webhook          string                `json:"webhook"`
-	WebhookAction    string                `json:"webhook_action"`
-	WebhookHeaders   []WebhookHeader       `json:"webhook_headers"`
-	Resthook         string                `json:"resthook"`
+	Flow             *FlowReference  `json:"flow"`
+	FieldDelimiter   string          `json:"field_delimiter"`
+	FieldIndex       int             `json:"field_index"`
+	Webhook          string          `json:"webhook"`
+	WebhookAction    string          `json:"webhook_action"`
+	WebhookHeaders   []WebhookHeader `json:"webhook_headers"`
+	Resthook         string          `json:"resthook"`
 	LookupDb         map[string]string     `json:"lookup_db"`
 	LookupQueries    []actions.LookupQuery `json:"lookup_queries"`
 	GiftcardDb       map[string]string     `json:"giftcard_db"`

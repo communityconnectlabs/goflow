@@ -3,8 +3,8 @@ package types
 import (
 	"encoding/json"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/assets"
 
 	"github.com/buger/jsonparser"
 	"github.com/pkg/errors"

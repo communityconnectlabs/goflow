@@ -2,11 +2,11 @@ package actions
 
 import (
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
 )
 
 func init() {
@@ -116,9 +116,15 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 		// do we have a template defined?
 		if a.Templating != nil {
-			translation := sa.Templates().FindTranslation(a.Templating.Template.UUID, channelRef, []envs.Language{run.Contact().Language(), run.Environment().DefaultLanguage()})
+			// looks for a translation in these locales
+			locales := []envs.Locale{
+				run.Contact().Locale(run.Environment()),
+				run.Environment().DefaultLocale(),
+			}
+
+			translation := sa.Templates().FindTranslation(a.Templating.Template.UUID, channelRef, locales)
 			if translation != nil {
-				localizedVariables := run.GetTextArray(uuids.UUID(a.Templating.UUID), "variables", a.Templating.Variables)
+				localizedVariables, _ := run.GetTextArray(uuids.UUID(a.Templating.UUID), "variables", a.Templating.Variables)
 
 				// evaluate our variables
 				evaluatedVariables := make([]string, len(localizedVariables))
@@ -130,8 +136,8 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 					evaluatedVariables[i] = sub
 				}
 
-				text = translation.Substitute(evaluatedVariables)
-				templating = flows.NewMsgTemplating(a.Templating.Template, translation.Language(), evaluatedVariables)
+				evaluatedText = translation.Substitute(evaluatedVariables)
+				templating = flows.NewMsgTemplating(a.Templating.Template, translation.Language(), translation.Country(), evaluatedVariables)
 			}
 		}
 

@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/services/classification/bothub"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/services/classification/bothub"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +29,7 @@ func TestService(t *testing.T) {
 	uuids.SetGenerator(uuids.NewSeededGenerator(12345))
 	dates.SetNowSource(dates.NewSequentialNowSource(time.Date(2019, 10, 7, 15, 21, 30, 123456789, time.UTC)))
 	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
-		"https://nlp.bothub.it/parse": []httpx.MockResponse{
+		"https://nlp.bothub.it/parse": {
 			httpx.NewMockResponse(200, nil, `{
 				"intent": {
 				  "name": "book_flight",
@@ -63,9 +63,11 @@ func TestService(t *testing.T) {
 				"text": "book my flight to Quito",
 				"update_id": 13158,
 				"language": "en"
-			  }`, 1),
+			  }`),
 		},
 	}))
+
+	session.Contact().SetLanguage("spa")
 
 	svc := bothub.NewService(
 		http.DefaultClient,
@@ -79,15 +81,17 @@ func TestService(t *testing.T) {
 	classification, err := svc.Classify(session, "book my flight to Quito", httpLogger.Log)
 	assert.NoError(t, err)
 	assert.Equal(t, []flows.ExtractedIntent{
-		flows.ExtractedIntent{Name: "book_flight", Confidence: decimal.RequireFromString(`0.9224673593230207`)},
-		flows.ExtractedIntent{Name: "book_hotel", Confidence: decimal.RequireFromString(`0.07753264067697924`)},
+		{Name: "book_flight", Confidence: decimal.RequireFromString(`0.9224673593230207`)},
+		{Name: "book_hotel", Confidence: decimal.RequireFromString(`0.07753264067697924`)},
 	}, classification.Intents)
 	assert.Equal(t, map[string][]flows.ExtractedEntity{
-		"destination": []flows.ExtractedEntity{
+		"destination": {
 			flows.ExtractedEntity{Value: "quito", Confidence: decimal.RequireFromString(`0.8824543190522534`)},
 		},
 	}, classification.Entities)
 
 	assert.Equal(t, 1, len(httpLogger.Logs))
 	assert.Equal(t, "https://nlp.bothub.it/parse", httpLogger.Logs[0].URL)
+
+	test.AssertSnapshot(t, "parse_request", httpLogger.Logs[0].Request)
 }

@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
-	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/nyaruka/goflow/flows/resumes"
+	"github.com/nyaruka/goflow/flows/triggers"
 
 	"github.com/pkg/errors"
 )
@@ -50,6 +50,13 @@ var sessionAssets = `{
             "name": "Booking",
             "type": "wit",
             "intents": ["book_flight", "book_hotel"]
+        }
+    ],
+    "ticketers": [
+        {
+            "uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
+            "name": "Support Tickets",
+            "type": "mailgun"
         }
     ],
     "flows": [
@@ -141,7 +148,7 @@ var sessionAssets = `{
                                 "name": "Booking"
                             },
                             "input": "@input.text",
-                            "result_name": "intent"
+                            "result_name": "Intent"
                         }
                     ],
                     "exits": [
@@ -340,6 +347,7 @@ var sessionTrigger = `{
             "eng", 
             "spa"
         ],
+        "default_country": "US",
         "redaction_policy": "none",
         "time_format": "tt:mm",
         "timezone": "America/Guayaquil"
@@ -555,7 +563,7 @@ func CreateSession(assetsJSON json.RawMessage, flowUUID assets.FlowUUID) (flows.
 
 	env := envs.NewBuilder().Build()
 	contact := flows.NewEmptyContact(sa, "Bob", envs.NilLanguage, nil)
-	trigger := triggers.NewManual(env, flow.Reference(), contact, nil)
+	trigger := triggers.NewBuilder(env, flow.Reference(), contact).Manual().Build()
 	eng := engine.NewBuilder().Build()
 
 	return eng.NewSession(sa, trigger)

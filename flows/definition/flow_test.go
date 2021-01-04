@@ -7,19 +7,19 @@ import (
 	"testing"
 
 	"github.com/Masterminds/semver"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/actions"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/actions"
+	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/nyaruka/goflow/flows/definition/migrations"
+	"github.com/nyaruka/goflow/flows/routers"
+	"github.com/nyaruka/goflow/flows/routers/waits"
+	"github.com/nyaruka/goflow/flows/routers/waits/hints"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -213,7 +213,7 @@ func TestNewFlow(t *testing.T) {
 				routers.NewSwitch(
 					waits.NewMsgWait(nil, hints.NewImageHint()),
 					"Response 1",
-					[]*routers.Category{
+					[]flows.Category{
 						routers.NewCategory(
 							flows.CategoryUUID("97b9451c-2856-475b-af38-32af68100897"),
 							"Yes",
@@ -454,13 +454,14 @@ func TestReadFlow(t *testing.T) {
 	assert.Equal(t, 1, len(flow.Nodes()))
 }
 
-func TestExtractTemplates(t *testing.T) {
+func TestExtractTemplatesAndLocalizables(t *testing.T) {
 	env := envs.NewBuilder().Build()
 
 	testCases := []struct {
-		path      string
-		uuid      string
-		templates []string
+		path         string
+		uuid         string
+		templates    []string
+		localizables []string
 	}{
 		{
 			"../../test/testdata/runner/two_questions.json",
@@ -485,6 +486,24 @@ func TestExtractTemplates(t *testing.T) {
 				`{ "contact": @(json(contact.uuid)), "soda": @(json(results.soda.value)) }`,
 				`Great, you are done and like @results.soda.value! Webhook status was @results.webhook.value`,
 				`Parfait, vous avez finis et tu aimes @results.soda.category`,
+			},
+			[]string{
+				"Hi @contact.name! What is your favorite color? (red/blue) Your number is @(format_urn(contact.urn))",
+				"Red",
+				"Blue",
+				"red",
+				"blue",
+				"Red",
+				"Blue",
+				"Other",
+				"No Response",
+				"@(TITLE(results.favorite_color.category_localized)) it is! What is your favorite soda? (pepsi/coke)",
+				"pepsi",
+				"coke coca cola",
+				"Pepsi",
+				"Coke",
+				"Other",
+				"Great, you are done and like @results.soda.value! Webhook status was @results.webhook.value",
 			},
 		},
 		{
@@ -515,6 +534,20 @@ func TestExtractTemplates(t *testing.T) {
 				`@fields.raw_district`,
 				`http://localhost/?cmd=success&name=@(url_encode(contact.name))`,
 			},
+			[]string{
+				"Here is your activation token",
+				"Hi @fields.first_name, Your activation token is @fields.activation_token, your coupon is @(trigger.params.coupons[0].code)",
+				"Hi @contact.name, are you ready?",
+				"Hi @contact.name, are you ready for these attachments?",
+				"image/jpeg:http://s3.amazon.com/bucket/test_en.jpg?a=@(url_encode(format_location(fields.state)))",
+				"Hi @contact.name, are you ready to complete today's survey?",
+				"This is a message to each of @contact.name's urns.",
+				"This is a reply with attachments and quick replies",
+				"image/jpeg:http://s3.amazon.com/bucket/test_en.jpg?a=@(url_encode(format_location(fields.state)))",
+				"Yes",
+				"No",
+				"Male",
+			},
 		},
 	}
 
@@ -525,6 +558,10 @@ func TestExtractTemplates(t *testing.T) {
 		// try extracting all templates
 		templates := flow.ExtractTemplates()
 		assert.Equal(t, tc.templates, templates, "extracted templates mismatch for flow %s[uuid=%s]", tc.path, tc.uuid)
+
+		// try extracting all localizable text
+		localizables := flow.ExtractLocalizables()
+		assert.Equal(t, tc.localizables, localizables, "extracted localizables mismatch for flow %s[uuid=%s]", tc.path, tc.uuid)
 	}
 }
 
@@ -544,7 +581,7 @@ func TestInspection(t *testing.T) {
 			"615b8a0f-588c-4d20-a05f-363b0b4ce6f4",
 		},
 		{
-			"../../test/testdata/runner/dynamic_groups.json",
+			"../../test/testdata/runner/smart_groups.json",
 			"1b462ce8-983a-4393-b133-e15a0efdb70c",
 		},
 		{
@@ -582,4 +619,28 @@ func TestInspection(t *testing.T) {
 			require.NoError(t, err)
 		}
 	}
+}
+
+func TestChangeLanguage(t *testing.T) {
+	env := envs.NewBuilder().Build()
+
+	flow, err := test.LoadFlowFromAssets(env, "testdata/change_language.json", "19cad1f2-9110-4271-98d4-1b968bf19410")
+	require.NoError(t, err)
+
+	assertLanguageChange := func(lang envs.Language) {
+		copy, err := flow.ChangeLanguage(lang)
+		assert.NoError(t, err)
+
+		marshaled, err := jsonx.MarshalPretty(copy)
+		require.NoError(t, err)
+		test.AssertSnapshot(t, "change_language_to_"+string(lang), string(marshaled))
+
+		// check flow is valid by reading it back
+		_, err = definition.ReadFlow(marshaled, nil)
+		assert.NoError(t, err)
+	}
+
+	assertLanguageChange("spa") // has a complete translation
+	assertLanguageChange("ara") // missing translations will be left in eng
+	assertLanguageChange("kin") // everything is missing and will be left in eng
 }

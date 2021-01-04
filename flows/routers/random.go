@@ -3,10 +3,10 @@ package routers
 import (
 	"encoding/json"
 
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/random"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/random"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/shopspring/decimal"
 )
@@ -24,7 +24,7 @@ type RandomRouter struct {
 }
 
 // NewRandom creates a new random router
-func NewRandom(wait flows.Wait, resultName string, categories []*Category) *RandomRouter {
+func NewRandom(wait flows.Wait, resultName string, categories []flows.Category) *RandomRouter {
 	return &RandomRouter{newBaseRouter(TypeRandom, wait, resultName, categories)}
 }
 

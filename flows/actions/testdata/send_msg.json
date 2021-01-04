@@ -51,6 +51,12 @@
             "Red",
             "Blue"
         ],
+        "localizables": [
+            "Hi there",
+            "http://example.com/red.jpg",
+            "Red",
+            "Blue"
+        ],
         "inspection": {
             "dependencies": [],
             "issues": [],
@@ -209,6 +215,9 @@
         "templates": [
             "Hi there @contact welcome to @globals.org_name, the secret password is @globals.password"
         ],
+        "localizables": [
+            "Hi there @contact welcome to @globals.org_name, the secret password is @globals.password"
+        ],
         "inspection": {
             "dependencies": [
                 {
@@ -326,6 +335,11 @@
             "@contact.name",
             "boy"
         ],
+        "localizables": [
+            "Hi @contact.name, who's a good boy?",
+            "@contact.name",
+            "boy"
+        ],
         "inspection": {
             "dependencies": [
                 {
@@ -391,6 +405,7 @@
                             "name": "affirmation"
                         },
                         "language": "eng",
+                        "country": "US",
                         "variables": [
                             "Ryan Lewis",
                             "boy"
@@ -401,6 +416,11 @@
             }
         ],
         "templates": [
+            "Hi Ryan Lewis, who's a good boy?",
+            "@contact.name",
+            "boy"
+        ],
+        "localizables": [
             "Hi Ryan Lewis, who's a good boy?",
             "@contact.name",
             "boy"
@@ -466,6 +486,7 @@
                             "name": "affirmation"
                         },
                         "language": "spa",
+                        "country": "",
                         "variables": [
                             "Ryan Lewis",
                             "niño"
@@ -480,6 +501,11 @@
             "boy",
             "@contact.name",
             "niño"
+        ],
+        "localizables": [
+            "Hi Ryan Lewis, who's a good boy?",
+            "@contact.name",
+            "boy"
         ],
         "inspection": {
             "dependencies": [
@@ -528,12 +554,16 @@
                             "uuid": "2edc8dfd-aef0-41cf-a900-8a71bdb00900",
                             "name": "wakeup"
                         },
-                        "language": "eng"
+                        "language": "eng",
+                        "country": ""
                     }
                 }
             }
         ],
         "templates": [
+            "Hi there, it's time to get up!"
+        ],
+        "localizables": [
             "Hi there, it's time to get up!"
         ],
         "inspection": {
@@ -611,6 +641,12 @@
             "Yes",
             "No",
             "Si",
+            "No"
+        ],
+        "localizables": [
+            "Hi there!",
+            "http://example.com/red.jpg",
+            "Yes",
             "No"
         ],
         "inspection": {

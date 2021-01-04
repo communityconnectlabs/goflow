@@ -3,17 +3,17 @@ package inspect_test
 import (
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/actions"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
-	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/actions"
+	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/nyaruka/goflow/flows/inspect"
+	"github.com/nyaruka/goflow/flows/routers"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -45,6 +45,7 @@ func TestDependencies(t *testing.T) {
 		flows.NewExtractedReference(node1, action1, nil, envs.NilLanguage, assets.NewGroupReference("377c3101-a7fc-47b1-9136-980348e362c0", "Customers")),
 		flows.NewExtractedReference(node1, action1, nil, envs.NilLanguage, assets.NewLabelReference("31c06b7c-010d-4f91-9590-d3fbdc2fb7ac", "Spam")),
 		flows.NewExtractedReference(node1, action1, nil, envs.NilLanguage, assets.NewTemplateReference("ff958d30-f50e-48ab-a524-37ed1e9620d9", "Welcome")),
+		flows.NewExtractedReference(node1, action1, nil, envs.NilLanguage, assets.NewTicketerReference("fb9cab80-4450-4a9d-ba9b-cb8df40dd233", "Support")),
 		flows.NewExtractedReference(node2, nil, router2, envs.NilLanguage, assets.NewGlobalReference("org_name", "Org Name")),
 	}
 
@@ -122,6 +123,12 @@ func TestDependencies(t *testing.T) {
 			"name": "Welcome",
 			"type": "template",
 			"uuid": "ff958d30-f50e-48ab-a524-37ed1e9620d9"
+		},
+		{
+			"missing": true,
+			"name": "Support",
+			"type": "ticketer",
+			"uuid": "fb9cab80-4450-4a9d-ba9b-cb8df40dd233"
 		}
 	]`), depsJSON, "deps JSON mismatch")
 

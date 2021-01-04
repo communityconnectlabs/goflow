@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/contactql"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/contactql"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/utils"
 )
 
 // NodeUUID is a UUID of a flow node
@@ -124,6 +124,7 @@ type SessionAssets interface {
 	Locations() *LocationAssets
 	Resthooks() *ResthookAssets
 	Templates() *TemplateAssets
+	Ticketers() *TicketerAssets
 }
 
 // Localizable is anything in the flow definition which can be localized and therefore needs a UUID
@@ -150,6 +151,8 @@ type Flow interface {
 
 	Inspect(sa SessionAssets) *Inspection
 	ExtractTemplates() []string
+	ExtractLocalizables() []string
+	ChangeLanguage(envs.Language) (Flow, error)
 }
 
 // Node is a single node in a flow
@@ -164,6 +167,7 @@ type Node interface {
 	EnumerateTemplates(Localization, func(Action, Router, envs.Language, string))
 	EnumerateDependencies(Localization, func(Action, Router, envs.Language, assets.Reference))
 	EnumerateResults(func(Action, Router, *ResultInfo))
+	EnumerateLocalizables(func(uuids.UUID, string, []string, func([]string)))
 }
 
 // Action is an action within a flow node
@@ -177,11 +181,21 @@ type Action interface {
 	AllowedFlowTypes() []FlowType
 }
 
+// Category is how routers map results to exits
+type Category interface {
+	Localizable
+
+	UUID() CategoryUUID
+	Name() string
+	ExitUUID() ExitUUID
+}
+
 // Router is a router on a note which can pick an exit
 type Router interface {
 	utils.Typed
 
 	Wait() Wait
+	Categories() []Category
 	ResultName() string
 
 	Validate([]Exit) error
@@ -192,6 +206,7 @@ type Router interface {
 	EnumerateTemplates(Localization, func(envs.Language, string))
 	EnumerateDependencies(Localization, func(envs.Language, assets.Reference))
 	EnumerateResults(func(*ResultInfo))
+	EnumerateLocalizables(func(uuids.UUID, string, []string, func([]string)))
 }
 
 // Exit is a route out of a node and optionally to another node
@@ -230,15 +245,9 @@ type Hint interface {
 
 // Localization provide a way to get the translations for a specific language
 type Localization interface {
-	AddItemTranslation(envs.Language, uuids.UUID, string, []string)
-	GetTranslations(envs.Language) Translations
+	GetItemTranslation(envs.Language, uuids.UUID, string) []string
+	SetItemTranslation(envs.Language, uuids.UUID, string, []string)
 	Languages() []envs.Language
-}
-
-// Translations provide a way to get the translation for a specific language for a uuid/key pair
-type Translations interface {
-	GetTextArray(uuids.UUID, string) []string
-	SetTextArray(uuids.UUID, string, []string)
 }
 
 // Trigger represents something which can initiate a session with the flow engine
@@ -253,7 +262,9 @@ type Trigger interface {
 	Flow() *assets.FlowReference
 	Contact() *Contact
 	Connection() *Connection
+	Batch() bool
 	Params() *types.XObject
+	History() *SessionHistory
 	TriggeredOn() time.Time
 }
 
@@ -268,7 +279,7 @@ type TriggerWithRun interface {
 type Resume interface {
 	utils.Typed
 
-	Apply(FlowRun, EventCallback) error
+	Apply(FlowRun, EventCallback)
 
 	Environment() envs.Environment
 	Contact() *Contact
@@ -356,6 +367,7 @@ type Session interface {
 
 	Status() SessionStatus
 	Trigger() Trigger
+	BatchStart() bool
 	PushFlow(Flow, FlowRun, bool)
 	Wait() ActivatedWait
 
@@ -365,6 +377,7 @@ type Session interface {
 	GetCurrentChild(FlowRun) FlowRun
 	ParentRun() RunSummary
 	CurrentContext() *types.XObject
+	History() *SessionHistory
 
 	Engine() Engine
 }
@@ -379,15 +392,6 @@ type RunSummary interface {
 	Results() Results
 }
 
-// RunEnvironment is a run specific environment which adds location functionality required by some router tests
-type RunEnvironment interface {
-	envs.Environment
-
-	FindLocations(string, utils.LocationLevel, *utils.Location) ([]*utils.Location, error)
-	FindLocationsFuzzy(string, utils.LocationLevel, *utils.Location) ([]*utils.Location, error)
-	LookupLocation(utils.LocationPath) (*utils.Location, error)
-}
-
 // FlowRun is a single contact's journey through a flow. It records the path they have taken,
 // and the results that have been collected.
 type FlowRun interface {
@@ -395,7 +399,7 @@ type FlowRun interface {
 	RunSummary
 	FlowReference() *assets.FlowReference
 
-	Environment() RunEnvironment
+	Environment() envs.Environment
 	Session() Session
 	SaveResult(*Result)
 	SetStatus(RunStatus)
@@ -409,6 +413,7 @@ type FlowRun interface {
 	LogEvent(Step, Event)
 	LogError(Step, error)
 	Events() []Event
+	ReceivedInput() bool
 
 	EvaluateTemplateValue(string) (types.XValue, error)
 	EvaluateTemplateText(string, excellent.Escaping, bool) (string, error)
@@ -416,7 +421,7 @@ type FlowRun interface {
 	RootContext(envs.Environment) map[string]types.XValue
 
 	GetText(uuids.UUID, string, string) string
-	GetTextArray(uuids.UUID, string, []string) []string
+	GetTextArray(uuids.UUID, string, []string) ([]string, envs.Language)
 	GetTranslatedTextArray(uuids.UUID, string, []string, []envs.Language) []string
 
 	Snapshot() RunSummary

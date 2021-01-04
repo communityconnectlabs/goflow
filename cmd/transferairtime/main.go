@@ -1,6 +1,6 @@
 package main
 
-// go install github.com/greatnonprofits-nfp/goflow/cmd/transferairtime
+// go install github.com/nyaruka/goflow/cmd/transferairtime
 
 import (
 	"flag"
@@ -8,16 +8,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/services/airtime/dtone"
-	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/nyaruka/goflow/flows/triggers"
+	"github.com/nyaruka/goflow/services/airtime/dtone"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -125,7 +125,9 @@ func transferAirtime(destination urns.URN, amount decimal.Decimal, currency stri
 	contact := flows.NewEmptyContact(sa, "", "", nil)
 	contact.AddURN(destination, nil)
 
-	_, sprint, err := eng.NewSession(sa, triggers.NewManual(env, assets.NewFlowReference(assets.FlowUUID("2374f60d-7412-442c-9177-585967afa972"), "Airtime"), contact, nil))
+	trigger := triggers.NewBuilder(env, assets.NewFlowReference(assets.FlowUUID("2374f60d-7412-442c-9177-585967afa972"), "Airtime"), contact).Manual().Build()
+
+	_, sprint, err := eng.NewSession(sa, trigger)
 	if err != nil {
 		return err
 	}

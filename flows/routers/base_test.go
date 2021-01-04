@@ -7,16 +7,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/random"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/random"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/routers"
+	"github.com/nyaruka/goflow/flows/triggers"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -60,6 +60,7 @@ func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		Results           json.RawMessage `json:"results,omitempty"`
 		Events            json.RawMessage `json:"events,omitempty"`
 		Templates         []string        `json:"templates,omitempty"`
+		LocalizedText     []string        `json:"localizables,omitempty"`
 		Inspection        json.RawMessage `json:"inspection,omitempty"`
 	}{}
 
@@ -99,7 +100,7 @@ func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		contact, err := flows.ReadContact(sa, json.RawMessage(contactJSON), assets.PanicOnMissing)
 		require.NoError(t, err)
 
-		trigger := triggers.NewManual(envs.NewBuilder().Build(), flow.Reference(), contact, nil)
+		trigger := triggers.NewBuilder(envs.NewBuilder().Build(), flow.Reference(), contact).Manual().Build()
 
 		eng := test.NewEngine()
 		session, _, err := eng.NewSession(sa, trigger)
@@ -119,6 +120,9 @@ func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		if tc.Templates != nil {
 			actual.Templates = flow.ExtractTemplates()
 		}
+		if tc.LocalizedText != nil {
+			actual.LocalizedText = flow.ExtractLocalizables()
+		}
 		if tc.Inspection != nil {
 			actual.Inspection, _ = jsonx.Marshal(flow.Inspect(sa))
 		}
@@ -134,6 +138,9 @@ func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 
 			// check extracted templates
 			assert.Equal(t, tc.Templates, actual.Templates, "extracted templates mismatch in %s", testName)
+
+			// check extracted localized text
+			assert.Equal(t, tc.LocalizedText, actual.LocalizedText, "extracted localized text mismatch in %s", testName)
 
 			// check inspection results
 			test.AssertEqualJSON(t, tc.Inspection, actual.Inspection, "inspection mismatch in %s", testName)

@@ -3,8 +3,8 @@ package dtone_test
 import (
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/services/airtime/dtone"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/services/airtime/dtone"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

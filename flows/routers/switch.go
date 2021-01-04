@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/cases"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/inspect"
+	"github.com/nyaruka/goflow/flows/routers/cases"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 	"strconv"
@@ -68,7 +68,7 @@ func (c *Case) Dependencies(localization flows.Localization, include func(envs.L
 
 		// the group UUID might be different in different translations
 		for _, lang := range localization.Languages() {
-			arguments := localization.GetTranslations(lang).GetTextArray(c.UUID, "arguments")
+			arguments := localization.GetItemTranslation(lang, c.UUID, "arguments")
 			if len(arguments) > 0 {
 				include(lang, groupRef(arguments))
 			}
@@ -88,7 +88,7 @@ type SwitchRouter struct {
 }
 
 // NewSwitch creates a new switch router
-func NewSwitch(wait flows.Wait, resultName string, categories []*Category, operand string, cases []*Case, defaultCategory flows.CategoryUUID, config *SwitchRouterConfig) *SwitchRouter {
+func NewSwitch(wait flows.Wait, resultName string, categories []flows.Category, operand string, cases []*Case, defaultCategory flows.CategoryUUID) *SwitchRouter {
 	return &SwitchRouter{
 		baseRouter: newBaseRouter(TypeSwitch, wait, resultName, categories),
 		default_:   defaultCategory,
@@ -229,7 +229,7 @@ func (r *SwitchRouter) matchCase(run flows.FlowRun, step flows.Step, operand typ
 		// build our argument list which starts with the operand
 		args := []types.XValue{operand}
 
-		localizedArgs := run.GetTextArray(c.UUID, "arguments", c.Arguments)
+		localizedArgs, _ := run.GetTextArray(c.UUID, "arguments", c.Arguments)
 		for i := range c.Arguments {
 			test := localizedArgs[i]
 			arg, err := run.EvaluateTemplateValue(test)
@@ -300,6 +300,13 @@ func (r *SwitchRouter) EnumerateTemplates(localization flows.Localization, inclu
 // EnumerateDependencies enumerates all dependencies on this object and its children
 func (r *SwitchRouter) EnumerateDependencies(localization flows.Localization, include func(envs.Language, assets.Reference)) {
 	inspect.Dependencies(r.cases, localization, include)
+}
+
+// EnumerateLocalizables enumerates all the localizable text on this object
+func (r *SwitchRouter) EnumerateLocalizables(include func(uuids.UUID, string, []string, func([]string))) {
+	inspect.LocalizableText(r.cases, include)
+
+	r.baseRouter.EnumerateLocalizables(include)
 }
 
 //------------------------------------------------------------------------------------------

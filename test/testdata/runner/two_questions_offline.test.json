@@ -28,6 +28,7 @@
                     "id": 1234567,
                     "language": "eng",
                     "name": "Ben Haggerty",
+                    "status": "active",
                     "timezone": "America/Guayaquil",
                     "urns": [
                         "tel:+12065551212",
@@ -100,6 +101,7 @@
                         "id": 1234567,
                         "language": "eng",
                         "name": "Ben Haggerty",
+                        "status": "active",
                         "timezone": "America/Guayaquil",
                         "urns": [
                             "tel:+12065551212",
@@ -140,7 +142,7 @@
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:11.123456789Z",
+                    "created_on": "2018-07-06T12:30:12.123456789Z",
                     "msg": {
                         "text": "red",
                         "urn": "tel:+12065551212",
@@ -183,7 +185,9 @@
                     },
                     "id": 1234567,
                     "language": "eng",
+                    "last_seen_on": "2018-10-18T11:30:28.281119-05:00",
                     "name": "Ben Haggerty",
+                    "status": "active",
                     "timezone": "America/Guayaquil",
                     "urns": [
                         "tel:+12065551212",
@@ -233,7 +237,7 @@
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:11.123456789Z",
+                                "created_on": "2018-07-06T12:30:12.123456789Z",
                                 "msg": {
                                     "text": "red",
                                     "urn": "tel:+12065551212",
@@ -267,7 +271,7 @@
                             }
                         ],
                         "exited_on": null,
-                        "expires_on": "2018-07-06T12:30:09.123456789Z",
+                        "expires_on": "2018-07-06T12:30:10.123456789Z",
                         "flow": {
                             "name": "Two Questions",
                             "uuid": "7c3db26f-e12a-48af-9673-e2feefdf8516"
@@ -312,6 +316,7 @@
                         "id": 1234567,
                         "language": "eng",
                         "name": "Ben Haggerty",
+                        "status": "active",
                         "timezone": "America/Guayaquil",
                         "urns": [
                             "tel:+12065551212",
@@ -352,7 +357,7 @@
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:26.123456789Z",
+                    "created_on": "2018-07-06T12:30:27.123456789Z",
                     "msg": {
                         "text": "pepsi",
                         "urn": "tel:+12065551212",
@@ -398,7 +403,9 @@
                     },
                     "id": 1234567,
                     "language": "eng",
+                    "last_seen_on": "2018-10-18T11:30:32.52256-05:00",
                     "name": "Ben Haggerty",
+                    "status": "active",
                     "timezone": "America/Guayaquil",
                     "urns": [
                         "tel:+12065551212",
@@ -448,7 +455,7 @@
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:11.123456789Z",
+                                "created_on": "2018-07-06T12:30:12.123456789Z",
                                 "msg": {
                                     "text": "red",
                                     "urn": "tel:+12065551212",
@@ -481,7 +488,7 @@
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:26.123456789Z",
+                                "created_on": "2018-07-06T12:30:27.123456789Z",
                                 "msg": {
                                     "text": "pepsi",
                                     "urn": "tel:+12065551212",
@@ -518,7 +525,7 @@
                             }
                         ],
                         "exited_on": null,
-                        "expires_on": "2018-07-06T12:30:24.123456789Z",
+                        "expires_on": "2018-07-06T12:30:25.123456789Z",
                         "flow": {
                             "name": "Two Questions",
                             "uuid": "7c3db26f-e12a-48af-9673-e2feefdf8516"
@@ -577,6 +584,7 @@
                         "id": 1234567,
                         "language": "eng",
                         "name": "Ben Haggerty",
+                        "status": "active",
                         "timezone": "America/Guayaquil",
                         "urns": [
                             "tel:+12065551212",
@@ -620,7 +628,7 @@
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:41.123456789Z",
+                    "created_on": "2018-07-06T12:30:42.123456789Z",
                     "msg": {
                         "attachments": [
                             "image/jpeg:http://s3.com/selfie.jpg"
@@ -643,7 +651,9 @@
                     },
                     "id": 1234567,
                     "language": "eng",
+                    "last_seen_on": "2018-10-18T11:30:32.52256-05:00",
                     "name": "Ben Haggerty",
+                    "status": "active",
                     "timezone": "America/Guayaquil",
                     "urns": [
                         "tel:+12065551212",
@@ -696,7 +706,7 @@
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:11.123456789Z",
+                                "created_on": "2018-07-06T12:30:12.123456789Z",
                                 "msg": {
                                     "text": "red",
                                     "urn": "tel:+12065551212",
@@ -729,7 +739,7 @@
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:26.123456789Z",
+                                "created_on": "2018-07-06T12:30:27.123456789Z",
                                 "msg": {
                                     "text": "pepsi",
                                     "urn": "tel:+12065551212",
@@ -765,7 +775,7 @@
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:41.123456789Z",
+                                "created_on": "2018-07-06T12:30:42.123456789Z",
                                 "msg": {
                                     "attachments": [
                                         "image/jpeg:http://s3.com/selfie.jpg"
@@ -779,7 +789,7 @@
                             }
                         ],
                         "exited_on": "2018-07-06T12:30:44.123456789Z",
-                        "expires_on": "2018-07-06T12:30:39.123456789Z",
+                        "expires_on": null,
                         "flow": {
                             "name": "Two Questions",
                             "uuid": "7c3db26f-e12a-48af-9673-e2feefdf8516"
@@ -839,6 +849,7 @@
                         "id": 1234567,
                         "language": "eng",
                         "name": "Ben Haggerty",
+                        "status": "active",
                         "timezone": "America/Guayaquil",
                         "urns": [
                             "tel:+12065551212",
@@ -916,6 +927,7 @@
             "id": 1234567,
             "language": "eng",
             "name": "Ben Haggerty",
+            "status": "active",
             "timezone": "America/Guayaquil",
             "urns": [
                 "tel:+12065551212",

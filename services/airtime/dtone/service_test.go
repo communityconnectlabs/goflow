@@ -6,14 +6,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/httpx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/services/airtime/dtone"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/services/airtime/dtone"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -80,10 +80,10 @@ func TestServiceWithSuccessfulTopup(t *testing.T) {
 	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
 	mocks := httpx.NewMockRequestor(map[string][]httpx.MockResponse{
-		"https://airtime-api.dtone.com/cgi-bin/shop/topup": []httpx.MockResponse{
-			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse), 1),
-			httpx.NewMockResponse(200, nil, withCRLF(reserveResponse), 1),
-			httpx.NewMockResponse(200, nil, withCRLF(topupResponse), 1),
+		"https://airtime-api.dtone.com/cgi-bin/shop/topup": {
+			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse)),
+			httpx.NewMockResponse(200, nil, withCRLF(reserveResponse)),
+			httpx.NewMockResponse(200, nil, withCRLF(topupResponse)),
 		},
 	})
 
@@ -126,9 +126,9 @@ func TestServiceFailedTransfers(t *testing.T) {
 	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
 	mocks := httpx.NewMockRequestor(map[string][]httpx.MockResponse{
-		"https://airtime-api.dtone.com/cgi-bin/shop/topup": []httpx.MockResponse{
-			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse), 1),
-			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse), 1),
+		"https://airtime-api.dtone.com/cgi-bin/shop/topup": {
+			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse)),
+			httpx.NewMockResponse(200, nil, withCRLF(msisdnResponse)),
 		},
 	})
 

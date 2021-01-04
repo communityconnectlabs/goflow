@@ -3,12 +3,11 @@ package triggers
 import (
 	"encoding/json"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/utils"
 )
 
 func init() {
@@ -18,26 +17,27 @@ func init() {
 // TypeCampaign is the type for sessions triggered by campaign events
 const TypeCampaign string = "campaign"
 
+// CampaignUUID is the type for campaign UUIDs
+type CampaignUUID uuids.UUID
+
+// CampaignEventUUID is the type for campaign event UUIDs
+type CampaignEventUUID uuids.UUID
+
 // CampaignReference is a reference to the campaign that triggered the session
 type CampaignReference struct {
-	UUID string `json:"uuid" validate:"required,uuid4"`
-	Name string `json:"name" validate:"required"`
+	UUID CampaignUUID `json:"uuid" validate:"required,uuid4"`
+	Name string       `json:"name" validate:"required"`
 }
 
 // NewCampaignReference creates a new campaign reference
-func NewCampaignReference(uuid, name string) *CampaignReference {
+func NewCampaignReference(uuid CampaignUUID, name string) *CampaignReference {
 	return &CampaignReference{UUID: uuid, Name: name}
 }
 
 // CampaignEvent describes the specific event in the campaign that triggered the session
 type CampaignEvent struct {
-	UUID     string             `json:"uuid" validate:"required,uuid4"`
+	UUID     CampaignEventUUID  `json:"uuid" validate:"required,uuid4"`
 	Campaign *CampaignReference `json:"campaign" validate:"required,dive"`
-}
-
-// NewCampaignEvent creates a new campaign event
-func NewCampaignEvent(uuid string, campaign *CampaignReference) *CampaignEvent {
-	return &CampaignEvent{UUID: uuid, Campaign: campaign}
 }
 
 // CampaignTrigger is used when a session was triggered by a campaign event
@@ -63,15 +63,31 @@ type CampaignTrigger struct {
 	event *CampaignEvent
 }
 
-// NewCampaign creates a new campaign trigger with the passed in values
-func NewCampaign(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, event *CampaignEvent, params *types.XObject) *CampaignTrigger {
-	return &CampaignTrigger{
-		baseTrigger: newBaseTrigger(TypeCampaign, env, flow, contact, nil, params),
-		event:       event,
+var _ flows.Trigger = (*CampaignTrigger)(nil)
+
+//------------------------------------------------------------------------------------------
+// Builder
+//------------------------------------------------------------------------------------------
+
+// CampaignBuilder is a builder for campaign type triggers
+type CampaignBuilder struct {
+	t *CampaignTrigger
+}
+
+// Campaign returns a campaign trigger builder
+func (b *Builder) Campaign(campaign *CampaignReference, eventUUID CampaignEventUUID) *CampaignBuilder {
+	return &CampaignBuilder{
+		t: &CampaignTrigger{
+			baseTrigger: newBaseTrigger(TypeCampaign, b.environment, b.flow, b.contact, nil, false, nil),
+			event:       &CampaignEvent{UUID: eventUUID, Campaign: campaign},
+		},
 	}
 }
 
-var _ flows.Trigger = (*CampaignTrigger)(nil)
+// Build builds the trigger
+func (b *CampaignBuilder) Build() *CampaignTrigger {
+	return b.t
+}
 
 //------------------------------------------------------------------------------------------
 // JSON Encoding / Decoding

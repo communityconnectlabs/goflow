@@ -4,11 +4,11 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/tools"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/tools"
+	"github.com/nyaruka/goflow/flows"
 )
 
 // Templates extracts template values by reading engine tags on a struct
@@ -33,8 +33,7 @@ func templateValues(v reflect.Value, localization flows.Localization, include fu
 
 func Translations(localization flows.Localization, itemUUID uuids.UUID, property string, include func(envs.Language, string)) {
 	for _, lang := range localization.Languages() {
-		translations := localization.GetTranslations(lang)
-		for _, v := range translations.GetTextArray(itemUUID, property) {
+		for _, v := range localization.GetItemTranslation(lang, itemUUID, property) {
 			include(lang, v)
 		}
 	}

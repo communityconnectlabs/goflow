@@ -1,0 +1,1904 @@
+[
+    {
+        "description": "text field is set",
+        "query": "color!=\"\"",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "ecc7b13b-c698-4f46-8a90-24a8fab6fe34"
+                                }
+                            },
+                            {
+                                "exists": {
+                                    "field": "fields.text"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "text field is not set",
+        "query": "color=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.field": "ecc7b13b-c698-4f46-8a90-24a8fab6fe34"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.text"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "text field equality",
+        "query": "color=red",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "ecc7b13b-c698-4f46-8a90-24a8fab6fe34"
+                                }
+                            },
+                            {
+                                "term": {
+                                    "fields.text": "red"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "text field inequality",
+        "query": "color != red",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.field": "ecc7b13b-c698-4f46-8a90-24a8fab6fe34"
+                                        }
+                                    },
+                                    {
+                                        "term": {
+                                            "fields.text": "red"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.text"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "text field greater than",
+        "query": "color > red",
+        "error": "comparisons with > can only be used with date and number fields"
+    },
+    {
+        "description": "text field less than",
+        "query": "color < red",
+        "error": "comparisons with < can only be used with date and number fields"
+    },
+    {
+        "description": "text field less than empty string",
+        "query": "color < \"\"",
+        "error": "comparisons with < can only be used with date and number fields"
+    },
+    {
+        "description": "text field greater than empty string",
+        "query": "color > \"\"",
+        "error": "comparisons with > can only be used with date and number fields"
+    },
+    {
+        "description": "number field is set",
+        "query": "age!=\"\"",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                }
+                            },
+                            {
+                                "exists": {
+                                    "field": "fields.number"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "number field is not set",
+        "query": "age=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.number"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "number field equality",
+        "query": "age=10",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                }
+                            },
+                            {
+                                "match": {
+                                    "fields.number": {
+                                        "query": 10
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "number field inequality",
+        "query": "age!=10",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "fields.number": {
+                                                "query": 10
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "number field less than or equal",
+        "query": "age<=10",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "fields.number": {
+                                        "from": null,
+                                        "include_lower": true,
+                                        "include_upper": true,
+                                        "to": 10
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "number field greater than or equal",
+        "query": "age>=10",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "fields.number": {
+                                        "from": 10,
+                                        "include_lower": true,
+                                        "include_upper": true,
+                                        "to": null
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "number field less than",
+        "query": "age<10",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "fields.number": {
+                                        "from": null,
+                                        "include_lower": true,
+                                        "include_upper": false,
+                                        "to": 10
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "number field greater than",
+        "query": "age>10",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "fields.number": {
+                                        "from": 10,
+                                        "include_lower": false,
+                                        "include_upper": true,
+                                        "to": null
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "number field with invalid value",
+        "query": "age=fred",
+        "error": "can't convert 'fred' to a number"
+    },
+    {
+        "description": "number field greater than empty string",
+        "query": "age > \"\"",
+        "error": "can't convert '' to a number"
+    },
+    {
+        "description": "datetime field with invalid value",
+        "query": "dob=10",
+        "error": "can't convert '10' to a date"
+    },
+    {
+        "description": "datetime field greater than empty string",
+        "query": "dob > \"\"",
+        "error": "can't convert '' to a date"
+    },
+    {
+        "description": "date field is set",
+        "query": "dob!=\"\"",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "cbd3fc0e-9b74-4207-a8c7-248082bb4572"
+                                }
+                            },
+                            {
+                                "exists": {
+                                    "field": "fields.datetime"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "date field is not set",
+        "query": "dob=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.field": "cbd3fc0e-9b74-4207-a8c7-248082bb4572"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.datetime"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "date field equality",
+        "query": "dob=2018-06-23",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "cbd3fc0e-9b74-4207-a8c7-248082bb4572"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "fields.datetime": {
+                                        "from": "2018-06-23T00:00:00-04:00",
+                                        "include_lower": true,
+                                        "include_upper": false,
+                                        "to": "2018-06-24T00:00:00-04:00"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "date field inequality",
+        "query": "dob!=2018-06-23",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.field": "cbd3fc0e-9b74-4207-a8c7-248082bb4572"
+                                        }
+                                    },
+                                    {
+                                        "range": {
+                                            "fields.datetime": {
+                                                "from": "2018-06-23T00:00:00-04:00",
+                                                "include_lower": true,
+                                                "include_upper": false,
+                                                "to": "2018-06-24T00:00:00-04:00"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "date field greater than",
+        "query": "dob>2018-06-23",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "cbd3fc0e-9b74-4207-a8c7-248082bb4572"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "fields.datetime": {
+                                        "from": "2018-06-24T00:00:00-04:00",
+                                        "include_lower": true,
+                                        "include_upper": true,
+                                        "to": null
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "date field greater than",
+        "query": "dob>=2018-06-23",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "cbd3fc0e-9b74-4207-a8c7-248082bb4572"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "fields.datetime": {
+                                        "from": "2018-06-23T00:00:00-04:00",
+                                        "include_lower": true,
+                                        "include_upper": true,
+                                        "to": null
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "date field less than",
+        "query": "dob<2018-06-23",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "cbd3fc0e-9b74-4207-a8c7-248082bb4572"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "fields.datetime": {
+                                        "from": null,
+                                        "include_lower": true,
+                                        "include_upper": false,
+                                        "to": "2018-06-23T00:00:00-04:00"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "date field less than or equal",
+        "query": "dob<=2018-06-23",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "cbd3fc0e-9b74-4207-a8c7-248082bb4572"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "fields.datetime": {
+                                        "from": null,
+                                        "include_lower": true,
+                                        "include_upper": false,
+                                        "to": "2018-06-24T00:00:00-04:00"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "implicit name",
+        "query": "will",
+        "elastic": {
+            "match": {
+                "name": {
+                    "query": "will"
+                }
+            }
+        }
+    },
+    {
+        "description": "implicit name with URN redaction",
+        "query": "will",
+        "redact_urns": true,
+        "elastic": {
+            "match": {
+                "name": {
+                    "query": "will"
+                }
+            }
+        }
+    },
+    {
+        "description": "implicit id with URN redaction",
+        "query": "7979",
+        "redact_urns": true,
+        "elastic": {
+            "ids": {
+                "values": [
+                    "7979"
+                ]
+            }
+        }
+    },
+    {
+        "description": "implicit tel",
+        "query": "7979",
+        "elastic": {
+            "nested": {
+                "path": "urns",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "match_phrase": {
+                                    "urns.path": {
+                                        "query": "7979"
+                                    }
+                                }
+                            },
+                            {
+                                "term": {
+                                    "urns.scheme": "tel"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "state field is set",
+        "query": "state!=\"\"",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "67663ad1-3abc-42dd-a162-09df2dea66ec"
+                                }
+                            },
+                            {
+                                "exists": {
+                                    "field": "fields.state"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "state field is not set",
+        "query": "state=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.field": "67663ad1-3abc-42dd-a162-09df2dea66ec"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.state"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "state field equality",
+        "query": "state=washington",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "67663ad1-3abc-42dd-a162-09df2dea66ec"
+                                }
+                            },
+                            {
+                                "term": {
+                                    "fields.state_keyword": "washington"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "state field inequality",
+        "query": "state!=washington",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.state_keyword": "washington"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.state_keyword"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "state field with greater than",
+        "query": "state<washington",
+        "error": "comparisons with < can only be used with date and number fields"
+    },
+    {
+        "description": "district field is set",
+        "query": "district!=\"\"",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "54c72635-d747-4e45-883c-099d57dd998e"
+                                }
+                            },
+                            {
+                                "exists": {
+                                    "field": "fields.district"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "district field is unset",
+        "query": "district=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.field": "54c72635-d747-4e45-883c-099d57dd998e"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.district"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "district field equality",
+        "query": "district=chelan",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "54c72635-d747-4e45-883c-099d57dd998e"
+                                }
+                            },
+                            {
+                                "term": {
+                                    "fields.district_keyword": "chelan"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "vdistrict field inequality",
+        "query": "district!=chelan",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.district_keyword": "chelan"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.district_keyword"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "district field with greater than",
+        "query": "district<chelan",
+        "error": "comparisons with < can only be used with date and number fields"
+    },
+    {
+        "description": "ward field is set",
+        "query": "ward!=\"\"",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "fde8f740-c337-421b-8abb-83b954897c80"
+                                }
+                            },
+                            {
+                                "exists": {
+                                    "field": "fields.ward"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "ward field is unset",
+        "query": "ward=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.field": "fde8f740-c337-421b-8abb-83b954897c80"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.ward"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "ward field equality",
+        "query": "ward=stevens",
+        "elastic": {
+            "nested": {
+                "path": "fields",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "fields.field": "fde8f740-c337-421b-8abb-83b954897c80"
+                                }
+                            },
+                            {
+                                "term": {
+                                    "fields.ward_keyword": "stevens"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "ward field inequality",
+        "query": "ward!=stevens",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "fields",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "fields.ward_keyword": "stevens"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "fields.ward_keyword"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "ward field with greater than",
+        "query": "ward<stevens",
+        "error": "comparisons with < can only be used with date and number fields"
+    },
+    {
+        "description": "name equality",
+        "query": "name=chef",
+        "elastic": {
+            "term": {
+                "name.keyword": "chef"
+            }
+        }
+    },
+    {
+        "description": "name inequality",
+        "query": "name!=chef",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "term": {
+                        "name.keyword": "chef"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "name is set",
+        "query": "name!=\"\"",
+        "elastic": {
+            "bool": {
+                "must": [
+                    {
+                        "exists": {
+                            "field": "name"
+                        }
+                    },
+                    {
+                        "bool": {
+                            "must_not": {
+                                "term": {
+                                    "name.keyword": ""
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "description": "name is not set",
+        "query": "name=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "bool": {
+                        "must": [
+                            {
+                                "exists": {
+                                    "field": "name"
+                                }
+                            },
+                            {
+                                "bool": {
+                                    "must_not": {
+                                        "term": {
+                                            "name.keyword": ""
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "name contains",
+        "query": "name~chef",
+        "elastic": {
+            "match": {
+                "name": {
+                    "query": "chef"
+                }
+            }
+        }
+    },
+    {
+        "description": "name with greater than",
+        "query": "name>chef",
+        "error": "comparisons with > can only be used with date and number fields"
+    },
+    {
+        "description": "uuid equality",
+        "query": "uuid=bbe6dba0-818b-4c5a-be51-10432095e27a",
+        "elastic": {
+            "term": {
+                "uuid": "bbe6dba0-818b-4c5a-be51-10432095e27a"
+            }
+        }
+    },
+    {
+        "description": "uuid inequality",
+        "query": "uuid!=bbe6dba0-818b-4c5a-be51-10432095e27a",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "term": {
+                        "uuid": "bbe6dba0-818b-4c5a-be51-10432095e27a"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "id equality",
+        "query": "id=123",
+        "elastic": {
+            "ids": {
+                "values": [
+                    "123"
+                ]
+            }
+        }
+    },
+    {
+        "description": "id inequality",
+        "query": "id!=123",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "ids": {
+                        "values": [
+                            "123"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "language equality",
+        "query": "language=spa",
+        "elastic": {
+            "term": {
+                "language": "spa"
+            }
+        }
+    },
+    {
+        "description": "language inequality",
+        "query": "language!=fra",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "term": {
+                        "language": "fra"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "language is set",
+        "query": "language!=\"\"",
+        "elastic": {
+            "bool": {
+                "must": [
+                    {
+                        "exists": {
+                            "field": "language"
+                        }
+                    },
+                    {
+                        "bool": {
+                            "must_not": {
+                                "term": {
+                                    "language.keyword": ""
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "description": "language is not set",
+        "query": "language=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "bool": {
+                        "must": [
+                            {
+                                "exists": {
+                                    "field": "language"
+                                }
+                            },
+                            {
+                                "bool": {
+                                    "must_not": {
+                                        "term": {
+                                            "language.keyword": ""
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "language equality with invalid language",
+        "query": "language=dog",
+        "error": "'dog' is not a valid language code"
+    },
+    {
+        "description": "language inequality with invalid language",
+        "query": "language!=dog",
+        "error": "'dog' is not a valid language code"
+    },
+    {
+        "description": "language greater than with invalid language",
+        "query": "language>dog",
+        "error": "comparisons with > can only be used with date and number fields"
+    },
+    {
+        "description": "created_on greater than",
+        "query": "created_on>2018-06-23",
+        "elastic": {
+            "range": {
+                "created_on": {
+                    "from": "2018-06-24T00:00:00-04:00",
+                    "include_lower": true,
+                    "include_upper": true,
+                    "to": null
+                }
+            }
+        }
+    },
+    {
+        "description": "created_on greater than or equal",
+        "query": "created_on>=2018-06-23",
+        "elastic": {
+            "range": {
+                "created_on": {
+                    "from": "2018-06-23T00:00:00-04:00",
+                    "include_lower": true,
+                    "include_upper": true,
+                    "to": null
+                }
+            }
+        }
+    },
+    {
+        "description": "created_on less than",
+        "query": "created_on<2018-06-23",
+        "elastic": {
+            "range": {
+                "created_on": {
+                    "from": null,
+                    "include_lower": true,
+                    "include_upper": false,
+                    "to": "2018-06-23T00:00:00-04:00"
+                }
+            }
+        }
+    },
+    {
+        "description": "created_on less than or equal",
+        "query": "created_on<=2018-06-23",
+        "elastic": {
+            "range": {
+                "created_on": {
+                    "from": null,
+                    "include_lower": true,
+                    "include_upper": false,
+                    "to": "2018-06-24T00:00:00-04:00"
+                }
+            }
+        }
+    },
+    {
+        "description": "created_on equality",
+        "query": "created_on=2018-06-23",
+        "elastic": {
+            "range": {
+                "created_on": {
+                    "from": "2018-06-23T00:00:00-04:00",
+                    "include_lower": true,
+                    "include_upper": false,
+                    "to": "2018-06-24T00:00:00-04:00"
+                }
+            }
+        }
+    },
+    {
+        "description": "created_on inequality",
+        "query": "created_on!=2018-06-23",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "range": {
+                        "created_on": {
+                            "from": "2018-06-23T00:00:00-04:00",
+                            "include_lower": true,
+                            "include_upper": false,
+                            "to": "2018-06-24T00:00:00-04:00"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "created_on less than with invalid date",
+        "query": "created_on<dog",
+        "error": "can't convert 'dog' to a date"
+    },
+    {
+        "description": "last_seen_on greater than",
+        "query": "last_seen_on>2018-06-23",
+        "elastic": {
+            "range": {
+                "last_seen_on": {
+                    "from": "2018-06-24T00:00:00-04:00",
+                    "include_lower": true,
+                    "include_upper": true,
+                    "to": null
+                }
+            }
+        }
+    },
+    {
+        "description": "last_seen_on greater than or equal",
+        "query": "last_seen_on>=2018-06-23",
+        "elastic": {
+            "range": {
+                "last_seen_on": {
+                    "from": "2018-06-23T00:00:00-04:00",
+                    "include_lower": true,
+                    "include_upper": true,
+                    "to": null
+                }
+            }
+        }
+    },
+    {
+        "description": "last_seen_on less than",
+        "query": "last_seen_on<2018-06-23",
+        "elastic": {
+            "range": {
+                "last_seen_on": {
+                    "from": null,
+                    "include_lower": true,
+                    "include_upper": false,
+                    "to": "2018-06-23T00:00:00-04:00"
+                }
+            }
+        }
+    },
+    {
+        "description": "last_seen_on less than or equal",
+        "query": "last_seen_on<=2018-06-23",
+        "elastic": {
+            "range": {
+                "last_seen_on": {
+                    "from": null,
+                    "include_lower": true,
+                    "include_upper": false,
+                    "to": "2018-06-24T00:00:00-04:00"
+                }
+            }
+        }
+    },
+    {
+        "description": "last_seen_on equality",
+        "query": "last_seen_on=2018-06-23",
+        "elastic": {
+            "range": {
+                "last_seen_on": {
+                    "from": "2018-06-23T00:00:00-04:00",
+                    "include_lower": true,
+                    "include_upper": false,
+                    "to": "2018-06-24T00:00:00-04:00"
+                }
+            }
+        }
+    },
+    {
+        "description": "last_seen_on inequality",
+        "query": "last_seen_on!=2018-06-23",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "range": {
+                        "last_seen_on": {
+                            "from": "2018-06-23T00:00:00-04:00",
+                            "include_lower": true,
+                            "include_upper": false,
+                            "to": "2018-06-24T00:00:00-04:00"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "last_seen_on is set",
+        "query": "last_seen_on != \"\"",
+        "elastic": {
+            "exists": {
+                "field": "last_seen_on"
+            }
+        }
+    },
+    {
+        "description": "last_seen_on is not set",
+        "query": "last_seen_on = \"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "exists": {
+                        "field": "last_seen_on"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "last_seen_on less than with invalid date",
+        "query": "last_seen_on<dog",
+        "error": "can't convert 'dog' to a date"
+    },
+    {
+        "description": "tel scheme is set",
+        "query": "tel!=\"\"",
+        "elastic": {
+            "nested": {
+                "path": "urns",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "urns.scheme": "tel"
+                                }
+                            },
+                            {
+                                "exists": {
+                                    "field": "urns.path"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "tel scheme is not set",
+        "query": "tel=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "urns",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "urns.scheme": "tel"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "urns.path"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "tel scheme equality",
+        "query": "tel=12345",
+        "elastic": {
+            "nested": {
+                "path": "urns",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "urns.path.keyword": "12345"
+                                }
+                            },
+                            {
+                                "term": {
+                                    "urns.scheme": "tel"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "tel scheme inequality",
+        "query": "tel!=12345",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "urns",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "urns.path.keyword": "12345"
+                                        }
+                                    },
+                                    {
+                                        "term": {
+                                            "urns.scheme": "tel"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "tel scheme contains",
+        "query": "tel~12345",
+        "elastic": {
+            "nested": {
+                "path": "urns",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "match_phrase": {
+                                    "urns.path": {
+                                        "query": "12345"
+                                    }
+                                }
+                            },
+                            {
+                                "term": {
+                                    "urns.scheme": "tel"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "tel scheme greater than",
+        "query": "tel>12345",
+        "error": "comparisons with > can only be used with date and number fields"
+    },
+    {
+        "description": "tel scheme is set with URN redaction",
+        "query": "tel!=\"\"",
+        "redact_urns": true,
+        "elastic": {
+            "nested": {
+                "path": "urns",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "urns.scheme": "tel"
+                                }
+                            },
+                            {
+                                "exists": {
+                                    "field": "urns.path"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "tel scheme is not set with URN redaction",
+        "query": "tel=\"\"",
+        "redact_urns": true,
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "urns",
+                        "query": {
+                            "bool": {
+                                "must": [
+                                    {
+                                        "term": {
+                                            "urns.scheme": "tel"
+                                        }
+                                    },
+                                    {
+                                        "exists": {
+                                            "field": "urns.path"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "tel scheme equality with URN redaction",
+        "query": "tel=12345",
+        "redact_urns": true,
+        "error": "cannot query on redacted URNs"
+    },
+    {
+        "description": "urn is set",
+        "query": "urn !=\"\"",
+        "elastic": {
+            "nested": {
+                "path": "urns",
+                "query": {
+                    "exists": {
+                        "field": "urns.path"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "urn is not set",
+        "query": "urn=\"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "urns",
+                        "query": {
+                            "exists": {
+                                "field": "urns.path"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "urn attribute equality",
+        "query": "urn=\"+12067799192\"",
+        "elastic": {
+            "nested": {
+                "path": "urns",
+                "query": {
+                    "term": {
+                        "urns.path.keyword": "+12067799192"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "urn attribute inequality",
+        "query": "urn!=\"+12067799192\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "nested": {
+                        "path": "urns",
+                        "query": {
+                            "term": {
+                                "urns.path.keyword": "+12067799192"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "urn attribute contains",
+        "query": "urn~12345",
+        "elastic": {
+            "nested": {
+                "path": "urns",
+                "query": {
+                    "match_phrase": {
+                        "urns.path": {
+                            "query": "12345"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "group equality",
+        "query": "group = \"U-Reporters\"",
+        "elastic": {
+            "term": {
+                "groups": "8de30b78-d9ef-4db2-b2e8-4f7b6aef64cf"
+            }
+        }
+    },
+    {
+        "description": "group equality with invalid group",
+        "query": "group = \"Spammers\"",
+        "error": "'Spammers' is not a valid group name"
+    },
+    {
+        "description": "group inequality",
+        "query": "group != \"U-Reporters\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "term": {
+                        "groups": "8de30b78-d9ef-4db2-b2e8-4f7b6aef64cf"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "group inequality with invalid group",
+        "query": "group != \"Spammers\"",
+        "error": "'Spammers' is not a valid group name"
+    },
+    {
+        "description": "group is set",
+        "query": "group != \"\"",
+        "error": "can't check whether 'group' is set or not set"
+    },
+    {
+        "description": "group is not set",
+        "query": "group = \"\"",
+        "error": "can't check whether 'group' is set or not set"
+    },
+    {
+        "description": "unknown property equality",
+        "query": "unsupported=12345",
+        "error": "can't resolve 'unsupported' to attribute, scheme or field"
+    },
+    {
+        "description": "bool and",
+        "query": "color=red and age>10",
+        "elastic": {
+            "bool": {
+                "must": [
+                    {
+                        "nested": {
+                            "path": "fields",
+                            "query": {
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "term": {
+                                                "fields.field": "ecc7b13b-c698-4f46-8a90-24a8fab6fe34"
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "fields.text": "red"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "nested": {
+                            "path": "fields",
+                            "query": {
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "term": {
+                                                "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                            }
+                                        },
+                                        {
+                                            "range": {
+                                                "fields.number": {
+                                                    "from": 10,
+                                                    "include_lower": false,
+                                                    "include_upper": true,
+                                                    "to": null
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "description": "bool or",
+        "query": "color=red or age>10",
+        "elastic": {
+            "bool": {
+                "should": [
+                    {
+                        "nested": {
+                            "path": "fields",
+                            "query": {
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "term": {
+                                                "fields.field": "ecc7b13b-c698-4f46-8a90-24a8fab6fe34"
+                                            }
+                                        },
+                                        {
+                                            "term": {
+                                                "fields.text": "red"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "nested": {
+                            "path": "fields",
+                            "query": {
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "term": {
+                                                "fields.field": "6b6a43fa-a26d-4017-bede-328bcdd5c93b"
+                                            }
+                                        },
+                                        {
+                                            "range": {
+                                                "fields.number": {
+                                                    "from": 10,
+                                                    "include_lower": false,
+                                                    "include_upper": true,
+                                                    "to": null
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+]

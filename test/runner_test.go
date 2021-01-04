@@ -11,20 +11,20 @@ import (
 	"testing"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
-	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/services/airtime/dtone"
-	"github.com/greatnonprofits-nfp/goflow/services/email/smtp"
-	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/httpx"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/smtpx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/nyaruka/goflow/flows/resumes"
+	"github.com/nyaruka/goflow/flows/triggers"
+	"github.com/nyaruka/goflow/services/airtime/dtone"
+	"github.com/nyaruka/goflow/services/email/smtp"
+	"github.com/nyaruka/goflow/services/webhooks"
+	"github.com/nyaruka/goflow/utils/smtpx"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -119,7 +119,7 @@ func runFlow(assetsPath string, rawTrigger json.RawMessage, rawResumes []json.Ra
 
 	eng := engine.NewBuilder().
 		WithEmailServiceFactory(func(flows.Session) (flows.EmailService, error) {
-			return smtp.NewService("mail.temba.io", 25, "nyaruka", "pass123", "flows@temba.io"), nil
+			return smtp.NewService("smtp://nyaruka:pass123@mail.temba.io?from=flows@temba.io")
 		}).
 		WithWebhookServiceFactory(webhooks.NewServiceFactory(http.DefaultClient, nil, nil, map[string]string{"User-Agent": "goflow-testing"}, 100000)).
 		WithClassificationServiceFactory(func(s flows.Session, c *flows.Classifier) (flows.ClassificationService, error) {

@@ -3,13 +3,12 @@ package triggers
 import (
 	"encoding/json"
 
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/utils"
 )
 
 func init() {
@@ -32,11 +31,6 @@ const (
 type ChannelEvent struct {
 	Type    ChannelEventType         `json:"type" validate:"required"`
 	Channel *assets.ChannelReference `json:"channel" validate:"required,dive"`
-}
-
-// NewChannelEvent creates a new channel event
-func NewChannelEvent(typeName ChannelEventType, channel *assets.ChannelReference) *ChannelEvent {
-	return &ChannelEvent{Type: typeName, Channel: channel}
 }
 
 // ChannelTrigger is used when a session was triggered by a channel event
@@ -62,30 +56,43 @@ type ChannelTrigger struct {
 	event *ChannelEvent
 }
 
-// NewChannel creates a new channel trigger with the passed in values
-func NewChannel(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, event *ChannelEvent, params *types.XObject) *ChannelTrigger {
-	if params == nil {
-		params = types.XObjectEmpty
-	}
-
-	return &ChannelTrigger{
-		baseTrigger: newBaseTrigger(TypeChannel, env, flow, contact, nil, params),
-		event:       event,
-	}
-}
-
-// NewIncomingCall creates a new channel trigger with the passed in values
-func NewIncomingCall(env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, urn urns.URN, channel *assets.ChannelReference) *ChannelTrigger {
-	event := NewChannelEvent(ChannelEventTypeIncomingCall, channel)
-	connection := flows.NewConnection(channel, urn)
-
-	return &ChannelTrigger{
-		baseTrigger: newBaseTrigger(TypeChannel, env, flow, contact, connection, types.XObjectEmpty),
-		event:       event,
-	}
-}
-
 var _ flows.Trigger = (*ChannelTrigger)(nil)
+
+//------------------------------------------------------------------------------------------
+// Builder
+//------------------------------------------------------------------------------------------
+
+// ChannelBuilder is a builder for channel type triggers
+type ChannelBuilder struct {
+	t *ChannelTrigger
+}
+
+// Channel returns a channel trigger builder
+func (b *Builder) Channel(channel *assets.ChannelReference, eventType ChannelEventType) *ChannelBuilder {
+	return &ChannelBuilder{
+		t: &ChannelTrigger{
+			baseTrigger: newBaseTrigger(TypeChannel, b.environment, b.flow, b.contact, nil, false, nil),
+			event:       &ChannelEvent{Type: eventType, Channel: channel},
+		},
+	}
+}
+
+// WithConnection sets the channel connection for the trigger
+func (b *ChannelBuilder) WithConnection(urn urns.URN) *ChannelBuilder {
+	b.t.connection = flows.NewConnection(b.t.event.Channel, urn)
+	return b
+}
+
+// WithParams sets the params for the trigger
+func (b *ChannelBuilder) WithParams(params *types.XObject) *ChannelBuilder {
+	b.t.params = params
+	return b
+}
+
+// Build builds the trigger
+func (b *ChannelBuilder) Build() *ChannelTrigger {
+	return b.t
+}
 
 //------------------------------------------------------------------------------------------
 // JSON Encoding / Decoding

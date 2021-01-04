@@ -1,19 +1,20 @@
 package runs_test
 
 import (
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/runs"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/runs"
+	"github.com/nyaruka/goflow/flows/triggers"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -130,6 +131,7 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, 10, len(r.Events()))
 		assert.Equal(t, "Parent", r.Parent().Flow().Name())
 		assert.Equal(t, 0, len(r.Ancestors())) // no parent runs within this session
+		assert.True(t, r.ReceivedInput())
 	}
 
 	checkRun(run)
@@ -192,7 +194,7 @@ func TestRunContext(t *testing.T) {
 		},
 		{
 			`@(json(urns))`,
-			`{"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":"mailto:foo@bar.com","tel":"tel:+12024561111","telegram":null,"twitter":null,"twitterid":"twitterid:54784326227#nyaruka","viber":null,"vk":null,"wechat":null,"whatsapp":null}`,
+			`{"discord":null,"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":"mailto:foo@bar.com","rocketchat":null,"tel":"tel:+12024561111","telegram":null,"twitter":null,"twitterid":"twitterid:54784326227#nyaruka","viber":null,"vk":null,"wechat":null,"whatsapp":null}`,
 		},
 		{
 			`@(json(results.favorite_color))`,
@@ -208,7 +210,7 @@ func TestRunContext(t *testing.T) {
 		},
 		{
 			`@(json(parent.urns))`,
-			`{"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":null,"tel":"tel:+12024562222","telegram":null,"twitter":null,"twitterid":null,"viber":null,"vk":null,"wechat":null,"whatsapp":null}`,
+			`{"discord":null,"ext":null,"facebook":null,"fcm":null,"freshchat":null,"jiochat":null,"line":null,"mailto":null,"rocketchat":null,"tel":"tel:+12024562222","telegram":null,"twitter":null,"twitterid":null,"viber":null,"vk":null,"wechat":null,"whatsapp":null}`,
 		},
 		{
 			`@(json(parent.fields))`,
@@ -261,4 +263,43 @@ func TestMissingRelatedRunContext(t *testing.T) {
 	val, err = run.EvaluateTemplateValue(`@child.contact`)
 	assert.NoError(t, err)
 	assert.Equal(t, types.NewXErrorf("null doesn't support lookups"), val)
+}
+
+func TestSaveResult(t *testing.T) {
+	sa, err := test.CreateSessionAssets([]byte(sessionAssets), "")
+	require.NoError(t, err)
+
+	trigger, err := triggers.ReadTrigger(sa, []byte(sessionTrigger), assets.IgnoreMissing)
+	require.NoError(t, err)
+
+	eng := test.NewEngine()
+	session, _, err := eng.NewSession(sa, trigger)
+	require.NoError(t, err)
+
+	run := session.Runs()[0]
+
+	dates.SetNowSource(dates.NewFixedNowSource(time.Date(2020, 4, 20, 12, 39, 30, 123456789, time.UTC)))
+	defer dates.SetNowSource(dates.DefaultNowSource)
+
+	// no results means empty object with default of empty string
+	test.AssertXEqual(t, types.NewXObject(map[string]types.XValue{"__default__": types.XTextEmpty}), flows.Context(session.Environment(), run.Results()))
+
+	run.SaveResult(flows.NewResult("Response 1", "red", "Red", "Rojo", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like red", nil, dates.Now()))
+
+	// name is snaked
+	assert.Equal(t, "red", run.Results().Get("response_1").Value)
+	assert.Equal(t, "Red", run.Results().Get("response_1").Category)
+	assert.Equal(t, time.Date(2020, 4, 20, 12, 39, 30, 123456789, time.UTC), run.ModifiedOn())
+
+	run.SaveResult(flows.NewResult("Response 1", "blue", "Blue", "Azul", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like blue", nil, dates.Now()))
+
+	// result is overwritten
+	assert.Equal(t, "blue", run.Results().Get("response_1").Value)
+	assert.Equal(t, "Blue", run.Results().Get("response_1").Category)
+	assert.Equal(t, time.Date(2020, 4, 20, 12, 39, 30, 123456789, time.UTC), run.ModifiedOn())
+
+	// long values should truncated
+	run.SaveResult(flows.NewResult("Response 1", strings.Repeat("創", 700), "Blue", "Azul", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like blue", nil, dates.Now()))
+
+	assert.Equal(t, strings.Repeat("創", 640), run.Results().Get("response_1").Value)
 }

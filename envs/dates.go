@@ -8,22 +8,30 @@ import (
 	"strings"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 	validator "gopkg.in/go-playground/validator.v9"
 )
 
 func init() {
-	utils.Validator.RegisterValidation("date_format", func(fl validator.FieldLevel) bool {
-		_, err := ToGoDateFormat(fl.Field().String(), DateOnlyFormatting)
-		return err == nil
+	utils.RegisterValidatorTag("date_format", validateDateFormat, func(validator.FieldError) string {
+		return "is not a valid date format"
 	})
-	utils.Validator.RegisterValidation("time_format", func(fl validator.FieldLevel) bool {
-		_, err := ToGoDateFormat(fl.Field().String(), TimeOnlyFormatting)
-		return err == nil
+	utils.RegisterValidatorTag("time_format", validateTimeFormat, func(validator.FieldError) string {
+		return "is not a valid time format"
 	})
+}
+
+func validateDateFormat(fl validator.FieldLevel) bool {
+	_, err := ToGoDateFormat(fl.Field().String(), DateOnlyFormatting)
+	return err == nil
+}
+
+func validateTimeFormat(fl validator.FieldLevel) bool {
+	_, err := ToGoDateFormat(fl.Field().String(), TimeOnlyFormatting)
+	return err == nil
 }
 
 // patterns for date and time formats supported for human-entered data
@@ -246,7 +254,7 @@ var ignoredFormattingRunes = map[rune]bool{' ': true, ':': true, '/': true, '.':
 //
 //  `h`         - hour of the day 1-12
 //  `hh`        - hour of the day 01-12
-//  `tt`        - twenty four hour of the day 01-23
+//  `tt`        - twenty four hour of the day 00-23
 //  `m`         - minute 0-59
 //  `mm`        - minute 00-59
 //  `s`         - second 0-59

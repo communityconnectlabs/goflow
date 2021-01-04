@@ -3,7 +3,7 @@ package dtone
 import (
 	"strings"
 
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/shopspring/decimal"
 )
 

@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 )
@@ -52,7 +51,7 @@ func (r *baseResume) Contact() *flows.Contact       { return r.contact }
 func (r *baseResume) ResumedOn() time.Time          { return r.resumedOn }
 
 // Apply applies our state changes and saves any events to the run
-func (r *baseResume) Apply(run flows.FlowRun, logEvent flows.EventCallback) error {
+func (r *baseResume) Apply(run flows.FlowRun, logEvent flows.EventCallback) {
 	if r.environment != nil {
 		if !run.Session().Environment().Equal(r.environment) {
 			logEvent(events.NewEnvironmentRefreshed(r.environment))
@@ -66,15 +65,11 @@ func (r *baseResume) Apply(run flows.FlowRun, logEvent flows.EventCallback) erro
 		}
 
 		run.Session().SetContact(r.contact)
-
-		triggers.EnsureDynamicGroups(run.Session(), logEvent)
 	}
 
 	if run.Status() == flows.RunStatusWaiting {
 		run.SetStatus(flows.RunStatusActive)
 	}
-
-	return nil
 }
 
 //------------------------------------------------------------------------------------------

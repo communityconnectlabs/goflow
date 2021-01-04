@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
+	"github.com/nyaruka/goflow/flows/routers/waits"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 )
@@ -41,11 +41,11 @@ type baseRouter struct {
 	type_      string
 	wait       flows.Wait
 	resultName string
-	categories []*Category
+	categories []flows.Category
 }
 
 // creates a new base router
-func newBaseRouter(typeName string, wait flows.Wait, resultName string, categories []*Category) baseRouter {
+func newBaseRouter(typeName string, wait flows.Wait, resultName string, categories []flows.Category) baseRouter {
 	return baseRouter{type_: typeName, wait: wait, resultName: resultName, categories: categories}
 }
 
@@ -54,6 +54,9 @@ func (r *baseRouter) Type() string { return r.type_ }
 
 // Wait returns the optional wait on this router
 func (r *baseRouter) Wait() flows.Wait { return r.wait }
+
+// Categories returns the categories on this router
+func (r *baseRouter) Categories() []flows.Category { return r.categories }
 
 // AllowTimeout returns whether this router can be resumed at with a timeout
 func (r *baseRouter) AllowTimeout() bool {
@@ -80,6 +83,16 @@ func (r *baseRouter) EnumerateResults(include func(*flows.ResultInfo)) {
 		}
 
 		include(flows.NewResultInfo(r.resultName, categoryNames))
+	}
+}
+
+// EnumerateLocalizables enumerates all the localizable text on this object
+func (r *baseRouter) EnumerateLocalizables(include func(uuids.UUID, string, []string, func([]string))) {
+	for _, cat := range r.categories {
+		w := func(v []string) {
+			cat.(*Category).name = v[0]
+		}
+		include(cat.LocalizationUUID(), "name", []string{cat.Name()}, w)
 	}
 }
 
@@ -147,7 +160,7 @@ func (r *baseRouter) routeToCategory(run flows.FlowRun, step flows.Step, categor
 	}
 
 	// find the actual category
-	var category *Category
+	var category flows.Category
 	for _, c := range r.categories {
 		if c.UUID() == categoryUUID {
 			category = c
@@ -181,10 +194,10 @@ func (r *baseRouter) routeToCategory(run flows.FlowRun, step flows.Step, categor
 //------------------------------------------------------------------------------------------
 
 type baseRouterEnvelope struct {
-	Type       string          `json:"type"                  validate:"required"`
-	Wait       json.RawMessage `json:"wait,omitempty"`
-	ResultName string          `json:"result_name,omitempty"`
-	Categories []*Category     `json:"categories,omitempty"  validate:"required,min=1"`
+	Type       string            `json:"type"                  validate:"required"`
+	Wait       json.RawMessage   `json:"wait,omitempty"`
+	ResultName string            `json:"result_name,omitempty"`
+	Categories []json.RawMessage `json:"categories,omitempty"  validate:"required,min=1"`
 }
 
 // ReadRouter reads a router from the given JSON
@@ -203,11 +216,18 @@ func ReadRouter(data json.RawMessage) (flows.Router, error) {
 }
 
 func (r *baseRouter) unmarshal(e *baseRouterEnvelope) error {
+	var err error
+
 	r.type_ = e.Type
 	r.resultName = e.ResultName
-	r.categories = e.Categories
+	r.categories = make([]flows.Category, len(e.Categories))
 
-	var err error
+	for i, c := range e.Categories {
+		r.categories[i], err = ReadCategory(c)
+		if err != nil {
+			return err
+		}
+	}
 
 	if e.Wait != nil {
 		r.wait, err = waits.ReadWait(e.Wait)
@@ -220,11 +240,18 @@ func (r *baseRouter) unmarshal(e *baseRouterEnvelope) error {
 }
 
 func (r *baseRouter) marshal(e *baseRouterEnvelope) error {
+	var err error
+
 	e.Type = r.type_
 	e.ResultName = r.resultName
-	e.Categories = r.categories
+	e.Categories = make([]json.RawMessage, len(r.categories))
 
-	var err error
+	for i, c := range r.categories {
+		e.Categories[i], err = jsonx.Marshal(c)
+		if err != nil {
+			return err
+		}
+	}
 
 	if r.wait != nil {
 		e.Wait, err = jsonx.Marshal(r.wait)

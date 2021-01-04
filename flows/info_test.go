@@ -3,10 +3,10 @@ package flows_test
 import (
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -28,10 +28,10 @@ func TestNewResultSpecs(t *testing.T) {
 	)
 
 	extracted := []flows.ExtractedResult{
-		flows.ExtractedResult{Node: node1, Info: flows.NewResultInfo("Response 1", []string{"Red", "Green"})},
-		flows.ExtractedResult{Node: node1, Info: flows.NewResultInfo("Response-1", nil)},
-		flows.ExtractedResult{Node: node2, Info: flows.NewResultInfo("Response-1", []string{"Green", "Blue"})},
-		flows.ExtractedResult{Node: node2, Info: flows.NewResultInfo("Favorite Beer", []string{})},
+		{Node: node1, Info: flows.NewResultInfo("Response 1", []string{"Red", "Green"})},
+		{Node: node1, Info: flows.NewResultInfo("Response-1", nil)},
+		{Node: node2, Info: flows.NewResultInfo("Response-1", []string{"Green", "Blue"})},
+		{Node: node2, Info: flows.NewResultInfo("Favorite Beer", []string{})},
 	}
 
 	specs := flows.NewResultSpecs(extracted)

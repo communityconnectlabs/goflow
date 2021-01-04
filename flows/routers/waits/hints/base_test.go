@@ -3,8 +3,8 @@ package hints_test
 import (
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/flows/routers/waits/hints"
 
 	"github.com/stretchr/testify/assert"
 )

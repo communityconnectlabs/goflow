@@ -3,15 +3,15 @@ package waits_test
 import (
 	"testing"
 
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/routers/waits"
+	"github.com/nyaruka/goflow/flows/routers/waits/hints"
+	"github.com/nyaruka/goflow/flows/triggers"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -77,7 +77,7 @@ func TestMsgWaitSkipIfInitial(t *testing.T) {
 	contact := flows.NewEmptyContact(sa, "Ben Haggerty", envs.Language("eng"), nil)
 
 	// a manual trigger will wait at the initial wait
-	trigger := triggers.NewManual(env, flow.Reference(), contact, nil)
+	trigger := triggers.NewBuilder(env, flow.Reference(), contact).Manual().Build()
 
 	session, sprint, err := eng.NewSession(sa, trigger)
 	require.NoError(t, err)
@@ -90,9 +90,9 @@ func TestMsgWaitSkipIfInitial(t *testing.T) {
 
 	// whereas a msg trigger will skip over it
 	msg := flows.NewMsgIn(flows.MsgUUID(uuids.New()), urns.NilURN, nil, "Hi there", nil)
-	trigger = triggers.NewMsg(env, flow.Reference(), contact, msg, nil, nil)
+	trigger2 := triggers.NewBuilder(env, flow.Reference(), contact).Msg(msg).Build()
 
-	session, sprint, err = eng.NewSession(sa, trigger)
+	session, sprint, err = eng.NewSession(sa, trigger2)
 	require.NoError(t, err)
 
 	assert.Equal(t, flows.SessionStatusCompleted, session.Status())

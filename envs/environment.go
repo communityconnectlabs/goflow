@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/utils"
 )
 
 type RedactionPolicy string
@@ -39,6 +39,10 @@ type Environment interface {
 	MaxValueLength() int
 	Links() []string
 
+	DefaultLocale() Locale
+
+	LocationResolver() LocationResolver
+
 	// Convenience method to get the current time in the env timezone
 	Now() time.Time
 
@@ -69,6 +73,14 @@ func (e *environment) RedactionPolicy() RedactionPolicy { return e.redactionPoli
 func (e *environment) MaxValueLength() int              { return e.maxValueLength }
 func (e *environment) Links() []string                  { return e.links }
 
+// DefaultLocale combines the default languages and countries into a locale
+func (e *environment) DefaultLocale() Locale {
+	return NewLocale(e.DefaultLanguage(), e.DefaultCountry())
+}
+
+func (e *environment) LocationResolver() LocationResolver { return nil }
+
+// Now gets the current time in the eonvironment's timezone
 func (e *environment) Now() time.Time { return dates.Now().In(e.Timezone()) }
 
 // Equal returns true if this instance is equal to the given instance

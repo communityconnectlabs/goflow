@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
 )
 
 type Dependency struct {
@@ -85,6 +85,8 @@ func CheckReference(sa flows.SessionAssets, ref assets.Reference) bool {
 		return sa.Labels().Get(typed.UUID) != nil
 	case *assets.TemplateReference:
 		return sa.Templates().Get(typed.UUID) != nil
+	case *assets.TicketerReference:
+		return sa.Ticketers().Get(typed.UUID) != nil
 	default:
 		panic(fmt.Sprintf("unknown dependency type reference: %T", ref))
 	}

@@ -1,3 +1,247 @@
+v0.106.1
+----------
+ * URN and channel modifiers should error with invalid URNs and channels
+
+v0.106.0
+----------
+ * Getting channel for URN should always consider the role on the channels
+ * Update to latest gocommon which adds rocketchat scheme
+ * SetPreferredChannel only when the channel has the send role
+
+v0.105.5
+----------
+ * Support sorting contacts by last seen on attribute
+
+v0.105.4
+----------
+ * Add support for Bengali numerals in number tests
+
+v0.105.3
+----------
+ * Add support for Eastern Arabic numerals in number tests
+
+v0.105.2
+----------
+ * Clear a run's expiration when it exits
+ * Unwind accumulated run expirations as child runs complete
+ * Include country in msg templating on msg_created events
+
+v0.105.1
+----------
+ * Update to latest gocommon v1.5.3
+
+v0.105.0
+----------
+ * Bump some deps, test on go 1.15 and fix bug found by 1.15 compiler
+
+v0.104.1
+----------
+ * Update to gocommon v1.5.1
+
+v0.104.0
+----------
+ * Use dummy value to avoid sending empty emails
+ * Rework smtpx package for sending emails in places besides flows
+ * Don't parse numbers in scientific notation
+
+v0.103.1
+----------
+ * Update to latest gocommon v1.5.0
+ * Run environment's DefaultLanguage and DefaultLocale methods should use contact language
+
+v0.103.0
+----------
+ * Update to latest gocommon
+ * Update terminology around groups with queries
+
+v0.102.1
+----------
+ * Add archived contact status
+
+v0.102.0
+----------
+ * Update to latest gocommon
+
+v0.101.2
+----------
+ * Add empty localizations for all the languages used in RapidPro
+
+v0.101.1
+----------
+ * Fix test
+
+v0.101.0
+----------
+ * Use language codes (e.g. en-us) rather than locale names (en_US) for docs directories
+
+v0.100.1
+----------
+ * Add completed pt_BR translation
+
+v0.100.0
+----------
+ * Add last_seen_on to contacts and expose in expressions and queries
+
+v0.99.0
+----------
+ * Rework elastic query generation so that all errors are caught at parsing stage
+ * Allow URN inequality in elastic searches
+
+v0.98.0
+----------
+ * Rework error handling in contactql so more errors are caught during parsing and have associated codes
+
+v0.97.0
+----------
+ * Re-add classifier_called events for backward compatibility
+ * Groups modifier should generate error if asked to operate on blocked or stopped contact
+ * Move modifiers package out of actions package
+ * ContactQL parser errors should contain more info
+
+v0.96.0
+----------
+ * Reorganize validation code so utils doesn't have to know about tags defined higher up
+ * Clone the test session during doc generation so actions always start with the same session
+ * Add action to change contact status
+ * Add historical information to triggers about the session that triggered them and use to prevent looping
+
+v0.95.1
+----------
+ * Improve documentation of call_webhook action
+
+v0.95.0
+----------
+ * Use latest wit.ai API version
+ * Allow searching with values containing single quotes
+ * Add user and origin fields to manual triggers
+ * Add builder for triggers
+ * Pass language to bothub API calls
+
+v0.94.2
+----------
+ * Use jsonx.Marshal consistently
+
+v0.94.1
+----------
+ * Add IsQueryError util
+
+v0.94.0
+----------
+ * Move all location stuff from utils to envs
+ * Simplify resolving locations from environments
+ * Refactor field modifiers to take raw values and location parsing to not require a session
+
+v0.93.1
+----------
+ * Fix clearing all URNs
+
+v0.93.0
+----------
+ * Add urns modifier to replace all the URNs on a contact
+
+v0.92.0
+----------
+ * Move elastic functionality from mailroom
+
+v0.91.1
+----------
+ * Fix clearing of fields
+
+v0.91.0
+----------
+ * Move generic PO stuff into utils/i18n
+
+v0.90.0
+----------
+ * Allow querying contacts by UUID
+ * Move i18n package under flows to avoid confusion with locales package
+ * Add completion to localized documentation
+
+v0.89.0
+----------
+ * Tweak change language functionality to allow missing translations
+ * Add country to template translations and use when resolving templates
+
+v0.88.0
+----------
+ * Add support for localized documentation
+
+v0.87.0
+----------
+ * Disallow opening tickets, starting sessions and sending broadcasts when doing batch start
+ * Add ability to change the language of a flow
+ * Update our format_datetime docs to properly show range of 01-24
+ * Fix evaluation of legacy vars in other-contacts actions
+
+v0.86.2
+----------
+ * Fix spelling of Readact
+
+v0.86.1
+----------
+ * Do redaction of access keys from HTTP logs
+
+v0.86.0
+----------
+ * Add open_ticket actions and ticket_opened events
+
+v0.85.0
+----------
+ * Add new service_called event to be used for classifiers and ticketers etc
+
+v0.84.0
+----------
+ * Replace contact blocked and stopped fields with status field
+ * Rename blocked and stopped modifiers to contact status modifier
+
+v0.83.1
+----------
+ * Fix anywhere we truncate strings to do it by rune
+
+v0.83.0
+----------
+ * Add blocked and stopped modifiers and events
+ * Add blocked and stopped fields to contact
+
+v0.82.0
+----------
+ * Fix default to understand objects with defaults
+
+v0.81.0
+----------
+ * Rework httpx to replace NewTrace with NewRequest+DoTrace
+ * Separate out the header part of response traces from the body which won't always be valid UTF-8
+
+v0.80.0
+----------
+ * ivr_created events should include language of translated text
+
+v0.79.1
+----------
+ * Include 3-char language code as extra header in PO files
+
+v0.79.0
+----------
+ * Add custom Source-Flows header to exported PO files
+ * Make router categories inspectable
+ * Importing of translations into flows
+
+v0.78.1
+----------
+ * Add decode_html Excellent function
+ * Start of i18n work
+ * Prevent XText.Slice from panicking
+
+v0.78.0
+----------
+ * Add support for extracting the "base" translation of a flow
+ * Allow queries on URNs to check if they are set or not
+ * Add Language.ToISO639_2()
+ * Make flowrunner easier to use by defaulting to first flow in the assets
+ * Default to current version in flowmigrate cmd
+ * Rework group asset loading so that parsing is not deferred
+ * Override environment country if contact has preferred channel with country
+
 v0.77.4
 ----------
  * Fix loading flow assets that are new spec but also have metadata section

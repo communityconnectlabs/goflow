@@ -1,14 +1,17 @@
 package envs
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	
+	"github.com/nyaruka/goflow/utils"
+
 	"github.com/pkg/errors"
 	"golang.org/x/text/language"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 func init() {
-	utils.Validator.RegisterAlias("language", "eq=base|len=3")
+	utils.RegisterValidatorAlias("language", "eq=base|len=3", func(validator.FieldError) string {
+		return "is not a valid language code"
+	})
 }
 
 // Language is our internal representation of a language

@@ -3,15 +3,15 @@ package definition
 import (
 	"encoding/json"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/actions"
-	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/utils/uuids"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/actions"
+	"github.com/nyaruka/goflow/flows/inspect"
+	"github.com/nyaruka/goflow/flows/routers"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 )
@@ -130,6 +130,17 @@ func (n *node) EnumerateResults(include func(flows.Action, flows.Router, *flows.
 		n.router.EnumerateResults(func(r *flows.ResultInfo) {
 			include(nil, n.router, r)
 		})
+	}
+}
+
+// EnumerateLocalizables enumerates all localizable text on this object
+func (n *node) EnumerateLocalizables(include func(uuids.UUID, string, []string, func([]string))) {
+	for _, action := range n.actions {
+		inspect.LocalizableText(action, include)
+	}
+
+	if n.router != nil {
+		n.router.EnumerateLocalizables(include)
 	}
 }
 
