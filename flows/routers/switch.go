@@ -88,7 +88,7 @@ type SwitchRouter struct {
 }
 
 // NewSwitch creates a new switch router
-func NewSwitch(wait flows.Wait, resultName string, categories []flows.Category, operand string, cases []*Case, defaultCategory flows.CategoryUUID) *SwitchRouter {
+func NewSwitch(wait flows.Wait, resultName string, categories []flows.Category, operand string, cases []*Case, defaultCategory flows.CategoryUUID, config *SwitchRouterConfig) *SwitchRouter {
 	return &SwitchRouter{
 		baseRouter: newBaseRouter(TypeSwitch, wait, resultName, categories),
 		default_:   defaultCategory,
@@ -250,7 +250,7 @@ func (r *SwitchRouter) matchCase(run flows.FlowRun, step flows.Step, operand typ
 				}
 
 				newMsgIn := flows.NewMsgIn(msgInput.UUID_, msgInput.URN_, msgInput.Channel_, corrected, msgInput.Attachments_)
-				newMsgInput, _ := inputs.NewMsg(run.Session().Assets(), newMsgIn, time.Now())
+				newMsgInput := inputs.NewMsg(run.Session().Assets(), newMsgIn, time.Now())
 				args[idx] = types.NewXObject(newMsgInput.Context(run.Environment()))
 			}
 		}
