@@ -40,7 +40,7 @@ func (r *RandomRouter) Route(run flows.FlowRun, step flows.Step, logEvent flows.
 	categoryNum := rand.Mul(decimal.New(int64(len(r.categories)), 0)).IntPart()
 	categoryUUID := r.categories[categoryNum].UUID()
 
-	// TODO should raw rand value be iput and category number the match ?
+	// TODO should raw rand value be input and category number the match ?
 	return r.routeToCategory(run, step, categoryUUID, rand.String(), "", nil, logEvent, "")
 }
 
