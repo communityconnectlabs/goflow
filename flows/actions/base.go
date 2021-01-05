@@ -18,7 +18,6 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/pkg/errors"
-	"strings"
 	"net/url"
 	"net/http"
 	"io/ioutil"
