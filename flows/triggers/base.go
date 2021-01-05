@@ -44,7 +44,7 @@ type baseTrigger struct {
 }
 
 // create a new base trigger
-func newBaseTrigger(typeName string, env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, connection *flows.Connection, batch bool, history *flows.SessionHistory) baseTrigger {
+func newBaseTrigger(typeName string, env envs.Environment, flow *assets.FlowReference, contact *flows.Contact, connection *flows.Connection, batch bool, history *flows.SessionHistory, params *types.XObject) baseTrigger {
 	return baseTrigger{
 		type_:       typeName,
 		environment: env,
@@ -54,6 +54,7 @@ func newBaseTrigger(typeName string, env envs.Environment, flow *assets.FlowRefe
 		batch:       batch,
 		history:     history,
 		triggeredOn: dates.Now(),
+		params:      params,
 	}
 }
 

@@ -106,7 +106,7 @@ type MsgBuilder struct {
 func (b *Builder) Msg(msg *flows.MsgIn) *MsgBuilder {
 	return &MsgBuilder{
 		t: &MsgTrigger{
-			baseTrigger: newBaseTrigger(TypeMsg, b.environment, b.flow, b.contact, nil, false, nil),
+			baseTrigger: newBaseTrigger(TypeMsg, b.environment, b.flow, b.contact, nil, false, nil, nil),
 			msg:         msg,
 		},
 	}
