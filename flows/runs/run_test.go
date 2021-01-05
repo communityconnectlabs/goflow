@@ -284,14 +284,14 @@ func TestSaveResult(t *testing.T) {
 	// no results means empty object with default of empty string
 	test.AssertXEqual(t, types.NewXObject(map[string]types.XValue{"__default__": types.XTextEmpty}), flows.Context(session.Environment(), run.Results()))
 
-	run.SaveResult(flows.NewResult("Response 1", "red", "Red", "Rojo", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like red", nil, dates.Now()))
+	run.SaveResult(flows.NewResult("Response 1", "red", "Red", "Rojo", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like red", nil, dates.Now(), ""))
 
 	// name is snaked
 	assert.Equal(t, "red", run.Results().Get("response_1").Value)
 	assert.Equal(t, "Red", run.Results().Get("response_1").Category)
 	assert.Equal(t, time.Date(2020, 4, 20, 12, 39, 30, 123456789, time.UTC), run.ModifiedOn())
 
-	run.SaveResult(flows.NewResult("Response 1", "blue", "Blue", "Azul", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like blue", nil, dates.Now()))
+	run.SaveResult(flows.NewResult("Response 1", "blue", "Blue", "Azul", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like blue", nil, dates.Now(), ""))
 
 	// result is overwritten
 	assert.Equal(t, "blue", run.Results().Get("response_1").Value)
@@ -299,7 +299,7 @@ func TestSaveResult(t *testing.T) {
 	assert.Equal(t, time.Date(2020, 4, 20, 12, 39, 30, 123456789, time.UTC), run.ModifiedOn())
 
 	// long values should truncated
-	run.SaveResult(flows.NewResult("Response 1", strings.Repeat("創", 700), "Blue", "Azul", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like blue", nil, dates.Now()))
+	run.SaveResult(flows.NewResult("Response 1", strings.Repeat("創", 700), "Blue", "Azul", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like blue", nil, dates.Now(), ""))
 
 	assert.Equal(t, strings.Repeat("創", 640), run.Results().Get("response_1").Value)
 }
