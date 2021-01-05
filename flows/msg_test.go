@@ -74,6 +74,8 @@ func TestMsgOut(t *testing.T) {
 		nil,
 		nil,
 		flows.MsgTopicAgent,
+		"",
+		flows.ShareableIconsConfig{},
 	)
 
 	// test marshaling our msg
