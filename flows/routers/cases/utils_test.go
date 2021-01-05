@@ -3,8 +3,8 @@ package cases_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/flows/routers/cases"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/flows/routers/cases"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"

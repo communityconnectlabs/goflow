@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // LocationLevel is a numeric level, e.g. 0 = country, 1 = state

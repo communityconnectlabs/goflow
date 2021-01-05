@@ -5,10 +5,10 @@ import (
 
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/actions"
-	"github.com/nyaruka/goflow/flows/inspect"
-	"github.com/nyaruka/goflow/test"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/actions"
+	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
+	"github.com/greatnonprofits-nfp/goflow/test"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -9,12 +9,12 @@ import (
 
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/definition"
-	"github.com/nyaruka/goflow/flows/definition/migrations"
-	"github.com/nyaruka/goflow/test"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
+	"github.com/greatnonprofits-nfp/goflow/test"
 
 	"github.com/Masterminds/semver"
 	"github.com/stretchr/testify/assert"

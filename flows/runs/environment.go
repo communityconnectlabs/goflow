@@ -3,8 +3,8 @@ package runs
 import (
 	"time"
 
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 // an extended environment which takes some values from a contact if there is one and if the have those values.

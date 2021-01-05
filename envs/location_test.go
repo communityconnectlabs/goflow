@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/nyaruka/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/goflow/contactql/es"
-	"github.com/nyaruka/goflow/test"
+	"github.com/greatnonprofits-nfp/goflow/contactql/es"
+	"github.com/greatnonprofits-nfp/goflow/test"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

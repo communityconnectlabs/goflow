@@ -3,7 +3,7 @@ package smtpx_test
 import (
 	"testing"
 
-	"github.com/nyaruka/goflow/utils/smtpx"
+	"github.com/greatnonprofits-nfp/goflow/utils/smtpx"
 
 	"github.com/stretchr/testify/assert"
 )

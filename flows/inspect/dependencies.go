@@ -5,9 +5,9 @@ import (
 	"reflect"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 type Dependency struct {

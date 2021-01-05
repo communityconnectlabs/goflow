@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/goflow/cmd/docgen/docs"
+	"github.com/greatnonprofits-nfp/goflow/cmd/docgen/docs"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -45,7 +45,7 @@ func TestGenerateDocs(t *testing.T) {
 		require.NoError(t, err)
 
 		// if the docs we just generated don't match the existing ones, someone needs to run docgen
-		require.Equal(t, string(existing), string(generated), "changes have been made that require re-running docgen (go install github.com/nyaruka/goflow/cmd/docgen; docgen)")
+		require.Equal(t, string(existing), string(generated), "changes have been made that require re-running docgen (go install github.com/greatnonprofits-nfp/goflow/cmd/docgen; docgen)")
 	}
 
 	// check other outputs

@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows"
 )
 
 // LocalizableText extracts localizable text by reading engine tags on a struct

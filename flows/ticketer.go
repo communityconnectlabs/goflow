@@ -2,7 +2,7 @@ package flows
 
 import (
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets"
 )
 
 // TicketUUID is the UUID of a ticket

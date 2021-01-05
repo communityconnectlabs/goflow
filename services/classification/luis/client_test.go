@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/nyaruka/gocommon/httpx"
-	"github.com/nyaruka/goflow/services/classification/luis"
-	"github.com/nyaruka/goflow/test"
+	"github.com/greatnonprofits-nfp/goflow/services/classification/luis"
+	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/assert"

@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/nyaruka/gocommon/httpx"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 )
 
 type service struct {

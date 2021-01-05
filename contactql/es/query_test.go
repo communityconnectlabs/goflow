@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/assets/static/types"
-	"github.com/nyaruka/goflow/contactql"
-	"github.com/nyaruka/goflow/contactql/es"
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/test"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets/static/types"
+	"github.com/greatnonprofits-nfp/goflow/contactql"
+	"github.com/greatnonprofits-nfp/goflow/contactql/es"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/test"
 
 	"github.com/olivere/elastic"
 	"github.com/stretchr/testify/assert"

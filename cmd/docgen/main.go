@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nyaruka/goflow/cmd/docgen/docs"
+	"github.com/greatnonprofits-nfp/goflow/cmd/docgen/docs"
 )
 
 const (

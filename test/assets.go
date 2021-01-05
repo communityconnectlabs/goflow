@@ -4,13 +4,13 @@ import (
 	"io/ioutil"
 
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/assets/static"
-	"github.com/nyaruka/goflow/assets/static/types"
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/definition/migrations"
-	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/assets/static/types"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
+	"github.com/greatnonprofits-nfp/goflow/flows/engine"
 )
 
 // LoadSessionAssets loads a session assets instance from a static JSON file

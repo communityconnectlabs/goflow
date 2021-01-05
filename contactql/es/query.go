@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/nyaruka/gocommon/dates"
-	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/contactql"
-	"github.com/nyaruka/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/greatnonprofits-nfp/goflow/contactql"
+	"github.com/greatnonprofits-nfp/goflow/envs"
 
 	"github.com/olivere/elastic"
 )
