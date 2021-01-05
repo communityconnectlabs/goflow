@@ -17,8 +17,8 @@ func TestMockSender(t *testing.T) {
 
 	c := smtpx.NewClient("mail.temba.io", 255, "leah", "pass123", "updates@temba.io")
 
-	msg1 := smtpx.NewMessage([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great week", "<p>Have a great week</p>")
-	msg2 := smtpx.NewMessage([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great weekend", "")
+	msg1 := smtpx.NewMessage([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great week", "<p>Have a great week</p>", []string{})
+	msg2 := smtpx.NewMessage([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Updates", "Have a great weekend", "", []string{})
 
 	err := smtpx.Send(c, msg1)
 	assert.NoError(t, err)

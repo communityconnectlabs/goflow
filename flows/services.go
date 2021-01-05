@@ -22,7 +22,7 @@ type Services interface {
 
 // EmailService provides email functionality to the engine
 type EmailService interface {
-	Send(session Session, addresses []string, subject, body string) error
+	Send(session Session, addresses []string, subject, body string, attachments []string) error
 }
 
 // CallStatus represents the status of a call to an external service

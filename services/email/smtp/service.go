@@ -21,12 +21,12 @@ func NewService(smtpURL string) (flows.EmailService, error) {
 	return &service{smtpClient: c}, nil
 }
 
-func (s *service) Send(session flows.Session, addresses []string, subject, body string) error {
+func (s *service) Send(session flows.Session, addresses []string, subject, body string, attachments []string) error {
 	// sending blank emails is a good way to get flagged as a spammer so use placeholder if body is empty
 	if strings.TrimSpace(body) == "" {
 		body = "(empty body)"
 	}
 
-	m := smtpx.NewMessage(addresses, subject, body, "")
+	m := smtpx.NewMessage(addresses, subject, body, "", attachments)
 	return smtpx.Send(s.smtpClient, m)
 }

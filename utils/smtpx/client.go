@@ -78,6 +78,10 @@ func (c *Client) Send(m *Message) error {
 		mm.AddAlternative("text/html", m.html)
 	}
 
+	for _, filepath := range m.attachments {
+		mm.Attach(filepath)
+	}
+
 	d := mail.NewDialer(c.host, c.port, c.username, c.password)
 	return d.DialAndSend(mm)
 }

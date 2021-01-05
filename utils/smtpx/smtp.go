@@ -2,19 +2,21 @@ package smtpx
 
 // Message is email message
 type Message struct {
-	recipients []string
-	subject    string
-	text       string
-	html       string
+	recipients  []string
+	subject     string
+	text        string
+	html        string
+	attachments []string
 }
 
 // NewMessage creates a new message
-func NewMessage(recipients []string, subject, text, html string) *Message {
+func NewMessage(recipients []string, subject, text, html string, attachments []string) *Message {
 	return &Message{
-		recipients: recipients,
-		subject:    subject,
-		text:       text,
-		html:       html,
+		recipients:  recipients,
+		subject:     subject,
+		text:        text,
+		html:        html,
+		attachments: attachments,
 	}
 }
 
