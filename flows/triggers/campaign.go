@@ -8,6 +8,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 )
 
 func init() {
@@ -82,6 +83,12 @@ func (b *Builder) Campaign(campaign *CampaignReference, eventUUID CampaignEventU
 			event:       &CampaignEvent{UUID: eventUUID, Campaign: campaign},
 		},
 	}
+}
+
+// WithParams sets the params for the trigger
+func (b *CampaignBuilder) WithParams(params *types.XObject) *CampaignBuilder {
+	b.t.params = params
+	return b
 }
 
 // Build builds the trigger

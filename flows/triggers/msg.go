@@ -118,6 +118,12 @@ func (b *MsgBuilder) WithMatch(match *KeywordMatch) *MsgBuilder {
 	return b
 }
 
+// WithParams sets the params for the trigger
+func (b *MsgBuilder) WithParams(params *types.XObject) *MsgBuilder {
+	b.t.params = params
+	return b
+}
+
 // Build builds the trigger
 func (b *MsgBuilder) Build() *MsgTrigger {
 	return b.t
