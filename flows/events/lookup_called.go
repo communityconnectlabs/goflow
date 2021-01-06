@@ -29,6 +29,6 @@ func NewLookupCalled(call *flows.WebhookCall, status flows.CallStatus, resthook 
 		ElapsedMS:   int((call.EndTime.Sub(call.StartTime)) / time.Millisecond),
 		Resthook:    resthook,
 		StatusCode:  statusCode,
-		BodyIgnored: call.BodyIgnored,
+		BodyIgnored: len(call.ResponseBody) > 0 && !call.ValidJSON,
 	}
 }
