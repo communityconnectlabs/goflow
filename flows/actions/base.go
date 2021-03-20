@@ -416,8 +416,6 @@ func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID st
 
 		destUUID, destLink, sendFullLink := findDestinationInLinks(d, orgLinks)
 
-		fmt.Println(destUUID, destLink, sendFullLink)
-
 		if destUUID == "" || destLink == "" || sendFullLink {
 			continue
 		}
