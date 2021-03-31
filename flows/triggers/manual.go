@@ -75,8 +75,8 @@ func (b *ManualBuilder) WithParams(params *types.XObject) *ManualBuilder {
 }
 
 // WithConnection sets the channel connection for the trigger
-func (b *ManualBuilder) WithConnection(channel *assets.ChannelReference, urn urns.URN) *ManualBuilder {
-	b.t.connection = flows.NewConnection(channel, urn)
+func (b *ManualBuilder) WithConnection(channel *assets.ChannelReference, urn urns.URN, externalID string) *ManualBuilder {
+	b.t.connection = flows.NewConnection(channel, urn, externalID)
 	return b
 }
 
