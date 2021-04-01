@@ -368,27 +368,14 @@ func ReadAction(data json.RawMessage) (flows.Action, error) {
 	return action, utils.UnmarshalAndValidate(data, action)
 }
 
-func findDestinationInLinks(dest string, links []string) (string, string, bool) {
-	var sendFullLink bool
+func findDestinationInLinks(dest string, links []string) (string, string) {
 	for _, link := range links {
-		linkSplitted := strings.Split(link, ":")
-
-		// Formatting the link like https://communityconnectlabs.com
-		linkFormatted := fmt.Sprintf("%s:%s", linkSplitted[1], linkSplitted[2])
-
-		// Whether the trackable link should be shorten
-		if linkSplitted[3] == "f" {
-			sendFullLink = false
-		} else {
-			sendFullLink = true
-		}
-
-		// If the destination matches then return it
-		if linkFormatted == dest {
-			return linkSplitted[0], linkFormatted, sendFullLink
+		linkSplitted := strings.SplitN(link, ":", 2)
+		if linkSplitted[1] == dest {
+			return linkSplitted[0], linkSplitted[1]
 		}
 	}
-	return "", "", true
+	return "", ""
 }
 
 func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID string) string {
@@ -414,9 +401,9 @@ func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID st
 			continue
 		}
 
-		destUUID, destLink, sendFullLink := findDestinationInLinks(d, orgLinks)
+		destUUID, destLink := findDestinationInLinks(d, orgLinks)
 
-		if destUUID == "" || destLink == "" || sendFullLink {
+		if destUUID == "" || destLink == "" {
 			continue
 		}
 
