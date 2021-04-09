@@ -40,6 +40,21 @@ const (
 
 	// CallStatusSubscriberGone represents a special state of resthook responses which indicate the caller must remove that subscriber
 	CallStatusSubscriberGone CallStatus = "subscriber_gone"
+
+	// CallStatusVoiceHuman represents that the Twilio voice call was answered by an human
+	CallStatusVoiceHuman CallStatus = "human"
+
+	// CallStatusVoiceUnknown represents that the Twilio voice call was answered by unknown (weird Twilio status)
+	CallStatusVoiceUnknown CallStatus = "unknown"
+
+	// CallStatusMachineEndBeep represents that the Twilio voice call machine end beep
+	CallStatusMachineEndBeep CallStatus = "machine_end_beep"
+
+	// CallStatusMachineEndSilence represents that the Twilio voice call machine end silence
+	CallStatusMachineEndSilence CallStatus = "machine_end_silence"
+
+	// CallStatusMachineEndOther represents that the Twilio voice call machine end other
+	CallStatusMachineEndOther CallStatus = "machine_end_other"
 )
 
 // WebhookCall is the result of a webhook call

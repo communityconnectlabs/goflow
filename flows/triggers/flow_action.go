@@ -86,8 +86,8 @@ func (b *Builder) FlowAction(history *flows.SessionHistory, runSummary json.RawM
 }
 
 // WithConnection sets the channel connection for the trigger
-func (b *FlowActionBuilder) WithConnection(channel *assets.ChannelReference, urn urns.URN, externalID string) *FlowActionBuilder {
-	b.t.connection = flows.NewConnection(channel, urn, externalID)
+func (b *FlowActionBuilder) WithConnection(channel *assets.ChannelReference, urn urns.URN, externalID string, twilioCredentials string) *FlowActionBuilder {
+	b.t.connection = flows.NewConnection(channel, urn, externalID, twilioCredentials)
 	return b
 }
 
