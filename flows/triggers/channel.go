@@ -79,7 +79,7 @@ func (b *Builder) Channel(channel *assets.ChannelReference, eventType ChannelEve
 
 // WithConnection sets the channel connection for the trigger
 func (b *ChannelBuilder) WithConnection(urn urns.URN) *ChannelBuilder {
-	b.t.connection = flows.NewConnection(b.t.event.Channel, urn, b.t.connection.ExternalID(), b.t.connection.TwilioCredentials())
+	b.t.connection = flows.NewConnection(b.t.event.Channel, urn, "", "")
 	return b
 }
 
