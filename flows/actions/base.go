@@ -165,8 +165,6 @@ func (a *baseAction) saveVoiceCallResult(run flows.FlowRun, step flows.Step, nam
 	category := voiceCallStatusCategories[status]
 	var extra json.RawMessage
 
-	fmt.Println(category)
-
 	if call.Response != nil {
 		value = strconv.Itoa(call.Response.StatusCode)
 	}

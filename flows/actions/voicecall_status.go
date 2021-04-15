@@ -7,6 +7,7 @@ import (
 	"strings"
 	"fmt"
 	"encoding/json"
+	"time"
 )
 
 func init() {
@@ -55,7 +56,7 @@ func (a *VoiceCallStatusAction) Execute(run flows.FlowRun, step flows.Step, logM
 
 	credentials := strings.Split(twilioCreds, ":")
 
-	// Whether we don't have the credentials
+	// whether we don't have the credentials
 	if len(credentials) != 2 {
 		return nil
 	}
@@ -89,12 +90,25 @@ func (a *VoiceCallStatusAction) Execute(run flows.FlowRun, step flows.Step, logM
 	if call != nil {
 		status := voiceCallStatus(call, err)
 
-		for {
-			if status != "" {
-				break
+		// whether status is empty, try 3x before goes to failure
+		if status == "" {
+			sleepFor := int(5 * time.Second)
+			maxTries := 2
+
+			for i := 0; i <= maxTries; i++ {
+				time.Sleep(time.Duration(i * sleepFor))
+
+				call, _ := svc.Call(run.Session(), req)
+				status = voiceCallStatus(call, err)
+
+				if status != "" {
+					break
+				}
 			}
-			call, _ := svc.Call(run.Session(), req)
-			status = voiceCallStatus(call, err)
+		}
+
+		if status == "" {
+			status = flows.CallStatusConnectionError
 		}
 
 		if a.ResultName != "" {
