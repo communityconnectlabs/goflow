@@ -139,6 +139,10 @@ func voiceCallStatus(call *flows.WebhookCall, err error) flows.CallStatus {
 		return flows.CallStatusResponseError
 	}
 
+	if result["answered_by"] == nil {
+		return ""
+	}
+
 	voiceStatusCategories := map[string]flows.CallStatus{
 		"human":               flows.CallStatusVoiceHuman,
 		"unknown":             flows.CallStatusVoiceUnknown,
