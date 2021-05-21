@@ -29,9 +29,11 @@ const resultExtraMaxBytes = 10000
 
 // common category names
 const (
-	CategorySuccess = "Success"
-	CategorySkipped = "Skipped"
-	CategoryFailure = "Failure"
+	CategorySuccess  = "Success"
+	CategorySkipped  = "Skipped"
+	CategoryFailure  = "Failure"
+	CategoryAnswer   = "Answer"
+	CategoryNoAnswer = "No Answer"
 )
 
 var webhookCategories = []string{CategorySuccess, CategoryFailure}
@@ -40,6 +42,17 @@ var webhookStatusCategories = map[flows.CallStatus]string{
 	flows.CallStatusResponseError:   CategoryFailure,
 	flows.CallStatusConnectionError: CategoryFailure,
 	flows.CallStatusSubscriberGone:  CategoryFailure,
+}
+
+var voiceCallCategories = []string{CategoryAnswer, CategoryNoAnswer, CategoryFailure}
+var voiceCallStatusCategories = map[flows.CallStatus]string{
+	flows.CallStatusVoiceHuman:        CategoryAnswer,
+	flows.CallStatusVoiceUnknown:      CategoryAnswer,
+	flows.CallStatusMachineEndBeep:    CategoryNoAnswer,
+	flows.CallStatusMachineEndSilence: CategoryNoAnswer,
+	flows.CallStatusMachineEndOther:   CategoryNoAnswer,
+	flows.CallStatusResponseError:     CategoryFailure,
+	flows.CallStatusConnectionError:   CategoryFailure,
 }
 
 var registeredTypes = map[string](func() flows.Action){}
@@ -144,6 +157,19 @@ func (a *baseAction) saveWebhookResult(run flows.FlowRun, step flows.Step, name 
 	}
 
 	a.saveResult(run, step, name, value, category, "", input, extra, logEvent)
+}
+
+// helper to save a run result based on a voice call and log it as an event
+func (a *baseAction) saveVoiceCallResult(run flows.FlowRun, step flows.Step, name string, call *flows.WebhookCall, status flows.CallStatus, logEvent flows.EventCallback) {
+	value := "0"
+	category := voiceCallStatusCategories[status]
+	var extra json.RawMessage
+
+	if call.Response != nil {
+		value = strconv.Itoa(call.Response.StatusCode)
+	}
+
+	a.saveResult(run, step, name, value, category, "", "", extra, logEvent)
 }
 
 func (a *baseAction) updateWebhook(run flows.FlowRun, call *flows.WebhookCall) {

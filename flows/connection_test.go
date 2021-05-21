@@ -18,6 +18,8 @@ func TestConnection(t *testing.T) {
 	connection := flows.NewConnection(
 		assets.NewChannelReference(assets.ChannelUUID("61f38f46-a856-4f90-899e-905691784159"), "My Android"),
 		urns.URN("tel:+1234567890"),
+		"",
+		"",
 	)
 
 	// test marshaling our connection

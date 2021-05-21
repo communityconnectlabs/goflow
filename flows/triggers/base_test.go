@@ -221,7 +221,7 @@ func TestTriggerMarshaling(t *testing.T) {
 		{
 			triggers.NewBuilder(env, flow, contact).
 				FlowAction(history, json.RawMessage(`{"uuid": "084e4bed-667c-425e-82f7-bdb625e6ec9e"}`)).
-				WithConnection(channel, "tel:+12065551212").
+				WithConnection(channel, "tel:+12065551212", "", "").
 				AsBatch().
 				Build(),
 			"flow_action_ivr",
@@ -239,7 +239,7 @@ func TestTriggerMarshaling(t *testing.T) {
 		{
 			triggers.NewBuilder(env, flow, contact).
 				Manual().
-				WithConnection(channel, "tel:+12065551212").
+				WithConnection(channel, "tel:+12065551212", "", "").
 				WithParams(types.NewXObject(map[string]types.XValue{"foo": types.NewXText("bar")})).
 				AsBatch().
 				Build(),
