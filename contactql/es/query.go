@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/nyaruka/gocommon/dates"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/contactql"
 	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/gocommon/dates"
 
 	"github.com/olivere/elastic"
 )
@@ -88,6 +88,9 @@ func fieldConditionToElastic(env envs.Environment, c *contactql.Condition) elast
 				elastic.NewExistsQuery("fields.text"),
 			)
 			return not(elastic.NewNestedQuery("fields", query))
+		case contactql.OpContains:
+			query = elastic.NewPrefixQuery("fields.text", value)
+			return elastic.NewNestedQuery("fields", elastic.NewBoolQuery().Must(fieldQuery, query))
 		default:
 			panic(fmt.Sprintf("unsupported text field operator: %s", c.Operator()))
 		}
