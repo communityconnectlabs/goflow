@@ -129,6 +129,10 @@ func (c *Condition) Validate(env envs.Environment, resolver Resolver) error {
 			if len(c.value) < minURNContainsLength {
 				return NewQueryError(ErrInvalidPartialURN, "contains operator on URN requires value of minimum length %d", minURNContainsLength).withExtra("min_value_length", strconv.Itoa(minURNContainsLength))
 			}
+		} else if c.propType == PropertyTypeField && c.valueType == assets.FieldTypeText {
+			if len(tokenizeNameValue(c.value)) == 0 {
+				return NewQueryError(ErrInvalidPartialName, "contains operator on field requires token of minimum length %d", minURNContainsLength).withExtra("min_token_length", strconv.Itoa(minURNContainsLength))
+			}
 		} else {
 			// ~ can only be used with the name/urn attributes or actual URNs
 			return NewQueryError(ErrUnsupportedContains, "contains conditions can only be used with name or URN values").withExtra("property", c.propKey)
