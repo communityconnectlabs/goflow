@@ -59,9 +59,9 @@ func (c *Connection) UnmarshalJSON(data []byte) error {
 // MarshalJSON marshals this connection into JSON
 func (c *Connection) MarshalJSON() ([]byte, error) {
 	return jsonx.Marshal(&connectionEnvelope{
-		Channel:    c.channel,
-		URN:        c.urn,
-		ExternalID: c.externalID,
+		Channel:           c.channel,
+		URN:               c.urn,
+		ExternalID:        c.externalID,
 		TwilioCredentials: c.twilioCredentials,
 	})
 }
