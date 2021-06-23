@@ -408,12 +408,12 @@ func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID st
 	yoURLsHost := utils.GetEnv(utils.YoURLsHost, "")
 	yoURLsLogin := utils.GetEnv(utils.YoURLsLogin, "")
 	yoURLsPassword := utils.GetEnv(utils.YoURLsPassword, "")
-	rapidProDomain := utils.GetEnv(utils.MailroomRapidProDomain, "")
+	mailroomDomain := utils.GetEnv(utils.MailroomDomain, "")
 
 	generatedText := text
 
 	// Whether we don't have the YoURLs credentials, should be skipped
-	if yoURLsHost == "" || yoURLsLogin == "" || yoURLsPassword == "" || rapidProDomain == "" {
+	if yoURLsHost == "" || yoURLsLogin == "" || yoURLsPassword == "" || mailroomDomain == "" {
 		return generatedText
 	}
 
@@ -435,7 +435,7 @@ func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID st
 
 		if contactUUID != "" {
 			yourlsURL := fmt.Sprintf("%s/yourls-api.php", yoURLsHost)
-			handleURL := fmt.Sprintf("https://%s/link/handler/%s", rapidProDomain, destUUID)
+			handleURL := fmt.Sprintf("https://%s/link/handler/%s", mailroomDomain, destUUID)
 			longURL := fmt.Sprintf("%s?contact=%s", handleURL, contactUUID)
 
 			// creating the payload

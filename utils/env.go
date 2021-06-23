@@ -13,7 +13,7 @@ const (
 	YoURLsHost              = "MAILROOM_YOURLS_HOST"
 	YoURLsLogin             = "MAILROOM_YOURLS_LOGIN"
 	YoURLsPassword          = "MAILROOM_YOURLS_PASSWORD"
-	MailroomRapidProDomain  = "MAILROOM_RAPIDPRO_DOMAIN"
+	MailroomDomain          = "MAILROOM_DOMAIN"
 	MailroomSpellCheckerKey = "MAILROOM_SPELL_CHECKER_KEY"
 )
 
