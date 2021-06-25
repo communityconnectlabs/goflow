@@ -264,6 +264,7 @@ type TemplateTranslation interface {
 	Content() string
 	Language() envs.Language
 	Country() envs.Country
+	Namespace() string
 	VariableCount() int
 	Channel() ChannelReference
 }
@@ -286,6 +287,19 @@ type Ticketer interface {
 	Type() string
 }
 
+// User is an person who can trigger flows or be assigned tickets etc.
+//
+//   {
+//     "email": "bob@nyaruka.com",
+//     "name": "Bob"
+//   }
+//
+// @asset user
+type User interface {
+	Email() string
+	Name() string
+}
+
 // Source is a source of assets
 type Source interface {
 	Channels() ([]Channel, error)
@@ -299,4 +313,5 @@ type Source interface {
 	Resthooks() ([]Resthook, error)
 	Templates() ([]Template, error)
 	Ticketers() ([]Ticketer, error)
+	Users() ([]User, error)
 }

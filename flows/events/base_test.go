@@ -41,6 +41,9 @@ func TestEventMarshaling(t *testing.T) {
 	tz, _ := time.LoadLocation("Africa/Kigali")
 	timeout := 500
 	gender := session.Assets().Fields().Get("gender")
+	mailgun := session.Assets().Ticketers().Get("19dc6346-9623-4fe4-be80-538d493ecdf5")
+	user := session.Assets().Users().Get("bob@nyaruka.com")
+	ticket := flows.NewTicket("7481888c-07dd-47dc-bf22-ef7448696ffe", mailgun, "Need help", "Where are my cookies?", "1243252", user)
 
 	eventTests := []struct {
 		event     flows.Event
@@ -280,6 +283,30 @@ func TestEventMarshaling(t *testing.T) {
 					"last_seen_on": "2017-12-31T11:35:10.035757258-02:00",
 					"name": "Ryan Lewis",
 					"status": "active",
+					"tickets": [
+						{
+							"body": "I have a problem",
+							"subject": "Old ticket",
+							"ticketer": {
+								"name": "Support Tickets",
+								"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
+							},
+							"uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52"
+						},
+						{
+							"assignee": {
+								"email": "bob@nyaruka.com",
+								"name": "Bob"
+							},
+							"body": "What day is it?",
+							"subject": "Question",
+							"ticketer": {
+								"name": "Support Tickets",
+								"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
+							},
+							"uuid": "78d1fe0d-7e39-461e-81c3-a6a25f15ed69"
+						}
+					],
 					"timezone": "America/Guayaquil",
 					"urns": [
 						"tel:+12024561111?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
@@ -343,7 +370,6 @@ func TestEventMarshaling(t *testing.T) {
 					],
 					"date_format": "DD-MM-YYYY",
 					"default_country": "US",
-					"default_language": "eng",
 					"max_value_length": 640,
 					"number_format": {
 						"decimal_symbol": ".",
@@ -423,6 +449,25 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
+			events.NewDialEnded(flows.NewDial(flows.DialStatusBusy, 0)),
+			`{
+				"type": "dial_ended",
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"dial": {
+					"status": "busy",
+					"duration": 0
+				}
+			}`,
+		},
+		{
+			events.NewDialWait(urns.URN("tel:+1234567890")),
+			`{
+				"type": "dial_wait",
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"urn": "tel:+1234567890"
+			}`,
+		},
+		{
 			events.NewSessionTriggered(
 				assets.NewFlowReference(assets.FlowUUID("e4d441f0-24e3-4627-85fb-1e99e733baf0"), "Collect Age"),
 				[]*assets.GroupReference{
@@ -471,23 +516,15 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewTicketOpened(
-				flows.NewTicket(
-					"a8b949ea-60c5-4f78-ae47-9c0a0ba61aa6",
-					assets.NewTicketerReference("5546b817-48b5-41e9-8c3a-26a4eb469003", "Support"),
-					"Need help",
-					"Where are my cookies?",
-					"1243252",
-				),
-			),
+			events.NewTicketOpened(ticket),
 			`{
 				"type": "ticket_opened",
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"ticket": {
-					"uuid": "a8b949ea-60c5-4f78-ae47-9c0a0ba61aa6",
+					"uuid": "7481888c-07dd-47dc-bf22-ef7448696ffe",
 					"ticketer": {
-						"uuid": "5546b817-48b5-41e9-8c3a-26a4eb469003",
-						"name": "Support"
+						"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
+						"name": "Support Tickets"
 					},
 					"subject": "Need help",
 					"body": "Where are my cookies?",
@@ -634,5 +671,5 @@ func TestDeprecatedEvents(t *testing.T) {
 
 	marshaled, err := jsonx.Marshal(e)
 	assert.NoError(t, err)
-	test.AssertEqualJSON(t, eventJSON, marshaled, "marshal event mismatch")
+	test.AssertEqualJSON(t, eventJSON, marshaled)
 }

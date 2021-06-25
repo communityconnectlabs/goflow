@@ -8,7 +8,6 @@ import (
 
 	"github.com/nyaruka/gocommon/httpx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/engine"
 	"github.com/nyaruka/goflow/services/webhooks"
@@ -121,7 +120,9 @@ func (s *ticketService) Open(session flows.Session, subject, body string, logHTT
 		ElapsedMS: 1,
 	})
 
-	return flows.NewTicket(flows.TicketUUID(uuids.New()), s.ticketer.Reference(), subject, body, "123456"), nil
+	ticket := flows.OpenTicket(s.ticketer, subject, body)
+	ticket.SetExternalID("123456")
+	return ticket, nil
 }
 
 // implementation of an airtime service for testing which uses a fixed currency

@@ -111,6 +111,7 @@ type SessionAssets interface {
 	Resthooks() *ResthookAssets
 	Templates() *TemplateAssets
 	Ticketers() *TicketerAssets
+	Users() *UserAssets
 }
 
 // Localizable is anything in the flow definition which can be localized and therefore needs a UUID
@@ -265,6 +266,7 @@ type TriggerWithRun interface {
 // Resume represents something which can resume a session with the flow engine
 type Resume interface {
 	utils.Typed
+	Contextable
 
 	Apply(FlowRun, EventCallback)
 
@@ -354,6 +356,7 @@ type Session interface {
 
 	Status() SessionStatus
 	Trigger() Trigger
+	CurrentResume() Resume
 	BatchStart() bool
 	PushFlow(Flow, FlowRun, bool)
 	Wait() ActivatedWait

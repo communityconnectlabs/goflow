@@ -129,8 +129,9 @@
             "keyword": "start",
             "origin": "",
             "params": {},
+            "ticket": null,
             "type": "msg",
-            "user": ""
+            "user": null
         }
     },
     {
@@ -184,8 +185,9 @@
             "keyword": "",
             "origin": "",
             "params": {},
+            "ticket": null,
             "type": "msg",
-            "user": ""
+            "user": null
         }
     }
 ]

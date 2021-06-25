@@ -2,6 +2,7 @@ package flows_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -34,6 +35,13 @@ func TestContact(t *testing.T) {
 				"roles": ["send", "receive"],
 				"country": "US"
 			}
+		],
+		"ticketers": [
+			{
+				"uuid": "d605bb96-258d-4097-ad0a-080937db2212",
+				"name": "Support Tickets",
+				"type": "mailgun"
+			}
 		]
 	}`))
 	require.NoError(t, err)
@@ -63,6 +71,7 @@ func TestContact(t *testing.T) {
 		nil,
 		nil,
 		nil,
+		nil,
 		assets.PanicOnMissing,
 	)
 	require.NoError(t, err)
@@ -85,7 +94,7 @@ func TestContact(t *testing.T) {
 	assert.Equal(t, envs.Language("eng"), contact.Language())
 	assert.Equal(t, android, contact.PreferredChannel())
 	assert.Equal(t, envs.Country("US"), contact.Country())
-	assert.Equal(t, "en-US", contact.Locale(env).ToISO639_2())
+	assert.Equal(t, "en-US", contact.Locale(env).ToBCP47())
 
 	contact.SetStatus(flows.ContactStatusStopped)
 	assert.Equal(t, flows.ContactStatusStopped, contact.Status())
@@ -125,12 +134,20 @@ func TestContact(t *testing.T) {
 		"whatsapp":   nil,
 	}), flows.ContextFunc(env, contact.URNs().MapContext))
 
+	assert.Equal(t, 0, contact.Tickets().Count())
+
+	ticket := flows.OpenTicket(sa.Ticketers().Get("d605bb96-258d-4097-ad0a-080937db2212"), "New ticket", "I have issues")
+	contact.Tickets().Add(ticket)
+
+	assert.Equal(t, 1, contact.Tickets().Count())
+
 	clone := contact.Clone()
 	assert.Equal(t, "Joe Bloggs", clone.Name())
 	assert.Equal(t, flows.ContactID(12345), clone.ID())
 	assert.Equal(t, tz, clone.Timezone())
 	assert.Equal(t, envs.Language("eng"), clone.Language())
 	assert.Equal(t, android, contact.PreferredChannel())
+	assert.Equal(t, 1, clone.Tickets().Count())
 
 	// can also clone a null contact!
 	mrNil := (*flows.Contact)(nil)
@@ -147,6 +164,7 @@ func TestContact(t *testing.T) {
 		"id":           types.NewXText("12345"),
 		"language":     types.NewXText("eng"),
 		"name":         types.NewXText("Joe Bloggs"),
+		"tickets":      contact.Tickets().ToXValue(env),
 		"timezone":     types.NewXText("America/Bogota"),
 		"urn":          contact.URNs()[0].ToXValue(env),
 		"urns":         contact.URNs().ToXValue(env),
@@ -156,6 +174,16 @@ func TestContact(t *testing.T) {
 	assert.True(t, contact.ClearURNs()) // did have URNs
 	assert.False(t, contact.ClearURNs())
 	assert.Equal(t, flows.URNList{}, contact.URNs())
+
+	marshaled, err := jsonx.Marshal(contact)
+	require.NoError(t, err)
+
+	fmt.Println(string(marshaled))
+
+	unmarshaled, err := flows.ReadContact(sa, marshaled, assets.PanicOnMissing)
+	require.NoError(t, err)
+
+	assert.True(t, contact.Equal(unmarshaled))
 }
 
 func TestReadContact(t *testing.T) {
@@ -197,6 +225,7 @@ func TestContactFormat(t *testing.T) {
 		flows.ContactStatusActive,
 		nil,
 		time.Now(),
+		nil,
 		nil,
 		nil,
 		nil,
@@ -282,7 +311,6 @@ func TestReevaluateQueryBasedGroups(t *testing.T) {
 
 	for _, tc := range tests {
 		envBuilder := envs.NewBuilder().
-			WithDefaultLanguage("eng").
 			WithAllowedLanguages([]envs.Language{"eng", "spa"}).
 			WithDefaultCountry("RW")
 

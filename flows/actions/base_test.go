@@ -118,7 +118,11 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		} else {
 			httpx.SetRequestor(httpx.DefaultRequestor)
 		}
-		smtpx.SetSender(smtpx.NewMockSender(tc.SMTPError))
+		if tc.SMTPError != "" {
+			smtpx.SetSender(smtpx.NewMockSender(errors.New(tc.SMTPError)))
+		} else {
+			smtpx.SetSender(smtpx.NewMockSender(nil))
+		}
 
 		testName := fmt.Sprintf("test '%s' for action type '%s'", tc.Description, typeName)
 
@@ -175,7 +179,6 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		}
 
 		envBuilder := envs.NewBuilder().
-			WithDefaultLanguage("eng").
 			WithAllowedLanguages([]envs.Language{"eng", "spa"}).
 			WithDefaultCountry("RW")
 
@@ -214,7 +217,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		// create an engine instance
 		eng := engine.NewBuilder().
 			WithEmailServiceFactory(func(flows.Session) (flows.EmailService, error) {
-				return smtp.NewService("smtp://nyaruka:pass123@mail.temba.io?from=flows@temba.io")
+				return smtp.NewService("smtp://nyaruka:pass123@mail.temba.io?from=flows@temba.io", nil)
 			}).
 			WithWebhookServiceFactory(webhooks.NewServiceFactory(http.DefaultClient, nil, nil, map[string]string{"User-Agent": "goflow-testing"}, 100000)).
 			WithClassificationServiceFactory(func(s flows.Session, c *flows.Classifier) (flows.ClassificationService, error) {
@@ -227,7 +230,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 				return test.NewTicketService(t), nil
 			}).
 			WithAirtimeServiceFactory(func(flows.Session) (flows.AirtimeService, error) {
-				return dtone.NewService(http.DefaultClient, nil, "nyaruka", "123456789", "RWF"), nil
+				return dtone.NewService(http.DefaultClient, nil, "nyaruka", "123456789"), nil
 			}).
 			Build()
 

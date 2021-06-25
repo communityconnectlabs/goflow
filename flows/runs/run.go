@@ -187,7 +187,10 @@ func (r *flowRun) PathLocation() (flows.Step, flows.Node, error) {
 	step := r.Path()[len(r.Path())-1]
 
 	// check that we still have a node for this step
-	node := r.Flow().GetNode(step.NodeUUID())
+	var node flows.Node
+	if r.Flow() != nil {
+		node = r.Flow().GetNode(step.NodeUUID())
+	}
 	if node == nil {
 		return nil, nil, errors.Errorf("run is located at a flow node that no longer exists")
 	}
@@ -229,20 +232,34 @@ func (r *flowRun) ExitedOn() *time.Time { return r.exitedOn }
 //   run:run -> the current run
 //   child:related_run -> the last child run
 //   parent:related_run -> the parent of the run
+//   ticket:ticket -> the last opened ticket for the contact
 //   webhook:any -> the parsed JSON response of the last webhook call
+//   node:node -> the current node
 //   globals:globals -> the global values
 //   trigger:trigger -> the trigger that started this session
+//   resume:resume -> the current resume that continued this session
 //
 // @context root
 func (r *flowRun) RootContext(env envs.Environment) map[string]types.XValue {
-	var urns, fields types.XValue
+	var urns, fields, ticket, node types.XValue
 	if r.Contact() != nil {
 		urns = flows.ContextFunc(env, r.Contact().URNs().MapContext)
 		fields = flows.Context(env, r.Contact().Fields())
+
+		tickets := r.Contact().Tickets()
+
+		if tickets.Count() > 0 {
+			ticket = flows.Context(env, tickets.All()[tickets.Count()-1])
+		}
 	}
 
 	var child = newRelatedRunContext(r.Session().GetCurrentChild(r))
 	var parent = newRelatedRunContext(r.Parent())
+
+	_, n, _ := r.PathLocation()
+	if n != nil {
+		node = flows.ContextFunc(env, r.nodeContext)
+	}
 
 	return map[string]types.XValue{
 		// the available runs
@@ -250,17 +267,20 @@ func (r *flowRun) RootContext(env envs.Environment) map[string]types.XValue {
 		"child":  flows.Context(env, child),
 		"parent": flows.Context(env, parent),
 
-		// shortcuts to things on the current run
+		// shortcuts to things on the current run or contact
 		"contact": flows.Context(env, r.Contact()),
 		"results": flows.Context(env, r.Results()),
 		"urns":    urns,
 		"fields":  fields,
+		"ticket":  ticket,
 
 		// other
 		"trigger":      flows.Context(env, r.Session().Trigger()),
+		"resume":       flows.Context(env, r.Session().CurrentResume()),
 		"input":        flows.Context(env, r.Session().Input()),
 		"globals":      flows.Context(env, r.Session().Assets().Globals()),
 		"webhook":      r.webhook,
+		"node":         node,
 		"legacy_extra": r.legacyExtra.ToXValue(env),
 	}
 }
@@ -293,6 +313,27 @@ func (r *flowRun) Context(env envs.Environment) map[string]types.XValue {
 		"path":        r.path.ToXValue(env),
 		"created_on":  types.NewXDateTime(r.CreatedOn()),
 		"exited_on":   exitedOn,
+	}
+}
+
+// returns the context representation of the current node
+//
+//   uuid:text -> the UUID of the node
+//   visit_count:number -> the count of visits to the node in this run
+//
+// @context node
+func (r *flowRun) nodeContext(env envs.Environment) map[string]types.XValue {
+	_, node, _ := r.PathLocation()
+	visitCount := 0
+	for _, s := range r.path {
+		if s.NodeUUID() == node.UUID() {
+			visitCount++
+		}
+	}
+
+	return map[string]types.XValue{
+		"uuid":        types.NewXText(string(node.UUID())),
+		"visit_count": types.NewXNumberFromInt(visitCount),
 	}
 }
 
