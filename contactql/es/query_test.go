@@ -15,7 +15,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/test"
 
-	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/v7"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

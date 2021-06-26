@@ -27,6 +27,9 @@ import (
 // max number of bytes to be saved to extra on a result
 const resultExtraMaxBytes = 10000
 
+// max length of a message attachment (type:url)
+const maxAttachmentLength = 2048
+
 // common category names
 const (
 	CategorySuccess  = "Success"
@@ -111,6 +114,10 @@ func (a *baseAction) evaluateMessage(run flows.FlowRun, languages []envs.Languag
 		}
 		if evaluatedAttachment == "" {
 			logEvent(events.NewErrorf("attachment text evaluated to empty string, skipping"))
+			continue
+		}
+		if len(evaluatedAttachment) > maxAttachmentLength {
+			logEvent(events.NewErrorf("evaluated attachment is longer than %d limit, skipping", maxAttachmentLength))
 			continue
 		}
 		evaluatedAttachments = append(evaluatedAttachments, utils.Attachment(evaluatedAttachment))
@@ -200,6 +207,14 @@ type universalAction struct{}
 
 // AllowedFlowTypes returns the flow types which this action is allowed to occur in
 func (a *universalAction) AllowedFlowTypes() []flows.FlowType {
+	return []flows.FlowType{flows.FlowTypeMessaging, flows.FlowTypeMessagingBackground, flows.FlowTypeMessagingOffline, flows.FlowTypeVoice}
+}
+
+// utility struct which sets the allowed flow types to non-background
+type interactiveAction struct{}
+
+// AllowedFlowTypes returns the flow types which this action is allowed to occur in
+func (a *interactiveAction) AllowedFlowTypes() []flows.FlowType {
 	return []flows.FlowType{flows.FlowTypeMessaging, flows.FlowTypeMessagingOffline, flows.FlowTypeVoice}
 }
 
@@ -208,7 +223,7 @@ type onlineAction struct{}
 
 // AllowedFlowTypes returns the flow types which this action is allowed to occur in
 func (a *onlineAction) AllowedFlowTypes() []flows.FlowType {
-	return []flows.FlowType{flows.FlowTypeMessaging, flows.FlowTypeVoice}
+	return []flows.FlowType{flows.FlowTypeMessaging, flows.FlowTypeMessagingBackground, flows.FlowTypeVoice}
 }
 
 // utility struct which sets the allowed flow types to just voice

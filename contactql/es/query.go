@@ -9,7 +9,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/nyaruka/gocommon/dates"
 
-	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/v7"
 )
 
 // ToElasticQuery converts a contactql query to an Elastic query

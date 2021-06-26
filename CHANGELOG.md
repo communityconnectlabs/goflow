@@ -1,3 +1,91 @@
+v0.113.2
+----------
+ * Add last missing translations for es and pt-BR
+
+v0.113.1
+----------
+ * Update Spanish locale and gocommon dependency
+
+v0.113.0
+----------
+ * Don't blow up building context if node is null
+ * Add contact language to resthook payload
+
+v0.112.2
+----------
+ * Add accessor for URN on ActivatedDialWait
+
+v0.112.1
+----------
+ * Log error event and skip when attachment is longer than 2048 limit
+
+v0.112.0
+----------
+ * Include resume and node in migration expression parsing
+ * Add dial types of waits and resumes
+
+v0.111.0
+----------
+ * Move to ElasticSearch v7 clients (backwards incompatible change)
+
+v0.110.2
+----------
+ * Remove forward_ivr action and ivr_forwarded event
+
+v0.110.1
+----------
+ * Spanish translations from transifex
+
+v0.110.0
+----------
+ * Combine the completion.json and functions.json editor support files into a single editor.json file
+ * Remove generated docs from repo
+
+v0.109.4
+----------
+ * Fix release workflow
+
+v0.109.3
+----------
+ * Fix release workflow
+
+v0.109.2
+----------
+ * Don't use fuzzy entries in po files
+
+v0.109.1
+----------
+ * Add forward_ivr action and ivr_forwarded event
+
+v0.109.0
+----------
+ * Add @node.(uuid|visit_count) to context
+
+v0.108.0
+----------
+ * Rename messaging_passive to messaging_background
+
+v0.107.2
+----------
+ * Disallow labeling actions in passive flows
+
+v0.107.1
+----------
+ * Add float64 workaround for exponent expressions with non-integer exponents
+
+v0.107.0
+----------
+ * Add new flow type for passive messaging flows
+ * Update to gocommon v1.7.1 to get fix for phone number parsing
+
+v0.106.3
+----------
+ * Engine evaluator for contact sql should support != x for number and datetime values
+
+v0.106.2
+----------
+ * Update to latest gocommon
+
 v0.106.1
 ----------
  * URN and channel modifiers should error with invalid URNs and channels

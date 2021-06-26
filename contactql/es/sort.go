@@ -7,7 +7,7 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/contactql"
 
-	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 )
 
