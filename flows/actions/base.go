@@ -18,7 +18,6 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/pkg/errors"
-	"net/url"
 	"net/http"
 	"io/ioutil"
 	"github.com/buger/jsonparser"
@@ -405,15 +404,14 @@ func findDestinationInLinks(dest string, links []string) (string, string) {
 }
 
 func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID string) string {
-	yoURLsHost := utils.GetEnv(utils.YoURLsHost, "")
-	yoURLsLogin := utils.GetEnv(utils.YoURLsLogin, "")
-	yoURLsPassword := utils.GetEnv(utils.YoURLsPassword, "")
+	URLshHost := utils.GetEnv(utils.URLshHost, "")
+	URLshToken := utils.GetEnv(utils.URLshToken, "")
 	mailroomDomain := utils.GetEnv(utils.MailroomDomain, "")
 
 	generatedText := text
 
-	// Whether we don't have the YoURLs credentials, should be skipped
-	if yoURLsHost == "" || yoURLsLogin == "" || yoURLsPassword == "" || mailroomDomain == "" {
+	// Whether we don't have the URLsh credentials, should be skipped
+	if URLshHost == "" || URLshToken == "" || mailroomDomain == "" {
 		return generatedText
 	}
 
@@ -434,27 +432,25 @@ func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID st
 		}
 
 		if contactUUID != "" {
-			yourlsURL := fmt.Sprintf("%s/yourls-api.php", yoURLsHost)
+			urlshURL := fmt.Sprintf("%s/api/admin/urls", URLshHost)
 			handleURL := fmt.Sprintf("https://%s/link/handler/%s", mailroomDomain, destUUID)
 			longURL := fmt.Sprintf("%s?contact=%s", handleURL, contactUUID)
 
-			// creating the payload
-			payload := url.Values{}
-			payload.Add("url", longURL)
-			payload.Add("format", "json")
-			payload.Add("action", "shorturl")
-			payload.Add("username", yoURLsLogin)
-			payload.Add("password", yoURLsPassword)
-
 			// build our request
-			method := "GET"
-			yourlsURL = fmt.Sprintf("%s?%s", yourlsURL, payload.Encode())
-			req, errReq := http.NewRequest(method, yourlsURL, strings.NewReader(""))
+			method := "POST"
+
+			payload := map[string]string{
+				"url": longURL,
+			}
+			payloadString, _ := json.Marshal(payload)
+
+			req, errReq := http.NewRequest(method, urlshURL, strings.NewReader(string(payloadString)))
 			if errReq != nil {
 				continue
 			}
 
-			req.Header.Add("Content-Type", "multipart/form-data")
+			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", URLshToken))
+			req.Header.Add("Content-Type", "application/json")
 
 			resp, errHttp := http.DefaultClient.Do(req)
 			if errHttp != nil {
@@ -466,7 +462,7 @@ func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID st
 			}
 
 			// replacing the link for the YoURLs generated link
-			shortLink, _ := jsonparser.GetString(content, "shorturl")
+			shortLink, _ := jsonparser.GetString(content, "short_url")
 			generatedText = strings.Replace(generatedText, d, shortLink, -1)
 		}
 
