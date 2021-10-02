@@ -10,9 +10,8 @@ const (
 	ParseServerUrl          = "MAILROOM_PARSE_SERVER_URL"
 	GiftcardCheckType       = "GIFTCARD_CHECK"
 	ShortenURLPing          = "MAILROOM_SHORTEN_URL_PING"
-	YoURLsHost              = "MAILROOM_YOURLS_HOST"
-	YoURLsLogin             = "MAILROOM_YOURLS_LOGIN"
-	YoURLsPassword          = "MAILROOM_YOURLS_PASSWORD"
+	URLshHost               = "MAILROOM_URLSH_HOST"
+	URLshToken              = "MAILROOM_URLSH_TOKEN"
 	MailroomDomain          = "MAILROOM_DOMAIN"
 	MailroomSpellCheckerKey = "MAILROOM_SPELL_CHECKER_KEY"
 )
