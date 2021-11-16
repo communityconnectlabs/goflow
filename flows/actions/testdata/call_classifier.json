@@ -25,7 +25,8 @@
                 "name": "Intent",
                 "value": "0",
                 "category": "Failure",
-                "input": "Hi everybody"
+                "input": "Hi everybody",
+                "corrected": ""
             }
         ],
         "templates": [
@@ -96,7 +97,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "_Intent Classification",
                 "value": "0",
-                "category": "Skipped"
+                "category": "Skipped",
+                "corrected": ""
             }
         ],
         "templates": [
@@ -193,7 +195,8 @@
                             }
                         ]
                     }
-                }
+                },
+                "corrected": ""
             }
         ],
         "templates": [
@@ -280,7 +283,8 @@
                 "name": "Intent",
                 "value": "0",
                 "category": "Failure",
-                "input": "Hi everybody"
+                "input": "Hi everybody",
+                "corrected": ""
             }
         ],
         "templates": [
@@ -366,7 +370,8 @@
                 "name": "Intent",
                 "value": "0",
                 "category": "Failure",
-                "input": "Hi everybody"
+                "input": "Hi everybody",
+                "corrected": ""
             }
         ],
         "templates": [

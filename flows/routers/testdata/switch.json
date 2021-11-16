@@ -175,7 +175,8 @@
                     "category_uuid": "c70fe86c-9aac-4cc2-a5cb-d35cbe3fed6e"
                 }
             ],
-            "default_category_uuid": "78ae8f05-f92e-43b2-a886-406eaea1b8e0"
+            "default_category_uuid": "78ae8f05-f92e-43b2-a886-406eaea1b8e0",
+            "config": null
         },
         "results": {
             "favorite_color": {
@@ -184,7 +185,8 @@
                 "category": "Yes",
                 "node_uuid": "64373978-e8f6-4973-b6ff-a2993f3376fc",
                 "input": "YES!!",
-                "created_on": "2018-10-18T14:20:30.000123456Z"
+                "created_on": "2018-10-18T14:20:30.000123456Z",
+                "corrected": "YES!!"
             }
         },
         "events": [
@@ -195,7 +197,8 @@
                 "name": "Favorite Color",
                 "value": "YES",
                 "category": "Yes",
-                "input": "YES!!"
+                "input": "YES!!",
+                "corrected": "YES!!"
             }
         ],
         "templates": [
@@ -265,7 +268,8 @@
                     "category_uuid": "598ae7a5-2f81-48f1-afac-595262514aa1"
                 }
             ],
-            "default_category_uuid": "78ae8f05-f92e-43b2-a886-406eaea1b8e0"
+            "default_category_uuid": "78ae8f05-f92e-43b2-a886-406eaea1b8e0",
+            "config": null
         },
         "results": {
             "is_member": {
@@ -274,7 +278,8 @@
                 "category": "Other",
                 "node_uuid": "64373978-e8f6-4973-b6ff-a2993f3376fc",
                 "input": "[]",
-                "created_on": "2018-10-18T14:20:30.000123456Z"
+                "created_on": "2018-10-18T14:20:30.000123456Z",
+                "corrected": "[]"
             }
         },
         "events": [
@@ -285,7 +290,8 @@
                 "name": "Is Member",
                 "value": "[]",
                 "category": "Other",
-                "input": "[]"
+                "input": "[]",
+                "corrected": "[]"
             }
         ],
         "templates": [
@@ -355,7 +361,8 @@
                     "category_uuid": "598ae7a5-2f81-48f1-afac-595262514aa1"
                 }
             ],
-            "default_category_uuid": "78ae8f05-f92e-43b2-a886-406eaea1b8e0"
+            "default_category_uuid": "78ae8f05-f92e-43b2-a886-406eaea1b8e0",
+            "config": null
         },
         "results": {
             "in_group": {
@@ -364,7 +371,8 @@
                 "category": "Other",
                 "node_uuid": "64373978-e8f6-4973-b6ff-a2993f3376fc",
                 "input": "[]",
-                "created_on": "2018-10-18T14:20:30.000123456Z"
+                "created_on": "2018-10-18T14:20:30.000123456Z",
+                "corrected": "[]"
             }
         },
         "events": [
@@ -375,7 +383,8 @@
                 "name": "In Group",
                 "value": "[]",
                 "category": "Other",
-                "input": "[]"
+                "input": "[]",
+                "corrected": "[]"
             }
         ],
         "templates": [
@@ -464,7 +473,8 @@
                     "category_uuid": "c70fe86c-9aac-4cc2-a5cb-d35cbe3fed6e"
                 }
             ],
-            "default_category_uuid": "78ae8f05-f92e-43b2-a886-406eaea1b8e0"
+            "default_category_uuid": "78ae8f05-f92e-43b2-a886-406eaea1b8e0",
+            "config": null
         },
         "results": {
             "favorite_color": {
@@ -473,7 +483,8 @@
                 "category": "Yes",
                 "node_uuid": "64373978-e8f6-4973-b6ff-a2993f3376fc",
                 "input": "YES!!",
-                "created_on": "2018-10-18T14:20:30.000123456Z"
+                "created_on": "2018-10-18T14:20:30.000123456Z",
+                "corrected": "YES!!"
             }
         },
         "events": [
@@ -484,7 +495,8 @@
                 "name": "Favorite Color",
                 "value": "YES",
                 "category": "Yes",
-                "input": "YES!!"
+                "input": "YES!!",
+                "corrected": "YES!!"
             }
         ],
         "templates": [
@@ -556,7 +568,8 @@
                     "category_uuid": "c70fe86c-9aac-4cc2-a5cb-d35cbe3fed6e"
                 }
             ],
-            "default_category_uuid": ""
+            "default_category_uuid": "",
+            "config": null
         },
         "results": {},
         "events": [

@@ -134,14 +134,15 @@
             "msg": "Body @step.value"
         },
         "expected_action": {
-            "type": "send_email",
-            "uuid": "5a4d00aa-807e-44af-9693-64b9fdedd352",
             "addresses": [
                 "bob@nyaruka.com",
                 "@fields.supervisor"
             ],
+            "attachments": [],
+            "body": "Body @input",
             "subject": "Subject @input",
-            "body": "Body @input"
+            "type": "send_email",
+            "uuid": "5a4d00aa-807e-44af-9693-64b9fdedd352"
         },
         "expected_localization": {}
     },

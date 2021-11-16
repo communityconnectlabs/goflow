@@ -23,7 +23,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Reward Transfer",
                 "value": "0",
-                "category": "Failure"
+                "category": "Failure",
+                "corrected": ""
             }
         ],
         "inspection": {
@@ -70,7 +71,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Reward Transfer",
                 "value": "0",
-                "category": "Failure"
+                "category": "Failure",
+                "corrected": ""
             }
         ],
         "inspection": {
@@ -144,7 +146,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Reward Transfer",
                 "value": "0",
-                "category": "Failure"
+                "category": "Failure",
+                "corrected": ""
             }
         ],
         "inspection": {
@@ -237,7 +240,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Reward Transfer",
                 "value": "500",
-                "category": "Success"
+                "category": "Success",
+                "corrected": ""
             }
         ],
         "inspection": {
@@ -312,7 +316,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Reward Transfer",
                 "value": "0",
-                "category": "Failure"
+                "category": "Failure",
+                "corrected": ""
             }
         ],
         "inspection": {
@@ -399,7 +404,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Reward Transfer",
                 "value": "0",
-                "category": "Failure"
+                "category": "Failure",
+                "corrected": ""
             }
         ],
         "inspection": {
@@ -498,7 +504,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Reward Transfer",
                 "value": "0",
-                "category": "Failure"
+                "category": "Failure",
+                "corrected": ""
             }
         ],
         "inspection": {

@@ -3,14 +3,14 @@ package flows_test
 import (
 	"testing"
 
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -88,7 +88,8 @@ func TestMsgOut(t *testing.T) {
 		"channel": {"uuid":"61f38f46-a856-4f90-899e-905691784159", "name":"My Android"},
 		"text": "Hi there",
 		"attachments": ["image/jpeg:https://example.com/test.jpg", "audio/mp3:https://example.com/test.mp3"],
-		"topic": "agent"
+		"topic": "agent",
+		"sharing_config":{}
 	}`), marshaled, "JSON mismatch")
 }
 
@@ -114,6 +115,7 @@ func TestIVRMsgOut(t *testing.T) {
 		"channel": {"uuid":"61f38f46-a856-4f90-899e-905691784159", "name":"My Android"},
 		"text": "Hi there",
 		"attachments": ["audio:https://example.com/test.mp3"],
-		"text_language": "eng"
+		"text_language": "eng",
+		"sharing_config": {}
 	}`), marshaled, "JSON mismatch")
 }

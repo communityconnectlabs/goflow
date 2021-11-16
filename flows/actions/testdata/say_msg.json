@@ -43,7 +43,8 @@
                     "attachments": [
                         "audio:http://uploads.temba.io/welcome.m4a"
                     ],
-                    "text_language": "eng"
+                    "text_language": "eng",
+                    "sharing_config": {}
                 }
             }
         ],
@@ -83,7 +84,8 @@
                         "name": "My Android Phone"
                     },
                     "text": "Hi there Ryan Lewis",
-                    "text_language": "eng"
+                    "text_language": "eng",
+                    "sharing_config": {}
                 }
             }
         ]
@@ -126,7 +128,8 @@
                     "attachments": [
                         "audio:http://uploads.temba.io/bienvenido.m4a"
                     ],
-                    "text_language": "spa"
+                    "text_language": "spa",
+                    "sharing_config": {}
                 }
             }
         ],

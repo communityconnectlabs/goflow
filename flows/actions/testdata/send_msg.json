@@ -1,27 +1,5 @@
 [
     {
-        "description": "Read fails when text is empty",
-        "action": {
-            "type": "send_msg",
-            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "text": "",
-            "attachments": [
-                "http://example.com/red.jpg"
-            ]
-        },
-        "read_error": "field 'text' is required"
-    },
-    {
-        "description": "Read fails when topic is invalid",
-        "action": {
-            "type": "send_msg",
-            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "text": "hi there",
-            "topic": "spam"
-        },
-        "read_error": "field 'topic' is not a valid message topic"
-    },
-    {
         "description": "Error event if session has no contact",
         "no_contact": true,
         "action": {
@@ -35,7 +13,8 @@
                 "Red",
                 "Blue"
             ],
-            "all_urns": true
+            "all_urns": true,
+            "sharing_config": {}
         },
         "events": [
             {
@@ -79,7 +58,8 @@
                 "Red@(1 / 0)",
                 "Blue",
                 "@(xxxxx)"
-            ]
+            ],
+            "sharing_config": {}
         },
         "events": [
             {
@@ -142,7 +122,8 @@
                     "quick_replies": [
                         "Red",
                         "Blue"
-                    ]
+                    ],
+                    "sharing_config": {}
                 }
             }
         ]
@@ -158,7 +139,8 @@
             ],
             "quick_replies": [
                 "@(\"\")"
-            ]
+            ],
+            "sharing_config": {}
         },
         "events": [
             {
@@ -184,7 +166,8 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi there"
+                    "text": "Hi there",
+                    "sharing_config": {}
                 }
             }
         ]
@@ -198,7 +181,8 @@
             "attachments": [
                 "@(json(run) & json(run) & json(run))",
                 "image/jpeg:http://exacmple.com/test.jpg"
-            ]
+            ],
+            "sharing_config": {}
         },
         "events": [
             {
@@ -221,7 +205,8 @@
                     "text": "Hi there",
                     "attachments": [
                         "image/jpeg:http://exacmple.com/test.jpg"
-                    ]
+                    ],
+                    "sharing_config": {}
                 }
             }
         ]
@@ -231,7 +216,8 @@
         "action": {
             "type": "send_msg",
             "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "text": "Hi there @contact welcome to @globals.org_name, the secret password is @globals.password"
+            "text": "Hi there @contact welcome to @globals.org_name, the secret password is @globals.password",
+            "sharing_config": {}
         },
         "events": [
             {
@@ -245,7 +231,8 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi there Ryan Lewis welcome to U-Report, the secret password is Chef"
+                    "text": "Hi there Ryan Lewis welcome to U-Report, the secret password is Chef",
+                    "sharing_config": {}
                 }
             }
         ],
@@ -280,7 +267,8 @@
             "type": "send_msg",
             "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
             "text": "Hi there",
-            "all_urns": true
+            "all_urns": true,
+            "sharing_config": {}
         },
         "events": [
             {
@@ -294,7 +282,8 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi there"
+                    "text": "Hi there",
+                    "sharing_config": {}
                 }
             },
             {
@@ -308,7 +297,8 @@
                         "uuid": "8e21f093-99aa-413b-b55b-758b54308fcb",
                         "name": "Twitter Channel"
                     },
-                    "text": "Hi there"
+                    "text": "Hi there",
+                    "sharing_config": {}
                 }
             }
         ]
@@ -319,7 +309,8 @@
         "action": {
             "type": "send_msg",
             "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "text": "Hi there"
+            "text": "Hi there",
+            "sharing_config": {}
         },
         "events": [
             {
@@ -328,7 +319,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "msg": {
                     "uuid": "9688d21d-95aa-4bed-afc7-f31b35731a3d",
-                    "text": "Hi there"
+                    "text": "Hi there",
+                    "sharing_config": {}
                 }
             }
         ]
@@ -349,7 +341,8 @@
                     "@contact.name",
                     "boy"
                 ]
-            }
+            },
+            "sharing_config": {}
         },
         "events": [
             {
@@ -363,7 +356,8 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi Ryan Lewis, who's a good boy?"
+                    "text": "Hi Ryan Lewis, who's a good boy?",
+                    "sharing_config": {}
                 }
             }
         ],
@@ -421,7 +415,8 @@
                     "boy"
                 ]
             },
-            "topic": "account"
+            "topic": "account",
+            "sharing_config": {}
         },
         "events": [
             {
@@ -435,7 +430,7 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi Ryan Lewis, who's an excellent boy?",
+                    "text": "Hi Ryan Lewis, who's a good boy?",
                     "templating": {
                         "template": {
                             "uuid": "5722e1fd-fe32-4e74-ac78-3cf41a6adb7e",
@@ -448,7 +443,8 @@
                             "boy"
                         ]
                     },
-                    "topic": "account"
+                    "topic": "account",
+                    "sharing_config": {}
                 }
             }
         ],
@@ -492,7 +488,8 @@
                     "@contact.name",
                     "boy"
                 ]
-            }
+            },
+            "sharing_config": {}
         },
         "localization": {
             "spa": {
@@ -516,7 +513,7 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hola Ryan Lewis, quien es un niño excelente?",
+                    "text": "Hi Ryan Lewis, who's a good boy?",
                     "templating": {
                         "template": {
                             "uuid": "5722e1fd-fe32-4e74-ac78-3cf41a6adb7e",
@@ -528,7 +525,8 @@
                             "Ryan Lewis",
                             "niño"
                         ]
-                    }
+                    },
+                    "sharing_config": {}
                 }
             }
         ],
@@ -571,7 +569,8 @@
                     "name": "wakeup"
                 },
                 "variables": []
-            }
+            },
+            "sharing_config": {}
         },
         "events": [
             {
@@ -593,7 +592,8 @@
                         },
                         "language": "eng",
                         "country": ""
-                    }
+                    },
+                    "sharing_config": {}
                 }
             }
         ],
@@ -629,7 +629,8 @@
             "quick_replies": [
                 "Yes",
                 "No"
-            ]
+            ],
+            "sharing_config": {}
         },
         "localization": {
             "spa": {
@@ -666,7 +667,8 @@
                     "quick_replies": [
                         "Si",
                         "No"
-                    ]
+                    ],
+                    "sharing_config": {}
                 }
             }
         ],

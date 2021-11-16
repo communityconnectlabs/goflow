@@ -12,9 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
 	"github.com/greatnonprofits-nfp/goflow/envs"
@@ -26,6 +23,9 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/services/classification/wit"
 	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 
 	"github.com/buger/jsonparser"
 	"github.com/pkg/errors"
@@ -156,7 +156,7 @@ func RunFlow(eng flows.Engine, assetsPath string, flowUUID assets.FlowUUID, init
 		// if we're starting a voice flow we need a channel connection
 		if flow.Type() == flows.FlowTypeVoice {
 			channel := sa.Channels().GetForURN(flows.NewContactURN(urns.URN("tel:+12065551212"), nil), assets.ChannelRoleCall)
-			tb = tb.WithConnection(channel.Reference(), urns.URN("tel:+12065551212"))
+			tb = tb.WithConnection(channel.Reference(), urns.URN("tel:+12065551212"), "", "")
 		}
 
 		repro.Trigger = tb.Build()

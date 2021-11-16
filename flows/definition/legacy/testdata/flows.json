@@ -474,6 +474,10 @@
                                 "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
                             }
                         ],
+                        "config": {
+                            "spell_checker": false,
+                            "spelling_correction_sensitivity": ""
+                        },
                         "operand": "@input",
                         "cases": [
                             {
@@ -527,6 +531,10 @@
                         ],
                         "operand": "@contact.name",
                         "cases": [],
+                        "config": {
+                            "spell_checker": false,
+                            "spelling_correction_sensitivity": ""
+                        },
                         "default_category_uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                     },
                     "exits": [
@@ -785,6 +793,10 @@
                                 "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
                             }
                         ],
+                        "config": {
+                            "spell_checker": false,
+                            "spelling_correction_sensitivity": ""
+                        },
                         "default_category_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                         "operand": "@input",
                         "result_name": "Response 1",

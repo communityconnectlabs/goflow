@@ -53,6 +53,7 @@
                 "name": "Favorite Color",
                 "value": "red",
                 "category": "Red",
+                "corrected": "red",
                 "input": "red"
             }
         ],

@@ -9,11 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nyaruka/gocommon/dates"
-	"github.com/nyaruka/gocommon/httpx"
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/assets/static"
 	"github.com/greatnonprofits-nfp/goflow/envs"
@@ -30,6 +25,11 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/greatnonprofits-nfp/goflow/utils"
 	"github.com/greatnonprofits-nfp/goflow/utils/smtpx"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -548,6 +548,7 @@ func TestConstructors(t *testing.T) {
 			"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
 			"addresses": ["bob@example.com"],
 			"subject": "Hi there",
+			"attachments": null,
 			"body": "So I was thinking..."
 		}`,
 		},
@@ -562,6 +563,7 @@ func TestConstructors(t *testing.T) {
 			`{
 			"type": "send_msg",
 			"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
+			"sharing_config": {},
 			"text": "Hi there",
 			"attachments": ["http://example.com/red.jpg"],
 			"quick_replies": ["Red", "Blue"],

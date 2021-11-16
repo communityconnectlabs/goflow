@@ -9,324 +9,339 @@
     },
     "outputs": [
         {
-            "events": [
-                {
-                    "created_on": "2018-07-06T12:30:04.123456789Z",
-                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                    "type": "msg_wait"
-                }
-            ],
             "session": {
-                "contact": {
-                    "created_on": "2000-01-01T00:00:00Z",
-                    "id": 1234567,
-                    "language": "eng",
-                    "name": "Ben Haggerty",
-                    "status": "active",
-                    "timezone": "America/Guayaquil",
-                    "urns": [
-                        "tel:+12065551212"
-                    ],
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
-                },
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
+                "type": "messaging",
                 "environment": {
                     "date_format": "YYYY-MM-DD",
-                    "max_value_length": 640,
+                    "time_format": "tt:mm",
+                    "timezone": "UTC",
                     "number_format": {
                         "decimal_symbol": ".",
                         "digit_grouping_symbol": ","
                     },
                     "redaction_policy": "none",
-                    "time_format": "tt:mm",
-                    "timezone": "UTC"
+                    "max_value_length": 640,
+                    "links": [
+                        ""
+                    ]
+                },
+                "trigger": {
+                    "type": "manual",
+                    "flow": {
+                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
+                        "name": "Migrated Webhook"
+                    },
+                    "contact": {
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
+                        "id": 1234567,
+                        "name": "Ben Haggerty",
+                        "language": "eng",
+                        "status": "active",
+                        "timezone": "America/Guayaquil",
+                        "created_on": "2000-01-01T00:00:00Z",
+                        "urns": [
+                            "tel:+12065551212"
+                        ]
+                    },
+                    "triggered_on": "2000-01-01T00:00:00Z"
+                },
+                "contact": {
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
+                    "id": 1234567,
+                    "name": "Ben Haggerty",
+                    "language": "eng",
+                    "status": "active",
+                    "timezone": "America/Guayaquil",
+                    "created_on": "2000-01-01T00:00:00Z",
+                    "urns": [
+                        "tel:+12065551212"
+                    ]
                 },
                 "runs": [
                     {
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
-                        "events": [
-                            {
-                                "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "type": "msg_wait"
-                            }
-                        ],
-                        "exited_on": null,
-                        "expires_on": "2018-07-06T12:30:01.123456789Z",
+                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
                         "flow": {
-                            "name": "Migrated Webhook",
-                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
+                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
+                            "name": "Migrated Webhook"
                         },
-                        "modified_on": "2018-07-06T12:30:06.123456789Z",
                         "path": [
                             {
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "node_uuid": "5b5abbf2-5f12-4f83-a804-90695e6c4302",
-                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
+                            }
+                        ],
+                        "events": [
+                            {
+                                "type": "msg_wait",
+                                "created_on": "2018-07-06T12:30:04.123456789Z",
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
                             }
                         ],
                         "status": "waiting",
-                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
+                        "modified_on": "2018-07-06T12:30:06.123456789Z",
+                        "expires_on": "2018-07-06T12:30:01.123456789Z",
+                        "exited_on": null
                     }
                 ],
                 "status": "waiting",
-                "trigger": {
-                    "contact": {
-                        "created_on": "2000-01-01T00:00:00Z",
-                        "id": 1234567,
-                        "language": "eng",
-                        "name": "Ben Haggerty",
-                        "status": "active",
-                        "timezone": "America/Guayaquil",
-                        "urns": [
-                            "tel:+12065551212"
-                        ],
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
-                    },
-                    "flow": {
-                        "name": "Migrated Webhook",
-                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
-                    },
-                    "triggered_on": "2000-01-01T00:00:00Z",
-                    "type": "manual"
-                },
-                "type": "messaging",
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
                 "wait": {
                     "type": "msg"
                 }
-            }
-        },
-        {
+            },
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:10.123456789Z",
-                    "msg": {
-                        "text": "Ryan Lewis",
-                        "urn": "tel:+12065551212",
-                        "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5"
-                    },
-                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                    "type": "msg_received"
-                },
-                {
-                    "category": "Other",
-                    "created_on": "2018-07-06T12:30:14.123456789Z",
-                    "input": "Ryan Lewis",
-                    "name": "Country Response",
-                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                    "type": "run_result_changed",
-                    "value": "Ryan Lewis"
-                },
-                {
-                    "created_on": "2018-07-06T12:30:19.123456789Z",
-                    "elapsed_ms": 1000,
-                    "request": "GET /?cmd=country HTTP/1.1\r\nHost: localhost\r\nUser-Agent: goflow-testing\r\nAccept-Encoding: gzip\r\n\r\n",
-                    "response": "HTTP/1.0 200 OK\r\nContent-Length: 18\r\n\r\n{\"exists\":\"valid\"}",
-                    "status": "success",
-                    "status_code": 200,
-                    "step_uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                    "type": "webhook_called",
-                    "url": "http://localhost/?cmd=country"
-                },
-                {
-                    "category": "Success",
-                    "created_on": "2018-07-06T12:30:23.123456789Z",
-                    "extra": {
-                        "exists": "valid"
-                    },
-                    "input": "GET http://localhost/?cmd=country",
-                    "name": "Country Webhook",
-                    "step_uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                    "type": "run_result_changed",
-                    "value": "200"
-                },
-                {
-                    "category": "Valid",
-                    "created_on": "2018-07-06T12:30:28.123456789Z",
-                    "input": "valid",
-                    "name": "Country",
-                    "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
-                    "type": "run_result_changed",
-                    "value": "valid"
+                    "type": "msg_wait",
+                    "created_on": "2018-07-06T12:30:04.123456789Z",
+                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
                 }
-            ],
+            ]
+        },
+        {
             "session": {
-                "contact": {
-                    "created_on": "2000-01-01T00:00:00Z",
-                    "id": 1234567,
-                    "language": "eng",
-                    "last_seen_on": "2000-01-01T00:00:00Z",
-                    "name": "Ben Haggerty",
-                    "status": "active",
-                    "timezone": "America/Guayaquil",
-                    "urns": [
-                        "tel:+12065551212"
-                    ],
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
-                },
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
+                "type": "messaging",
                 "environment": {
                     "date_format": "YYYY-MM-DD",
-                    "max_value_length": 640,
+                    "time_format": "tt:mm",
+                    "timezone": "UTC",
                     "number_format": {
                         "decimal_symbol": ".",
                         "digit_grouping_symbol": ","
                     },
                     "redaction_policy": "none",
-                    "time_format": "tt:mm",
-                    "timezone": "UTC"
+                    "max_value_length": 640,
+                    "links": [
+                        ""
+                    ]
                 },
-                "input": {
+                "trigger": {
+                    "type": "manual",
+                    "flow": {
+                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
+                        "name": "Migrated Webhook"
+                    },
+                    "contact": {
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
+                        "id": 1234567,
+                        "name": "Ben Haggerty",
+                        "language": "eng",
+                        "status": "active",
+                        "timezone": "America/Guayaquil",
+                        "created_on": "2000-01-01T00:00:00Z",
+                        "urns": [
+                            "tel:+12065551212"
+                        ]
+                    },
+                    "triggered_on": "2000-01-01T00:00:00Z"
+                },
+                "contact": {
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
+                    "id": 1234567,
+                    "name": "Ben Haggerty",
+                    "language": "eng",
+                    "status": "active",
+                    "timezone": "America/Guayaquil",
                     "created_on": "2000-01-01T00:00:00Z",
-                    "text": "Ryan Lewis",
-                    "type": "msg",
-                    "urn": "tel:+12065551212",
-                    "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5"
+                    "last_seen_on": "2000-01-01T00:00:00Z",
+                    "urns": [
+                        "tel:+12065551212"
+                    ]
                 },
                 "runs": [
                     {
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
+                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
+                        "flow": {
+                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
+                            "name": "Migrated Webhook"
+                        },
+                        "path": [
+                            {
+                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                                "node_uuid": "5b5abbf2-5f12-4f83-a804-90695e6c4302",
+                                "exit_uuid": "cbb4ff9e-fa50-4d19-be5b-3c219e9366b1",
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
+                            },
+                            {
+                                "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
+                                "node_uuid": "d02536d0-7e86-47ab-8c60-fcf2678abc2b",
+                                "exit_uuid": "96a1ff26-af04-4698-a4bd-40939bf2e7ab",
+                                "arrived_on": "2018-07-06T12:30:16.123456789Z"
+                            },
+                            {
+                                "uuid": "5802813d-6c58-4292-8228-9728778b6c98",
+                                "node_uuid": "e5d0c54c-7702-4e6b-9080-3de1a120a647",
+                                "exit_uuid": "10b6fb5d-7da8-433c-835c-d05cfd352ce4",
+                                "arrived_on": "2018-07-06T12:30:25.123456789Z"
+                            }
+                        ],
                         "events": [
                             {
+                                "type": "msg_wait",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "type": "msg_wait"
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
                             },
                             {
+                                "type": "msg_received",
                                 "created_on": "2018-07-06T12:30:10.123456789Z",
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "msg": {
-                                    "text": "Ryan Lewis",
+                                    "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5",
                                     "urn": "tel:+12065551212",
-                                    "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5"
-                                },
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "type": "msg_received"
+                                    "text": "Ryan Lewis"
+                                }
                             },
                             {
-                                "category": "Other",
-                                "created_on": "2018-07-06T12:30:14.123456789Z",
-                                "input": "Ryan Lewis",
-                                "name": "Country Response",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "type": "run_result_changed",
-                                "value": "Ryan Lewis"
+                                "created_on": "2018-07-06T12:30:14.123456789Z",
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                                "name": "Country Response",
+                                "value": "Ryan Lewis",
+                                "category": "Other",
+                                "input": "Ryan Lewis",
+                                "corrected": "Ryan Lewis"
                             },
                             {
+                                "type": "webhook_called",
                                 "created_on": "2018-07-06T12:30:19.123456789Z",
-                                "elapsed_ms": 1000,
+                                "step_uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
+                                "url": "http://localhost/?cmd=country",
+                                "status": "success",
                                 "request": "GET /?cmd=country HTTP/1.1\r\nHost: localhost\r\nUser-Agent: goflow-testing\r\nAccept-Encoding: gzip\r\n\r\n",
                                 "response": "HTTP/1.0 200 OK\r\nContent-Length: 18\r\n\r\n{\"exists\":\"valid\"}",
-                                "status": "success",
-                                "status_code": 200,
-                                "step_uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                                "type": "webhook_called",
-                                "url": "http://localhost/?cmd=country"
+                                "elapsed_ms": 1000,
+                                "status_code": 200
                             },
                             {
-                                "category": "Success",
+                                "type": "run_result_changed",
                                 "created_on": "2018-07-06T12:30:23.123456789Z",
+                                "step_uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
+                                "name": "Country Webhook",
+                                "value": "200",
+                                "category": "Success",
+                                "input": "GET http://localhost/?cmd=country",
                                 "extra": {
                                     "exists": "valid"
                                 },
-                                "input": "GET http://localhost/?cmd=country",
-                                "name": "Country Webhook",
-                                "step_uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                                "type": "run_result_changed",
-                                "value": "200"
+                                "corrected": ""
                             },
                             {
-                                "category": "Valid",
+                                "type": "run_result_changed",
                                 "created_on": "2018-07-06T12:30:28.123456789Z",
-                                "input": "valid",
-                                "name": "Country",
                                 "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
-                                "type": "run_result_changed",
-                                "value": "valid"
-                            }
-                        ],
-                        "exited_on": "2018-07-06T12:30:30.123456789Z",
-                        "expires_on": null,
-                        "flow": {
-                            "name": "Migrated Webhook",
-                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
-                        },
-                        "modified_on": "2018-07-06T12:30:30.123456789Z",
-                        "path": [
-                            {
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
-                                "exit_uuid": "cbb4ff9e-fa50-4d19-be5b-3c219e9366b1",
-                                "node_uuid": "5b5abbf2-5f12-4f83-a804-90695e6c4302",
-                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
-                            },
-                            {
-                                "arrived_on": "2018-07-06T12:30:16.123456789Z",
-                                "exit_uuid": "96a1ff26-af04-4698-a4bd-40939bf2e7ab",
-                                "node_uuid": "d02536d0-7e86-47ab-8c60-fcf2678abc2b",
-                                "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
-                            },
-                            {
-                                "arrived_on": "2018-07-06T12:30:25.123456789Z",
-                                "exit_uuid": "10b6fb5d-7da8-433c-835c-d05cfd352ce4",
-                                "node_uuid": "e5d0c54c-7702-4e6b-9080-3de1a120a647",
-                                "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
+                                "name": "Country",
+                                "value": "valid",
+                                "category": "Valid",
+                                "input": "valid",
+                                "corrected": "valid"
                             }
                         ],
                         "results": {
                             "country": {
-                                "category": "Valid",
-                                "created_on": "2018-07-06T12:30:26.123456789Z",
-                                "input": "valid",
                                 "name": "Country",
+                                "value": "valid",
+                                "category": "Valid",
                                 "node_uuid": "e5d0c54c-7702-4e6b-9080-3de1a120a647",
-                                "value": "valid"
+                                "input": "valid",
+                                "created_on": "2018-07-06T12:30:26.123456789Z",
+                                "corrected": "valid"
                             },
                             "country_response": {
-                                "category": "Other",
-                                "created_on": "2018-07-06T12:30:12.123456789Z",
-                                "input": "Ryan Lewis",
                                 "name": "Country Response",
+                                "value": "Ryan Lewis",
+                                "category": "Other",
                                 "node_uuid": "5b5abbf2-5f12-4f83-a804-90695e6c4302",
-                                "value": "Ryan Lewis"
+                                "input": "Ryan Lewis",
+                                "created_on": "2018-07-06T12:30:12.123456789Z",
+                                "corrected": "Ryan Lewis"
                             },
                             "country_webhook": {
+                                "name": "Country Webhook",
+                                "value": "200",
                                 "category": "Success",
-                                "created_on": "2018-07-06T12:30:21.123456789Z",
+                                "node_uuid": "d02536d0-7e86-47ab-8c60-fcf2678abc2b",
+                                "input": "GET http://localhost/?cmd=country",
                                 "extra": {
                                     "exists": "valid"
                                 },
-                                "input": "GET http://localhost/?cmd=country",
-                                "name": "Country Webhook",
-                                "node_uuid": "d02536d0-7e86-47ab-8c60-fcf2678abc2b",
-                                "value": "200"
+                                "created_on": "2018-07-06T12:30:21.123456789Z",
+                                "corrected": ""
                             }
                         },
                         "status": "completed",
-                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
+                        "modified_on": "2018-07-06T12:30:30.123456789Z",
+                        "expires_on": null,
+                        "exited_on": "2018-07-06T12:30:30.123456789Z"
                     }
                 ],
                 "status": "completed",
-                "trigger": {
-                    "contact": {
-                        "created_on": "2000-01-01T00:00:00Z",
-                        "id": 1234567,
-                        "language": "eng",
-                        "name": "Ben Haggerty",
-                        "status": "active",
-                        "timezone": "America/Guayaquil",
-                        "urns": [
-                            "tel:+12065551212"
-                        ],
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
-                    },
-                    "flow": {
-                        "name": "Migrated Webhook",
-                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
-                    },
-                    "triggered_on": "2000-01-01T00:00:00Z",
-                    "type": "manual"
+                "input": {
+                    "type": "msg",
+                    "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5",
+                    "created_on": "2000-01-01T00:00:00Z",
+                    "urn": "tel:+12065551212",
+                    "text": "Ryan Lewis"
+                }
+            },
+            "events": [
+                {
+                    "type": "msg_received",
+                    "created_on": "2018-07-06T12:30:10.123456789Z",
+                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                    "msg": {
+                        "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5",
+                        "urn": "tel:+12065551212",
+                        "text": "Ryan Lewis"
+                    }
                 },
-                "type": "messaging",
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5"
-            }
+                {
+                    "type": "run_result_changed",
+                    "created_on": "2018-07-06T12:30:14.123456789Z",
+                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                    "name": "Country Response",
+                    "value": "Ryan Lewis",
+                    "category": "Other",
+                    "input": "Ryan Lewis",
+                    "corrected": "Ryan Lewis"
+                },
+                {
+                    "type": "webhook_called",
+                    "created_on": "2018-07-06T12:30:19.123456789Z",
+                    "step_uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
+                    "url": "http://localhost/?cmd=country",
+                    "status": "success",
+                    "request": "GET /?cmd=country HTTP/1.1\r\nHost: localhost\r\nUser-Agent: goflow-testing\r\nAccept-Encoding: gzip\r\n\r\n",
+                    "response": "HTTP/1.0 200 OK\r\nContent-Length: 18\r\n\r\n{\"exists\":\"valid\"}",
+                    "elapsed_ms": 1000,
+                    "status_code": 200
+                },
+                {
+                    "type": "run_result_changed",
+                    "created_on": "2018-07-06T12:30:23.123456789Z",
+                    "step_uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
+                    "name": "Country Webhook",
+                    "value": "200",
+                    "category": "Success",
+                    "input": "GET http://localhost/?cmd=country",
+                    "extra": {
+                        "exists": "valid"
+                    },
+                    "corrected": ""
+                },
+                {
+                    "type": "run_result_changed",
+                    "created_on": "2018-07-06T12:30:28.123456789Z",
+                    "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
+                    "name": "Country",
+                    "value": "valid",
+                    "category": "Valid",
+                    "input": "valid",
+                    "corrected": "valid"
+                }
+            ]
         }
     ],
     "resumes": [

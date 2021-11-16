@@ -25,7 +25,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
                 "value": "",
-                "category": "Failure"
+                "category": "Failure",
+                "corrected": ""
             }
         ],
         "templates": [
@@ -86,7 +87,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
                 "value": "",
-                "category": "Failure"
+                "category": "Failure",
+                "corrected": ""
             }
         ],
         "templates": [
@@ -149,7 +151,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
                 "value": "9688d21d-95aa-4bed-afc7-f31b35731a3d",
-                "category": "Success"
+                "category": "Success",
+                "corrected": ""
             }
         ],
         "templates": [
@@ -237,7 +240,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
                 "value": "9688d21d-95aa-4bed-afc7-f31b35731a3d",
-                "category": "Success"
+                "category": "Success",
+                "corrected": ""
             }
         ],
         "templates": [
@@ -304,7 +308,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
                 "value": "",
-                "category": "Failure"
+                "category": "Failure",
+                "corrected": ""
             }
         ],
         "templates": [

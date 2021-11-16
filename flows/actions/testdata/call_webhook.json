@@ -1,29 +1,5 @@
 [
     {
-        "description": "Read fails if method is empty",
-        "action": {
-            "type": "call_webhook",
-            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "method": "",
-            "url": "http://temba.io/"
-        },
-        "read_error": "field 'method' is required"
-    },
-    {
-        "description": "Read fails if header name is invalid",
-        "action": {
-            "type": "call_webhook",
-            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "method": "POST",
-            "url": "http://temba.io/",
-            "body": "Hi there!",
-            "headers": {
-                "Accept:": "something"
-            }
-        },
-        "read_error": "header 'Accept:' is not a valid HTTP header"
-    },
-    {
         "description": "Error events created if URL, header or body contain expression errors",
         "http_mocks": {
             "http://temba.io/?q=": [
@@ -195,7 +171,8 @@
                 "input": "POST http://temba.io/",
                 "extra": {
                     "ok": true
-                }
+                },
+                "corrected": ""
             }
         ],
         "webhook": {
@@ -272,7 +249,8 @@
                 "name": "My Webhook",
                 "value": "200",
                 "category": "Success",
-                "input": "GET http://temba.io/"
+                "input": "GET http://temba.io/",
+                "corrected": ""
             }
         ],
         "webhook": {},
@@ -335,7 +313,8 @@
                 "name": "My Webhook",
                 "value": "200",
                 "category": "Success",
-                "input": "GET http://temba.io/"
+                "input": "GET http://temba.io/",
+                "corrected": ""
             }
         ],
         "webhook": {
@@ -406,7 +385,8 @@
                     "errors": [
                         "bad_request"
                     ]
-                }
+                },
+                "corrected": ""
             }
         ],
         "webhook": {
@@ -474,7 +454,8 @@
                 "name": "My Webhook",
                 "value": "0",
                 "category": "Failure",
-                "input": "POST http://temba.io/"
+                "input": "POST http://temba.io/",
+                "corrected": ""
             }
         ],
         "webhook": {},
@@ -545,7 +526,8 @@
                 "name": "My Webhook",
                 "value": "200",
                 "category": "Failure",
-                "input": "GET http://temba.io/"
+                "input": "GET http://temba.io/",
+                "corrected": ""
             }
         ],
         "webhook": {},
