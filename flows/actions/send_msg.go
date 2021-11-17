@@ -38,18 +38,18 @@ const TypeSendMsg string = "send_msg"
 //     },
 //     "topic": "event",
 //     "receive_attachment": "image",
-//	   "sharing_config": {
-//	  	 "text": "test",
-//	  	 "hashtags": [],
-//	  	 "email": false,
-//	  	 "facebook": true,
-//	  	 "whatsapp": false,
-//	  	 "pinterest": false,
-//	  	 "download": false,
-//	  	 "twitter": false,
-//	  	 "telegram": false,
-//	  	 "line": false
-//	   }
+//     "sharing_config": {
+//         "text": "test",
+//         "hashtags": [],
+//         "email": false,
+//         "facebook": true,
+//         "whatsapp": false,
+//         "pinterest": false,
+//         "download": false,
+//         "twitter": false,
+//         "telegram": false,
+//         "line": false
+//     }
 //   }
 //
 // @action send_msg
