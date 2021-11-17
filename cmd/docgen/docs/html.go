@@ -11,12 +11,12 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/nyaruka/gocommon/dates"
-	"github.com/nyaruka/gocommon/random"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/random"
+	"github.com/nyaruka/gocommon/uuids"
 
 	"github.com/pkg/errors"
 )
@@ -183,9 +183,17 @@ func createLinkResolver(items map[string][]*TaggedItem) (urlResolver, map[string
 
 func resolveLinks(s string, resolver urlResolver, targets map[string]bool) string {
 	r := regexp.MustCompile(`\[\w+:\w+\]`)
+
+	// these events are all alias to event:webhook_called
+	ignoredTargets := map[string]bool{
+		"event:giftcard_called": true,
+		"event:shorten_url_called": true,
+		"event:lookup_called": true,
+		"event:voicecall_status": true,
+	}
 	return r.ReplaceAllStringFunc(s, func(old string) string {
 		target := old[1 : len(old)-1]
-		if !targets[target] {
+		if !targets[target] && !ignoredTargets[target] {
 			panic(fmt.Sprintf("found link to %s which is not a valid target", target))
 		}
 
