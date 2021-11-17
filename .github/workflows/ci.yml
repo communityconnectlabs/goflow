@@ -19,6 +19,8 @@ jobs:
         go-version: ${{ env.go-version }}
 
     - name: Run tests
+      env:
+        MAILROOM_SHORTEN_URL_PING: https://example.com
       run: go test -p=1 -coverprofile=coverage.text -covermode=atomic ./...
 
     - name: Upload coverage
