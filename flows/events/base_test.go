@@ -345,9 +345,7 @@ func TestEventMarshaling(t *testing.T) {
 					"date_format": "DD-MM-YYYY",
 					"default_country": "US",
 					"default_language": "eng",
-					"links": [
-						""
-                    ],
+					"links": [""],
 					"max_value_length": 640,
 					"number_format": {
 						"decimal_symbol": ".",
