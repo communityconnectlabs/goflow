@@ -103,7 +103,9 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 	orgLinks := run.Environment().Links()
 
-	evaluatedText = generateTextWithShortenLinks(evaluatedText, orgLinks, string(run.Contact().UUID()))
+	contactUUID := string(run.Contact().UUID())
+
+	evaluatedText = generateTextWithShortenLinks(evaluatedText, orgLinks, contactUUID)
 
 	// create a new message for each URN+channel destination
 	for _, dest := range destinations {
@@ -136,7 +138,7 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 					evaluatedVariables[i] = sub
 				}
 
-				evaluatedText = translation.Substitute(evaluatedVariables)
+				evaluatedText = generateTextWithShortenLinks(translation.Substitute(evaluatedVariables), orgLinks, contactUUID)
 				templating = flows.NewMsgTemplating(a.Templating.Template, translation.Language(), translation.Country(), evaluatedVariables)
 			}
 		}
