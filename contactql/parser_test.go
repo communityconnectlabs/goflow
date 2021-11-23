@@ -84,7 +84,7 @@ func TestParseQuery(t *testing.T) {
 		{`Age IS 18`, `age = 18`, "", envs.RedactionPolicyNone},
 		{`AGE != ""`, `age != ""`, "", envs.RedactionPolicyNone},
 		{`age ~ 34`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
-		{`gender ~ M`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
+		{`gender ~ M`, ``, "contains operator on field requires token of minimum length 3", envs.RedactionPolicyNone},
 
 		// lt/lte/gt/gte comparisons
 		{`Age > "18"`, `age > 18`, "", envs.RedactionPolicyNone},
@@ -178,7 +178,7 @@ func TestParseQuery(t *testing.T) {
 		{`tel ~ 02352`, `tel ~ 02352`, "", envs.RedactionPolicyNone},
 		{`urn ~ 02352`, `urn ~ 02352`, "", envs.RedactionPolicyNone},
 		{`age ~ 18`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
-		{`gender ~ mal`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
+		{`gender ~ mal`, `gender ~ "mal"`, "", envs.RedactionPolicyNone},
 		{`dob ~ 20-02-2020`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
 		{`state ~ Pichincha`, ``, "contains conditions can only be used with name or URN values", envs.RedactionPolicyNone},
 

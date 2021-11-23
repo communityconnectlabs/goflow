@@ -7,8 +7,6 @@ import (
 	"testing"
 
 	"github.com/Masterminds/semver"
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
@@ -20,6 +18,8 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits"
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
 	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -109,7 +109,7 @@ func TestBrokenFlows(t *testing.T) {
 func TestNewFlow(t *testing.T) {
 	var flowDef = fmt.Sprintf(`
 {
-    "uuid": "8ca44c09-791d-453a-9799-a70dd3303306", 
+    "uuid": "8ca44c09-791d-453a-9799-a70dd3303306",
     "name": "Test Flow",
     "spec_version": "%s",
     "language": "eng",
@@ -122,20 +122,34 @@ func TestNewFlow(t *testing.T) {
             "uuid": "a58be63b-907d-4a1a-856b-0bb5579d7507",
             "actions": [
                 {
-                   "type": "send_msg",
-                   "uuid": "76112ef2-790e-4b5b-84cb-e910f191a335",
-                   "text": "Do you like beer?"
+                    "type": "send_msg",
+                    "uuid": "76112ef2-790e-4b5b-84cb-e910f191a335",
+                    "text": "Do you like beer?",
+                    "sharing_config": {}
                 }
             ],
             "router": {
-				"type": "switch",
-				"wait": {
-					"type": "msg",
-					"hint": {
-						"type": "image"
-					}
-				},
-				"operand": "@input.text",
+                "type": "switch",
+                "wait": {
+                    "type": "msg",
+                    "hint": {
+                        "type": "image"
+                    }
+                },
+                "result_name": "Response 1",
+                "categories": [
+                    {
+                        "uuid": "97b9451c-2856-475b-af38-32af68100897",
+                        "name": "Yes",
+                        "exit_uuid": "023a5c10-d74a-4fad-9560-990caead8170"
+                    },
+                    {
+                        "uuid": "8fd08f1c-8f4e-42c1-af6c-df2db2e0eda6",
+                        "name": "No",
+                        "exit_uuid": "8943c032-2a91-456c-8080-2a249f1b420c"
+                    }
+                ],
+                "operand": "@input.text",
                 "cases": [
                     {
                         "uuid": "9f593e22-7886-4c08-a52f-0e8780504d75",
@@ -148,19 +162,10 @@ func TestNewFlow(t *testing.T) {
                     }
                 ],
                 "default_category_uuid": "8fd08f1c-8f4e-42c1-af6c-df2db2e0eda6",
-                "result_name": "Response 1",
-				"categories": [
-					{
-						"uuid": "97b9451c-2856-475b-af38-32af68100897",
-						"name": "Yes",
-						"exit_uuid": "023a5c10-d74a-4fad-9560-990caead8170"
-					},
-					{
-						"uuid": "8fd08f1c-8f4e-42c1-af6c-df2db2e0eda6",
-						"name": "No",
-						"exit_uuid": "8943c032-2a91-456c-8080-2a249f1b420c"
-					}
-				]
+                "config": {
+                    "spell_checker": false,
+                    "spelling_correction_sensitivity": ""
+                }
             },
             "exits": [
                 {

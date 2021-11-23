@@ -37,3 +37,7 @@ fabfile.*
 fabconfig.*
 
 antlr/.antlr
+
+# test coverage files
+coverage.text
+cover.html

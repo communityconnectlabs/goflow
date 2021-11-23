@@ -8,7 +8,8 @@
                 "bob@example.com@(1 / 0)"
             ],
             "subject": "Hi there@(1 / 0)",
-            "body": "So I was thinking...@(1 / 0)"
+            "body": "So I was thinking...@(1 / 0)",
+            "attachments": null
         },
         "events": [
             {
@@ -37,7 +38,8 @@
                     "bob@example.com"
                 ],
                 "subject": "Hi there",
-                "body": "So I was thinking..."
+                "body": "So I was thinking...",
+                "attachments": null
             }
         ],
         "templates": [
@@ -66,7 +68,8 @@
                 "bob@example.com"
             ],
             "subject": "@(\"\")",
-            "body": "So I was thinking..."
+            "body": "So I was thinking...",
+            "attachments": null
         },
         "events": [
             {
@@ -86,7 +89,8 @@
                 "bob@example.com"
             ],
             "subject": "\nHi\tthere  \n   Bob",
-            "body": "So I was thinking..."
+            "body": "So I was thinking...",
+            "attachments": null
         },
         "events": [
             {
@@ -97,7 +101,8 @@
                     "bob@example.com"
                 ],
                 "subject": "Hi there Bob",
-                "body": "So I was thinking..."
+                "body": "So I was thinking...",
+                "attachments": null
             }
         ]
     },
@@ -110,7 +115,8 @@
                 "bob@example.com"
             ],
             "subject": "Hi there",
-            "body": "@(\"\")"
+            "body": "@(\"\")",
+            "attachments": null
         },
         "events": [
             {
@@ -130,7 +136,8 @@
                 "@(\"\")"
             ],
             "subject": "Hi there",
-            "body": "So I was thinking..."
+            "body": "So I was thinking...",
+            "attachments": null
         },
         "events": [
             {
@@ -150,7 +157,8 @@
                 "mailto:bob@example.com"
             ],
             "subject": "Hi there",
-            "body": "So I was thinking..."
+            "body": "So I was thinking...",
+            "attachments": null
         },
         "events": [
             {
@@ -161,7 +169,8 @@
                     "bob@example.com"
                 ],
                 "subject": "Hi there",
-                "body": "So I was thinking..."
+                "body": "So I was thinking...",
+                "attachments": null
             }
         ]
     },
@@ -174,7 +183,8 @@
                 "bob@example.com"
             ],
             "subject": "Hi there",
-            "body": "So I was thinking..."
+            "body": "So I was thinking...",
+            "attachments": null
         },
         "localization": {
             "spa": {
@@ -197,7 +207,8 @@
                     "bob@example.com"
                 ],
                 "subject": "Hola",
-                "body": "Pues estuve pensando..."
+                "body": "Pues estuve pensando...",
+                "attachments": null
             }
         ],
         "templates": [
@@ -229,7 +240,8 @@
                 "bob@example.com"
             ],
             "subject": "Hi there",
-            "body": "So I was thinking..."
+            "body": "So I was thinking...",
+            "attachments": null
         },
         "events": [
             {

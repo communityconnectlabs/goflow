@@ -3,12 +3,12 @@ package inspect_test
 import (
 	"testing"
 
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/actions"
 	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
 	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -48,6 +48,7 @@ func TestLocalizableText(t *testing.T) {
 		"quick_replies": [
 			"foo",
 			"bar"
-		]
+		],
+	    "sharing_config": {}
 	}`), data, "JSON mismatch")
 }

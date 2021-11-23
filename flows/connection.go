@@ -20,16 +20,31 @@ func NewConnection(channel *assets.ChannelReference, urn urns.URN, externalID st
 }
 
 // Channel returns a reference to the channel
-func (c *Connection) Channel() *assets.ChannelReference { return c.channel }
+func (c *Connection) Channel() *assets.ChannelReference {
+	if c == nil {
+		return nil
+	}
+	return c.channel
+}
 
 // URN returns the URN
 func (c *Connection) URN() urns.URN { return c.urn }
 
 // ExternalID returns the External ID of this channel connection
-func (c *Connection) ExternalID() string { return c.externalID }
+func (c *Connection) ExternalID() string {
+	if c == nil {
+		return ""
+	}
+	return c.externalID
+}
 
 // TwilioCredentials returns the External ID of this channel connection
-func (c *Connection) TwilioCredentials() string { return c.twilioCredentials }
+func (c *Connection) TwilioCredentials() string {
+	if c == nil {
+		return ""
+	}
+	return c.twilioCredentials
+}
 
 //------------------------------------------------------------------------------------------
 // JSON Encoding / Decoding

@@ -54,6 +54,7 @@ func TestResults(t *testing.T) {
 			"created_on":           types.NewXDateTime(time.Date(2019, 4, 5, 14, 16, 30, 123456, time.UTC)),
 			"extra":                nil,
 			"input":                types.XTextEmpty,
+			"corrected":            types.XTextEmpty,
 			"name":                 types.NewXText("Empty"),
 			"node_uuid":            types.NewXText("26493ebb-a254-4461-a28d-c7761784e276"),
 			"value":                types.NewXText(""),

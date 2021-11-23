@@ -9,7 +9,10 @@
             "digit_grouping_symbol": ","
         },
         "redaction_policy": "none",
-        "max_value_length": 640
+        "max_value_length": 640,
+        "links": [
+            ""
+        ]
     },
     "flow": {
         "uuid": "7c37d7e5-6468-4b31-8109-ced2ef8b5ddc",
@@ -30,7 +33,9 @@
             "uuid": "3a05eaf5-cb1b-4246-bef1-f277419c83a7",
             "name": "Nexmo"
         },
-        "urn": "tel:+12065551212"
+        "urn": "tel:+12065551212",
+        "external_id": "",
+        "twilio_credentials": ""
     },
     "triggered_on": "2018-10-20T09:49:31.23456789Z",
     "event": {

@@ -9,11 +9,6 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/nyaruka/gocommon/dates"
-	"github.com/nyaruka/gocommon/httpx"
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/excellent/types"
@@ -22,6 +17,11 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits/hints"
 	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
 	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/assert"
@@ -325,6 +325,7 @@ func TestEventMarshaling(t *testing.T) {
 		{
 			events.NewEmailSent([]string{"bob@nyaruka.com", "jim@nyaruka.com"}, "Update", "Flows are great!", nil),
 			`{
+				"attachments": null,
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"type": "email_sent",
 				"to": ["bob@nyaruka.com", "jim@nyaruka.com"],
@@ -344,6 +345,7 @@ func TestEventMarshaling(t *testing.T) {
 					"date_format": "DD-MM-YYYY",
 					"default_country": "US",
 					"default_language": "eng",
+					"links": [""],
 					"max_value_length": 640,
 					"number_format": {
 						"decimal_symbol": ".",
@@ -401,6 +403,7 @@ func TestEventMarshaling(t *testing.T) {
 						"name": "My Android Phone",
 						"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
 					},
+					"sharing_config": {},
 					"text": "Hi there",
 					"urn": "tel:+12345678900",
 					"uuid": "20cc4181-48cf-4344-9751-99419796decd"

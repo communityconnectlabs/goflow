@@ -113,7 +113,8 @@
                     "quick_replies": [
                         "Red",
                         "Blue"
-                    ]
+                    ],
+                    "sharing_config": {}
                 }
             ],
             "exits": [
@@ -167,7 +168,8 @@
                         "category_uuid": "43f7e69e-727d-4cfe-81b8-564e7833052b"
                     }
                 ],
-                "default_category_uuid": "3a044264-81d1-4ba7-882a-e98740c8e724"
+                "default_category_uuid": "3a044264-81d1-4ba7-882a-e98740c8e724",
+                "config": null
             },
             "exits": [
                 {
