@@ -1,12 +1,12 @@
 package actions
 
 import (
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/events"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 )
 
 func init() {
@@ -103,7 +103,7 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 
 	orgLinks := run.Environment().Links()
 
-	text := generateTextWithShortenLinks(evaluatedText, orgLinks, string(run.Contact().UUID()))
+	evaluatedText = generateTextWithShortenLinks(evaluatedText, orgLinks, string(run.Contact().UUID()))
 
 	// create a new message for each URN+channel destination
 	for _, dest := range destinations {
@@ -141,14 +141,14 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 			}
 		}
 
-		msg := flows.NewMsgOut(dest.URN.URN(), channelRef, text, evaluatedAttachments, evaluatedQuickReplies, templating, a.Topic, a.ReceiveAttachment, a.SharingConfig)
+		msg := flows.NewMsgOut(dest.URN.URN(), channelRef, evaluatedText, evaluatedAttachments, evaluatedQuickReplies, templating, a.Topic, a.ReceiveAttachment, a.SharingConfig)
 		logEvent(events.NewMsgCreated(msg))
 	}
 
 	// if we couldn't find a destination, create a msg without a URN or channel and it's up to the caller
 	// to handle that as they want
 	if len(destinations) == 0 {
-		msg := flows.NewMsgOut(urns.NilURN, nil, text, evaluatedAttachments, evaluatedQuickReplies, nil, flows.NilMsgTopic, a.ReceiveAttachment, a.SharingConfig)
+		msg := flows.NewMsgOut(urns.NilURN, nil, evaluatedText, evaluatedAttachments, evaluatedQuickReplies, nil, flows.NilMsgTopic, a.ReceiveAttachment, a.SharingConfig)
 		logEvent(events.NewMsgCreated(msg))
 	}
 

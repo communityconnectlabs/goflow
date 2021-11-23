@@ -430,7 +430,7 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi Ryan Lewis, who's a good boy?",
+                    "text": "Hi Ryan Lewis, who's an excellent boy?",
                     "templating": {
                         "template": {
                             "uuid": "5722e1fd-fe32-4e74-ac78-3cf41a6adb7e",
@@ -513,7 +513,7 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi Ryan Lewis, who's a good boy?",
+                    "text": "Hola Ryan Lewis, quien es un niño excelente?",
                     "templating": {
                         "template": {
                             "uuid": "5722e1fd-fe32-4e74-ac78-3cf41a6adb7e",
