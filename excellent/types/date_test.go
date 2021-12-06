@@ -7,7 +7,6 @@ import (
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
-
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -32,7 +31,7 @@ func TestXDate(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "mié, 20-02-2019", formatted)
 
-	formatted, err = d1.FormatCustom(env, "YYYYYY")
+	_, err = d1.FormatCustom(env, "YYYYYY")
 	assert.EqualError(t, err, "'YYYYYY' is not valid in a date formatting layout")
 
 	asJSON, _ := types.ToXJSON(d1)

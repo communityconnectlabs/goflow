@@ -141,7 +141,7 @@ func (a *baseAction) saveWebhookResult(run flows.FlowRun, step flows.Step, name 
 	if call.Response != nil {
 		value = strconv.Itoa(call.Response.StatusCode)
 
-		if len(call.ResponseBody) < resultExtraMaxBytes && call.ValidJSON {
+		if len(call.ResponseJSON) > 0 && len(call.ResponseJSON) < resultExtraMaxBytes {
 			extra = call.ResponseBody
 		}
 	}
@@ -218,21 +218,14 @@ func (a *otherContactsAction) resolveRecipients(run flows.FlowRun, logEvent flow
 
 	// copy URNs
 	urnList := make([]urns.URN, 0, len(a.URNs))
-	for _, urn := range a.URNs {
-		urnList = append(urnList, urn)
-	}
+	urnList = append(urnList, a.URNs...)
 
 	// copy contact references
 	contactRefs := make([]*flows.ContactReference, 0, len(a.Contacts))
-	for _, contactRef := range a.Contacts {
-		contactRefs = append(contactRefs, contactRef)
-	}
+	contactRefs = append(contactRefs, a.Contacts...)
 
 	// resolve group references
-	groups, err := resolveGroups(run, a.Groups, logEvent)
-	if err != nil {
-		return nil, nil, "", nil, err
-	}
+	groups := resolveGroups(run, a.Groups, logEvent)
 	groupRefs := make([]*assets.GroupReference, 0, len(groups))
 	for _, group := range groups {
 		groupRefs = append(groupRefs, group.Reference())
@@ -288,30 +281,30 @@ type createMsgAction struct {
 }
 
 // helper function for actions that have a set of group references that must be resolved to actual groups
-func resolveGroups(run flows.FlowRun, references []*assets.GroupReference, logEvent flows.EventCallback) ([]*flows.Group, error) {
-	groupSet := run.Session().Assets().Groups()
+func resolveGroups(run flows.FlowRun, references []*assets.GroupReference, logEvent flows.EventCallback) []*flows.Group {
+	groupAssets := run.Session().Assets().Groups()
 	groups := make([]*flows.Group, 0, len(references))
 
 	for _, ref := range references {
 		var group *flows.Group
 
-		if ref.UUID != "" {
-			// group is a fixed group with a UUID
-			group = groupSet.Get(ref.UUID)
-			if group == nil {
-				logEvent(events.NewDependencyError(ref))
-			}
-		} else {
-			// group is an expression that evaluates to an existing group's name
-			evaluatedGroupName, err := run.EvaluateTemplate(ref.NameMatch)
+		if ref.Variable() {
+			// is an expression that evaluates to an existing group's name
+			evaluatedName, err := run.EvaluateTemplate(ref.NameMatch)
 			if err != nil {
 				logEvent(events.NewError(err))
 			} else {
 				// look up the set of all groups to see if such a group exists
-				group = groupSet.FindByName(evaluatedGroupName)
+				group = groupAssets.FindByName(evaluatedName)
 				if group == nil {
-					logEvent(events.NewErrorf("no such group with name '%s'", evaluatedGroupName))
+					logEvent(events.NewErrorf("no such group with name '%s'", evaluatedName))
 				}
+			}
+		} else {
+			// group is a fixed group with a UUID
+			group = groupAssets.Get(ref.UUID)
+			if group == nil {
+				logEvent(events.NewDependencyError(ref))
 			}
 		}
 
@@ -320,34 +313,34 @@ func resolveGroups(run flows.FlowRun, references []*assets.GroupReference, logEv
 		}
 	}
 
-	return groups, nil
+	return groups
 }
 
 // helper function for actions that have a set of label references that must be resolved to actual labels
-func resolveLabels(run flows.FlowRun, references []*assets.LabelReference, logEvent flows.EventCallback) ([]*flows.Label, error) {
-	labelSet := run.Session().Assets().Labels()
+func resolveLabels(run flows.FlowRun, references []*assets.LabelReference, logEvent flows.EventCallback) []*flows.Label {
+	labelAssets := run.Session().Assets().Labels()
 	labels := make([]*flows.Label, 0, len(references))
 
 	for _, ref := range references {
 		var label *flows.Label
 
-		if ref.UUID != "" {
-			// label is a fixed label with a UUID
-			label = labelSet.Get(ref.UUID)
-			if label == nil {
-				logEvent(events.NewDependencyError(ref))
-			}
-		} else {
-			// label is an expression that evaluates to an existing label's name
-			evaluatedLabelName, err := run.EvaluateTemplate(ref.NameMatch)
+		if ref.Variable() {
+			// is an expression that evaluates to an existing label's name
+			evaluatedName, err := run.EvaluateTemplate(ref.NameMatch)
 			if err != nil {
 				logEvent(events.NewError(err))
 			} else {
 				// look up the set of all labels to see if such a label exists
-				label = labelSet.FindByName(evaluatedLabelName)
+				label = labelAssets.FindByName(evaluatedName)
 				if label == nil {
-					logEvent(events.NewErrorf("no such label with name '%s'", evaluatedLabelName))
+					logEvent(events.NewErrorf("no such label with name '%s'", evaluatedName))
 				}
+			}
+		} else {
+			// label is a fixed label with a UUID
+			label = labelAssets.Get(ref.UUID)
+			if label == nil {
+				logEvent(events.NewDependencyError(ref))
 			}
 		}
 
@@ -356,7 +349,35 @@ func resolveLabels(run flows.FlowRun, references []*assets.LabelReference, logEv
 		}
 	}
 
-	return labels, nil
+	return labels
+}
+
+// helper function to resolve a user reference to a user
+func resolveUser(run flows.FlowRun, ref *assets.UserReference, logEvent flows.EventCallback) *flows.User {
+	userAssets := run.Session().Assets().Users()
+	var user *flows.User
+
+	if ref.Variable() {
+		// is an expression that evaluates to an existing user's email
+		evaluatedEmail, err := run.EvaluateTemplate(ref.EmailMatch)
+		if err != nil {
+			logEvent(events.NewError(err))
+		} else {
+			// look up to see if such a user exists
+			user = userAssets.Get(evaluatedEmail)
+			if user == nil {
+				logEvent(events.NewErrorf("no such user with email '%s'", evaluatedEmail))
+			}
+		}
+	} else {
+		// user is a fixed user with this email address
+		user = userAssets.Get(ref.Email)
+		if user == nil {
+			logEvent(events.NewDependencyError(ref))
+		}
+	}
+
+	return user
 }
 
 //------------------------------------------------------------------------------------------

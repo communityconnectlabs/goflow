@@ -3,7 +3,7 @@ package translation_test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -97,12 +97,12 @@ func TestExtractFromFlows(t *testing.T) {
 		poAsStr := b.String()
 
 		if !test.UpdateSnapshots {
-			expected, err := ioutil.ReadFile(fmt.Sprintf("testdata/%s", tc.po))
+			expected, err := os.ReadFile(fmt.Sprintf("testdata/%s", tc.po))
 			require.NoError(t, err)
 
 			assert.Equal(t, string(expected), poAsStr)
 		} else {
-			ioutil.WriteFile(fmt.Sprintf("testdata/%s", tc.po), []byte(poAsStr), 0666)
+			os.WriteFile(fmt.Sprintf("testdata/%s", tc.po), []byte(poAsStr), 0666)
 		}
 	}
 }
@@ -168,7 +168,7 @@ func TestImportIntoFlows(t *testing.T) {
 	err = translation.ImportIntoFlows(po, envs.Language("spa"), flow)
 	require.NoError(t, err)
 
-	localJSON, _ := jsonx.Marshal(flow.Localization())
+	localJSON := jsonx.MustMarshal(flow.Localization())
 	test.AssertEqualJSON(t, []byte(`{
 		"spa": {
 			"e42deebf-90fa-4636-81cb-d247a3d3ba75": {
@@ -216,15 +216,16 @@ func TestImportNewTranslationIntoFlows(t *testing.T) {
 	flow, err := sa.Flows().Get(`615b8a0f-588c-4d20-a05f-363b0b4ce6f4`)
 	require.NoError(t, err)
 
-	poData, err := ioutil.ReadFile("testdata/imports/two_questions.es.po")
+	poData, err := os.ReadFile("testdata/imports/two_questions.es.po")
 	require.NoError(t, err)
 
 	po, err := i18n.ReadPO(bytes.NewReader(poData))
+	require.NoError(t, err)
 
 	err = translation.ImportIntoFlows(po, "spa", flow)
 	require.NoError(t, err)
 
-	localJSON, _ := jsonx.Marshal(flow.Localization())
+	localJSON := jsonx.MustMarshal(flow.Localization())
 	spaJSON, _, _, _ := jsonparser.Get(localJSON, "spa")
 
 	test.AssertEqualJSON(t, []byte(`{

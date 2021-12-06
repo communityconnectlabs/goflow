@@ -6,7 +6,6 @@ import (
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -73,7 +72,7 @@ func TestToXNumberAndInteger(t *testing.T) {
 	env := envs.NewBuilder().Build()
 
 	for _, test := range tests {
-		number, err := types.ToXNumber(env, test.value)
+		number, _ := types.ToXNumber(env, test.value)
 		integer, err := types.ToInteger(env, test.value)
 
 		if test.hasError {

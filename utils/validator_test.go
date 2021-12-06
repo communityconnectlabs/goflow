@@ -2,7 +2,7 @@ package utils_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"strings"
 	"testing"
 
@@ -31,7 +31,13 @@ type TestObject struct {
 	Things     []string  `json:"things" validate:"min=1,max=3,dive,http_method"`
 	DateFormat string    `json:"date_format" validate:"date_format"`
 	TimeFormat string    `json:"time_format" validate:"time_format"`
+	Email      string    `json:"email" validate:"email"`
 	Hex        string    `json:"hex" validate:"hexadecimal"`
+}
+
+type NoJSONObject struct {
+	Foo string `validate:"required"`
+	Bar string `validate:"startswith=go"`
 }
 
 func TestValidate(t *testing.T) {
@@ -49,6 +55,7 @@ func TestValidate(t *testing.T) {
 		Things:     []string{"GET", "POST", "PATCH"},
 		DateFormat: "DD-MM-YYYY",
 		TimeFormat: "hh:mm:ss",
+		Email:      "bob@nyaruka.com",
 		Hex:        "0A",
 	})
 	assert.Nil(t, errs)
@@ -65,6 +72,7 @@ func TestValidate(t *testing.T) {
 		Things:     nil,
 		DateFormat: "hh:mm",
 		TimeFormat: "DD-MM",
+		Email:      " # ",
 		Hex:        "XY",
 	})
 	assert.NotNil(t, errs)
@@ -80,6 +88,7 @@ func TestValidate(t *testing.T) {
 		`field 'things' must have a minimum of 1 items`,
 		`field 'date_format' is not a valid date format`,
 		`field 'time_format' is not a valid time format`,
+		`field 'email' is not a valid email address`,
 		`field 'hex' failed tag 'hexadecimal'`,
 	}, msgs)
 
@@ -93,6 +102,7 @@ func TestValidate(t *testing.T) {
 			SomeValue: 2,
 		},
 		Things: []string{"UGHHH"},
+		Email:  "a@b.c",
 		Hex:    "ZY",
 	})
 	assert.NotNil(t, errs)
@@ -103,6 +113,11 @@ func TestValidate(t *testing.T) {
 		`field 'things[0]' is not a valid HTTP method`,
 		`field 'hex' failed tag 'hexadecimal'`,
 	}, msgs)
+}
+
+func TestValidateObjectWithoutJSONTags(t *testing.T) {
+	err := utils.Validate(&NoJSONObject{})
+	assert.EqualError(t, err, "field 'Foo' is required, field 'Bar' must start with 'go'")
 }
 
 func TestUnmarshalAndValidate(t *testing.T) {
@@ -116,12 +131,12 @@ func TestUnmarshalAndValidate(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "123", o.Foo)
 
-	err = utils.UnmarshalAndValidateWithLimit(ioutil.NopCloser(bytes.NewReader([]byte(`{"foo": "abc"}`))), o, 100)
+	err = utils.UnmarshalAndValidateWithLimit(io.NopCloser(bytes.NewReader([]byte(`{"foo": "abc"}`))), o, 100)
 
 	assert.NoError(t, err)
 	assert.Equal(t, "abc", o.Foo)
 
-	err = utils.UnmarshalAndValidateWithLimit(ioutil.NopCloser(bytes.NewReader([]byte(`{"foo": "abc"}`))), o, 5)
+	err = utils.UnmarshalAndValidateWithLimit(io.NopCloser(bytes.NewReader([]byte(`{"foo": "abc"}`))), o, 5)
 
 	assert.EqualError(t, err, "unexpected end of JSON input")
 }

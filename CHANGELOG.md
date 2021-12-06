@@ -1,3 +1,168 @@
+v0.141.0
+----------
+ * Rework Context into Scope, expose functions via a root scope, and support shadowing
+ * Cleanup function exposure in contexts and add more tests
+ * Drop unused child.run.* and parent.run.* parts of the context except .status as used subflow splits
+ * Add support for anonymous functions in excellent
+ * Fix function equality/inequality for consistency
+ * Use syntax tree for refactoring operations
+ * Excellent evaluation should parse to syntax tree as first step
+ * Let Excellent functions know their own name to make better error messages
+ * Only msg resumes should set input, all other resumes clear it
+
+v0.140.1
+----------
+ * Update locale files (adds empty cs and mn translations)
+
+v0.140.0
+----------
+ * Add reverse excellent function
+
+v0.139.1
+----------
+ * Limit webhook URLs to 2048 chars
+
+v0.139.0
+----------
+ * Add sort() excellent function
+
+v0.138.0
+----------
+ * Add engine property for maximum resumes per session
+
+v0.137.0
+----------
+ * Simplify contactql queries after parsing
+
+v0.136.5
+----------
+ * Update to latest gocommon
+ * Update locale files
+
+v0.136.4
+----------
+ * Improve validator error message with startswith tag
+
+v0.136.3
+----------
+ * Tweak validation to work when struct doesn't use json tags
+
+v0.136.2
+----------
+ * Fix trigger docs
+
+v0.136.1
+----------
+ * Add Session.FindStep
+
+v0.136.0
+----------
+ * Rework WebhookCall and HTTPLog to overlap as much as possible
+
+v0.135.0
+----------
+ * Get rid of ticket subjects
+
+v0.134.3
+----------
+ * Add number of retries to webhook_called events
+
+v0.134.2
+----------
+ * Fix word_slice when passing custom delimiters
+
+v0.134.1
+----------
+ * Re-evaluate dynamic groups after opening tickets
+
+v0.134.0
+----------
+ * Add support for variable user references to open ticket actions
+
+v0.133.1
+----------
+ * Update to latest gocommon/phonenumbers
+
+v0.133.0
+----------
+ * If open ticket action doesn't specify a topic, default to General
+ * Expose topic instead of subject in context for ticket objects
+
+v0.132.1
+----------
+ * Update to latest gocommon and add webchat URN schemes
+
+v0.132.0
+----------
+ * Require either a subject or a topic to open a ticket but not both
+ * Add assignee as optional field to open ticket actions
+ * Add topics to tickets
+
+v0.131.1
+----------
+ * Move slot param for LUIS classifiers to last
+ * Add util cmd for testing classifier services
+
+v0.131.0
+----------
+ * Update to LUIS API v3.0
+
+v0.130.2
+----------
+ * Add support for tickets queries in elastic
+
+v0.130.1
+----------
+ * Also simplify converting queries to elastic
+
+v0.130.0
+----------
+ * Simplify parsing contact queries
+ * Add support for query property tickets
+
+v0.129.0
+----------
+ * Rework contactql to separate query parsing, validation and evaluation
+
+v0.128.0
+----------
+ * Add unique excellent function to get unique elements in an array
+
+v0.127.0
+----------
+ * Update to latest gocommon
+
+v0.126.2
+----------
+ * Updated translations from Transifex
+ * Replace usages of soon to be deprecated ioutil
+ * Allow Msg type triggers to have connections
+
+v0.126.1
+----------
+ * Update locale files
+
+v0.126.0
+----------
+ * Use latest gocommon, replace all nulls and escaped nulls when parsing bodies as JSON
+
+v0.125.2
+----------
+ * Add assignee (optional) to ticket_opened events
+ * Cleanup from linter suggestions
+
+v0.125.1
+----------
+ * Strip out invalid UTF-8 from webhook responses before trying to convert to JSON
+
+v0.125.0
+----------
+ * Update to latest gocommon
+
+v0.124.4
+----------
+ * Make users more like contacts in expressions by giving them an always non-empty default and a first_name property
+
 v0.124.3
 ----------
  * Fix inspecting user dependencies in flows

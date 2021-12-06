@@ -2,7 +2,7 @@ package definition_test
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 
@@ -90,7 +90,7 @@ func TestBrokenFlows(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		assetsJSON, err := ioutil.ReadFile("testdata/broken_flows/" + tc.path)
+		assetsJSON, err := os.ReadFile("testdata/broken_flows/" + tc.path)
 		require.NoError(t, err)
 
 		sa, err := test.CreateSessionAssets(assetsJSON, "")
@@ -290,7 +290,7 @@ func TestNewFlow(t *testing.T) {
 
 	// check inspection
 	info := flow.Inspect(session.Assets())
-	infoJSON, _ := jsonx.Marshal(info)
+	infoJSON := jsonx.MustMarshal(info)
 
 	test.AssertEqualJSON(t, []byte(`{
 		"dependencies": [
@@ -349,7 +349,7 @@ func TestEmptyFlow(t *testing.T) {
 	test.AssertEqualJSON(t, []byte(expected), marshaled, "flow definition mismatch")
 
 	info := flow.Inspect(nil)
-	infoJSON, _ := jsonx.Marshal(info)
+	infoJSON := jsonx.MustMarshal(info)
 
 	test.AssertEqualJSON(t, []byte(`{
 		"dependencies": [],
@@ -623,11 +623,11 @@ func TestInspection(t *testing.T) {
 		testDataPath := "testdata/inspection/" + tc.path[strings.LastIndex(tc.path, "/"):]
 
 		if !test.UpdateSnapshots {
-			expectedJSON, err := ioutil.ReadFile(testDataPath)
+			expectedJSON, err := os.ReadFile(testDataPath)
 			require.NoError(t, err)
 			test.AssertEqualJSON(t, expectedJSON, actualJSON, "inspection mismatch for flow %s[uuid=%s]", tc.path, tc.uuid)
 		} else {
-			err := ioutil.WriteFile(testDataPath, actualJSON, 0666)
+			err := os.WriteFile(testDataPath, actualJSON, 0666)
 			require.NoError(t, err)
 		}
 	}

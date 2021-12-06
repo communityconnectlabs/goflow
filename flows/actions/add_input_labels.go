@@ -47,14 +47,11 @@ func (a *AddInputLabelsAction) Execute(run flows.FlowRun, step flows.Step, logMo
 	// log error if we don't have any input that could be labeled
 	input := run.Session().Input()
 	if input == nil {
-		logEvent(events.NewErrorf("can't execute action in session without input"))
+		logEvent(events.NewErrorf("no input to add labels to"))
 		return nil
 	}
 
-	labels, err := resolveLabels(run, a.Labels, logEvent)
-	if err != nil {
-		return err
-	}
+	labels := resolveLabels(run, a.Labels, logEvent)
 
 	if len(labels) > 0 {
 		logEvent(events.NewInputLabelsAdded(input.UUID(), labels))

@@ -2,7 +2,7 @@ package engine_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"sort"
 	"testing"
 	"time"
@@ -26,7 +26,7 @@ import (
 )
 
 func TestEvaluateTemplate(t *testing.T) {
-	testFile, err := ioutil.ReadFile("testdata/templates.json")
+	testFile, err := os.ReadFile("testdata/templates.json")
 	require.NoError(t, err)
 
 	server := test.NewTestHTTPServer(49992)
@@ -91,13 +91,13 @@ func TestEvaluateTemplate(t *testing.T) {
 		actualJSON, err := jsonx.MarshalPretty(tests)
 		require.NoError(t, err)
 
-		err = ioutil.WriteFile("testdata/templates.json", actualJSON, 0666)
+		err = os.WriteFile("testdata/templates.json", actualJSON, 0666)
 		require.NoError(t, err)
 	}
 }
 
 func BenchmarkEvaluateTemplate(b *testing.B) {
-	testFile, err := ioutil.ReadFile("testdata/templates.json")
+	testFile, err := os.ReadFile("testdata/templates.json")
 	require.NoError(b, err)
 
 	session, _, err := test.CreateTestSession("http://localhost", envs.RedactionPolicyNone)
@@ -170,13 +170,15 @@ func TestReadWithMissingAssets(t *testing.T) {
 		"ticketer[uuid=19dc6346-9623-4fe4-be80-538d493ecdf5,name=Support Tickets]",
 		"ticketer[uuid=19dc6346-9623-4fe4-be80-538d493ecdf5,name=Support Tickets]",
 		"ticketer[uuid=19dc6346-9623-4fe4-be80-538d493ecdf5,name=Support Tickets]",
+		"topic[uuid=472a7a73-96cb-4736-b567-056d987cc5b4,name=Weather]",
+		"topic[uuid=472a7a73-96cb-4736-b567-056d987cc5b4,name=Weather]",
 		"user[email=bob@nyaruka.com,name=Bob]",
 		"user[email=bob@nyaruka.com,name=Bob]",
 	}, refs)
 }
 
 func TestQueryBasedGroupReevaluationOnTrigger(t *testing.T) {
-	assetsJSON, err := ioutil.ReadFile("testdata/smart_groups.json")
+	assetsJSON, err := os.ReadFile("testdata/smart_groups.json")
 	require.NoError(t, err)
 
 	sa, err := test.CreateSessionAssets(assetsJSON, "")
@@ -211,7 +213,7 @@ func TestQueryBasedGroupReevaluationOnTrigger(t *testing.T) {
 }
 
 func TestRunResuming(t *testing.T) {
-	assetsJSON, err := ioutil.ReadFile("testdata/subflows.json")
+	assetsJSON, err := os.ReadFile("testdata/subflows.json")
 	require.NoError(t, err)
 
 	session, _, err := test.CreateSession(assetsJSON, assets.FlowUUID("72162f46-dce3-4798-9f19-384a2447efc5"))
@@ -236,7 +238,7 @@ func TestRunResuming(t *testing.T) {
 }
 
 func TestResumeAfterWaitWithMissingFlowAssets(t *testing.T) {
-	assetsJSON, err := ioutil.ReadFile("../../test/testdata/runner/subflow.json")
+	assetsJSON, err := os.ReadFile("../../test/testdata/runner/subflow.json")
 	require.NoError(t, err)
 
 	session1, _, err := test.CreateSession(assetsJSON, assets.FlowUUID("76f0a02f-3b75-4b86-9064-e9195e1b3a02"))
@@ -275,7 +277,7 @@ func TestWaitTimeout(t *testing.T) {
 	t1 := time.Date(2018, 4, 11, 13, 24, 30, 123456000, time.UTC)
 	dates.SetNowSource(dates.NewFixedNowSource(t1))
 
-	assetsJSON, err := ioutil.ReadFile("testdata/timeout_test.json")
+	assetsJSON, err := os.ReadFile("testdata/timeout_test.json")
 	require.NoError(t, err)
 
 	session, sprint, err := test.CreateSession(assetsJSON, assets.FlowUUID("76f0a02f-3b75-4b86-9064-e9195e1b3a02"))
@@ -306,7 +308,7 @@ func TestWaitTimeout(t *testing.T) {
 }
 
 func TestCurrentContext(t *testing.T) {
-	assetsJSON, err := ioutil.ReadFile("../../test/testdata/runner/subflow_loop_with_wait.json")
+	assetsJSON, err := os.ReadFile("../../test/testdata/runner/subflow_loop_with_wait.json")
 	require.NoError(t, err)
 
 	session, _, err := test.CreateSession(assetsJSON, assets.FlowUUID("76f0a02f-3b75-4b86-9064-e9195e1b3a02"))
@@ -372,7 +374,7 @@ func TestSessionHistory(t *testing.T) {
 
 	// trigger another session from that session
 	runSummary := session1.Runs()[0].Snapshot()
-	runSummaryJSON, _ := jsonx.Marshal(runSummary)
+	runSummaryJSON := jsonx.MustMarshal(runSummary)
 	history := flows.NewChildHistory(session1)
 
 	session2, _, err := eng.NewSession(sa, triggers.NewBuilder(env, flow, contact).FlowAction(history, runSummaryJSON).Build())
@@ -383,4 +385,42 @@ func TestSessionHistory(t *testing.T) {
 		Ancestors:           1,
 		AncestorsSinceInput: 1,
 	}, session2.History())
+}
+
+func TestMaxResumesPerSession(t *testing.T) {
+	assetsJSON, err := os.ReadFile("../../test/testdata/runner/two_questions.json")
+	require.NoError(t, err)
+
+	session, _, err := test.CreateSession(assetsJSON, "615b8a0f-588c-4d20-a05f-363b0b4ce6f4")
+	require.NoError(t, err)
+	require.Equal(t, flows.SessionStatusWaiting, session.Status())
+
+	numResumes := 0
+	for {
+		msg := flows.NewMsgIn(flows.MsgUUID(uuids.New()), "tel:+593979123456", nil, "Teal", nil)
+		resume := resumes.NewMsg(nil, nil, msg)
+		numResumes++
+
+		_, err := session.Resume(resume)
+		require.NoError(t, err)
+
+		if session.Status() == flows.SessionStatusFailed {
+			break
+		}
+	}
+
+	assert.Equal(t, 500, numResumes)
+}
+
+func TestFindStep(t *testing.T) {
+	session, evts, err := test.CreateTestSession("", envs.RedactionPolicyNone)
+	require.NoError(t, err)
+
+	run, step := session.FindStep(evts[0].StepUUID())
+	assert.Equal(t, "Registration", run.Flow().Name())
+	assert.Equal(t, step.UUID(), evts[0].StepUUID())
+
+	run, step = session.FindStep(flows.StepUUID("4f33917a-d562-4c20-88bd-f1a4c6827848"))
+	assert.Nil(t, run)
+	assert.Nil(t, step)
 }

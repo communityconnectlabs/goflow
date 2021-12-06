@@ -8,14 +8,12 @@ import (
 	"github.com/nyaruka/goflow/excellent/operators"
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/test"
-
 	"github.com/stretchr/testify/assert"
 )
 
 var xs = types.NewXText
 var xn = types.RequireXNumberFromString
 var xi = types.NewXNumberFromInt
-var xa = types.NewXArray
 var ERROR = types.NewXErrorf("any error")
 
 func TestBinaryOperators(t *testing.T) {

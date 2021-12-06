@@ -2,7 +2,7 @@ package es_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/nyaruka/gocommon/jsonx"
@@ -23,7 +23,7 @@ func TestElasticSort(t *testing.T) {
 		Error       string          `json:"error,omitempty"`
 	}
 	tcs := make([]testCase, 0, 20)
-	tcJSON, err := ioutil.ReadFile("testdata/to_sort.json")
+	tcJSON, err := os.ReadFile("testdata/to_sort.json")
 	require.NoError(t, err)
 
 	err = json.Unmarshal(tcJSON, &tcs)
@@ -36,7 +36,7 @@ func TestElasticSort(t *testing.T) {
 			assert.EqualError(t, err, tc.Error)
 		} else {
 			src, _ := sort.Source()
-			encoded, _ := jsonx.Marshal(src)
+			encoded := jsonx.MustMarshal(src)
 			test.AssertEqualJSON(t, []byte(tc.Elastic), encoded, "field sort mismatch for %s", tc.Description)
 		}
 	}

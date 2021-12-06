@@ -3,7 +3,7 @@ package migrations_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"sort"
 	"testing"
 
@@ -32,7 +32,7 @@ func TestMigrateToVersion(t *testing.T) {
 	sort.SliceStable(versions, func(i, j int) bool { return versions[i].LessThan(versions[j]) })
 
 	for _, version := range versions {
-		testsJSON, err := ioutil.ReadFile(fmt.Sprintf("testdata/migrations/%s.json", version.String()))
+		testsJSON, err := os.ReadFile(fmt.Sprintf("testdata/migrations/%s.json", version.String()))
 		require.NoError(t, err)
 
 		tests := []struct {
@@ -68,7 +68,7 @@ func TestMigrateToLatest(t *testing.T) {
 	assert.EqualError(t, err, "unable to read flow header: json: cannot unmarshal array into Go value of type migrations.Header13")
 	assert.Nil(t, migrated)
 
-	migrated, err = migrations.MigrateToLatest([]byte(`{}`), nil)
+	_, err = migrations.MigrateToLatest([]byte(`{}`), nil)
 	assert.EqualError(t, err, "unable to read flow header: field 'uuid' is required, field 'spec_version' is required")
 
 	migrated, err = migrations.MigrateToLatest([]byte(`{
@@ -137,7 +137,7 @@ func TestMigrateToLatest(t *testing.T) {
 	test.AssertEqualJSON(t, []byte(expected), migrated, "flow migration mismatch")
 
 	// try to migrate legacy definition without migration config
-	migrated, err = migrations.MigrateToLatest([]byte(`{
+	_, err = migrations.MigrateToLatest([]byte(`{
 		"base_language": "eng",
 		"entry": "10e483a8-5ffb-4c4f-917b-d43ce86c1d65", 
 		"flow_type": "M",

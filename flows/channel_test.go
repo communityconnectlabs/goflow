@@ -1,7 +1,6 @@
 package flows_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/nyaruka/gocommon/urns"
@@ -28,7 +27,7 @@ func TestChannel(t *testing.T) {
 	assert.Equal(t, "Android", ch.Name())
 	assert.Equal(t, []string{"tel"}, ch.Schemes())
 	assert.Equal(t, "+250961111111", ch.Address())
-	assert.Equal(t, "+250961111111 (Android)", fmt.Sprintf("%s", ch))
+	assert.Equal(t, "+250961111111 (Android)", ch.String())
 
 	test.AssertXEqual(t, types.NewXObject(map[string]types.XValue{
 		"__default__": types.NewXText("Android"),
@@ -40,6 +39,9 @@ func TestChannel(t *testing.T) {
 	assert.Equal(t, assets.NewChannelReference(ch.UUID(), "Android"), ch.Reference())
 	assert.True(t, ch.HasRole(assets.ChannelRoleSend))
 	assert.False(t, ch.HasRole(assets.ChannelRoleCall))
+
+	// nil object returns nil reference
+	assert.Nil(t, (*flows.Channel)(nil).Reference())
 }
 
 func TestChannelSetGetForURN(t *testing.T) {

@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/buger/jsonparser"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/buger/jsonparser"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
@@ -60,7 +59,7 @@ func jsonTypeToXValue(data []byte, valType jsonparser.ValueType) XValue {
 
 func jsonToObject(data []byte) *XObject {
 	return NewXLazyObject(func() map[string]XValue {
-		properties := make(map[string]XValue, 0)
+		properties := make(map[string]XValue)
 
 		jsonparser.ObjectEach(data, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
 			properties[string(key)] = jsonTypeToXValue(value, dataType)

@@ -59,6 +59,16 @@ var sessionAssets = `{
             "type": "mailgun"
         }
     ],
+    "topics": [
+        {
+            "uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
+            "name": "Weather"
+        },
+        {
+            "uuid": "daa356b6-32af-44f0-9d35-6126d55ec3e9",
+            "name": "Computers"
+        }
+    ],
     "flows": [
         {
             "uuid": "50c3706e-fedb-42c0-8eab-dda3335714b7",
@@ -329,6 +339,10 @@ var sessionTrigger = `{
                     "name": "Support Tickets",
                     "uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
                 },
+                "topic": {
+                    "uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
+                    "name": "Weather"
+                },
                 "assignee": {"email": "bob@nyaruka.com", "name": "Bob"}
             }
         ]
@@ -512,7 +526,7 @@ func CreateTestSession(testServerURL string, redact envs.RedactionPolicy) (flows
 
 	eng := NewEngine()
 
-	session, sprint, err := eng.NewSession(sa, trigger)
+	session, _, err := eng.NewSession(sa, trigger)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "error starting test session")
 	}
@@ -523,7 +537,7 @@ func CreateTestSession(testServerURL string, redact envs.RedactionPolicy) (flows
 		return nil, nil, errors.Wrap(err, "error reading resume")
 	}
 
-	sprint, err = session.Resume(resume)
+	sprint, err := session.Resume(resume)
 	return session, sprint.Events(), err
 }
 

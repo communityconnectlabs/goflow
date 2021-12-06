@@ -42,8 +42,9 @@ func TestEventMarshaling(t *testing.T) {
 	timeout := 500
 	gender := session.Assets().Fields().Get("gender")
 	mailgun := session.Assets().Ticketers().Get("19dc6346-9623-4fe4-be80-538d493ecdf5")
+	weather := session.Assets().Topics().Get("472a7a73-96cb-4736-b567-056d987cc5b4")
 	user := session.Assets().Users().Get("bob@nyaruka.com")
-	ticket := flows.NewTicket("7481888c-07dd-47dc-bf22-ef7448696ffe", mailgun, "Need help", "Where are my cookies?", "1243252", user)
+	ticket := flows.NewTicket("7481888c-07dd-47dc-bf22-ef7448696ffe", mailgun, weather, "Where are my cookies?", "1243252", user)
 
 	eventTests := []struct {
 		event     flows.Event
@@ -60,12 +61,15 @@ func TestEventMarshaling(t *testing.T) {
 				},
 				[]*flows.HTTPLog{
 					{
+						HTTPTrace: &flows.HTTPTrace{
+							URL:        "https://send.money.com/topup",
+							StatusCode: 200,
+							Status:     flows.CallStatusSuccess,
+							Request:    "POST /topup HTTP/1.1\r\nHost: send.money.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+							Response:   "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"errors\":[]}",
+							ElapsedMS:  12,
+						},
 						CreatedOn: dates.Now(),
-						ElapsedMS: 12,
-						Request:   "POST /topup HTTP/1.1\r\nHost: send.money.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
-						Response:  "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"errors\":[]}",
-						Status:    flows.CallStatusSuccess,
-						URL:       "https://send.money.com/topup",
 					},
 				},
 			),
@@ -76,12 +80,14 @@ func TestEventMarshaling(t *testing.T) {
         	    "desired_amount": 1.2,
 				"http_logs": [
 					{
-						"created_on": "2018-10-18T14:20:30.000123456Z",
-						"elapsed_ms": 12,
+						"url": "https://send.money.com/topup",
+						"status_code": 200,
+						"status": "success",
 						"request": "POST /topup HTTP/1.1\r\nHost: send.money.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
 						"response": "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"errors\":[]}",
-						"status": "success",
-						"url": "https://send.money.com/topup"
+						"elapsed_ms": 12,
+						"retries": 0,
+						"created_on": "2018-10-18T14:20:30.000123456Z"
 					}
 				],
 				"recipient": "tel:+593979099222",
@@ -138,12 +144,15 @@ func TestEventMarshaling(t *testing.T) {
 				assets.NewClassifierReference(assets.ClassifierUUID("4b937f49-7fb7-43a5-8e57-14e2f028a471"), "Booking"),
 				[]*flows.HTTPLog{
 					{
+						HTTPTrace: &flows.HTTPTrace{
+							URL:        "https://api.wit.ai/message?v=20200513&q=hello",
+							StatusCode: 200,
+							Status:     flows.CallStatusSuccess,
+							Request:    "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: api.wit.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+							Response:   "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
+							ElapsedMS:  12,
+						},
 						CreatedOn: dates.Now(),
-						ElapsedMS: 12,
-						Request:   "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: api.wit.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
-						Response:  "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
-						Status:    flows.CallStatusSuccess,
-						URL:       "https://api.wit.ai/message?v=20200513&q=hello",
 					},
 				},
 			),
@@ -157,12 +166,14 @@ func TestEventMarshaling(t *testing.T) {
 				},
 				"http_logs": [
 					{
-						"created_on": "2018-10-18T14:20:30.000123456Z",
-						"elapsed_ms": 12,
+						"url": "https://api.wit.ai/message?v=20200513&q=hello",
+						"status_code": 200,
+						"status": "success",
 						"request": "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: api.wit.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
 						"response": "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
-						"status": "success",
-						"url": "https://api.wit.ai/message?v=20200513&q=hello"
+						"elapsed_ms": 12,
+						"retries": 0,
+						"created_on": "2018-10-18T14:20:30.000123456Z"
 					}
 				]
 			}`,
@@ -286,11 +297,11 @@ func TestEventMarshaling(t *testing.T) {
 					"tickets": [
 						{
 							"body": "I have a problem",
-							"subject": "Old ticket",
 							"ticketer": {
 								"name": "Support Tickets",
 								"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
 							},
+							"topic": null,
 							"uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52"
 						},
 						{
@@ -299,10 +310,13 @@ func TestEventMarshaling(t *testing.T) {
 								"name": "Bob"
 							},
 							"body": "What day is it?",
-							"subject": "Question",
 							"ticketer": {
 								"name": "Support Tickets",
 								"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
+							},
+							"topic": {
+								"uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
+                    			"name": "Weather"
 							},
 							"uuid": "78d1fe0d-7e39-461e-81c3-a6a25f15ed69"
 						}
@@ -526,9 +540,16 @@ func TestEventMarshaling(t *testing.T) {
 						"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
 						"name": "Support Tickets"
 					},
-					"subject": "Need help",
+					"topic": {
+						"uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
+         				"name": "Weather"
+					},
 					"body": "Where are my cookies?",
-					"external_id": "1243252"
+					"external_id": "1243252",
+					"assignee": {
+						"email": "bob@nyaruka.com",
+						"name": "Bob"
+					}
 				}
 			}`,
 		},
@@ -537,12 +558,15 @@ func TestEventMarshaling(t *testing.T) {
 				assets.NewTicketerReference(assets.TicketerUUID("4b937f49-7fb7-43a5-8e57-14e2f028a471"), "Support"),
 				[]*flows.HTTPLog{
 					{
+						HTTPTrace: &flows.HTTPTrace{
+							URL:        "https://tickets.com",
+							StatusCode: 200,
+							Status:     flows.CallStatusSuccess,
+							Request:    "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: tickets.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+							Response:   "HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\r\n",
+							ElapsedMS:  12,
+						},
 						CreatedOn: dates.Now(),
-						ElapsedMS: 12,
-						Request:   "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: tickets.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
-						Response:  "HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\r\n",
-						Status:    flows.CallStatusSuccess,
-						URL:       "https://tickets.com",
 					},
 				},
 			),
@@ -556,12 +580,14 @@ func TestEventMarshaling(t *testing.T) {
 				},
 				"http_logs": [
 					{
-						"created_on": "2018-10-18T14:20:30.000123456Z",
-						"elapsed_ms": 12,
+						"url": "https://tickets.com",
+						"status_code": 200,
+						"status": "success",
 						"request": "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: tickets.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
 						"response": "HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\r\n",
-						"status": "success",
-						"url": "https://tickets.com"
+						"elapsed_ms": 12,
+						"retries": 0,
+						"created_on": "2018-10-18T14:20:30.000123456Z"
 					}
 				]
 			}`,
@@ -626,12 +652,35 @@ func TestWebhookCalledEventTrimming(t *testing.T) {
 	assert.Equal(t, "YYYYYYY...", event.Response[9990:])
 }
 
+func TestWebhookCalledEventNullChar(t *testing.T) {
+	defer httpx.SetRequestor(httpx.DefaultRequestor)
+
+	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
+		"http://temba.io/": {
+			httpx.NewMockResponse(200, nil, "abc \x00 \\u0000 \\\u0000 \\\\u0000"),
+		},
+	}))
+
+	request, _ := http.NewRequest("GET", "http://temba.io/", nil)
+
+	svc := webhooks.NewService(http.DefaultClient, nil, nil, nil, 1024*1024)
+	call, err := svc.Call(nil, request)
+	require.NoError(t, err)
+
+	event := events.NewWebhookCalled(call, flows.CallStatusSuccess, "")
+
+	// actual null will have been stripped, escaped null will remain
+	assert.Equal(t, "http://temba.io/", event.URL)
+	assert.Equal(t, "HTTP/1.0 200 OK\r\nContent-Length: 23\r\n\r\nabc � � \\� \\\\u0000", event.Response)
+	assert.True(t, utf8.ValidString(event.Response))
+}
+
 func TestWebhookCalledEventBadUTF8(t *testing.T) {
 	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
 	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
 		"http://temba.io/": {
-			httpx.NewMockResponse(200, nil, "\xa0\xa1"),
+			httpx.NewMockResponse(200, map[string]string{"Bad-Header": "\xa0\xa1"}, "\xa0\xa1"),
 		},
 	}))
 
@@ -644,7 +693,7 @@ func TestWebhookCalledEventBadUTF8(t *testing.T) {
 	event := events.NewWebhookCalled(call, flows.CallStatusSuccess, "")
 
 	assert.Equal(t, "http://temba.io/", event.URL)
-	assert.Equal(t, "HTTP/1.0 200 OK\r\nContent-Length: 2\r\n\r\n...", event.Response)
+	assert.Equal(t, "HTTP/1.0 200 OK\r\nContent-Length: 2\r\nBad-Header: �\r\n\r\n...", event.Response)
 	assert.True(t, utf8.ValidString(event.Response))
 }
 
@@ -654,14 +703,16 @@ func TestDeprecatedEvents(t *testing.T) {
 		"created_on": "2006-01-02T15:04:05Z",
 		"classifier": {"uuid": "1c06c884-39dd-4ce4-ad9f-9a01cbe6c000", "name": "Booking"},
 		"http_logs": [
-		{
-			"url": "https://api.wit.ai/message?v=20170307&q=hello",
-			"status": "success",
-			"request": "GET /message?v=20170307&q=hello HTTP/1.1",
-			"response": "HTTP/1.1 200 OK\r\n\r\n{\"intents\":[]}",
-			"created_on": "2006-01-02T15:04:05Z",
-			"elapsed_ms": 123
-		}
+			{
+				"url": "https://api.wit.ai/message?v=20170307&q=hello",
+				"status_code": 200,
+				"status": "success",
+				"request": "GET /message?v=20170307&q=hello HTTP/1.1",
+				"response": "HTTP/1.1 200 OK\r\n\r\n{\"intents\":[]}",
+				"elapsed_ms": 123,
+				"retries": 0,
+				"created_on": "2006-01-02T15:04:05Z"
+			}
 		]
 	}`)
 

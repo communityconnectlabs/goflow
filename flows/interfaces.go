@@ -111,6 +111,7 @@ type SessionAssets interface {
 	Resthooks() *ResthookAssets
 	Templates() *TemplateAssets
 	Ticketers() *TicketerAssets
+	Topics() *TopicAssets
 	Users() *UserAssets
 }
 
@@ -326,6 +327,7 @@ type Engine interface {
 
 	Services() Services
 	MaxStepsPerSprint() int
+	MaxResumesPerSession() int
 	MaxTemplateChars() int
 }
 
@@ -364,6 +366,7 @@ type Session interface {
 	Resume(Resume) (Sprint, error)
 	Runs() []FlowRun
 	GetRun(RunUUID) (FlowRun, error)
+	FindStep(uuid StepUUID) (FlowRun, Step)
 	GetCurrentChild(FlowRun) FlowRun
 	ParentRun() RunSummary
 	CurrentContext() *types.XObject
