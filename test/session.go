@@ -224,6 +224,7 @@ var sessionAssets = `{
         {"uuid": "f1b5aea6-6586-41c7-9020-1a6326cc6565", "key": "age", "name": "Age", "type": "number"},
         {"uuid": "6c86d5ab-3fd9-4a5c-a5b6-48168b016747", "key": "join_date", "name": "Join Date", "type": "datetime"},
         {"uuid": "c88d2640-d124-438a-b666-5ec53a353dcd", "key": "activation_token", "name": "Activation Token", "type": "text"},
+        {"uuid": "ab9c0631-d8cd-4e77-a5a2-66a8b077e385", "key": "state", "name": "State", "type": "state"},
         {"uuid": "3bfc3908-a402-48ea-841c-b73b5ef3a254", "key": "not_set", "name": "Not set", "type": "text"}
     ],
     "groups": [
@@ -270,6 +271,12 @@ var sessionAssets = `{
                 "http://localhost/?cmd=success"
             ]
         }
+    ],
+    "users": [
+        {
+            "email": "bob@nyaruka.com",
+            "name": "Bob"
+        }
     ]
 }`
 
@@ -303,7 +310,28 @@ var sessionTrigger = `{
             "activation_token": {
                 "text": "AACC55"
             }
-        }
+        },
+        "tickets": [
+            {
+                "uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52",
+                "subject": "Old ticket",
+                "body": "I have a problem",
+                "ticketer": {
+                    "name": "Support Tickets",
+                    "uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
+                }
+            },
+            {
+                "uuid": "78d1fe0d-7e39-461e-81c3-a6a25f15ed69",
+                "subject": "Question",
+                "body": "What day is it?",
+                "ticketer": {
+                    "name": "Support Tickets",
+                    "uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
+                },
+                "assignee": {"email": "bob@nyaruka.com", "name": "Bob"}
+            }
+        ]
     },
     "run_summary": {
         "uuid": "4213ac47-93fd-48c4-af12-7da8218ef09d",
@@ -342,7 +370,6 @@ var sessionTrigger = `{
     },
     "environment": {
         "date_format": "DD-MM-YYYY",
-        "default_language": "eng",
         "allowed_languages": [
             "eng", 
             "spa"
@@ -455,7 +482,6 @@ var voiceSessionTrigger = `{
     },
     "environment": {
         "date_format": "DD-MM-YYYY",
-        "default_language": "eng",
         "allowed_languages": [
             "eng", 
             "spa"
@@ -486,7 +512,7 @@ func CreateTestSession(testServerURL string, redact envs.RedactionPolicy) (flows
 
 	eng := NewEngine()
 
-	session, sprint, err := eng.NewSession(sa, trigger)
+	session, _, err := eng.NewSession(sa, trigger)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "error starting test session")
 	}
@@ -497,7 +523,7 @@ func CreateTestSession(testServerURL string, redact envs.RedactionPolicy) (flows
 		return nil, nil, errors.Wrap(err, "error reading resume")
 	}
 
-	sprint, err = session.Resume(resume)
+	sprint, err := session.Resume(resume)
 	return session, sprint.Events(), err
 }
 

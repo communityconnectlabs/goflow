@@ -154,6 +154,8 @@
                         "eng",
                         "fra"
                     ],
+                    "date_format": "YYYY-MM-DD",
+                    "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
                         "digit_grouping_symbol": ","
@@ -175,6 +177,8 @@
                             "eng",
                             "fra"
                         ],
+                        "date_format": "YYYY-MM-DD",
+                        "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
                             "digit_grouping_symbol": ","
@@ -389,6 +393,8 @@
                         "eng",
                         "fra"
                     ],
+                    "date_format": "YYYY-MM-DD",
+                    "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
                         "digit_grouping_symbol": ","
@@ -410,6 +416,8 @@
                             "eng",
                             "fra"
                         ],
+                        "date_format": "YYYY-MM-DD",
+                        "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
                             "digit_grouping_symbol": ","
@@ -449,7 +457,30 @@
                     "last_seen_on": "2000-01-01T00:00:00Z",
                     "urns": [
                         "tel:+12065551212"
-                    ]
+                    ],
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                },
+                "environment": {
+                    "allowed_languages": [
+                        "eng",
+                        "fra"
+                    ],
+                    "date_format": "YYYY-MM-DD",
+                    "max_value_length": 640,
+                    "number_format": {
+                        "decimal_symbol": ".",
+                        "digit_grouping_symbol": ","
+                    },
+                    "redaction_policy": "none",
+                    "time_format": "hh:mm",
+                    "timezone": "America/Los_Angeles"
+                },
+                "input": {
+                    "created_on": "2000-01-01T00:00:00Z",
+                    "text": "Pilsner",
+                    "type": "msg",
+                    "urn": "tel:+12065551212",
+                    "uuid": "34bf602e-e86a-4957-8a47-fcb455e58cf4"
                 },
                 "runs": [
                     {
@@ -608,25 +639,29 @@
                     }
                 ],
                 "status": "completed",
-                "input": {
-                    "type": "msg",
-                    "uuid": "34bf602e-e86a-4957-8a47-fcb455e58cf4",
-                    "created_on": "2000-01-01T00:00:00Z",
-                    "urn": "tel:+12065551212",
-                    "text": "Pilsner"
-                }
-            },
-            "events": [
-                {
-                    "type": "msg_received",
-                    "created_on": "2018-07-06T12:30:29.123456789Z",
-                    "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
-                    "msg": {
-                        "uuid": "34bf602e-e86a-4957-8a47-fcb455e58cf4",
-                        "urn": "tel:+12065551212",
-                        "channel": {
-                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                            "name": "Nexmo"
+                "trigger": {
+                    "contact": {
+                        "created_on": "2000-01-01T00:00:00Z",
+                        "id": 1234567,
+                        "language": "eng",
+                        "name": "Ben Haggerty",
+                        "status": "active",
+                        "timezone": "America/Guayaquil",
+                        "urns": [
+                            "tel:+12065551212"
+                        ],
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                    },
+                    "environment": {
+                        "allowed_languages": [
+                            "eng",
+                            "fra"
+                        ],
+                        "date_format": "YYYY-MM-DD",
+                        "max_value_length": 640,
+                        "number_format": {
+                            "decimal_symbol": ".",
+                            "digit_grouping_symbol": ","
                         },
                         "text": "Pilsner"
                     }
@@ -701,7 +736,6 @@
                 "fra"
             ],
             "date_format": "YYYY-MM-DD",
-            "default_language": "eng",
             "time_format": "hh:mm",
             "timezone": "America/Los_Angeles"
         },

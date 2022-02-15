@@ -13,6 +13,8 @@
                         "eng",
                         "fra"
                     ],
+                    "date_format": "YYYY-MM-DD",
+                    "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
                         "digit_grouping_symbol": ","
@@ -190,6 +192,8 @@
                             "eng",
                             "fra"
                         ],
+                        "date_format": "YYYY-MM-DD",
+                        "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
                             "digit_grouping_symbol": ","
@@ -235,12 +239,22 @@
                     "urns": [
                         "tel:+12065551212"
                     ],
-                    "fields": {
-                        "age": {
-                            "text": "30",
-                            "number": 30
-                        }
-                    }
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                },
+                "environment": {
+                    "allowed_languages": [
+                        "eng",
+                        "fra"
+                    ],
+                    "date_format": "YYYY-MM-DD",
+                    "max_value_length": 640,
+                    "number_format": {
+                        "decimal_symbol": ".",
+                        "digit_grouping_symbol": ","
+                    },
+                    "redaction_policy": "none",
+                    "time_format": "hh:mm",
+                    "timezone": "America/Los_Angeles"
                 },
                 "runs": [
                     {
@@ -337,7 +351,50 @@
                         "exited_on": "2018-07-06T12:30:22.123456789Z"
                     }
                 ],
-                "status": "completed"
+                "status": "completed",
+                "trigger": {
+                    "contact": {
+                        "created_on": "2000-01-01T00:00:00Z",
+                        "fields": {
+                            "age": {
+                                "number": 30,
+                                "text": "30"
+                            }
+                        },
+                        "id": 1234567,
+                        "language": "eng",
+                        "name": "Ben Haggerty",
+                        "status": "active",
+                        "timezone": "America/Guayaquil",
+                        "urns": [
+                            "tel:+12065551212"
+                        ],
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                    },
+                    "environment": {
+                        "allowed_languages": [
+                            "eng",
+                            "fra"
+                        ],
+                        "date_format": "YYYY-MM-DD",
+                        "max_value_length": 640,
+                        "number_format": {
+                            "decimal_symbol": ".",
+                            "digit_grouping_symbol": ","
+                        },
+                        "redaction_policy": "none",
+                        "time_format": "hh:mm",
+                        "timezone": "America/Los_Angeles"
+                    },
+                    "flow": {
+                        "name": "Legacy Timeout",
+                        "uuid": "eaae833a-4970-4be1-aed4-2e6295903b8f"
+                    },
+                    "triggered_on": "2000-01-01T00:00:00Z",
+                    "type": "manual"
+                },
+                "type": "messaging",
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5"
             },
             "events": [
                 {
@@ -398,7 +455,6 @@
                 "fra"
             ],
             "date_format": "YYYY-MM-DD",
-            "default_language": "eng",
             "time_format": "hh:mm",
             "timezone": "America/Los_Angeles"
         },

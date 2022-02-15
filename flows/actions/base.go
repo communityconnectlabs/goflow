@@ -157,7 +157,7 @@ func (a *baseAction) saveWebhookResult(run flows.FlowRun, step flows.Step, name 
 	if call.Response != nil {
 		value = strconv.Itoa(call.Response.StatusCode)
 
-		if len(call.ResponseBody) < resultExtraMaxBytes && call.ValidJSON {
+		if len(call.ResponseJSON) > 0 && len(call.ResponseJSON) < resultExtraMaxBytes {
 			extra = call.ResponseBody
 		}
 	}
@@ -247,15 +247,11 @@ func (a *otherContactsAction) resolveRecipients(run flows.FlowRun, logEvent flow
 
 	// copy URNs
 	urnList := make([]urns.URN, 0, len(a.URNs))
-	for _, urn := range a.URNs {
-		urnList = append(urnList, urn)
-	}
+	urnList = append(urnList, a.URNs...)
 
 	// copy contact references
 	contactRefs := make([]*flows.ContactReference, 0, len(a.Contacts))
-	for _, contactRef := range a.Contacts {
-		contactRefs = append(contactRefs, contactRef)
-	}
+	contactRefs = append(contactRefs, a.Contacts...)
 
 	// resolve group references
 	groups, err := resolveGroups(run, a.Groups, logEvent)

@@ -1,5 +1,9 @@
 package smtpx
 
+import (
+	"time"
+)
+
 // Message is email message
 type Message struct {
 	recipients  []string
@@ -21,8 +25,26 @@ func NewMessage(recipients []string, subject, text, html string, attachments []s
 }
 
 // Send an email using SMTP
-func Send(c *Client, m *Message) error {
-	return currentSender.Send(c, m)
+func Send(c *Client, m *Message, retries *RetryConfig) error {
+	var err error
+	retry := 0
+
+	for {
+		err = currentSender.Send(c, m)
+
+		if err != nil && retries != nil && retry < retries.MaxRetries() {
+			backoff := retries.Backoff(retry)
+
+			if retries.ShouldRetry(err) {
+				time.Sleep(backoff)
+				retry++
+				continue
+			}
+		}
+		break
+	}
+
+	return err
 }
 
 // Sender is anything that can send an email

@@ -111,8 +111,9 @@ type Context struct {
 	type_   string
 	params  *types.XObject
 	keyword string
-	user    string
+	user    types.XValue
 	origin  string
+	ticket  types.XValue
 }
 
 func (c *Context) asMap() map[string]types.XValue {
@@ -120,8 +121,9 @@ func (c *Context) asMap() map[string]types.XValue {
 		"type":    types.NewXText(c.type_),
 		"params":  c.params,
 		"keyword": types.NewXText(c.keyword),
-		"user":    types.NewXText(c.user),
+		"user":    c.user,
 		"origin":  types.NewXText(c.origin),
+		"ticket":  c.ticket,
 	}
 }
 

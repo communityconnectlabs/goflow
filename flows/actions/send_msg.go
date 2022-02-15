@@ -139,7 +139,7 @@ func (a *SendMsgAction) Execute(run flows.FlowRun, step flows.Step, logModifier 
 				}
 
 				evaluatedText = generateTextWithShortenLinks(translation.Substitute(evaluatedVariables), orgLinks, contactUUID)
-				templating = flows.NewMsgTemplating(a.Templating.Template, translation.Language(), translation.Country(), evaluatedVariables)
+				templating = flows.NewMsgTemplating(a.Templating.Template, translation.Language(), translation.Country(), evaluatedVariables, translation.Namespace())
 			}
 		}
 

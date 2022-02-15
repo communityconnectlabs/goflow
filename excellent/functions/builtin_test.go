@@ -309,6 +309,8 @@ func TestFunctions(t *testing.T) {
 		{"format_time", dmy, []types.XValue{xs("15:34:00.000000")}, xs("15:34")},
 		{"format_time", mdy, []types.XValue{xs("15:34:00.000000")}, xs("3:34 pm")},
 		{"format_time", dmy, []types.XValue{xs("15:34:00.000000"), xs("tt")}, xs("15")},
+		{"format_time", dmy, []types.XValue{xs("15:34:00.000000"), xs("YY")}, ERROR},
+		{"format_time", dmy, []types.XValue{xs("15:34:00.000000"), ERROR}, ERROR},
 		{"format_time", dmy, []types.XValue{}, ERROR},
 
 		{"format_location", dmy, []types.XValue{xs("Rwanda")}, xs("Rwanda")},
@@ -478,12 +480,13 @@ func TestFunctions(t *testing.T) {
 
 		{"remove_first_word", dmy, []types.XValue{xs("hello World")}, xs("World")},
 		{"remove_first_word", dmy, []types.XValue{xs("hello")}, xs("")},
-		{"remove_first_word", dmy, []types.XValue{xs(`"hello"`)}, xs(`"`)},   // " ignored when extracting words, thus first word is hello
+		{"remove_first_word", dmy, []types.XValue{xs(`"hello"`)}, xs("")},    // " ignored when extracting words
 		{"remove_first_word", dmy, []types.XValue{xs(`don't go`)}, xs(`go`)}, // ' included when extracting words
 		{"remove_first_word", dmy, []types.XValue{xs(`'start' this`)}, xs(`this`)},
 		{"remove_first_word", dmy, []types.XValue{xs(` ‘start’ this`)}, xs(`this`)},
 		{"remove_first_word", dmy, []types.XValue{xs("     hello World")}, xs("World")},
 		{"remove_first_word", dmy, []types.XValue{xs("😁 hello")}, xs("hello")},
+		{"remove_first_word", dmy, []types.XValue{xs("“SIGN ABCDEF”")}, xs("ABCDEF”")},
 		{"remove_first_word", dmy, []types.XValue{xs("Hi there. I'm a flow!")}, xs("there. I'm a flow!")},
 		{"remove_first_word", dmy, []types.XValue{xs("ጥሩ ፍሰቶች")}, xs("ፍሰቶች")},
 		{"remove_first_word", dmy, []types.XValue{xs("")}, xs("")},
@@ -562,6 +565,14 @@ func TestFunctions(t *testing.T) {
 		{"split", dmy, []types.XValue{xs("1,2,3"), ERROR}, ERROR},
 		{"split", dmy, []types.XValue{ERROR, xs(",")}, ERROR},
 		{"split", dmy, []types.XValue{}, ERROR},
+
+		{"sum", dmy, []types.XValue{xa(xn("1"), xn("2"), xs("3"))}, xn("6")},
+		{"sum", dmy, []types.XValue{xa()}, xn("0")},
+		{"sum", dmy, []types.XValue{xs("xx")}, ERROR},
+		{"sum", dmy, []types.XValue{xa(xn("1"), xn("2"), xs("xx"))}, ERROR},
+		{"sum", dmy, []types.XValue{xa(xn("1"), xn("2"), ERROR)}, ERROR},
+		{"sum", dmy, []types.XValue{ERROR}, ERROR},
+		{"sum", dmy, []types.XValue{}, ERROR},
 
 		{"text", dmy, []types.XValue{xs("abc")}, xs("abc")},
 		{"text", dmy, []types.XValue{xi(123)}, xs("123")},
@@ -660,6 +671,7 @@ func TestFunctions(t *testing.T) {
 		{"word", dmy, []types.XValue{xs(""), xi(0)}, ERROR},
 		{"word", dmy, []types.XValue{xs("cat dog bee"), xi(-1)}, xs("bee")},
 		{"word", dmy, []types.XValue{xs("😁 hello World"), xi(0)}, xs("😁")},
+		{"word", dmy, []types.XValue{xs("“SIGN ABCDEF”"), xi(0)}, xs("SIGN")},
 		{"word", dmy, []types.XValue{xs("bee.*cat,dog"), xi(1), xs(".*=|")}, xs("cat,dog")},
 		{"word", dmy, []types.XValue{xs("bee.*cat,dog"), xi(1), ERROR}, ERROR}, // delimiters is error
 		{"word", dmy, []types.XValue{xs(" hello World"), xi(2)}, ERROR},        // out of range
@@ -685,6 +697,7 @@ func TestFunctions(t *testing.T) {
 		{"word_count", dmy, []types.XValue{xs("hello")}, xi(1)},
 		{"word_count", dmy, []types.XValue{xs("")}, xi(0)},
 		{"word_count", dmy, []types.XValue{xs("😁😁")}, xi(2)},
+		{"word_count", dmy, []types.XValue{xs("“SIGN ABCDEF”")}, xi(2)},
 		{"word_count", dmy, []types.XValue{xs("bee.*cat,dog"), xs(".*=|")}, xi(2)},
 		{"word_count", dmy, []types.XValue{xs("bee.*cat,dog"), ERROR}, ERROR},
 		{"word_count", dmy, []types.XValue{}, ERROR},

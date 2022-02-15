@@ -1,3 +1,116 @@
+v0.126.1
+----------
+ * Update locale files
+
+v0.126.0
+----------
+ * Use latest gocommon, replace all nulls and escaped nulls when parsing bodies as JSON
+
+v0.125.2
+----------
+ * Add assignee (optional) to ticket_opened events
+ * Cleanup from linter suggestions
+
+v0.125.1
+----------
+ * Strip out invalid UTF-8 from webhook responses before trying to convert to JSON
+
+v0.125.0
+----------
+ * Update to latest gocommon
+
+v0.124.4
+----------
+ * Make users more like contacts in expressions by giving them an always non-empty default and a first_name property
+
+v0.124.3
+----------
+ * Fix inspecting user dependencies in flows
+
+v0.124.2
+----------
+ * Change default property of user objects in expressions to be the name to match contacts
+
+v0.124.1
+----------
+ * Fix remove_first_word when input contains non-ASCII
+
+v0.124.0
+----------
+ * Add User assets and use for Ticket.Assignee and Trigger.user
+
+v0.123.0
+----------
+ * Add SUM() excellent function
+ * Remove default_language from envs and usa first item of allowed_languages as the default
+
+v0.122.0
+----------
+ * Allow build failing on codecov uploads again
+ * Get rid of ticket references
+
+v0.121.0
+----------
+ * Don't generate separate completion/functions doc files
+
+v0.120.1
+----------
+ * Tweak test.AssertEqualJSON to take msgAndArgs param like asserts library
+
+v0.120.0
+----------
+ * Add ticket as property to @trigger in context
+ * Add new ticket type trigger with a closed event
+
+v0.119.0
+----------
+ * Remove legacy_extra issue type
+
+v0.118.2
+----------
+ * Add @ticket to the root context as the last opened ticket
+
+v0.118.1
+----------
+ * Add way to create new ticket reference instances and add contact tickets to editor autocompletion
+
+v0.118.0
+----------
+ * Add contact tickets to expression context
+
+v0.117.0
+----------
+ * Add WA template translations namespace
+
+v0.116.1
+----------
+ * Use standard hypenated BCP47 locale codes consistently
+
+v0.116.0
+----------
+ * Test on go 1.16.x
+ * Update to latest gocommon datefmt and pass locale to all date formatting calls
+
+v0.115.2
+----------
+ * Fix dtone API endpoint URL and use external IDs
+
+v0.115.1
+----------
+ * Fix sometimes retrying successful SMTP sends
+
+v0.115.0
+----------
+ * Add support for retrying SMTP sends
+
+v0.114.0
+----------
+ * Fully implement airtime service using new DT One API
+
+v0.113.3
+----------
+ * Fix resuming a parent run when flow is missing
+
 v0.113.2
 ----------
  * Add last missing translations for es and pt-BR

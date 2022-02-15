@@ -95,9 +95,7 @@ func (a *SendEmailAction) Execute(run flows.FlowRun, step flows.Step, logModifie
 		}
 
 		// strip mailto prefix if this is an email URN
-		if strings.HasPrefix(evaluatedAddress, "mailto:") {
-			evaluatedAddress = evaluatedAddress[7:]
-		}
+		evaluatedAddress = strings.TrimPrefix(evaluatedAddress, "mailto:")
 
 		evaluatedAddresses = append(evaluatedAddresses, evaluatedAddress)
 	}

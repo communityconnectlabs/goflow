@@ -168,7 +168,7 @@ func TestImportIntoFlows(t *testing.T) {
 	err = translation.ImportIntoFlows(po, envs.Language("spa"), flow)
 	require.NoError(t, err)
 
-	localJSON, _ := jsonx.Marshal(flow.Localization())
+	localJSON := jsonx.MustMarshal(flow.Localization())
 	test.AssertEqualJSON(t, []byte(`{
 		"spa": {
 			"e42deebf-90fa-4636-81cb-d247a3d3ba75": {
@@ -220,11 +220,12 @@ func TestImportNewTranslationIntoFlows(t *testing.T) {
 	require.NoError(t, err)
 
 	po, err := i18n.ReadPO(bytes.NewReader(poData))
+	require.NoError(t, err)
 
 	err = translation.ImportIntoFlows(po, "spa", flow)
 	require.NoError(t, err)
 
-	localJSON, _ := jsonx.Marshal(flow.Localization())
+	localJSON := jsonx.MustMarshal(flow.Localization())
 	spaJSON, _, _, _ := jsonparser.Get(localJSON, "spa")
 
 	test.AssertEqualJSON(t, []byte(`{
