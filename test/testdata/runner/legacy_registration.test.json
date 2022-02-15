@@ -1,1068 +1,1068 @@
 {
     "outputs": [
         {
+            "events": [
+                {
+                    "created_on": "2018-07-06T12:30:04.123456789Z",
+                    "msg": {
+                        "sharing_config": {},
+                        "text": "Hi there. What is your name?",
+                        "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
+                    },
+                    "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
+                    "type": "msg_created"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:07.123456789Z",
+                    "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                    "type": "msg_wait"
+                }
+            ],
             "session": {
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "type": "messaging",
+                "contact": {
+                    "created_on": "2018-01-01T12:00:00Z",
+                    "id": 1234567,
+                    "language": "eng",
+                    "name": "Ben Haggerty",
+                    "status": "active",
+                    "timezone": "America/Guayaquil",
+                    "urns": [
+                        "tel:+12065551212",
+                        "facebook:1122334455667788",
+                        "mailto:ben@macklemore"
+                    ],
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                },
                 "environment": {
-                    "date_format": "YYYY-MM-DD",
-                    "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles",
                     "allowed_languages": [
                         "eng",
                         "eng"
                     ],
+                    "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
+                    "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
                         "digit_grouping_symbol": ","
                     },
                     "redaction_policy": "none",
-                    "max_value_length": 640,
-                    "links": [
-                        ""
-                    ]
-                },
-                "trigger": {
-                    "type": "manual",
-                    "environment": {
-                        "date_format": "YYYY-MM-DD",
-                        "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles",
-                        "allowed_languages": [
-                            "eng",
-                            "eng"
-                        ],
-                        "number_format": {
-                            "decimal_symbol": ".",
-                            "digit_grouping_symbol": ","
-                        },
-                        "redaction_policy": "none",
-                        "max_value_length": 640,
-                        "links": [
-                            ""
-                        ]
-                    },
-                    "flow": {
-                        "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
-                        "name": "Registration"
-                    },
-                    "contact": {
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                        "id": 1234567,
-                        "name": "Ben Haggerty",
-                        "language": "eng",
-                        "status": "active",
-                        "timezone": "America/Guayaquil",
-                        "created_on": "2018-01-01T12:00:00Z",
-                        "urns": [
-                            "tel:+12065551212",
-                            "facebook:1122334455667788",
-                            "mailto:ben@macklemore"
-                        ]
-                    },
-                    "triggered_on": "2019-03-21T14:19:25.640503-05:00"
-                },
-                "contact": {
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                    "id": 1234567,
-                    "name": "Ben Haggerty",
-                    "language": "eng",
-                    "status": "active",
-                    "timezone": "America/Guayaquil",
-                    "created_on": "2018-01-01T12:00:00Z",
-                    "urns": [
-                        "tel:+12065551212",
-                        "facebook:1122334455667788",
-                        "mailto:ben@macklemore"
-                    ]
+                    "time_format": "tt:mm",
+                    "timezone": "America/Los_Angeles"
                 },
                 "runs": [
                     {
-                        "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
-                        "flow": {
-                            "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
-                            "name": "Registration"
-                        },
-                        "path": [
-                            {
-                                "uuid": "b88ce93d-4360-4455-a691-235cbe720980",
-                                "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
-                                "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
-                            },
-                            {
-                                "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z"
-                            }
-                        ],
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
                                 "msg": {
-                                    "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
+                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
-                                    "sharing_config": {}
-                                }
+                                    "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
+                                },
+                                "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "msg_wait",
                                 "created_on": "2018-07-06T12:30:07.123456789Z",
-                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
+                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                                "type": "msg_wait"
+                            }
+                        ],
+                        "exited_on": null,
+                        "expires_on": "2018-07-13T12:30:01.123456789Z",
+                        "flow": {
+                            "name": "Registration",
+                            "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
+                        },
+                        "modified_on": "2018-07-06T12:30:09.123456789Z",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
+                                "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
+                                "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
+                                "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
                             }
                         ],
                         "status": "waiting",
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
-                        "modified_on": "2018-07-06T12:30:09.123456789Z",
-                        "expires_on": "2018-07-13T12:30:01.123456789Z",
-                        "exited_on": null
+                        "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
                     }
                 ],
                 "status": "waiting",
-                "wait": {
-                    "type": "msg"
-                }
-            },
-            "events": [
-                {
-                    "type": "msg_created",
-                    "created_on": "2018-07-06T12:30:04.123456789Z",
-                    "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
-                    "msg": {
-                        "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
-                        "text": "Hi there. What is your name?",
-                        "sharing_config": {}
-                    }
-                },
-                {
-                    "type": "msg_wait",
-                    "created_on": "2018-07-06T12:30:07.123456789Z",
-                    "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
-                }
-            ]
-        },
-        {
-            "session": {
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "type": "messaging",
-                "environment": {
-                    "date_format": "YYYY-MM-DD",
-                    "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles",
-                    "allowed_languages": [
-                        "eng",
-                        "eng"
-                    ],
-                    "number_format": {
-                        "decimal_symbol": ".",
-                        "digit_grouping_symbol": ","
-                    },
-                    "redaction_policy": "none",
-                    "max_value_length": 640,
-                    "links": [
-                        ""
-                    ]
-                },
                 "trigger": {
-                    "type": "manual",
+                    "contact": {
+                        "created_on": "2018-01-01T12:00:00Z",
+                        "id": 1234567,
+                        "language": "eng",
+                        "name": "Ben Haggerty",
+                        "status": "active",
+                        "timezone": "America/Guayaquil",
+                        "urns": [
+                            "tel:+12065551212",
+                            "facebook:1122334455667788",
+                            "mailto:ben@macklemore"
+                        ],
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                    },
                     "environment": {
-                        "date_format": "YYYY-MM-DD",
-                        "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles",
                         "allowed_languages": [
                             "eng",
                             "eng"
                         ],
+                        "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
+                        "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
                             "digit_grouping_symbol": ","
                         },
                         "redaction_policy": "none",
-                        "max_value_length": 640,
-                        "links": [
-                            ""
-                        ]
+                        "time_format": "tt:mm",
+                        "timezone": "America/Los_Angeles"
                     },
                     "flow": {
-                        "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
-                        "name": "Registration"
+                        "name": "Registration",
+                        "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
                     },
-                    "contact": {
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                        "id": 1234567,
-                        "name": "Ben Haggerty",
-                        "language": "eng",
-                        "status": "active",
-                        "timezone": "America/Guayaquil",
-                        "created_on": "2018-01-01T12:00:00Z",
-                        "urns": [
-                            "tel:+12065551212",
-                            "facebook:1122334455667788",
-                            "mailto:ben@macklemore"
-                        ]
-                    },
-                    "triggered_on": "2019-03-21T14:19:25.640503-05:00"
+                    "triggered_on": "2019-03-21T14:19:25.640503-05:00",
+                    "type": "manual"
                 },
-                "contact": {
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                    "id": 1234567,
+                "type": "messaging",
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
+                "wait": {
+                    "type": "msg"
+                }
+            }
+        },
+        {
+            "events": [
+                {
+                    "created_on": "2018-07-06T12:30:13.123456789Z",
+                    "msg": {
+                        "text": "Bobby",
+                        "urn": "tel:+12065551212",
+                        "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef"
+                    },
+                    "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                    "type": "msg_received"
+                },
+                {
+                    "category": "All Responses",
+                    "corrected": "Bobby",
+                    "created_on": "2018-07-06T12:30:17.123456789Z",
+                    "input": "Bobby",
+                    "name": "Name",
+                    "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                    "type": "run_result_changed",
+                    "value": "Bobby"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:20.123456789Z",
                     "name": "Bobby",
+                    "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
+                    "type": "contact_name_changed"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:22.123456789Z",
+                    "msg": {
+                        "sharing_config": {},
+                        "text": "Ok Bobby, what age are you?",
+                        "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
+                    },
+                    "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
+                    "type": "msg_created"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:25.123456789Z",
+                    "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
+                    "type": "msg_wait"
+                }
+            ],
+            "session": {
+                "contact": {
+                    "created_on": "2018-01-01T12:00:00Z",
+                    "id": 1234567,
                     "language": "eng",
+                    "last_seen_on": "2019-03-21T14:19:29.724264-05:00",
+                    "name": "Bobby",
                     "status": "active",
                     "timezone": "America/Guayaquil",
-                    "created_on": "2018-01-01T12:00:00Z",
-                    "last_seen_on": "2019-03-21T14:19:29.724264-05:00",
                     "urns": [
                         "tel:+12065551212",
                         "facebook:1122334455667788",
                         "mailto:ben@macklemore"
-                    ]
+                    ],
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                },
+                "environment": {
+                    "allowed_languages": [
+                        "eng",
+                        "eng"
+                    ],
+                    "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
+                    "max_value_length": 640,
+                    "number_format": {
+                        "decimal_symbol": ".",
+                        "digit_grouping_symbol": ","
+                    },
+                    "redaction_policy": "none",
+                    "time_format": "tt:mm",
+                    "timezone": "America/Los_Angeles"
+                },
+                "input": {
+                    "created_on": "2019-03-21T14:19:29.724264-05:00",
+                    "text": "Bobby",
+                    "type": "msg",
+                    "urn": "tel:+12065551212",
+                    "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef"
                 },
                 "runs": [
                     {
-                        "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
-                        "flow": {
-                            "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
-                            "name": "Registration"
-                        },
-                        "path": [
-                            {
-                                "uuid": "b88ce93d-4360-4455-a691-235cbe720980",
-                                "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
-                                "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
-                            },
-                            {
-                                "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
-                                "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z"
-                            },
-                            {
-                                "uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                                "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
-                                "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
-                                "arrived_on": "2018-07-06T12:30:19.123456789Z"
-                            },
-                            {
-                                "uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
-                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
-                                "arrived_on": "2018-07-06T12:30:24.123456789Z"
-                            }
-                        ],
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
                                 "msg": {
-                                    "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
+                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
-                                    "sharing_config": {}
-                                }
+                                    "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
+                                },
+                                "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "msg_wait",
                                 "created_on": "2018-07-06T12:30:07.123456789Z",
-                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
+                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                                "type": "msg_wait"
                             },
                             {
-                                "type": "msg_received",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
-                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
                                 "msg": {
-                                    "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef",
+                                    "text": "Bobby",
                                     "urn": "tel:+12065551212",
-                                    "text": "Bobby"
-                                }
-                            },
-                            {
-                                "type": "run_result_changed",
-                                "created_on": "2018-07-06T12:30:17.123456789Z",
+                                    "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef"
+                                },
                                 "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                                "name": "Name",
-                                "value": "Bobby",
+                                "type": "msg_received"
+                            },
+                            {
                                 "category": "All Responses",
+                                "corrected": "Bobby",
+                                "created_on": "2018-07-06T12:30:17.123456789Z",
                                 "input": "Bobby",
-                                "corrected": "Bobby"
+                                "name": "Name",
+                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                                "type": "run_result_changed",
+                                "value": "Bobby"
                             },
                             {
-                                "type": "contact_name_changed",
                                 "created_on": "2018-07-06T12:30:20.123456789Z",
+                                "name": "Bobby",
                                 "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                                "name": "Bobby"
+                                "type": "contact_name_changed"
                             },
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:22.123456789Z",
-                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
                                 "msg": {
-                                    "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459",
+                                    "sharing_config": {},
                                     "text": "Ok Bobby, what age are you?",
-                                    "sharing_config": {}
-                                }
+                                    "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
+                                },
+                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "msg_wait",
                                 "created_on": "2018-07-06T12:30:25.123456789Z",
-                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4"
+                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
+                                "type": "msg_wait"
+                            }
+                        ],
+                        "exited_on": null,
+                        "expires_on": "2018-07-13T12:30:11.123456789Z",
+                        "flow": {
+                            "name": "Registration",
+                            "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
+                        },
+                        "modified_on": "2018-07-06T12:30:27.123456789Z",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
+                                "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
+                                "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
+                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
+                                "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:19.123456789Z",
+                                "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
+                                "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
+                                "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:24.123456789Z",
+                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                                "uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4"
                             }
                         ],
                         "results": {
                             "name": {
-                                "name": "Name",
-                                "value": "Bobby",
                                 "category": "All Responses",
-                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
-                                "input": "Bobby",
+                                "corrected": "Bobby",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
-                                "corrected": "Bobby"
+                                "input": "Bobby",
+                                "name": "Name",
+                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
+                                "value": "Bobby"
                             }
                         },
                         "status": "waiting",
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
-                        "modified_on": "2018-07-06T12:30:27.123456789Z",
-                        "expires_on": "2018-07-13T12:30:11.123456789Z",
-                        "exited_on": null
+                        "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
                     }
                 ],
                 "status": "waiting",
-                "wait": {
-                    "type": "msg"
-                },
-                "input": {
-                    "type": "msg",
-                    "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef",
-                    "created_on": "2019-03-21T14:19:29.724264-05:00",
-                    "urn": "tel:+12065551212",
-                    "text": "Bobby"
-                }
-            },
-            "events": [
-                {
-                    "type": "msg_received",
-                    "created_on": "2018-07-06T12:30:13.123456789Z",
-                    "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                    "msg": {
-                        "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef",
-                        "urn": "tel:+12065551212",
-                        "text": "Bobby"
-                    }
-                },
-                {
-                    "type": "run_result_changed",
-                    "created_on": "2018-07-06T12:30:17.123456789Z",
-                    "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                    "name": "Name",
-                    "value": "Bobby",
-                    "category": "All Responses",
-                    "input": "Bobby",
-                    "corrected": "Bobby"
-                },
-                {
-                    "type": "contact_name_changed",
-                    "created_on": "2018-07-06T12:30:20.123456789Z",
-                    "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                    "name": "Bobby"
-                },
-                {
-                    "type": "msg_created",
-                    "created_on": "2018-07-06T12:30:22.123456789Z",
-                    "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                    "msg": {
-                        "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459",
-                        "text": "Ok Bobby, what age are you?",
-                        "sharing_config": {}
-                    }
-                },
-                {
-                    "type": "msg_wait",
-                    "created_on": "2018-07-06T12:30:25.123456789Z",
-                    "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4"
-                }
-            ]
-        },
-        {
-            "session": {
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "type": "messaging",
-                "environment": {
-                    "date_format": "YYYY-MM-DD",
-                    "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles",
-                    "allowed_languages": [
-                        "eng",
-                        "eng"
-                    ],
-                    "number_format": {
-                        "decimal_symbol": ".",
-                        "digit_grouping_symbol": ","
-                    },
-                    "redaction_policy": "none",
-                    "max_value_length": 640,
-                    "links": [
-                        ""
-                    ]
-                },
                 "trigger": {
-                    "type": "manual",
+                    "contact": {
+                        "created_on": "2018-01-01T12:00:00Z",
+                        "id": 1234567,
+                        "language": "eng",
+                        "name": "Ben Haggerty",
+                        "status": "active",
+                        "timezone": "America/Guayaquil",
+                        "urns": [
+                            "tel:+12065551212",
+                            "facebook:1122334455667788",
+                            "mailto:ben@macklemore"
+                        ],
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                    },
                     "environment": {
-                        "date_format": "YYYY-MM-DD",
-                        "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles",
                         "allowed_languages": [
                             "eng",
                             "eng"
                         ],
+                        "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
+                        "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
                             "digit_grouping_symbol": ","
                         },
                         "redaction_policy": "none",
-                        "max_value_length": 640,
-                        "links": [
-                            ""
-                        ]
+                        "time_format": "tt:mm",
+                        "timezone": "America/Los_Angeles"
                     },
                     "flow": {
-                        "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
-                        "name": "Registration"
+                        "name": "Registration",
+                        "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
                     },
-                    "contact": {
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                        "id": 1234567,
-                        "name": "Ben Haggerty",
-                        "language": "eng",
-                        "status": "active",
-                        "timezone": "America/Guayaquil",
-                        "created_on": "2018-01-01T12:00:00Z",
-                        "urns": [
-                            "tel:+12065551212",
-                            "facebook:1122334455667788",
-                            "mailto:ben@macklemore"
-                        ]
-                    },
-                    "triggered_on": "2019-03-21T14:19:25.640503-05:00"
+                    "triggered_on": "2019-03-21T14:19:25.640503-05:00",
+                    "type": "manual"
                 },
+                "type": "messaging",
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
+                "wait": {
+                    "type": "msg"
+                }
+            }
+        },
+        {
+            "events": [
+                {
+                    "created_on": "2018-07-06T12:30:31.123456789Z",
+                    "msg": {
+                        "text": "123",
+                        "urn": "tel:+12065551212",
+                        "uuid": "67e1a638-4479-47cb-bcff-03c59c14e31d"
+                    },
+                    "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
+                    "type": "msg_received"
+                },
+                {
+                    "category": "Other",
+                    "corrected": "123",
+                    "created_on": "2018-07-06T12:30:35.123456789Z",
+                    "input": "123",
+                    "name": "Age",
+                    "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
+                    "type": "run_result_changed",
+                    "value": "123"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:38.123456789Z",
+                    "msg": {
+                        "sharing_config": {},
+                        "text": "Are you sure you're 123... maybe try again",
+                        "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
+                    },
+                    "step_uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae",
+                    "type": "msg_created"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:41.123456789Z",
+                    "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
+                    "type": "msg_wait"
+                }
+            ],
+            "session": {
                 "contact": {
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
+                    "created_on": "2018-01-01T12:00:00Z",
                     "id": 1234567,
-                    "name": "Bobby",
                     "language": "eng",
+                    "last_seen_on": "2019-03-21T14:19:35.1582-05:00",
+                    "name": "Bobby",
                     "status": "active",
                     "timezone": "America/Guayaquil",
-                    "created_on": "2018-01-01T12:00:00Z",
-                    "last_seen_on": "2019-03-21T14:19:35.1582-05:00",
                     "urns": [
                         "tel:+12065551212",
                         "facebook:1122334455667788",
                         "mailto:ben@macklemore"
-                    ]
+                    ],
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                },
+                "environment": {
+                    "allowed_languages": [
+                        "eng",
+                        "eng"
+                    ],
+                    "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
+                    "max_value_length": 640,
+                    "number_format": {
+                        "decimal_symbol": ".",
+                        "digit_grouping_symbol": ","
+                    },
+                    "redaction_policy": "none",
+                    "time_format": "tt:mm",
+                    "timezone": "America/Los_Angeles"
+                },
+                "input": {
+                    "created_on": "2019-03-21T14:19:35.1582-05:00",
+                    "text": "123",
+                    "type": "msg",
+                    "urn": "tel:+12065551212",
+                    "uuid": "67e1a638-4479-47cb-bcff-03c59c14e31d"
                 },
                 "runs": [
                     {
-                        "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
-                        "flow": {
-                            "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
-                            "name": "Registration"
-                        },
-                        "path": [
-                            {
-                                "uuid": "b88ce93d-4360-4455-a691-235cbe720980",
-                                "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
-                                "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
-                            },
-                            {
-                                "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
-                                "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z"
-                            },
-                            {
-                                "uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                                "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
-                                "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
-                                "arrived_on": "2018-07-06T12:30:19.123456789Z"
-                            },
-                            {
-                                "uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
-                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
-                                "exit_uuid": "47063adc-04c6-478f-b13d-fad09f383e1e",
-                                "arrived_on": "2018-07-06T12:30:24.123456789Z"
-                            },
-                            {
-                                "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae",
-                                "node_uuid": "050d338f-33d5-4c95-8a55-d4702c8365f5",
-                                "exit_uuid": "6d57b815-ad64-4091-9b37-5428f6cc56bb",
-                                "arrived_on": "2018-07-06T12:30:37.123456789Z"
-                            },
-                            {
-                                "uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
-                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
-                                "arrived_on": "2018-07-06T12:30:40.123456789Z"
-                            }
-                        ],
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
                                 "msg": {
-                                    "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
+                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
-                                    "sharing_config": {}
-                                }
+                                    "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
+                                },
+                                "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "msg_wait",
                                 "created_on": "2018-07-06T12:30:07.123456789Z",
-                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
+                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                                "type": "msg_wait"
                             },
                             {
-                                "type": "msg_received",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
-                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
                                 "msg": {
-                                    "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef",
+                                    "text": "Bobby",
                                     "urn": "tel:+12065551212",
-                                    "text": "Bobby"
-                                }
+                                    "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef"
+                                },
+                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                                "type": "msg_received"
                             },
                             {
-                                "type": "run_result_changed",
-                                "created_on": "2018-07-06T12:30:17.123456789Z",
-                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                                "name": "Name",
-                                "value": "Bobby",
                                 "category": "All Responses",
+                                "corrected": "Bobby",
+                                "created_on": "2018-07-06T12:30:17.123456789Z",
                                 "input": "Bobby",
-                                "corrected": "Bobby"
-                            },
-                            {
-                                "type": "contact_name_changed",
-                                "created_on": "2018-07-06T12:30:20.123456789Z",
-                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                                "name": "Bobby"
-                            },
-                            {
-                                "type": "msg_created",
-                                "created_on": "2018-07-06T12:30:22.123456789Z",
-                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                                "msg": {
-                                    "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459",
-                                    "text": "Ok Bobby, what age are you?",
-                                    "sharing_config": {}
-                                }
-                            },
-                            {
-                                "type": "msg_wait",
-                                "created_on": "2018-07-06T12:30:25.123456789Z",
-                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4"
-                            },
-                            {
-                                "type": "msg_received",
-                                "created_on": "2018-07-06T12:30:31.123456789Z",
-                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
-                                "msg": {
-                                    "uuid": "67e1a638-4479-47cb-bcff-03c59c14e31d",
-                                    "urn": "tel:+12065551212",
-                                    "text": "123"
-                                }
-                            },
-                            {
+                                "name": "Name",
+                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
                                 "type": "run_result_changed",
-                                "created_on": "2018-07-06T12:30:35.123456789Z",
-                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
-                                "name": "Age",
-                                "value": "123",
-                                "category": "Other",
-                                "input": "123",
-                                "corrected": "123"
+                                "value": "Bobby"
                             },
                             {
-                                "type": "msg_created",
-                                "created_on": "2018-07-06T12:30:38.123456789Z",
-                                "step_uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae",
+                                "created_on": "2018-07-06T12:30:20.123456789Z",
+                                "name": "Bobby",
+                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
+                                "type": "contact_name_changed"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:22.123456789Z",
                                 "msg": {
-                                    "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da",
-                                    "text": "Are you sure you're 123... maybe try again",
-                                    "sharing_config": {}
-                                }
+                                    "sharing_config": {},
+                                    "text": "Ok Bobby, what age are you?",
+                                    "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
+                                },
+                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "msg_wait",
+                                "created_on": "2018-07-06T12:30:25.123456789Z",
+                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
+                                "type": "msg_wait"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:31.123456789Z",
+                                "msg": {
+                                    "text": "123",
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "67e1a638-4479-47cb-bcff-03c59c14e31d"
+                                },
+                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
+                                "type": "msg_received"
+                            },
+                            {
+                                "category": "Other",
+                                "corrected": "123",
+                                "created_on": "2018-07-06T12:30:35.123456789Z",
+                                "input": "123",
+                                "name": "Age",
+                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
+                                "type": "run_result_changed",
+                                "value": "123"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:38.123456789Z",
+                                "msg": {
+                                    "sharing_config": {},
+                                    "text": "Are you sure you're 123... maybe try again",
+                                    "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
+                                },
+                                "step_uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae",
+                                "type": "msg_created"
+                            },
+                            {
                                 "created_on": "2018-07-06T12:30:41.123456789Z",
-                                "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db"
+                                "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
+                                "type": "msg_wait"
+                            }
+                        ],
+                        "exited_on": null,
+                        "expires_on": "2018-07-13T12:30:29.123456789Z",
+                        "flow": {
+                            "name": "Registration",
+                            "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
+                        },
+                        "modified_on": "2018-07-06T12:30:43.123456789Z",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
+                                "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
+                                "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
+                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
+                                "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:19.123456789Z",
+                                "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
+                                "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
+                                "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:24.123456789Z",
+                                "exit_uuid": "47063adc-04c6-478f-b13d-fad09f383e1e",
+                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                                "uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:37.123456789Z",
+                                "exit_uuid": "6d57b815-ad64-4091-9b37-5428f6cc56bb",
+                                "node_uuid": "050d338f-33d5-4c95-8a55-d4702c8365f5",
+                                "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:40.123456789Z",
+                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                                "uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db"
                             }
                         ],
                         "results": {
                             "age": {
-                                "name": "Age",
-                                "value": "123",
                                 "category": "Other",
-                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
-                                "input": "123",
+                                "corrected": "123",
                                 "created_on": "2018-07-06T12:30:33.123456789Z",
-                                "corrected": "123"
+                                "input": "123",
+                                "name": "Age",
+                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                                "value": "123"
                             },
                             "name": {
-                                "name": "Name",
-                                "value": "Bobby",
                                 "category": "All Responses",
-                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
-                                "input": "Bobby",
+                                "corrected": "Bobby",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
-                                "corrected": "Bobby"
+                                "input": "Bobby",
+                                "name": "Name",
+                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
+                                "value": "Bobby"
                             }
                         },
                         "status": "waiting",
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
-                        "modified_on": "2018-07-06T12:30:43.123456789Z",
-                        "expires_on": "2018-07-13T12:30:29.123456789Z",
-                        "exited_on": null
+                        "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
                     }
                 ],
                 "status": "waiting",
-                "wait": {
-                    "type": "msg"
-                },
-                "input": {
-                    "type": "msg",
-                    "uuid": "67e1a638-4479-47cb-bcff-03c59c14e31d",
-                    "created_on": "2019-03-21T14:19:35.1582-05:00",
-                    "urn": "tel:+12065551212",
-                    "text": "123"
-                }
-            },
-            "events": [
-                {
-                    "type": "msg_received",
-                    "created_on": "2018-07-06T12:30:31.123456789Z",
-                    "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
-                    "msg": {
-                        "uuid": "67e1a638-4479-47cb-bcff-03c59c14e31d",
-                        "urn": "tel:+12065551212",
-                        "text": "123"
-                    }
-                },
-                {
-                    "type": "run_result_changed",
-                    "created_on": "2018-07-06T12:30:35.123456789Z",
-                    "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
-                    "name": "Age",
-                    "value": "123",
-                    "category": "Other",
-                    "input": "123",
-                    "corrected": "123"
-                },
-                {
-                    "type": "msg_created",
-                    "created_on": "2018-07-06T12:30:38.123456789Z",
-                    "step_uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae",
-                    "msg": {
-                        "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da",
-                        "text": "Are you sure you're 123... maybe try again",
-                        "sharing_config": {}
-                    }
-                },
-                {
-                    "type": "msg_wait",
-                    "created_on": "2018-07-06T12:30:41.123456789Z",
-                    "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db"
-                }
-            ]
-        },
-        {
-            "session": {
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "type": "messaging",
-                "environment": {
-                    "date_format": "YYYY-MM-DD",
-                    "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles",
-                    "allowed_languages": [
-                        "eng",
-                        "eng"
-                    ],
-                    "number_format": {
-                        "decimal_symbol": ".",
-                        "digit_grouping_symbol": ","
-                    },
-                    "redaction_policy": "none",
-                    "max_value_length": 640,
-                    "links": [
-                        ""
-                    ]
-                },
                 "trigger": {
-                    "type": "manual",
+                    "contact": {
+                        "created_on": "2018-01-01T12:00:00Z",
+                        "id": 1234567,
+                        "language": "eng",
+                        "name": "Ben Haggerty",
+                        "status": "active",
+                        "timezone": "America/Guayaquil",
+                        "urns": [
+                            "tel:+12065551212",
+                            "facebook:1122334455667788",
+                            "mailto:ben@macklemore"
+                        ],
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                    },
                     "environment": {
-                        "date_format": "YYYY-MM-DD",
-                        "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles",
                         "allowed_languages": [
                             "eng",
                             "eng"
                         ],
+                        "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
+                        "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
                             "digit_grouping_symbol": ","
                         },
                         "redaction_policy": "none",
-                        "max_value_length": 640,
-                        "links": [
-                            ""
-                        ]
+                        "time_format": "tt:mm",
+                        "timezone": "America/Los_Angeles"
                     },
                     "flow": {
-                        "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
-                        "name": "Registration"
+                        "name": "Registration",
+                        "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
                     },
-                    "contact": {
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                        "id": 1234567,
-                        "name": "Ben Haggerty",
-                        "language": "eng",
-                        "status": "active",
-                        "timezone": "America/Guayaquil",
-                        "created_on": "2018-01-01T12:00:00Z",
-                        "urns": [
-                            "tel:+12065551212",
-                            "facebook:1122334455667788",
-                            "mailto:ben@macklemore"
-                        ]
-                    },
-                    "triggered_on": "2019-03-21T14:19:25.640503-05:00"
+                    "triggered_on": "2019-03-21T14:19:25.640503-05:00",
+                    "type": "manual"
                 },
-                "contact": {
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                    "id": 1234567,
-                    "name": "Bobby",
-                    "language": "eng",
-                    "status": "active",
-                    "timezone": "America/Guayaquil",
-                    "created_on": "2018-01-01T12:00:00Z",
-                    "last_seen_on": "2019-03-21T14:19:41.862787-05:00",
-                    "urns": [
-                        "tel:+12065551212",
-                        "facebook:1122334455667788",
-                        "mailto:ben@macklemore"
+                "type": "messaging",
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
+                "wait": {
+                    "type": "msg"
+                }
+            }
+        },
+        {
+            "events": [
+                {
+                    "created_on": "2018-07-06T12:30:47.123456789Z",
+                    "msg": {
+                        "text": "18",
+                        "urn": "tel:+12065551212",
+                        "uuid": "6b747d87-aa36-403a-aefb-304934a271e4"
+                    },
+                    "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
+                    "type": "msg_received"
+                },
+                {
+                    "category": "10 - 100",
+                    "corrected": "18",
+                    "created_on": "2018-07-06T12:30:51.123456789Z",
+                    "input": "18",
+                    "name": "Age",
+                    "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
+                    "type": "run_result_changed",
+                    "value": "18"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:54.123456789Z",
+                    "msg": {
+                        "sharing_config": {},
+                        "text": "Great, you are 18 years old",
+                        "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f"
+                    },
+                    "step_uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005",
+                    "type": "msg_created"
+                },
+                {
+                    "category": "Youth",
+                    "corrected": "18",
+                    "created_on": "2018-07-06T12:30:59.123456789Z",
+                    "input": "18",
+                    "name": "Response 3",
+                    "step_uuid": "b6c40a98-ecfa-4266-9853-0310d032b497",
+                    "type": "run_result_changed",
+                    "value": "18"
+                },
+                {
+                    "created_on": "2018-07-06T12:31:02.123456789Z",
+                    "groups_added": [
+                        {
+                            "name": "Youth",
+                            "uuid": "5ddddd32-9d5e-4102-8aa0-bf54d91a768c"
+                        }
                     ],
+                    "step_uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c",
+                    "type": "contact_groups_changed"
+                }
+            ],
+            "session": {
+                "contact": {
+                    "created_on": "2018-01-01T12:00:00Z",
                     "groups": [
                         {
-                            "uuid": "5ddddd32-9d5e-4102-8aa0-bf54d91a768c",
-                            "name": "Youth"
+                            "name": "Youth",
+                            "uuid": "5ddddd32-9d5e-4102-8aa0-bf54d91a768c"
                         }
-                    ]
+                    ],
+                    "id": 1234567,
+                    "language": "eng",
+                    "last_seen_on": "2019-03-21T14:19:41.862787-05:00",
+                    "name": "Bobby",
+                    "status": "active",
+                    "timezone": "America/Guayaquil",
+                    "urns": [
+                        "tel:+12065551212",
+                        "facebook:1122334455667788",
+                        "mailto:ben@macklemore"
+                    ],
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                },
+                "environment": {
+                    "allowed_languages": [
+                        "eng",
+                        "eng"
+                    ],
+                    "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
+                    "max_value_length": 640,
+                    "number_format": {
+                        "decimal_symbol": ".",
+                        "digit_grouping_symbol": ","
+                    },
+                    "redaction_policy": "none",
+                    "time_format": "tt:mm",
+                    "timezone": "America/Los_Angeles"
+                },
+                "input": {
+                    "created_on": "2019-03-21T14:19:41.862787-05:00",
+                    "text": "18",
+                    "type": "msg",
+                    "urn": "tel:+12065551212",
+                    "uuid": "6b747d87-aa36-403a-aefb-304934a271e4"
                 },
                 "runs": [
                     {
-                        "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
-                        "flow": {
-                            "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
-                            "name": "Registration"
-                        },
-                        "path": [
-                            {
-                                "uuid": "b88ce93d-4360-4455-a691-235cbe720980",
-                                "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
-                                "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
-                            },
-                            {
-                                "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
-                                "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z"
-                            },
-                            {
-                                "uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                                "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
-                                "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
-                                "arrived_on": "2018-07-06T12:30:19.123456789Z"
-                            },
-                            {
-                                "uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
-                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
-                                "exit_uuid": "47063adc-04c6-478f-b13d-fad09f383e1e",
-                                "arrived_on": "2018-07-06T12:30:24.123456789Z"
-                            },
-                            {
-                                "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae",
-                                "node_uuid": "050d338f-33d5-4c95-8a55-d4702c8365f5",
-                                "exit_uuid": "6d57b815-ad64-4091-9b37-5428f6cc56bb",
-                                "arrived_on": "2018-07-06T12:30:37.123456789Z"
-                            },
-                            {
-                                "uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
-                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
-                                "exit_uuid": "16772a2d-7302-4b4d-af6f-0a9eb7b68f1f",
-                                "arrived_on": "2018-07-06T12:30:40.123456789Z"
-                            },
-                            {
-                                "uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005",
-                                "node_uuid": "4c6e76f3-c91b-4a3c-b5fc-998e8bfd4bd8",
-                                "exit_uuid": "f0942cd4-c09b-4b35-b4aa-825eb805db45",
-                                "arrived_on": "2018-07-06T12:30:53.123456789Z"
-                            },
-                            {
-                                "uuid": "b6c40a98-ecfa-4266-9853-0310d032b497",
-                                "node_uuid": "45ba2955-3d64-43a6-bad9-a1eb30f6e27e",
-                                "exit_uuid": "83b81834-0287-4428-991d-c2a9fbfdff77",
-                                "arrived_on": "2018-07-06T12:30:56.123456789Z"
-                            },
-                            {
-                                "uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c",
-                                "node_uuid": "0e260a3e-d506-4c21-aded-1eb63bbfd911",
-                                "exit_uuid": "c6f4db9d-cfa5-46a0-a90d-0d4314a13188",
-                                "arrived_on": "2018-07-06T12:31:01.123456789Z"
-                            }
-                        ],
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
                                 "msg": {
-                                    "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
+                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
-                                    "sharing_config": {}
-                                }
+                                    "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
+                                },
+                                "step_uuid": "b88ce93d-4360-4455-a691-235cbe720980",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "msg_wait",
                                 "created_on": "2018-07-06T12:30:07.123456789Z",
-                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
+                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                                "type": "msg_wait"
                             },
                             {
-                                "type": "msg_received",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
-                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
                                 "msg": {
-                                    "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef",
+                                    "text": "Bobby",
                                     "urn": "tel:+12065551212",
-                                    "text": "Bobby"
-                                }
+                                    "uuid": "6fd3fb33-d798-4403-9ead-45822241ddef"
+                                },
+                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                                "type": "msg_received"
                             },
                             {
-                                "type": "run_result_changed",
-                                "created_on": "2018-07-06T12:30:17.123456789Z",
-                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                                "name": "Name",
-                                "value": "Bobby",
                                 "category": "All Responses",
+                                "corrected": "Bobby",
+                                "created_on": "2018-07-06T12:30:17.123456789Z",
                                 "input": "Bobby",
-                                "corrected": "Bobby"
+                                "name": "Name",
+                                "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
+                                "type": "run_result_changed",
+                                "value": "Bobby"
                             },
                             {
-                                "type": "contact_name_changed",
                                 "created_on": "2018-07-06T12:30:20.123456789Z",
+                                "name": "Bobby",
                                 "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                                "name": "Bobby"
+                                "type": "contact_name_changed"
                             },
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:22.123456789Z",
-                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
                                 "msg": {
-                                    "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459",
+                                    "sharing_config": {},
                                     "text": "Ok Bobby, what age are you?",
-                                    "sharing_config": {}
-                                }
+                                    "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
+                                },
+                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "msg_wait",
                                 "created_on": "2018-07-06T12:30:25.123456789Z",
-                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4"
+                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
+                                "type": "msg_wait"
                             },
                             {
-                                "type": "msg_received",
                                 "created_on": "2018-07-06T12:30:31.123456789Z",
-                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
                                 "msg": {
-                                    "uuid": "67e1a638-4479-47cb-bcff-03c59c14e31d",
+                                    "text": "123",
                                     "urn": "tel:+12065551212",
-                                    "text": "123"
-                                }
+                                    "uuid": "67e1a638-4479-47cb-bcff-03c59c14e31d"
+                                },
+                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
+                                "type": "msg_received"
                             },
                             {
-                                "type": "run_result_changed",
-                                "created_on": "2018-07-06T12:30:35.123456789Z",
-                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
-                                "name": "Age",
-                                "value": "123",
                                 "category": "Other",
+                                "corrected": "123",
+                                "created_on": "2018-07-06T12:30:35.123456789Z",
                                 "input": "123",
-                                "corrected": "123"
-                            },
-                            {
-                                "type": "msg_created",
-                                "created_on": "2018-07-06T12:30:38.123456789Z",
-                                "step_uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae",
-                                "msg": {
-                                    "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da",
-                                    "text": "Are you sure you're 123... maybe try again",
-                                    "sharing_config": {}
-                                }
-                            },
-                            {
-                                "type": "msg_wait",
-                                "created_on": "2018-07-06T12:30:41.123456789Z",
-                                "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db"
-                            },
-                            {
-                                "type": "msg_received",
-                                "created_on": "2018-07-06T12:30:47.123456789Z",
-                                "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
-                                "msg": {
-                                    "uuid": "6b747d87-aa36-403a-aefb-304934a271e4",
-                                    "urn": "tel:+12065551212",
-                                    "text": "18"
-                                }
-                            },
-                            {
-                                "type": "run_result_changed",
-                                "created_on": "2018-07-06T12:30:51.123456789Z",
-                                "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
                                 "name": "Age",
-                                "value": "18",
-                                "category": "10 - 100",
-                                "input": "18",
-                                "corrected": "18"
-                            },
-                            {
-                                "type": "msg_created",
-                                "created_on": "2018-07-06T12:30:54.123456789Z",
-                                "step_uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005",
-                                "msg": {
-                                    "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f",
-                                    "text": "Great, you are 18 years old",
-                                    "sharing_config": {}
-                                }
-                            },
-                            {
+                                "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
                                 "type": "run_result_changed",
-                                "created_on": "2018-07-06T12:30:59.123456789Z",
-                                "step_uuid": "b6c40a98-ecfa-4266-9853-0310d032b497",
-                                "name": "Response 3",
-                                "value": "18",
-                                "category": "Youth",
-                                "input": "18",
-                                "corrected": "18"
+                                "value": "123"
                             },
                             {
-                                "type": "contact_groups_changed",
+                                "created_on": "2018-07-06T12:30:38.123456789Z",
+                                "msg": {
+                                    "sharing_config": {},
+                                    "text": "Are you sure you're 123... maybe try again",
+                                    "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
+                                },
+                                "step_uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae",
+                                "type": "msg_created"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:41.123456789Z",
+                                "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
+                                "type": "msg_wait"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:47.123456789Z",
+                                "msg": {
+                                    "text": "18",
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "6b747d87-aa36-403a-aefb-304934a271e4"
+                                },
+                                "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
+                                "type": "msg_received"
+                            },
+                            {
+                                "category": "10 - 100",
+                                "corrected": "18",
+                                "created_on": "2018-07-06T12:30:51.123456789Z",
+                                "input": "18",
+                                "name": "Age",
+                                "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
+                                "type": "run_result_changed",
+                                "value": "18"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:54.123456789Z",
+                                "msg": {
+                                    "sharing_config": {},
+                                    "text": "Great, you are 18 years old",
+                                    "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f"
+                                },
+                                "step_uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005",
+                                "type": "msg_created"
+                            },
+                            {
+                                "category": "Youth",
+                                "corrected": "18",
+                                "created_on": "2018-07-06T12:30:59.123456789Z",
+                                "input": "18",
+                                "name": "Response 3",
+                                "step_uuid": "b6c40a98-ecfa-4266-9853-0310d032b497",
+                                "type": "run_result_changed",
+                                "value": "18"
+                            },
+                            {
                                 "created_on": "2018-07-06T12:31:02.123456789Z",
-                                "step_uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c",
                                 "groups_added": [
                                     {
-                                        "uuid": "5ddddd32-9d5e-4102-8aa0-bf54d91a768c",
-                                        "name": "Youth"
+                                        "name": "Youth",
+                                        "uuid": "5ddddd32-9d5e-4102-8aa0-bf54d91a768c"
                                     }
-                                ]
+                                ],
+                                "step_uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c",
+                                "type": "contact_groups_changed"
+                            }
+                        ],
+                        "exited_on": "2018-07-06T12:31:04.123456789Z",
+                        "expires_on": null,
+                        "flow": {
+                            "name": "Registration",
+                            "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
+                        },
+                        "modified_on": "2018-07-06T12:31:04.123456789Z",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
+                                "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
+                                "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
+                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
+                                "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:19.123456789Z",
+                                "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
+                                "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
+                                "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:24.123456789Z",
+                                "exit_uuid": "47063adc-04c6-478f-b13d-fad09f383e1e",
+                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                                "uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:37.123456789Z",
+                                "exit_uuid": "6d57b815-ad64-4091-9b37-5428f6cc56bb",
+                                "node_uuid": "050d338f-33d5-4c95-8a55-d4702c8365f5",
+                                "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:40.123456789Z",
+                                "exit_uuid": "16772a2d-7302-4b4d-af6f-0a9eb7b68f1f",
+                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                                "uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:53.123456789Z",
+                                "exit_uuid": "f0942cd4-c09b-4b35-b4aa-825eb805db45",
+                                "node_uuid": "4c6e76f3-c91b-4a3c-b5fc-998e8bfd4bd8",
+                                "uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:56.123456789Z",
+                                "exit_uuid": "83b81834-0287-4428-991d-c2a9fbfdff77",
+                                "node_uuid": "45ba2955-3d64-43a6-bad9-a1eb30f6e27e",
+                                "uuid": "b6c40a98-ecfa-4266-9853-0310d032b497"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:31:01.123456789Z",
+                                "exit_uuid": "c6f4db9d-cfa5-46a0-a90d-0d4314a13188",
+                                "node_uuid": "0e260a3e-d506-4c21-aded-1eb63bbfd911",
+                                "uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c"
                             }
                         ],
                         "results": {
                             "age": {
-                                "name": "Age",
-                                "value": "18",
                                 "category": "10 - 100",
-                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
-                                "input": "18",
+                                "corrected": "18",
                                 "created_on": "2018-07-06T12:30:49.123456789Z",
-                                "corrected": "18"
+                                "input": "18",
+                                "name": "Age",
+                                "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                                "value": "18"
                             },
                             "name": {
-                                "name": "Name",
-                                "value": "Bobby",
                                 "category": "All Responses",
-                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
-                                "input": "Bobby",
+                                "corrected": "Bobby",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
-                                "corrected": "Bobby"
+                                "input": "Bobby",
+                                "name": "Name",
+                                "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
+                                "value": "Bobby"
                             },
                             "response_3": {
-                                "name": "Response 3",
-                                "value": "18",
                                 "category": "Youth",
-                                "node_uuid": "45ba2955-3d64-43a6-bad9-a1eb30f6e27e",
-                                "input": "18",
+                                "corrected": "18",
                                 "created_on": "2018-07-06T12:30:57.123456789Z",
-                                "corrected": "18"
+                                "input": "18",
+                                "name": "Response 3",
+                                "node_uuid": "45ba2955-3d64-43a6-bad9-a1eb30f6e27e",
+                                "value": "18"
                             }
                         },
                         "status": "completed",
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
-                        "modified_on": "2018-07-06T12:31:04.123456789Z",
-                        "expires_on": null,
-                        "exited_on": "2018-07-06T12:31:04.123456789Z"
+                        "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
                     }
                 ],
                 "status": "completed",
-                "input": {
-                    "type": "msg",
-                    "uuid": "6b747d87-aa36-403a-aefb-304934a271e4",
-                    "created_on": "2019-03-21T14:19:41.862787-05:00",
-                    "urn": "tel:+12065551212",
-                    "text": "18"
-                }
-            },
-            "events": [
-                {
-                    "type": "msg_received",
-                    "created_on": "2018-07-06T12:30:47.123456789Z",
-                    "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
-                    "msg": {
-                        "uuid": "6b747d87-aa36-403a-aefb-304934a271e4",
-                        "urn": "tel:+12065551212",
-                        "text": "18"
-                    }
+                "trigger": {
+                    "contact": {
+                        "created_on": "2018-01-01T12:00:00Z",
+                        "id": 1234567,
+                        "language": "eng",
+                        "name": "Ben Haggerty",
+                        "status": "active",
+                        "timezone": "America/Guayaquil",
+                        "urns": [
+                            "tel:+12065551212",
+                            "facebook:1122334455667788",
+                            "mailto:ben@macklemore"
+                        ],
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                    },
+                    "environment": {
+                        "allowed_languages": [
+                            "eng",
+                            "eng"
+                        ],
+                        "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
+                        "max_value_length": 640,
+                        "number_format": {
+                            "decimal_symbol": ".",
+                            "digit_grouping_symbol": ","
+                        },
+                        "redaction_policy": "none",
+                        "time_format": "tt:mm",
+                        "timezone": "America/Los_Angeles"
+                    },
+                    "flow": {
+                        "name": "Registration",
+                        "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
+                    },
+                    "triggered_on": "2019-03-21T14:19:25.640503-05:00",
+                    "type": "manual"
                 },
-                {
-                    "type": "run_result_changed",
-                    "created_on": "2018-07-06T12:30:51.123456789Z",
-                    "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
-                    "name": "Age",
-                    "value": "18",
-                    "category": "10 - 100",
-                    "input": "18",
-                    "corrected": "18"
-                },
-                {
-                    "type": "msg_created",
-                    "created_on": "2018-07-06T12:30:54.123456789Z",
-                    "step_uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005",
-                    "msg": {
-                        "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f",
-                        "text": "Great, you are 18 years old",
-                        "sharing_config": {}
-                    }
-                },
-                {
-                    "type": "run_result_changed",
-                    "created_on": "2018-07-06T12:30:59.123456789Z",
-                    "step_uuid": "b6c40a98-ecfa-4266-9853-0310d032b497",
-                    "name": "Response 3",
-                    "value": "18",
-                    "category": "Youth",
-                    "input": "18",
-                    "corrected": "18"
-                },
-                {
-                    "type": "contact_groups_changed",
-                    "created_on": "2018-07-06T12:31:02.123456789Z",
-                    "step_uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c",
-                    "groups_added": [
-                        {
-                            "uuid": "5ddddd32-9d5e-4102-8aa0-bf54d91a768c",
-                            "name": "Youth"
-                        }
-                    ]
-                }
-            ]
+                "type": "messaging",
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5"
+            }
         }
     ],
     "resumes": [

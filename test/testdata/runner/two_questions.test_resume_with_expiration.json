@@ -13,6 +13,7 @@
                             "Red",
                             "Blue"
                         ],
+                        "sharing_config": {},
                         "text": "Hi Ben Haggerty! What is your favorite color? (red/blue) Your number is (202) 456-1111",
                         "urn": "tel:+12024561111",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -53,6 +54,9 @@
                         "fra"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -77,6 +81,7 @@
                                         "Red",
                                         "Blue"
                                     ],
+                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty! What is your favorite color? (red/blue) Your number is (202) 456-1111",
                                     "urn": "tel:+12024561111",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -136,6 +141,9 @@
                             "fra"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -195,6 +203,9 @@
                         "fra"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -219,6 +230,7 @@
                                         "Red",
                                         "Blue"
                                     ],
+                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty! What is your favorite color? (red/blue) Your number is (202) 456-1111",
                                     "urn": "tel:+12024561111",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -284,6 +296,9 @@
                             "fra"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",

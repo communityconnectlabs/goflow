@@ -3,104 +3,43 @@
         {
             "events": [
                 {
-                    "type": "msg_created",
                     "created_on": "2018-07-06T12:30:04.123456789Z",
-                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "msg": {
-                        "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                        "urn": "tel:+12065551212",
                         "channel": {
-                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                            "name": "Android Channel"
+                            "name": "Android Channel",
+                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Hi Ben Haggerty! When were you born, enter in format YYYY.MM.DD",
-                        "sharing_config": {}
-                    }
+                        "urn": "tel:+12065551212",
+                        "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
+                    },
+                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                    "type": "msg_created"
                 },
                 {
-                    "type": "msg_wait",
                     "created_on": "2018-07-06T12:30:06.123456789Z",
-                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
+                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                    "type": "msg_wait"
                 }
             ],
             "session": {
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "type": "messaging",
-                "environment": {
-                    "date_format": "YYYY-MM-DD",
-                    "time_format": "h:mm aa",
-                    "timezone": "America/Los_Angeles",
-                    "default_language": "eng",
-                    "allowed_languages": [
-                        "eng"
-                    ],
-                    "number_format": {
-                        "decimal_symbol": ".",
-                        "digit_grouping_symbol": ","
-                    },
-                    "redaction_policy": "none",
-                    "max_value_length": 640,
-                    "links": [
-                        ""
-                    ]
-                },
-                "trigger": {
-                    "type": "manual",
-                    "environment": {
-                        "date_format": "YYYY-MM-DD",
-                        "time_format": "h:mm aa",
-                        "timezone": "America/Los_Angeles",
-                        "default_language": "eng",
-                        "allowed_languages": [
-                            "eng"
-                        ],
-                        "number_format": {
-                            "decimal_symbol": ".",
-                            "digit_grouping_symbol": ","
+                "contact": {
+                    "created_on": "2000-01-01T00:00:00Z",
+                    "fields": {
+                        "first_name": {
+                            "text": "Ben"
                         },
-                        "redaction_policy": "none",
-                        "max_value_length": 640,
-                        "links": [
-                            ""
-                        ]
-                    },
-                    "flow": {
-                        "uuid": "615b8a0f-588c-4d20-a05f-363b0b4ce6f4",
-                        "name": "Registration"
-                    },
-                    "contact": {
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                        "id": 1234567,
-                        "name": "Ben Haggerty",
-                        "language": "eng",
-                        "status": "active",
-                        "timezone": "America/Guayaquil",
-                        "created_on": "2000-01-01T00:00:00Z",
-                        "urns": [
-                            "tel:+12065551212",
-                            "facebook:1122334455667788",
-                            "mailto:ben@macklemore"
-                        ],
-                        "fields": {
-                            "first_name": {
-                                "text": "Ben"
-                            },
-                            "state": {
-                                "text": "Ecuador > Azuay",
-                                "state": "Ecuador > Azuay"
-                            }
+                        "state": {
+                            "state": "Ecuador > Azuay",
+                            "text": "Ecuador > Azuay"
                         }
                     },
-                    "triggered_on": "2000-01-01T00:00:00Z"
-                },
-                "contact": {
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
                     "id": 1234567,
-                    "name": "Ben Haggerty",
                     "language": "eng",
+                    "name": "Ben Haggerty",
                     "status": "active",
                     "timezone": "America/Guayaquil",
-                    "created_on": "2000-01-01T00:00:00Z",
                     "urns": [
                         "tel:+12065551212",
                         "facebook:1122334455667788",
@@ -113,6 +52,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -124,45 +66,45 @@
                 },
                 "runs": [
                     {
-                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
-                        "flow": {
-                            "uuid": "615b8a0f-588c-4d20-a05f-363b0b4ce6f4",
-                            "name": "Date Test"
-                        },
-                        "path": [
-                            {
-                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "node_uuid": "46d51f50-58de-49da-8d13-dadbf322685d",
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
-                            }
-                        ],
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "msg": {
-                                    "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                                    "urn": "tel:+12065551212",
                                     "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Android Channel"
+                                        "name": "Android Channel",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty! When were you born, enter in format YYYY.MM.DD",
-                                    "sharing_config": {}
-                                }
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
+                                },
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "msg_wait",
                                 "created_on": "2018-07-06T12:30:06.123456789Z",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                                "type": "msg_wait"
+                            }
+                        ],
+                        "exited_on": null,
+                        "expires_on": "2018-07-06T12:30:01.123456789Z",
+                        "flow": {
+                            "name": "Date Test",
+                            "uuid": "615b8a0f-588c-4d20-a05f-363b0b4ce6f4"
+                        },
+                        "modified_on": "2018-07-06T12:30:08.123456789Z",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "node_uuid": "46d51f50-58de-49da-8d13-dadbf322685d",
+                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
                             }
                         ],
                         "status": "waiting",
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
-                        "modified_on": "2018-07-06T12:30:08.123456789Z",
-                        "expires_on": "2018-07-06T12:30:01.123456789Z",
-                        "exited_on": null
+                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
                     }
                 ],
                 "status": "waiting",
@@ -195,6 +137,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -221,153 +166,72 @@
         {
             "events": [
                 {
-                    "type": "msg_received",
                     "created_on": "2018-07-06T12:30:12.123456789Z",
-                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "msg": {
-                        "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5",
-                        "urn": "tel:+12065551212",
                         "channel": {
-                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                            "name": "Nexmo"
+                            "name": "Nexmo",
+                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
-                        "text": "I was born on 1977.06.23 at 3:34 pm"
-                    }
-                },
-                {
-                    "type": "run_result_changed",
-                    "created_on": "2018-07-06T12:30:17.123456789Z",
+                        "text": "I was born on 1977.06.23 at 3:34 pm",
+                        "urn": "tel:+12065551212",
+                        "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5"
+                    },
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                    "name": "Birth Date",
-                    "value": "1977-06-23T15:34:00.000000-05:00",
-                    "category": "Valid",
-                    "input": "I was born on 1977.06.23 at 3:34 pm",
-                    "corrected": "I was born on 1977.06.23 at 3:34 pm"
+                    "type": "msg_received"
                 },
                 {
-                    "type": "contact_field_changed",
+                    "category": "Valid",
+                    "corrected": "I was born on 1977.06.23 at 3:34 pm",
+                    "created_on": "2018-07-06T12:30:17.123456789Z",
+                    "input": "I was born on 1977.06.23 at 3:34 pm",
+                    "name": "Birth Date",
+                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                    "type": "run_result_changed",
+                    "value": "1977-06-23T15:34:00.000000-05:00"
+                },
+                {
                     "created_on": "2018-07-06T12:30:20.123456789Z",
-                    "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
                     "field": {
                         "key": "birth_date",
                         "name": "Birth Date"
                     },
+                    "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
+                    "type": "contact_field_changed",
                     "value": {
-                        "text": "1977-06-23T15:34:00.000000-05:00",
-                        "datetime": "1977-06-23T15:34:00.000000-05:00"
+                        "datetime": "1977-06-23T15:34:00.000000-05:00",
+                        "text": "1977-06-23T15:34:00.000000-05:00"
                     }
                 },
                 {
-                    "type": "msg_created",
                     "created_on": "2018-07-06T12:30:22.123456789Z",
-                    "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
                     "msg": {
-                        "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
-                        "urn": "tel:+12065551212",
                         "channel": {
-                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                            "name": "Android Channel"
+                            "name": "Android Channel",
+                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Awesome, you were born on 06-23-1977 at 15:34",
-                        "sharing_config": {}
-                    }
+                        "urn": "tel:+12065551212",
+                        "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
+                    },
+                    "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
+                    "type": "msg_created"
                 }
             ],
             "session": {
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "type": "messaging",
-                "environment": {
-                    "date_format": "YYYY-MM-DD",
-                    "time_format": "h:mm aa",
-                    "timezone": "America/Los_Angeles",
-                    "default_language": "eng",
-                    "allowed_languages": [
-                        "eng"
-                    ],
-                    "number_format": {
-                        "decimal_symbol": ".",
-                        "digit_grouping_symbol": ","
-                    },
-                    "redaction_policy": "none",
-                    "max_value_length": 640,
-                    "links": [
-                        ""
-                    ]
-                },
-                "trigger": {
-                    "type": "manual",
-                    "environment": {
-                        "date_format": "YYYY-MM-DD",
-                        "time_format": "h:mm aa",
-                        "timezone": "America/Los_Angeles",
-                        "default_language": "eng",
-                        "allowed_languages": [
-                            "eng"
-                        ],
-                        "number_format": {
-                            "decimal_symbol": ".",
-                            "digit_grouping_symbol": ","
-                        },
-                        "redaction_policy": "none",
-                        "max_value_length": 640,
-                        "links": [
-                            ""
-                        ]
-                    },
-                    "flow": {
-                        "uuid": "615b8a0f-588c-4d20-a05f-363b0b4ce6f4",
-                        "name": "Registration"
-                    },
-                    "contact": {
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                        "id": 1234567,
-                        "name": "Ben Haggerty",
-                        "language": "eng",
-                        "status": "active",
-                        "timezone": "America/Guayaquil",
-                        "created_on": "2000-01-01T00:00:00Z",
-                        "urns": [
-                            "tel:+12065551212",
-                            "facebook:1122334455667788",
-                            "mailto:ben@macklemore"
-                        ],
-                        "fields": {
-                            "first_name": {
-                                "text": "Ben"
-                            },
-                            "state": {
-                                "text": "Ecuador > Azuay",
-                                "state": "Ecuador > Azuay"
-                            }
-                        }
-                    },
-                    "triggered_on": "2000-01-01T00:00:00Z"
-                },
                 "contact": {
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                    "id": 1234567,
-                    "name": "Ben Haggerty",
-                    "language": "eng",
-                    "status": "active",
-                    "timezone": "America/Guayaquil",
                     "created_on": "2000-01-01T00:00:00Z",
-                    "last_seen_on": "2000-01-01T00:00:00Z",
-                    "urns": [
-                        "tel:+12065551212",
-                        "facebook:1122334455667788",
-                        "mailto:ben@macklemore"
-                    ],
                     "fields": {
                         "birth_date": {
-                            "text": "1977-06-23T15:34:00.000000-05:00",
-                            "datetime": "1977-06-23T15:34:00.000000-05:00"
+                            "datetime": "1977-06-23T15:34:00.000000-05:00",
+                            "text": "1977-06-23T15:34:00.000000-05:00"
                         },
                         "first_name": {
                             "text": "Ben"
                         },
                         "state": {
-                            "text": "Ecuador > Azuay",
-                            "state": "Ecuador > Azuay"
+                            "state": "Ecuador > Azuay",
+                            "text": "Ecuador > Azuay"
                         }
                     },
                     "id": 1234567,
@@ -388,6 +252,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -410,115 +277,115 @@
                 },
                 "runs": [
                     {
-                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
-                        "flow": {
-                            "uuid": "615b8a0f-588c-4d20-a05f-363b0b4ce6f4",
-                            "name": "Date Test"
-                        },
-                        "path": [
-                            {
-                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "node_uuid": "46d51f50-58de-49da-8d13-dadbf322685d",
-                                "exit_uuid": "079f247a-16f4-419f-8cd2-0c8ae13152c6",
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
-                            },
-                            {
-                                "uuid": "5802813d-6c58-4292-8228-9728778b6c98",
-                                "node_uuid": "11a772f3-3ca2-4429-8b33-20fdcfc2b69e",
-                                "exit_uuid": "4ae06b16-3854-4336-b285-302c984fc235",
-                                "arrived_on": "2018-07-06T12:30:19.123456789Z"
-                            }
-                        ],
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "msg": {
-                                    "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                                    "urn": "tel:+12065551212",
                                     "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Android Channel"
+                                        "name": "Android Channel",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty! When were you born, enter in format YYYY.MM.DD",
-                                    "sharing_config": {}
-                                }
-                            },
-                            {
-                                "type": "msg_wait",
-                                "created_on": "2018-07-06T12:30:06.123456789Z",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
-                            },
-                            {
-                                "type": "msg_received",
-                                "created_on": "2018-07-06T12:30:12.123456789Z",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "msg": {
-                                    "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5",
                                     "urn": "tel:+12065551212",
-                                    "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Nexmo"
-                                    },
-                                    "text": "I was born on 1977.06.23 at 3:34 pm"
-                                }
-                            },
-                            {
-                                "type": "run_result_changed",
-                                "created_on": "2018-07-06T12:30:17.123456789Z",
+                                    "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
+                                },
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "name": "Birth Date",
-                                "value": "1977-06-23T15:34:00.000000-05:00",
-                                "category": "Valid",
-                                "input": "I was born on 1977.06.23 at 3:34 pm",
-                                "corrected": "I was born on 1977.06.23 at 3:34 pm"
+                                "type": "msg_created"
                             },
                             {
-                                "type": "contact_field_changed",
+                                "created_on": "2018-07-06T12:30:06.123456789Z",
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                                "type": "msg_wait"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:12.123456789Z",
+                                "msg": {
+                                    "channel": {
+                                        "name": "Nexmo",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+                                    },
+                                    "text": "I was born on 1977.06.23 at 3:34 pm",
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5"
+                                },
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                                "type": "msg_received"
+                            },
+                            {
+                                "category": "Valid",
+                                "corrected": "I was born on 1977.06.23 at 3:34 pm",
+                                "created_on": "2018-07-06T12:30:17.123456789Z",
+                                "input": "I was born on 1977.06.23 at 3:34 pm",
+                                "name": "Birth Date",
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                                "type": "run_result_changed",
+                                "value": "1977-06-23T15:34:00.000000-05:00"
+                            },
+                            {
                                 "created_on": "2018-07-06T12:30:20.123456789Z",
-                                "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
                                 "field": {
                                     "key": "birth_date",
                                     "name": "Birth Date"
                                 },
+                                "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
+                                "type": "contact_field_changed",
                                 "value": {
-                                    "text": "1977-06-23T15:34:00.000000-05:00",
-                                    "datetime": "1977-06-23T15:34:00.000000-05:00"
+                                    "datetime": "1977-06-23T15:34:00.000000-05:00",
+                                    "text": "1977-06-23T15:34:00.000000-05:00"
                                 }
                             },
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:22.123456789Z",
-                                "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
                                 "msg": {
-                                    "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
-                                    "urn": "tel:+12065551212",
                                     "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Android Channel"
+                                        "name": "Android Channel",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Awesome, you were born on 06-23-1977 at 15:34",
-                                    "sharing_config": {}
-                                }
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
+                                },
+                                "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
+                                "type": "msg_created"
+                            }
+                        ],
+                        "exited_on": "2018-07-06T12:30:24.123456789Z",
+                        "expires_on": null,
+                        "flow": {
+                            "name": "Date Test",
+                            "uuid": "615b8a0f-588c-4d20-a05f-363b0b4ce6f4"
+                        },
+                        "modified_on": "2018-07-06T12:30:24.123456789Z",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "exit_uuid": "079f247a-16f4-419f-8cd2-0c8ae13152c6",
+                                "node_uuid": "46d51f50-58de-49da-8d13-dadbf322685d",
+                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:19.123456789Z",
+                                "exit_uuid": "4ae06b16-3854-4336-b285-302c984fc235",
+                                "node_uuid": "11a772f3-3ca2-4429-8b33-20fdcfc2b69e",
+                                "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
                             }
                         ],
                         "results": {
                             "birth_date": {
-                                "name": "Birth Date",
-                                "value": "1977-06-23T15:34:00.000000-05:00",
                                 "category": "Valid",
-                                "node_uuid": "46d51f50-58de-49da-8d13-dadbf322685d",
-                                "input": "I was born on 1977.06.23 at 3:34 pm",
+                                "corrected": "I was born on 1977.06.23 at 3:34 pm",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
-                                "corrected": "I was born on 1977.06.23 at 3:34 pm"
+                                "input": "I was born on 1977.06.23 at 3:34 pm",
+                                "name": "Birth Date",
+                                "node_uuid": "46d51f50-58de-49da-8d13-dadbf322685d",
+                                "value": "1977-06-23T15:34:00.000000-05:00"
                             }
                         },
                         "status": "completed",
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
-                        "modified_on": "2018-07-06T12:30:24.123456789Z",
-                        "expires_on": null,
-                        "exited_on": "2018-07-06T12:30:24.123456789Z"
+                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
                     }
                 ],
                 "status": "completed",
@@ -551,6 +418,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -564,10 +434,11 @@
                         "name": "Registration",
                         "uuid": "615b8a0f-588c-4d20-a05f-363b0b4ce6f4"
                     },
-                    "created_on": "2000-01-01T00:00:00Z",
-                    "urn": "tel:+12065551212",
-                    "text": "I was born on 1977.06.23 at 3:34 pm"
-                }
+                    "triggered_on": "2000-01-01T00:00:00Z",
+                    "type": "manual"
+                },
+                "type": "messaging",
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5"
             }
         }
     ],

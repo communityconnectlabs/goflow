@@ -1,606 +1,606 @@
 {
     "outputs": [
         {
-            "session": {
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "type": "messaging",
-                "environment": {
-                    "date_format": "YYYY-MM-DD",
-                    "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles",
-                    "allowed_languages": [
-                        "eng",
-                        "eng"
-                    ],
-                    "number_format": {
-                        "decimal_symbol": ".",
-                        "digit_grouping_symbol": ","
-                    },
-                    "redaction_policy": "none",
-                    "max_value_length": 640,
-                    "links": [
-                        ""
-                    ]
-                },
-                "trigger": {
-                    "type": "manual",
-                    "environment": {
-                        "date_format": "YYYY-MM-DD",
-                        "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles",
-                        "allowed_languages": [
-                            "eng",
-                            "eng"
-                        ],
-                        "number_format": {
-                            "decimal_symbol": ".",
-                            "digit_grouping_symbol": ","
+            "events": [
+                {
+                    "created_on": "2018-07-06T12:30:04.123456789Z",
+                    "msg": {
+                        "channel": {
+                            "name": "Android Channel",
+                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
-                        "redaction_policy": "none",
-                        "max_value_length": 640,
-                        "links": [
-                            ""
-                        ]
+                        "sharing_config": {},
+                        "text": "This is the parent flow",
+                        "urn": "tel:+12065551212",
+                        "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                     },
+                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                    "type": "msg_created"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:07.123456789Z",
                     "flow": {
-                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
-                        "name": "Parent Flow"
+                        "name": "Child Flow",
+                        "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195"
                     },
-                    "contact": {
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                        "id": 1234567,
-                        "name": "Ben Haggerty",
-                        "language": "eng",
-                        "status": "active",
-                        "timezone": "America/Guayaquil",
-                        "created_on": "2018-01-01T12:00:00Z",
-                        "urns": [
-                            "tel:+12065551212",
-                            "facebook:1122334455667788",
-                            "mailto:ben@macklemore"
-                        ],
-                        "fields": {
-                            "gender": {
-                                "text": "Male"
-                            }
+                    "parent_run_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
+                    "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
+                    "terminal": false,
+                    "type": "flow_entered"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:14.123456789Z",
+                    "msg": {
+                        "channel": {
+                            "name": "Android Channel",
+                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+                        },
+                        "sharing_config": {},
+                        "text": "This is the child flow. What's your name?",
+                        "urn": "tel:+12065551212",
+                        "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
+                    },
+                    "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
+                    "type": "msg_created"
+                },
+                {
+                    "created_on": "2018-07-06T12:30:16.123456789Z",
+                    "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
+                    "type": "msg_wait"
+                }
+            ],
+            "session": {
+                "contact": {
+                    "created_on": "2018-01-01T12:00:00Z",
+                    "fields": {
+                        "gender": {
+                            "text": "Male"
                         }
                     },
-                    "triggered_on": "2018-10-26T12:21:24.285648-05:00"
-                },
-                "contact": {
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
                     "id": 1234567,
-                    "name": "Ben Haggerty",
                     "language": "eng",
+                    "name": "Ben Haggerty",
                     "status": "active",
                     "timezone": "America/Guayaquil",
-                    "created_on": "2018-01-01T12:00:00Z",
                     "urns": [
                         "tel:+12065551212",
                         "facebook:1122334455667788",
                         "mailto:ben@macklemore"
                     ],
-                    "fields": {
-                        "gender": {
-                            "text": "Male"
-                        }
-                    }
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                },
+                "environment": {
+                    "allowed_languages": [
+                        "eng",
+                        "eng"
+                    ],
+                    "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
+                    "max_value_length": 640,
+                    "number_format": {
+                        "decimal_symbol": ".",
+                        "digit_grouping_symbol": ","
+                    },
+                    "redaction_policy": "none",
+                    "time_format": "tt:mm",
+                    "timezone": "America/Los_Angeles"
                 },
                 "runs": [
                     {
-                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
-                        "flow": {
-                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
-                            "name": "Parent Flow"
-                        },
-                        "path": [
-                            {
-                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "node_uuid": "e97a43c1-a15b-4566-bb6d-dfd2b18408e1",
-                                "exit_uuid": "f4c88a91-e1b7-4ccf-9919-b423eb3cfc3c",
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
-                            },
-                            {
-                                "uuid": "5802813d-6c58-4292-8228-9728778b6c98",
-                                "node_uuid": "48b59851-017e-4d84-a4d9-fcefc7399e98",
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z"
-                            }
-                        ],
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "msg": {
-                                    "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                                    "urn": "tel:+12065551212",
                                     "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Android Channel"
+                                        "name": "Android Channel",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "This is the parent flow",
-                                    "sharing_config": {}
-                                }
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
+                                },
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "flow_entered",
                                 "created_on": "2018-07-06T12:30:07.123456789Z",
-                                "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
                                 "flow": {
-                                    "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195",
-                                    "name": "Child Flow"
+                                    "name": "Child Flow",
+                                    "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195"
                                 },
                                 "parent_run_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
-                                "terminal": false
+                                "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
+                                "terminal": false,
+                                "type": "flow_entered"
+                            }
+                        ],
+                        "exited_on": null,
+                        "expires_on": "2018-07-06T12:30:10.123456789Z",
+                        "flow": {
+                            "name": "Parent Flow",
+                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
+                        },
+                        "modified_on": "2018-07-06T12:30:12.123456789Z",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "exit_uuid": "f4c88a91-e1b7-4ccf-9919-b423eb3cfc3c",
+                                "node_uuid": "e97a43c1-a15b-4566-bb6d-dfd2b18408e1",
+                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "node_uuid": "48b59851-017e-4d84-a4d9-fcefc7399e98",
+                                "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
                             }
                         ],
                         "status": "active",
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
-                        "modified_on": "2018-07-06T12:30:12.123456789Z",
-                        "expires_on": "2018-07-06T12:30:10.123456789Z",
-                        "exited_on": null
+                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
                     },
                     {
-                        "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
-                        "flow": {
-                            "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195",
-                            "name": "Child flow"
-                        },
-                        "path": [
-                            {
-                                "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
-                                "node_uuid": "9f7632ee-6e35-4247-9235-c4c7663fd601",
-                                "arrived_on": "2018-07-06T12:30:13.123456789Z"
-                            }
-                        ],
+                        "created_on": "2018-07-06T12:30:09.123456789Z",
                         "events": [
                             {
-                                "type": "msg_created",
                                 "created_on": "2018-07-06T12:30:14.123456789Z",
-                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
                                 "msg": {
-                                    "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
-                                    "urn": "tel:+12065551212",
                                     "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Android Channel"
+                                        "name": "Android Channel",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "This is the child flow. What's your name?",
-                                    "sharing_config": {}
-                                }
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
+                                },
+                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
+                                "type": "msg_created"
                             },
                             {
-                                "type": "msg_wait",
                                 "created_on": "2018-07-06T12:30:16.123456789Z",
-                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
+                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
+                                "type": "msg_wait"
+                            }
+                        ],
+                        "exited_on": null,
+                        "expires_on": "2018-07-06T12:30:10.123456789Z",
+                        "flow": {
+                            "name": "Child flow",
+                            "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195"
+                        },
+                        "modified_on": "2018-07-06T12:30:18.123456789Z",
+                        "parent_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:13.123456789Z",
+                                "node_uuid": "9f7632ee-6e35-4247-9235-c4c7663fd601",
+                                "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
                             }
                         ],
                         "status": "waiting",
-                        "parent_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
-                        "created_on": "2018-07-06T12:30:09.123456789Z",
-                        "modified_on": "2018-07-06T12:30:18.123456789Z",
-                        "expires_on": "2018-07-06T12:30:10.123456789Z",
-                        "exited_on": null
+                        "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
                     }
                 ],
                 "status": "waiting",
-                "wait": {
-                    "type": "msg"
-                }
-            },
-            "events": [
-                {
-                    "type": "msg_created",
-                    "created_on": "2018-07-06T12:30:04.123456789Z",
-                    "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                    "msg": {
-                        "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                        "urn": "tel:+12065551212",
-                        "channel": {
-                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                            "name": "Android Channel"
-                        },
-                        "text": "This is the parent flow",
-                        "sharing_config": {}
-                    }
-                },
-                {
-                    "type": "flow_entered",
-                    "created_on": "2018-07-06T12:30:07.123456789Z",
-                    "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
-                    "flow": {
-                        "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195",
-                        "name": "Child Flow"
-                    },
-                    "parent_run_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
-                    "terminal": false
-                },
-                {
-                    "type": "msg_created",
-                    "created_on": "2018-07-06T12:30:14.123456789Z",
-                    "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
-                    "msg": {
-                        "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
-                        "urn": "tel:+12065551212",
-                        "channel": {
-                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                            "name": "Android Channel"
-                        },
-                        "text": "This is the child flow. What's your name?",
-                        "sharing_config": {}
-                    }
-                },
-                {
-                    "type": "msg_wait",
-                    "created_on": "2018-07-06T12:30:16.123456789Z",
-                    "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
-                }
-            ]
-        },
-        {
-            "session": {
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "type": "messaging",
-                "environment": {
-                    "date_format": "YYYY-MM-DD",
-                    "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles",
-                    "allowed_languages": [
-                        "eng",
-                        "eng"
-                    ],
-                    "number_format": {
-                        "decimal_symbol": ".",
-                        "digit_grouping_symbol": ","
-                    },
-                    "redaction_policy": "none",
-                    "max_value_length": 640,
-                    "links": [
-                        ""
-                    ]
-                },
                 "trigger": {
-                    "type": "manual",
-                    "environment": {
-                        "date_format": "YYYY-MM-DD",
-                        "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles",
-                        "allowed_languages": [
-                            "eng",
-                            "eng"
-                        ],
-                        "number_format": {
-                            "decimal_symbol": ".",
-                            "digit_grouping_symbol": ","
-                        },
-                        "redaction_policy": "none",
-                        "max_value_length": 640,
-                        "links": [
-                            ""
-                        ]
-                    },
-                    "flow": {
-                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
-                        "name": "Parent Flow"
-                    },
                     "contact": {
-                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
+                        "created_on": "2018-01-01T12:00:00Z",
+                        "fields": {
+                            "gender": {
+                                "text": "Male"
+                            }
+                        },
                         "id": 1234567,
-                        "name": "Ben Haggerty",
                         "language": "eng",
+                        "name": "Ben Haggerty",
                         "status": "active",
                         "timezone": "America/Guayaquil",
-                        "created_on": "2018-01-01T12:00:00Z",
                         "urns": [
                             "tel:+12065551212",
                             "facebook:1122334455667788",
                             "mailto:ben@macklemore"
                         ],
-                        "fields": {
-                            "gender": {
-                                "text": "Male"
-                            }
-                        }
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
                     },
-                    "triggered_on": "2018-10-26T12:21:24.285648-05:00"
+                    "environment": {
+                        "allowed_languages": [
+                            "eng",
+                            "eng"
+                        ],
+                        "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
+                        "max_value_length": 640,
+                        "number_format": {
+                            "decimal_symbol": ".",
+                            "digit_grouping_symbol": ","
+                        },
+                        "redaction_policy": "none",
+                        "time_format": "tt:mm",
+                        "timezone": "America/Los_Angeles"
+                    },
+                    "flow": {
+                        "name": "Parent Flow",
+                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
+                    },
+                    "triggered_on": "2018-10-26T12:21:24.285648-05:00",
+                    "type": "manual"
                 },
-                "contact": {
-                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
-                    "id": 1234567,
-                    "name": "Ben Haggerty",
-                    "language": "eng",
-                    "status": "active",
-                    "timezone": "America/Guayaquil",
-                    "created_on": "2018-01-01T12:00:00Z",
-                    "last_seen_on": "2018-10-26T12:21:26.836366-05:00",
-                    "urns": [
-                        "tel:+12065551212",
-                        "facebook:1122334455667788",
-                        "mailto:ben@macklemore"
-                    ],
-                    "fields": {
-                        "activation_token": {
-                            "text": "32643463463",
-                            "number": 32643463463
-                        },
-                        "gender": {
-                            "text": "Male"
-                        }
-                    }
-                },
-                "runs": [
-                    {
-                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
-                        "flow": {
-                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
-                            "name": "Parent Flow"
-                        },
-                        "path": [
-                            {
-                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "node_uuid": "e97a43c1-a15b-4566-bb6d-dfd2b18408e1",
-                                "exit_uuid": "f4c88a91-e1b7-4ccf-9919-b423eb3cfc3c",
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z"
-                            },
-                            {
-                                "uuid": "5802813d-6c58-4292-8228-9728778b6c98",
-                                "node_uuid": "48b59851-017e-4d84-a4d9-fcefc7399e98",
-                                "exit_uuid": "2ce7eeea-ee70-4e1a-b8f4-84d8102a8aef",
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z"
-                            },
-                            {
-                                "uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                                "node_uuid": "c8380f24-7524-4340-9d38-db8a131d2b70",
-                                "exit_uuid": "1a26ab25-fc6d-4324-865b-1d8e7d73bf52",
-                                "arrived_on": "2018-07-06T12:30:46.123456789Z"
-                            }
-                        ],
-                        "events": [
-                            {
-                                "type": "msg_created",
-                                "created_on": "2018-07-06T12:30:04.123456789Z",
-                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
-                                "msg": {
-                                    "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb",
-                                    "urn": "tel:+12065551212",
-                                    "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Android Channel"
-                                    },
-                                    "text": "This is the parent flow",
-                                    "sharing_config": {}
-                                }
-                            },
-                            {
-                                "type": "flow_entered",
-                                "created_on": "2018-07-06T12:30:07.123456789Z",
-                                "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
-                                "flow": {
-                                    "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195",
-                                    "name": "Child Flow"
-                                },
-                                "parent_run_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
-                                "terminal": false
-                            },
-                            {
-                                "type": "msg_created",
-                                "created_on": "2018-07-06T12:30:47.123456789Z",
-                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
-                                "msg": {
-                                    "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459",
-                                    "urn": "tel:+12065551212",
-                                    "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Android Channel"
-                                    },
-                                    "text": "Flow succeeded",
-                                    "sharing_config": {}
-                                }
-                            }
-                        ],
-                        "status": "completed",
-                        "created_on": "2018-07-06T12:30:00.123456789Z",
-                        "modified_on": "2018-07-06T12:30:49.123456789Z",
-                        "expires_on": null,
-                        "exited_on": "2018-07-06T12:30:49.123456789Z"
-                    },
-                    {
-                        "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
-                        "flow": {
-                            "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195",
-                            "name": "Child flow"
-                        },
-                        "path": [
-                            {
-                                "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
-                                "node_uuid": "9f7632ee-6e35-4247-9235-c4c7663fd601",
-                                "exit_uuid": "f72c2fe8-c61f-498b-8976-1deb589a8b9b",
-                                "arrived_on": "2018-07-06T12:30:13.123456789Z"
-                            },
-                            {
-                                "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
-                                "node_uuid": "f1ecb42a-cf88-47dd-81b1-d7568ef0d219",
-                                "exit_uuid": "f7ed461f-2392-4549-aaba-f69beb1bdc50",
-                                "arrived_on": "2018-07-06T12:30:25.123456789Z"
-                            }
-                        ],
-                        "events": [
-                            {
-                                "type": "msg_created",
-                                "created_on": "2018-07-06T12:30:14.123456789Z",
-                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
-                                "msg": {
-                                    "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
-                                    "urn": "tel:+12065551212",
-                                    "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Android Channel"
-                                    },
-                                    "text": "This is the child flow. What's your name?",
-                                    "sharing_config": {}
-                                }
-                            },
-                            {
-                                "type": "msg_wait",
-                                "created_on": "2018-07-06T12:30:16.123456789Z",
-                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
-                            },
-                            {
-                                "type": "msg_received",
-                                "created_on": "2018-07-06T12:30:23.123456789Z",
-                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
-                                "msg": {
-                                    "uuid": "8b4c31ce-8168-4778-881e-cad97e917e74",
-                                    "urn": "tel:+12065551212",
-                                    "text": "Ben"
-                                }
-                            },
-                            {
-                                "type": "contact_field_changed",
-                                "created_on": "2018-07-06T12:30:27.123456789Z",
-                                "step_uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
-                                "field": {
-                                    "key": "activation_token",
-                                    "name": "Activation Token"
-                                },
-                                "value": {
-                                    "text": "32643463463",
-                                    "number": 32643463463
-                                }
-                            },
-                            {
-                                "type": "flow_entered",
-                                "created_on": "2018-07-06T12:30:29.123456789Z",
-                                "step_uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
-                                "flow": {
-                                    "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
-                                    "name": "Parent Flow"
-                                },
-                                "parent_run_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
-                                "terminal": false
-                            }
-                        ],
-                        "status": "completed",
-                        "parent_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
-                        "created_on": "2018-07-06T12:30:09.123456789Z",
-                        "modified_on": "2018-07-06T12:30:43.123456789Z",
-                        "expires_on": null,
-                        "exited_on": "2018-07-06T12:30:43.123456789Z"
-                    },
-                    {
-                        "uuid": "b88ce93d-4360-4455-a691-235cbe720980",
-                        "flow": {
-                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
-                            "name": "Parent Flow"
-                        },
-                        "path": [
-                            {
-                                "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
-                                "node_uuid": "e97a43c1-a15b-4566-bb6d-dfd2b18408e1",
-                                "exit_uuid": "5e11ad89-2ed0-44e5-b5ff-38448983bf15",
-                                "arrived_on": "2018-07-06T12:30:36.123456789Z"
-                            }
-                        ],
-                        "events": [
-                            {
-                                "type": "msg_created",
-                                "created_on": "2018-07-06T12:30:37.123456789Z",
-                                "step_uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
-                                "msg": {
-                                    "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                                    "urn": "tel:+12065551212",
-                                    "channel": {
-                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                                        "name": "Android Channel"
-                                    },
-                                    "text": "This is the parent flow",
-                                    "sharing_config": {}
-                                }
-                            }
-                        ],
-                        "status": "completed",
-                        "parent_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
-                        "created_on": "2018-07-06T12:30:31.123456789Z",
-                        "modified_on": "2018-07-06T12:30:39.123456789Z",
-                        "expires_on": null,
-                        "exited_on": "2018-07-06T12:30:39.123456789Z"
-                    }
-                ],
-                "status": "completed",
-                "input": {
-                    "type": "msg",
-                    "uuid": "8b4c31ce-8168-4778-881e-cad97e917e74",
-                    "created_on": "2018-10-26T12:21:26.836366-05:00",
-                    "urn": "tel:+12065551212",
-                    "text": "Ben"
+                "type": "messaging",
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
+                "wait": {
+                    "type": "msg"
                 }
-            },
+            }
+        },
+        {
             "events": [
                 {
-                    "type": "msg_received",
                     "created_on": "2018-07-06T12:30:23.123456789Z",
-                    "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
                     "msg": {
-                        "uuid": "8b4c31ce-8168-4778-881e-cad97e917e74",
+                        "text": "Ben",
                         "urn": "tel:+12065551212",
-                        "text": "Ben"
-                    }
+                        "uuid": "8b4c31ce-8168-4778-881e-cad97e917e74"
+                    },
+                    "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
+                    "type": "msg_received"
                 },
                 {
-                    "type": "contact_field_changed",
                     "created_on": "2018-07-06T12:30:27.123456789Z",
-                    "step_uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
                     "field": {
                         "key": "activation_token",
                         "name": "Activation Token"
                     },
+                    "step_uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
+                    "type": "contact_field_changed",
                     "value": {
-                        "text": "32643463463",
-                        "number": 32643463463
+                        "number": 32643463463,
+                        "text": "32643463463"
                     }
                 },
                 {
-                    "type": "flow_entered",
                     "created_on": "2018-07-06T12:30:29.123456789Z",
-                    "step_uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
                     "flow": {
-                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
-                        "name": "Parent Flow"
+                        "name": "Parent Flow",
+                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
                     },
                     "parent_run_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
-                    "terminal": false
+                    "step_uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
+                    "terminal": false,
+                    "type": "flow_entered"
                 },
                 {
-                    "type": "msg_created",
                     "created_on": "2018-07-06T12:30:37.123456789Z",
-                    "step_uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
                     "msg": {
-                        "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
-                        "urn": "tel:+12065551212",
                         "channel": {
-                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                            "name": "Android Channel"
+                            "name": "Android Channel",
+                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "This is the parent flow",
-                        "sharing_config": {}
-                    }
+                        "urn": "tel:+12065551212",
+                        "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
+                    },
+                    "step_uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
+                    "type": "msg_created"
                 },
                 {
-                    "type": "msg_created",
                     "created_on": "2018-07-06T12:30:47.123456789Z",
-                    "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
                     "msg": {
-                        "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459",
-                        "urn": "tel:+12065551212",
                         "channel": {
-                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
-                            "name": "Android Channel"
+                            "name": "Android Channel",
+                            "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Flow succeeded",
-                        "sharing_config": {}
-                    }
+                        "urn": "tel:+12065551212",
+                        "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
+                    },
+                    "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
+                    "type": "msg_created"
                 }
-            ]
+            ],
+            "session": {
+                "contact": {
+                    "created_on": "2018-01-01T12:00:00Z",
+                    "fields": {
+                        "activation_token": {
+                            "number": 32643463463,
+                            "text": "32643463463"
+                        },
+                        "gender": {
+                            "text": "Male"
+                        }
+                    },
+                    "id": 1234567,
+                    "language": "eng",
+                    "last_seen_on": "2018-10-26T12:21:26.836366-05:00",
+                    "name": "Ben Haggerty",
+                    "status": "active",
+                    "timezone": "America/Guayaquil",
+                    "urns": [
+                        "tel:+12065551212",
+                        "facebook:1122334455667788",
+                        "mailto:ben@macklemore"
+                    ],
+                    "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                },
+                "environment": {
+                    "allowed_languages": [
+                        "eng",
+                        "eng"
+                    ],
+                    "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
+                    "max_value_length": 640,
+                    "number_format": {
+                        "decimal_symbol": ".",
+                        "digit_grouping_symbol": ","
+                    },
+                    "redaction_policy": "none",
+                    "time_format": "tt:mm",
+                    "timezone": "America/Los_Angeles"
+                },
+                "input": {
+                    "created_on": "2018-10-26T12:21:26.836366-05:00",
+                    "text": "Ben",
+                    "type": "msg",
+                    "urn": "tel:+12065551212",
+                    "uuid": "8b4c31ce-8168-4778-881e-cad97e917e74"
+                },
+                "runs": [
+                    {
+                        "created_on": "2018-07-06T12:30:00.123456789Z",
+                        "events": [
+                            {
+                                "created_on": "2018-07-06T12:30:04.123456789Z",
+                                "msg": {
+                                    "channel": {
+                                        "name": "Android Channel",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+                                    },
+                                    "sharing_config": {},
+                                    "text": "This is the parent flow",
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
+                                },
+                                "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
+                                "type": "msg_created"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:07.123456789Z",
+                                "flow": {
+                                    "name": "Child Flow",
+                                    "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195"
+                                },
+                                "parent_run_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
+                                "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
+                                "terminal": false,
+                                "type": "flow_entered"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:47.123456789Z",
+                                "msg": {
+                                    "channel": {
+                                        "name": "Android Channel",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+                                    },
+                                    "sharing_config": {},
+                                    "text": "Flow succeeded",
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
+                                },
+                                "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
+                                "type": "msg_created"
+                            }
+                        ],
+                        "exited_on": "2018-07-06T12:30:49.123456789Z",
+                        "expires_on": null,
+                        "flow": {
+                            "name": "Parent Flow",
+                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
+                        },
+                        "modified_on": "2018-07-06T12:30:49.123456789Z",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "exit_uuid": "f4c88a91-e1b7-4ccf-9919-b423eb3cfc3c",
+                                "node_uuid": "e97a43c1-a15b-4566-bb6d-dfd2b18408e1",
+                                "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "exit_uuid": "2ce7eeea-ee70-4e1a-b8f4-84d8102a8aef",
+                                "node_uuid": "48b59851-017e-4d84-a4d9-fcefc7399e98",
+                                "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:46.123456789Z",
+                                "exit_uuid": "1a26ab25-fc6d-4324-865b-1d8e7d73bf52",
+                                "node_uuid": "c8380f24-7524-4340-9d38-db8a131d2b70",
+                                "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
+                            }
+                        ],
+                        "status": "completed",
+                        "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
+                    },
+                    {
+                        "created_on": "2018-07-06T12:30:09.123456789Z",
+                        "events": [
+                            {
+                                "created_on": "2018-07-06T12:30:14.123456789Z",
+                                "msg": {
+                                    "channel": {
+                                        "name": "Android Channel",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+                                    },
+                                    "sharing_config": {},
+                                    "text": "This is the child flow. What's your name?",
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
+                                },
+                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
+                                "type": "msg_created"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:16.123456789Z",
+                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
+                                "type": "msg_wait"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:23.123456789Z",
+                                "msg": {
+                                    "text": "Ben",
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "8b4c31ce-8168-4778-881e-cad97e917e74"
+                                },
+                                "step_uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9",
+                                "type": "msg_received"
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:27.123456789Z",
+                                "field": {
+                                    "key": "activation_token",
+                                    "name": "Activation Token"
+                                },
+                                "step_uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
+                                "type": "contact_field_changed",
+                                "value": {
+                                    "number": 32643463463,
+                                    "text": "32643463463"
+                                }
+                            },
+                            {
+                                "created_on": "2018-07-06T12:30:29.123456789Z",
+                                "flow": {
+                                    "name": "Parent Flow",
+                                    "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
+                                },
+                                "parent_run_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
+                                "step_uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186",
+                                "terminal": false,
+                                "type": "flow_entered"
+                            }
+                        ],
+                        "exited_on": "2018-07-06T12:30:43.123456789Z",
+                        "expires_on": null,
+                        "flow": {
+                            "name": "Child flow",
+                            "uuid": "a8d27b94-d3d0-4a96-8074-0f162f342195"
+                        },
+                        "modified_on": "2018-07-06T12:30:43.123456789Z",
+                        "parent_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:13.123456789Z",
+                                "exit_uuid": "f72c2fe8-c61f-498b-8976-1deb589a8b9b",
+                                "node_uuid": "9f7632ee-6e35-4247-9235-c4c7663fd601",
+                                "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
+                            },
+                            {
+                                "arrived_on": "2018-07-06T12:30:25.123456789Z",
+                                "exit_uuid": "f7ed461f-2392-4549-aaba-f69beb1bdc50",
+                                "node_uuid": "f1ecb42a-cf88-47dd-81b1-d7568ef0d219",
+                                "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
+                            }
+                        ],
+                        "status": "completed",
+                        "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
+                    },
+                    {
+                        "created_on": "2018-07-06T12:30:31.123456789Z",
+                        "events": [
+                            {
+                                "created_on": "2018-07-06T12:30:37.123456789Z",
+                                "msg": {
+                                    "channel": {
+                                        "name": "Android Channel",
+                                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+                                    },
+                                    "sharing_config": {},
+                                    "text": "This is the parent flow",
+                                    "urn": "tel:+12065551212",
+                                    "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
+                                },
+                                "step_uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c",
+                                "type": "msg_created"
+                            }
+                        ],
+                        "exited_on": "2018-07-06T12:30:39.123456789Z",
+                        "expires_on": null,
+                        "flow": {
+                            "name": "Parent Flow",
+                            "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
+                        },
+                        "modified_on": "2018-07-06T12:30:39.123456789Z",
+                        "parent_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
+                        "path": [
+                            {
+                                "arrived_on": "2018-07-06T12:30:36.123456789Z",
+                                "exit_uuid": "5e11ad89-2ed0-44e5-b5ff-38448983bf15",
+                                "node_uuid": "e97a43c1-a15b-4566-bb6d-dfd2b18408e1",
+                                "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
+                            }
+                        ],
+                        "status": "completed",
+                        "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
+                    }
+                ],
+                "status": "completed",
+                "trigger": {
+                    "contact": {
+                        "created_on": "2018-01-01T12:00:00Z",
+                        "fields": {
+                            "gender": {
+                                "text": "Male"
+                            }
+                        },
+                        "id": 1234567,
+                        "language": "eng",
+                        "name": "Ben Haggerty",
+                        "status": "active",
+                        "timezone": "America/Guayaquil",
+                        "urns": [
+                            "tel:+12065551212",
+                            "facebook:1122334455667788",
+                            "mailto:ben@macklemore"
+                        ],
+                        "uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3"
+                    },
+                    "environment": {
+                        "allowed_languages": [
+                            "eng",
+                            "eng"
+                        ],
+                        "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
+                        "max_value_length": 640,
+                        "number_format": {
+                            "decimal_symbol": ".",
+                            "digit_grouping_symbol": ","
+                        },
+                        "redaction_policy": "none",
+                        "time_format": "tt:mm",
+                        "timezone": "America/Los_Angeles"
+                    },
+                    "flow": {
+                        "name": "Parent Flow",
+                        "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02"
+                    },
+                    "triggered_on": "2018-10-26T12:21:24.285648-05:00",
+                    "type": "manual"
+                },
+                "type": "messaging",
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5"
+            }
         }
     ],
     "resumes": [

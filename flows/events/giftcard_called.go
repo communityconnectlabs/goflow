@@ -29,6 +29,6 @@ func NewGiftcardCalled(call *flows.WebhookCall, status flows.CallStatus, resthoo
 		ElapsedMS:   int((call.EndTime.Sub(call.StartTime)) / time.Millisecond),
 		Resthook:    resthook,
 		StatusCode:  statusCode,
-		BodyIgnored: len(call.ResponseBody) > 0 && !call.ValidJSON,
+		BodyIgnored: len(call.ResponseBody) > 0 && len(call.ResponseJSON) == 0,
 	}
 }

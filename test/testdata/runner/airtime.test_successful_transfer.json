@@ -165,6 +165,7 @@
                 },
                 {
                     "category": "Success",
+                    "corrected": "",
                     "created_on": "2018-07-06T12:30:14.123456789Z",
                     "name": "Transfer",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
@@ -191,6 +192,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -242,6 +246,7 @@
                             },
                             {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:14.123456789Z",
                                 "name": "Transfer",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
@@ -267,6 +272,7 @@
                         "results": {
                             "transfer": {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:12.123456789Z",
                                 "name": "Transfer",
                                 "node_uuid": "75656148-9e8b-4611-82c0-7ff4b55fb44a",
@@ -297,6 +303,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",

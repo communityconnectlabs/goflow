@@ -7,7 +7,7 @@ import (
 	"github.com/nyaruka/gocommon/httpx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 
 	"github.com/shopspring/decimal"
 )

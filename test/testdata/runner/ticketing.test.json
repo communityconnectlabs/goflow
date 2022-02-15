@@ -5,6 +5,7 @@
                 {
                     "created_on": "2018-07-06T12:30:04.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Hi! What can I help you with?",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                     },
@@ -46,6 +47,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -62,6 +66,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi! What can I help you with?",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -128,6 +133,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -165,6 +173,7 @@
                 },
                 {
                     "category": "All Responses",
+                    "corrected": "Rats",
                     "created_on": "2018-07-06T12:30:17.123456789Z",
                     "input": "Rats",
                     "name": "Response 1",
@@ -209,6 +218,7 @@
                 },
                 {
                     "category": "Success",
+                    "corrected": "",
                     "created_on": "2018-07-06T12:30:26.123456789Z",
                     "name": "Ticket",
                     "step_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
@@ -216,6 +226,7 @@
                     "value": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
                 },
                 {
+                    "attachments": null,
                     "body": "[{\"assignee\":null,\"body\":\"I have a problem\",\"subject\":\"Old ticket\",\"uuid\":\"e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52\"},{\"assignee\":null,\"body\":\"Last message: Rats\",\"subject\":\"New ticket\",\"uuid\":\"5ecda5fc-951c-437b-a17e-f85e49829fb9\"}]",
                     "created_on": "2018-07-06T12:30:29.123456789Z",
                     "step_uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
@@ -266,6 +277,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -289,6 +303,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi! What can I help you with?",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -312,6 +327,7 @@
                             },
                             {
                                 "category": "All Responses",
+                                "corrected": "Rats",
                                 "created_on": "2018-07-06T12:30:17.123456789Z",
                                 "input": "Rats",
                                 "name": "Response 1",
@@ -356,6 +372,7 @@
                             },
                             {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:26.123456789Z",
                                 "name": "Ticket",
                                 "step_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
@@ -363,6 +380,7 @@
                                 "value": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
                             },
                             {
+                                "attachments": null,
                                 "body": "[{\"assignee\":null,\"body\":\"I have a problem\",\"subject\":\"Old ticket\",\"uuid\":\"e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52\"},{\"assignee\":null,\"body\":\"Last message: Rats\",\"subject\":\"New ticket\",\"uuid\":\"5ecda5fc-951c-437b-a17e-f85e49829fb9\"}]",
                                 "created_on": "2018-07-06T12:30:29.123456789Z",
                                 "step_uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671",
@@ -409,6 +427,7 @@
                         "results": {
                             "response_1": {
                                 "category": "All Responses",
+                                "corrected": "Rats",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "Rats",
                                 "name": "Response 1",
@@ -417,6 +436,7 @@
                             },
                             "ticket": {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:24.123456789Z",
                                 "name": "Ticket",
                                 "node_uuid": "145eb3d3-b841-4e66-abac-297ae525c7ad",
@@ -457,6 +477,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",

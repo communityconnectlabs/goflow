@@ -55,7 +55,7 @@ func (a *CallShortenURLAction) Validate() error {
 func (a *CallShortenURLAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	// fake parameters
 	method := "GET"
-	url := utils.GetEnv(utils.ShortenURLPing, "https://communityconnectlabs.com")
+	url := utils.GetEnv(utils.ShortenURLPing, "https://cclabs.cc")
 	body := ""
 
 	return a.call(run, step, url, method, body, logEvent)

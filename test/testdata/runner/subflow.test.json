@@ -9,6 +9,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "This is the parent flow",
                         "urn": "tel:+12065551212",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -34,6 +35,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "What is your name?",
                         "urn": "tel:+12065551212",
                         "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -76,6 +78,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -96,6 +101,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "This is the parent flow",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -142,6 +148,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "What is your name?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -204,6 +211,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -245,6 +255,7 @@
                 },
                 {
                     "category": "Name",
+                    "corrected": "Ryan Lewis",
                     "created_on": "2018-07-06T12:30:26.123456789Z",
                     "input": "Ryan Lewis",
                     "name": "Name",
@@ -259,6 +270,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Got it!",
                         "urn": "tel:+12065551212",
                         "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
@@ -273,6 +285,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Flow succeeded, they said Ryan Lewis",
                         "urn": "tel:+12065551212",
                         "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
@@ -311,6 +324,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -342,6 +358,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "This is the parent flow",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -367,6 +384,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Flow succeeded, they said Ryan Lewis",
                                     "urn": "tel:+12065551212",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
@@ -409,6 +427,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "What is your name?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -437,6 +456,7 @@
                             },
                             {
                                 "category": "Name",
+                                "corrected": "Ryan Lewis",
                                 "created_on": "2018-07-06T12:30:26.123456789Z",
                                 "input": "Ryan Lewis",
                                 "name": "Name",
@@ -451,6 +471,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Got it!",
                                     "urn": "tel:+12065551212",
                                     "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
@@ -484,6 +505,7 @@
                         "results": {
                             "name": {
                                 "category": "Name",
+                                "corrected": "Ryan Lewis",
                                 "created_on": "2018-07-06T12:30:24.123456789Z",
                                 "input": "Ryan Lewis",
                                 "name": "Name",
@@ -525,6 +547,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
