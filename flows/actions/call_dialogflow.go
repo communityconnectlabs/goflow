@@ -1,8 +1,6 @@
 package actions
 
 import (
-	dialogflow "cloud.google.com/go/dialogflow/apiv2"
-	"context"
 	"fmt"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/flows"
@@ -11,7 +9,6 @@ import (
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/pkg/errors"
 	"golang.org/x/text/language"
-	"google.golang.org/api/option"
 	dialogflowpb "google.golang.org/genproto/googleapis/cloud/dialogflow/v2"
 )
 
@@ -102,15 +99,9 @@ func (a *CallCallDialogflowAction) saveSuccess(run flows.FlowRun, step flows.Ste
 }
 
 func (a *CallCallDialogflowAction) DetectIntentText(projectID, languageCode, text string, config []byte) (*dialogflowpb.DetectIntentResponse, error) {
-	ctx := context.Background()
 	if config == nil {
 		return nil, errors.New("service account credential is required to run dialogflow")
 	}
-	sessionClient, err := dialogflow.NewSessionsClient(ctx, option.WithCredentialsJSON(config))
-	if err != nil {
-		return nil, err
-	}
-	defer sessionClient.Close()
 
 	if projectID == "" {
 		return nil, errors.New(fmt.Sprintf("Received empty project (%s)", projectID))
