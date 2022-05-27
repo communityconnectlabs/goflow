@@ -8,19 +8,19 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/definition/legacy/expressions"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 
 	"github.com/buger/jsonparser"
+	"github.com/greatnonprofits-nfp/goflow/flows/actions"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"github.com/greatnonprofits-nfp/goflow/flows/actions"
 )
 
 //------------------------------------------------------------------------------------------
@@ -170,20 +170,22 @@ type FlowReference struct {
 
 // RulesetConfig holds the config dictionary for a legacy ruleset
 type RulesetConfig struct {
-	Flow             *FlowReference  `json:"flow"`
-	FieldDelimiter   string          `json:"field_delimiter"`
-	FieldIndex       int             `json:"field_index"`
-	Webhook          string          `json:"webhook"`
-	WebhookAction    string          `json:"webhook_action"`
-	WebhookHeaders   []WebhookHeader `json:"webhook_headers"`
-	Resthook         string          `json:"resthook"`
-	LookupDb         map[string]string     `json:"lookup_db"`
-	LookupQueries    []actions.LookupQuery `json:"lookup_queries"`
-	GiftcardDb       map[string]string     `json:"giftcard_db"`
-	GiftcardType     string                `json:"giftcard_type"`
-	ShortenURL       map[string]string     `json:"shorten_url"`
-	EnabledSpell     bool                  `json:"spell_checker"`
-	SpellSensitivity string                `json:"spelling_correction_sensitivity"`
+	Flow                  *FlowReference        `json:"flow"`
+	FieldDelimiter        string                `json:"field_delimiter"`
+	FieldIndex            int                   `json:"field_index"`
+	Webhook               string                `json:"webhook"`
+	WebhookAction         string                `json:"webhook_action"`
+	WebhookHeaders        []WebhookHeader       `json:"webhook_headers"`
+	Resthook              string                `json:"resthook"`
+	LookupDb              map[string]string     `json:"lookup_db"`
+	LookupQueries         []actions.LookupQuery `json:"lookup_queries"`
+	GiftcardDb            map[string]string     `json:"giftcard_db"`
+	GiftcardType          string                `json:"giftcard_type"`
+	ShortenURL            map[string]string     `json:"shorten_url"`
+	EnabledSpell          bool                  `json:"spell_checker"`
+	SpellSensitivity      string                `json:"spelling_correction_sensitivity"`
+	DialogflowDb          map[string]string     `json:"dialogflow_db_db"`
+	DialogflowQuestionSrc string                `json:"dialogflow_question_src"`
 }
 
 type WebhookHeader struct {
@@ -799,6 +801,15 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 		operand := fmt.Sprintf("@results.%s", utils.Snakify(resultName))
 		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory, &config)
 		uiType = UINodeTypeSplitByAirtime
+	case "dialogflow":
+		newActions = []migratedAction{
+			newCallDialogflowAction(uuids.New(), config.DialogflowDb, config.DialogflowQuestionSrc, resultName),
+		}
+
+		// lookup rulesets operate on the webhook status, saved as category
+		operand := fmt.Sprintf("@results.%s.category", utils.Snakify(resultName))
+		router = newSwitchRouter(nil, "", categories, operand, cases, defaultCategory, &config)
+		uiType = UINodeTypeSplitByDialogflow
 
 	default:
 		return nil, "", nil, errors.Errorf("unrecognized ruleset type: %s", r.Type)

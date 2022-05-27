@@ -26,6 +26,7 @@ const (
 	UINodeTypeSplitByRunResult          UINodeType = "split_by_run_result"
 	UINodeTypeSplitByRunResultDelimited UINodeType = "split_by_run_result_delimited"
 	UINodeTypeSplitByRandom             UINodeType = "split_by_random"
+	UINodeTypeSplitByDialogflow         UINodeType = "split_by_dialogflow"
 )
 
 //------------------------------------------------------------------------------------------
