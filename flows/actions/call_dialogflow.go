@@ -46,7 +46,7 @@ type CallCallDialogflowAction struct {
 // Validate validates our action is valid
 func (a *CallCallDialogflowAction) Validate() error {
 	if a.DB["id"] == "" {
-		return errors.Errorf("id is required on Giftcard DB")
+		return errors.Errorf("id is required on Dialogflow DB")
 	}
 
 	return nil
