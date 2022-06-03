@@ -5,7 +5,6 @@ import (
 	"github.com/greatnonprofits-nfp/goflow/utils"
 	"github.com/nyaruka/gocommon/httpx"
 	"golang.org/x/text/language"
-	dialogflowpb "google.golang.org/genproto/googleapis/cloud/dialogflow/v2"
 	"net/http"
 )
 
@@ -25,13 +24,15 @@ func NewService(httpClient *http.Client, httpRetries *httpx.RetryConfig, classif
 }
 
 func (s *service) Classify(session flows.Session, input string, logHTTP flows.HTTPLogCallback) (*flows.Classification, error) {
-	languageCode := string(session.Runs()[0].Contact().Language())
+	contact := session.Runs()[0].Contact()
+	contactId := string(contact.UUID())
+	languageCode := string(contact.Language())
 	ISO1Tag, err := language.Parse(languageCode)
 	if err != nil {
 		return nil, err
 	}
 
-	response, trace, err := s.client.DetectIntentText(input, ISO1Tag.String())
+	response, trace, err := s.client.DetectIntentText(input, ISO1Tag.String(), contactId)
 	if trace != nil {
 		logHTTP(flows.NewHTTPLog(trace, flows.HTTPStatusFromCode, s.redactor))
 	}
@@ -50,16 +51,6 @@ func (s *service) Classify(session flows.Session, input string, logHTTP flows.HT
 	}
 
 	return result, nil
-}
-
-func (s *service) DetectIntent(session flows.Session, input string) (*dialogflowpb.DetectIntentResponse, error) {
-	languageCode := string(session.Runs()[0].Contact().Language())
-	ISO1Tag, err := language.Parse(languageCode)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.DetectIntent(input, ISO1Tag.String())
 }
 
 var _ flows.ClassificationService = (*service)(nil)

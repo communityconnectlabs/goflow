@@ -59,8 +59,8 @@ func NewClient(httpClient *http.Client, httpRetries *httpx.RetryConfig, credenti
 	}
 }
 
-func (c Client) DetectIntentText(q, languageCode string) (*MessageResponse, *httpx.Trace, error) {
-	response, err := c.DetectIntent(q, languageCode)
+func (c Client) DetectIntentText(q, languageCode, contactId string) (*MessageResponse, *httpx.Trace, error) {
+	response, err := c.DetectIntent(q, languageCode, contactId)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -79,9 +79,9 @@ func (c Client) DetectIntentText(q, languageCode string) (*MessageResponse, *htt
 	return msgResponse, nil, nil
 }
 
-func (c Client) DetectIntent(q, languageCode string) (*dialogflowpb.DetectIntentResponse, error) {
+func (c Client) DetectIntent(q, languageCode, contactId string) (*dialogflowpb.DetectIntentResponse, error) {
 	projectID := c.ProjectID
-	sessionID := fmt.Sprintf("%s%s", projectID, languageCode)
+	sessionID := fmt.Sprintf("%s%s", projectID, contactId)
 	ctx := context.Background()
 	sessionClient, err := dialogflow.NewSessionsClient(ctx, option.WithCredentialsJSON(c.CredentialJSON))
 	if err != nil {

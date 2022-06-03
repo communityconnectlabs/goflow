@@ -71,14 +71,16 @@ func (a *CallCallDialogflowAction) Execute(run flows.FlowRun, step flows.Step, l
 	if err != nil {
 		logEvent(events.NewError(err))
 	}
-	languageCode := string(run.Contact().Language())
+	contact := run.Contact()
+	languageCode := string(contact.Language())
+	contactId := string(contact.UUID())
 	ISO1Tag, err := language.Parse(languageCode)
 	if err != nil {
 		return err
 	}
 	languageCode = ISO1Tag.String()
 	projectID := config["project_id"]
-	resp, err := a.DetectIntentText(projectID, languageCode, input, configStr)
+	resp, err := a.DetectIntentText(projectID, languageCode, input, contactId, configStr)
 
 	if err != nil {
 		logEvent(events.NewError(err))
@@ -98,7 +100,7 @@ func (a *CallCallDialogflowAction) saveSuccess(run flows.FlowRun, step flows.Ste
 	a.saveResult(run, step, a.ResultName, value, CategorySuccess, "", input, extra, logEvent)
 }
 
-func (a *CallCallDialogflowAction) DetectIntentText(projectID, languageCode, text string, config []byte) (*dialogflowpb.DetectIntentResponse, error) {
+func (a *CallCallDialogflowAction) DetectIntentText(projectID, languageCode, text, contactId string, config []byte) (*dialogflowpb.DetectIntentResponse, error) {
 	if config == nil {
 		return nil, errors.New("service account credential is required to run dialogflow")
 	}
@@ -108,5 +110,5 @@ func (a *CallCallDialogflowAction) DetectIntentText(projectID, languageCode, tex
 	}
 
 	c := dialogflowcl.Client{CredentialJSON: config, ProjectID: projectID}
-	return c.DetectIntent(text, languageCode)
+	return c.DetectIntent(text, languageCode, contactId)
 }
