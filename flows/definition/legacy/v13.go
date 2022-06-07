@@ -1,16 +1,16 @@
 package legacy
 
 import (
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/assets"
 	"github.com/greatnonprofits-nfp/goflow/envs"
 	"github.com/greatnonprofits-nfp/goflow/flows"
 	"github.com/greatnonprofits-nfp/goflow/flows/definition/legacy/expressions"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 
-	"github.com/shopspring/decimal"
 	"github.com/greatnonprofits-nfp/goflow/flows/actions"
 	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/shopspring/decimal"
 )
 
 // template that matches the JSON payload sent by legacy webhooks
@@ -530,6 +530,21 @@ func newTransferAirtimeAction(uuid uuids.UUID, amounts map[string]decimal.Decima
 		"type":    "transfer_airtime",
 		"amounts": amounts,
 	}
+	if resultName != "" {
+		d["result_name"] = resultName
+	}
+
+	return migratedAction(d)
+}
+
+func newCallDialogflowAction(uuid uuids.UUID, dialogflowDb map[string]string, dialogflowSrc string, resultName string) migratedAction {
+	d := map[string]interface{}{
+		"uuid":          uuid,
+		"type":          "call_dialogflow",
+		"question_src":  dialogflowSrc,
+		"dialogflow_db": dialogflowDb,
+	}
+
 	if resultName != "" {
 		d["result_name"] = resultName
 	}

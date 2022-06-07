@@ -3,8 +3,8 @@ package assets
 import (
 	"encoding/json"
 
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/gocommon/uuids"
 )
 
 // ChannelUUID is the UUID of a channel
@@ -64,6 +64,7 @@ type Classifier interface {
 	Name() string
 	Type() string
 	Intents() []string
+	Config() map[string]string
 }
 
 // FieldUUID is the UUID of a field

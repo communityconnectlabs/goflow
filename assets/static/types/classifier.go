@@ -10,6 +10,7 @@ type Classifier struct {
 	Name_    string                `json:"name"`
 	Type_    string                `json:"type"`
 	Intents_ []string              `json:"intents"`
+	Config_  map[string]string     `json:"config"`
 }
 
 // NewClassifier creates a new classifier
@@ -33,3 +34,5 @@ func (c *Classifier) Type() string { return c.Type_ }
 
 // Intents returns the intents of this classifier
 func (c *Classifier) Intents() []string { return c.Intents_ }
+
+func (c *Classifier) Config() map[string]string { return c.Config_ }

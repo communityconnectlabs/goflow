@@ -1,0 +1,24 @@
+[
+    {
+        "description": "Test dialogflow results",
+        "action": {
+            "type": "call_dialogflow",
+            "result_name": "dialogflow_resuls",
+            "dialogflow_db": {
+                "id": "de5b338c-05c6-401b-a4d0-8d563060ef1b",
+                "text": "CCLAgent1"
+            },
+            "question_src": "@input.text",
+            "uuid": "d70092f8-996d-4749-80bf-03033711c24b"
+        },
+        "events": [],
+        "templates": [],
+        "inspection": {
+            "dependencies": [],
+            "issues": [],
+            "results": [],
+            "waiting_exits": [],
+            "parent_refs": []
+        }
+    }
+]
