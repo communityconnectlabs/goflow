@@ -19,7 +19,7 @@ require (
 	golang.org/x/net v0.0.0-20220325170049-de3da57026de
 	golang.org/x/text v0.3.7
 	google.golang.org/api v0.74.0
-	google.golang.org/genproto v0.0.0-20220420195807-44278fea765b
+	google.golang.org/genproto v0.0.0-20220615141314-f1464d18c36b
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0
