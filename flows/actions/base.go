@@ -414,7 +414,7 @@ func findDestinationInLinks(dest string, links []string) (string, string) {
 	return "", ""
 }
 
-func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID string) string {
+func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID string, flowUUID string) string {
 	URLshHost := utils.GetEnv(utils.URLshHost, "")
 	URLshToken := utils.GetEnv(utils.URLshToken, "")
 	mailroomDomain := utils.GetEnv(utils.MailroomDomain, "")
@@ -445,7 +445,7 @@ func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID st
 		if contactUUID != "" {
 			urlshURL := fmt.Sprintf("%s/api/admin/urls", URLshHost)
 			handleURL := fmt.Sprintf("https://%s/link/handler/%s", mailroomDomain, destUUID)
-			longURL := fmt.Sprintf("%s?contact=%s", handleURL, contactUUID)
+			longURL := fmt.Sprintf("%s?contact=%s&flow=%s", handleURL, contactUUID, flowUUID)
 
 			// build our request
 			method := "POST"

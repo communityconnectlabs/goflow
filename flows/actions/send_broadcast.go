@@ -78,7 +78,7 @@ func (a *SendBroadcastAction) Execute(run flows.FlowRun, step flows.Step, logMod
 
 		evaluatedText, evaluatedAttachments, evaluatedQuickReplies := a.evaluateMessage(run, languages, a.Text, a.Attachments, a.QuickReplies, logEvent)
 
-		text := generateTextWithShortenLinks(evaluatedText, orgLinks, string(run.Contact().UUID()))
+		text := generateTextWithShortenLinks(evaluatedText, orgLinks, string(run.Contact().UUID()), string(run.Flow().UUID()))
 
 		translations[language] = &events.BroadcastTranslation{
 			Text:         text,
