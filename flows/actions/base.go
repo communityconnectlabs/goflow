@@ -407,7 +407,8 @@ func ReadAction(data json.RawMessage) (flows.Action, error) {
 func findDestinationInLinks(dest string, links []string) (string, string) {
 	for _, link := range links {
 		linkSplitted := strings.SplitN(link, ":", 2)
-		if linkSplitted[1] == dest {
+		destSplitted := strings.SplitN(dest, "?", 2)
+		if destSplitted[0] == linkSplitted[1] {
 			return linkSplitted[0], linkSplitted[1]
 		}
 	}
@@ -445,7 +446,7 @@ func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID st
 		if contactUUID != "" {
 			urlshURL := fmt.Sprintf("%s/api/admin/urls", URLshHost)
 			handleURL := fmt.Sprintf("https://%s/link/handler/%s", mailroomDomain, destUUID)
-			longURL := fmt.Sprintf("%s?contact=%s&flow=%s", handleURL, contactUUID, flowUUID)
+			longURL := fmt.Sprintf("%s?contact=%s&flow=%s&full_link=%s", handleURL, contactUUID, flowUUID, d)
 
 			// build our request
 			method := "POST"
