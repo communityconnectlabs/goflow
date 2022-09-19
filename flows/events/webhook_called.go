@@ -11,38 +11,61 @@ func init() {
 // TypeWebhookCalled is the type for our webhook events
 const TypeWebhookCalled string = "webhook_called"
 
+type Extraction string
+
+const (
+	ExtractionNone    Extraction = "none"    // no response or body was empty
+	ExtractionValid   Extraction = "valid"   // body was valid JSON
+	ExtractionCleaned Extraction = "cleaned" // body could be made into JSON with some cleaning
+	ExtractionIgnored Extraction = "ignored" // body couldn't be made into JSON and was ignored
+)
+
 // WebhookCalledEvent events are created when a webhook is called. The event contains
 // the URL and the status of the response, as well as a full dump of the
 // request and response.
 //
-//   {
-//     "type": "webhook_called",
-//     "created_on": "2006-01-02T15:04:05Z",
-//     "url": "http://localhost:49998/?cmd=success",
-//     "status": "success",
-//     "status_code": 200,
-//     "elapsed_ms": 123,
-//     "retries": 0,
-//     "request": "GET /?format=json HTTP/1.1",
-//     "response": "HTTP/1.1 200 OK\r\n\r\n{\"ip\":\"190.154.48.130\"}"
-//   }
+//	{
+//	  "type": "webhook_called",
+//	  "created_on": "2006-01-02T15:04:05Z",
+//	  "url": "http://localhost:49998/?cmd=success",
+//	  "status": "success",
+//	  "status_code": 200,
+//	  "elapsed_ms": 123,
+//	  "retries": 0,
+//	  "request": "GET /?format=json HTTP/1.1",
+//	  "response": "HTTP/1.1 200 OK\r\n\r\n{\"ip\":\"190.154.48.130\"}",
+//	  "extraction": "valid"
+//	}
 //
 // @event webhook_called
 type WebhookCalledEvent struct {
-	baseEvent
+	BaseEvent
 
-	*flows.HTTPTrace
+	*flows.HTTPLogWithoutTime
 
-	Resthook    string `json:"resthook,omitempty"`
-	BodyIgnored bool   `json:"body_ignored,omitempty"`
+	Resthook   string     `json:"resthook,omitempty"`
+	Extraction Extraction `json:"extraction"`
 }
 
 // NewWebhookCalled returns a new webhook called event
 func NewWebhookCalled(call *flows.WebhookCall, status flows.CallStatus, resthook string) *WebhookCalledEvent {
+	extraction := ExtractionNone
+	if len(call.ResponseBody) > 0 {
+		if len(call.ResponseJSON) > 0 {
+			if call.ResponseCleaned {
+				extraction = ExtractionCleaned
+			} else {
+				extraction = ExtractionValid
+			}
+		} else {
+			extraction = ExtractionIgnored
+		}
+	}
+
 	return &WebhookCalledEvent{
-		baseEvent:   newBaseEvent(TypeWebhookCalled),
-		HTTPTrace:   flows.NewHTTPTrace(call.Trace, status),
-		Resthook:    resthook,
-		BodyIgnored: len(call.ResponseBody) > 0 && len(call.ResponseJSON) == 0, // i.e. there was a body but it couldn't be converted to JSON
+		BaseEvent:          NewBaseEvent(TypeWebhookCalled),
+		HTTPLogWithoutTime: flows.NewHTTPLogWithoutTime(call.Trace, status, nil),
+		Resthook:           resthook,
+		Extraction:         extraction,
 	}
 }

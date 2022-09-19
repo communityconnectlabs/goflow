@@ -1127,6 +1127,28 @@
         }
     },
     {
+        "description": "status equality",
+        "query": "status=active",
+        "elastic": {
+            "term": {
+                "status": "A"
+            }
+        }
+    },
+    {
+        "description": "status inequality",
+        "query": "status!=BLOCKED",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "term": {
+                        "status": "B"
+                    }
+                }
+            }
+        }
+    },
+    {
         "description": "language equality",
         "query": "language=spa",
         "elastic": {
@@ -1674,7 +1696,7 @@
         "query": "group = \"U-Reporters\"",
         "elastic": {
             "term": {
-                "groups": "8de30b78-d9ef-4db2-b2e8-4f7b6aef64cf"
+                "group_ids": 345
             }
         }
     },
@@ -1685,7 +1707,117 @@
             "bool": {
                 "must_not": {
                     "term": {
-                        "groups": "8de30b78-d9ef-4db2-b2e8-4f7b6aef64cf"
+                        "group_ids": 345
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "group is set",
+        "query": "group != \"\"",
+        "elastic": {
+            "exists": {
+                "field": "group_ids"
+            }
+        }
+    },
+    {
+        "description": "group is not set",
+        "query": "group = \"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "exists": {
+                        "field": "group_ids"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "flow equality",
+        "query": "flow = \"registration\"",
+        "elastic": {
+            "term": {
+                "flow_id": 234
+            }
+        }
+    },
+    {
+        "description": "flow inequality",
+        "query": "flow != \"registration\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "term": {
+                        "flow_id": 234
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "flow is set",
+        "query": "flow != \"\"",
+        "elastic": {
+            "exists": {
+                "field": "flow_id"
+            }
+        }
+    },
+    {
+        "description": "flow is not set",
+        "query": "flow = \"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "exists": {
+                        "field": "flow_id"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "history equality",
+        "query": "history = \"registration\"",
+        "elastic": {
+            "term": {
+                "flow_history_ids": 234
+            }
+        }
+    },
+    {
+        "description": "flow inequality",
+        "query": "history != \"registration\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "term": {
+                        "flow_history_ids": 234
+                    }
+                }
+            }
+        }
+    },
+    {
+        "description": "history is set",
+        "query": "history != \"\"",
+        "elastic": {
+            "exists": {
+                "field": "flow_history_ids"
+            }
+        }
+    },
+    {
+        "description": "history is not set",
+        "query": "history = \"\"",
+        "elastic": {
+            "bool": {
+                "must_not": {
+                    "exists": {
+                        "field": "flow_history_ids"
                     }
                 }
             }

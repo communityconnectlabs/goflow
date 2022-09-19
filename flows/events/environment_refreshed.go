@@ -17,20 +17,20 @@ const TypeEnvironmentRefreshed string = "environment_refreshed"
 
 // EnvironmentRefreshedEvent events are sent by the caller to tell the engine to update the session environment.
 //
-//   {
-//     "type": "environment_refreshed",
-//     "created_on": "2006-01-02T15:04:05Z",
-//     "environment": {
-//       "date_format": "YYYY-MM-DD",
-//       "time_format": "hh:mm",
-//       "timezone": "Africa/Kigali",
-//       "allowed_languages": ["eng", "fra"]
-//     }
-//   }
+//	{
+//	  "type": "environment_refreshed",
+//	  "created_on": "2006-01-02T15:04:05Z",
+//	  "environment": {
+//	    "date_format": "YYYY-MM-DD",
+//	    "time_format": "hh:mm",
+//	    "timezone": "Africa/Kigali",
+//	    "allowed_languages": ["eng", "fra"]
+//	  }
+//	}
 //
 // @event environment_refreshed
 type EnvironmentRefreshedEvent struct {
-	baseEvent
+	BaseEvent
 
 	Environment json.RawMessage `json:"environment"`
 }
@@ -39,7 +39,7 @@ type EnvironmentRefreshedEvent struct {
 func NewEnvironmentRefreshed(env envs.Environment) *EnvironmentRefreshedEvent {
 	marshalled, _ := jsonx.Marshal(env)
 	return &EnvironmentRefreshedEvent{
-		baseEvent:   newBaseEvent(TypeEnvironmentRefreshed),
+		BaseEvent:   NewBaseEvent(TypeEnvironmentRefreshed),
 		Environment: marshalled,
 	}
 }

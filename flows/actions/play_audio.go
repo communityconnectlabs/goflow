@@ -20,11 +20,11 @@ const TypePlayAudio string = "play_audio"
 // [event:ivr_created] event if there is a valid audio URL. This will contain a message which
 // the caller should handle as an IVR play command using the audio attachment.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "play_audio",
-//     "audio_url": "http://uploads.temba.io/2353262.m4a"
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "play_audio",
+//	  "audio_url": "http://uploads.temba.io/2353262.m4a"
+//	}
 //
 // @action play_audio
 type PlayAudioAction struct {
@@ -43,7 +43,7 @@ func NewPlayAudio(uuid flows.ActionUUID, audioURL string) *PlayAudioAction {
 }
 
 // Execute runs this action
-func (a *PlayAudioAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *PlayAudioAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	// localize and evaluate audio URL
 	localizedAudioURL := run.GetText(uuids.UUID(a.UUID()), "audio_url", a.AudioURL)
 	evaluatedAudioURL, err := run.EvaluateTemplate(localizedAudioURL)

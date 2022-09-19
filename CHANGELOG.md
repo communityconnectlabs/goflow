@@ -1,3 +1,253 @@
+v0.170.0
+----------
+ * Add unsendable reason to MsgOut and set when contact status is not active
+
+v0.169.0
+----------
+ * Update to latest gocommon
+ * Add keys function to get object properties
+ * Use go 1.19
+
+v0.168.2
+----------
+ * Update to latest gocommon
+
+v0.168.1
+----------
+ * Update to latest gocommon
+
+v0.168.0
+----------
+ * Use HTTP log functionality from gocommon
+ * Update parsed docstrings to use codeblock formating (tab) for examples
+
+v0.167.0
+----------
+ * Update to latest gocommon
+
+v0.166.0
+----------
+ * Add contact status to variable context
+
+v0.165.5
+----------
+ * Update to latest gocommon which adds teams URNs
+
+v0.165.4
+----------
+ * Another tweak to SessionBuilder so that it doesn't override assets
+
+v0.165.3
+----------
+ * More tweaks to SessionBuilder
+
+v0.165.2
+----------
+ * Allow passing of a flows.SessionAssets to test.SessionBuilder
+
+v0.165.1
+----------
+ * Updated translations from Transifex
+
+v0.165.0
+----------
+ * Add modifier to open a ticket
+
+v0.164.3
+----------
+ * Modifer.Apply should return if it made a modification and caller responsible for calling ReevaluateGroups if so
+ * Add Services param to Modifier.Apply
+
+v0.164.2
+----------
+ * Pass session assets to service factories
+
+v0.164.1
+----------
+ * Remove flow sessions from service factories
+
+v0.164.0
+----------
+ * Rework services to not require sessions
+
+v0.163.0
+----------
+ * Always truncate URLs in HTTP logs to 2048 chars
+
+v0.162.1
+----------
+ * Support simplifying of queries than can't be parsed but can be constructed
+
+v0.162.0
+----------
+ * Provide API for building contact queries programatically
+
+v0.161.2
+----------
+ * Update ANTLR
+ * Update to better maintained fork of go-mail
+
+v0.161.1
+----------
+ * Ensure that failing a session doesn't leave runs in active/waiting state
+
+v0.161.0
+----------
+ * Update to latest gocommon and phonenumbers
+
+v0.160.0
+----------
+ * Add option to exclude contacts in a flow on start session action
+
+v0.159.2
+----------
+ * Trim URLs in call_webhook actions
+
+v0.159.1
+----------
+ * Fix not equals conditions in contact queries on fields that aren't set
+
+v0.159.0
+----------
+ * Improve simplifying of contactql queries
+ * Update direct dependencies except ANTLR4
+ * Go 1.18
+
+v0.158.1
+----------
+ * send_msg action should fallback to template trans in env default language if no trans found for contact language
+
+v0.158.0
+----------
+ * Add status as a contact query attribute, disallowed for smart groups
+
+v0.157.0
+----------
+ * Update to latest gocommon
+ * Allow querying on whether group is set or not for consistency with other fields
+ * Support contact queries on flow history
+
+v0.156.1
+----------
+ * SessionAssets implementation of contactql.Resolver methods should return pure assets
+
+v0.156.0
+----------
+ * Give flows.Flow a reference to their asset if they have one
+
+v0.155.0
+----------
+ * Switch from flow to flow_id and groups to group_ids for ES queries
+
+v0.154.0
+----------
+ * Give errors returned from Session.Resume codes
+
+v0.153.0
+----------
+ * Add concat excellent function
+ * Updated translations from Transifex
+
+v0.152.0
+----------
+ * start_session actions should generate error event if flow asset missing
+
+v0.151.0
+----------
+ * Add flow as contactql query attribute
+
+v0.150.2
+----------
+ * Export events.BaseEvent so that callers can create their own events
+
+v0.150.1
+----------
+ * Fix bug when we remove a contact from all static groups
+
+v0.150.0
+----------
+ * If caller tries to resume with wrong resume type, don't fail session but error instead
+
+v0.149.1
+----------
+ * Update to gocommon 1.17.1
+
+v0.149.0
+----------
+ * Remove no longer used Run.expires_on
+
+v0.148.0
+----------
+ * Add expiresOn to dial waits so all wait types have it
+
+v0.147.0
+----------
+ * Add @trigger.campaign for campaign triggers
+ * Only treat start_session legacy vars as tel URNs if they are parseable phone numbers
+
+v0.146.1
+----------
+ * Update to latest gocommon
+
+v0.146.0
+----------
+ * Rename FlowRun to Run
+ * Update to latest gocommon
+
+v0.145.0
+----------
+ * Add expires_on to msg_wait events
+ * Remove activated wait objects on sessions, callers should use the wait events
+ * Tweak validation error message for min and max tags when field isn't a slice
+
+v0.144.3
+----------
+ * Fix tests broken by new scheme addition
+
+v0.144.2
+----------
+ * Update to latest gocommon to get Instagram scheme type
+
+v0.144.1
+----------
+ * Update to latest gocommon
+
+v0.144.0
+----------
+ * Add extraction field to webhook_called events
+
+v0.143.4
+----------
+ * Use WebhookCall.ResponseJSON for @webhook and @result.*.extra
+ * Updated translations from Transifex
+
+v0.143.3
+----------
+ * Add more options for customizing contact used by test.SessionBuilder
+
+v0.143.2
+----------
+ * Add test.SessionBuilder to make it easier to build sessions for testing
+
+v0.143.1
+----------
+ * Include node on segments, revert change to add segments without destinations
+
+v0.143.0
+----------
+ * For random router results, input should be raw random number, value is the bucket
+ * Include segments with no destination
+ * Add operand and time to flows.Segment
+
+v0.142.1
+----------
+ * Put back engine.NewSprint which mailroom uses for surveyor submissions
+
+v0.142.0
+----------
+ * Add Segments() to Sprint which returns all complete segments in that sprint
+ * Simplify error message that users see if they have label action with no input
+
 v0.141.0
 ----------
  * Rework Context into Scope, expose functions via a root scope, and support shadowing

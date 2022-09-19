@@ -126,10 +126,13 @@ func TestContact(t *testing.T) {
 		"facebook":   nil,
 		"fcm":        nil,
 		"freshchat":  nil,
+		"instagram":  nil,
 		"jiochat":    nil,
 		"line":       nil,
 		"mailto":     nil,
 		"rocketchat": nil,
+		"slack":      nil,
+		"teams":      nil,
 		"tel":        flows.NewContactURN(urns.URN("tel:+12024561111?channel=294a14d4-c998-41e5-a314-5941b97b89d7"), nil).ToXValue(env),
 		"telegram":   nil,
 		"twitter":    flows.NewContactURN(urns.URN("twitter:joey"), nil).ToXValue(env),
@@ -175,6 +178,7 @@ func TestContact(t *testing.T) {
 		"name":         types.NewXText("Joe Bloggs"),
 		"tickets":      contact.Tickets().ToXValue(env),
 		"timezone":     types.NewXText("America/Bogota"),
+		"status":       types.NewXText(string(contact.Status())),
 		"urn":          contact.URNs()[0].ToXValue(env),
 		"urns":         contact.URNs().ToXValue(env),
 		"uuid":         types.NewXText(string(contact.UUID())),
@@ -349,8 +353,7 @@ func TestReevaluateQueryBasedGroups(t *testing.T) {
 }
 
 func TestContactEqual(t *testing.T) {
-	session, _, err := test.CreateTestSession("http://localhost", envs.RedactionPolicyNone)
-	require.NoError(t, err)
+	_, session, _ := test.NewSessionBuilder().MustBuild()
 
 	contact1JSON := []byte(`{
 		"uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
@@ -389,8 +392,7 @@ func TestContactEqual(t *testing.T) {
 }
 
 func TestContactQuery(t *testing.T) {
-	session, _, err := test.CreateTestSession("", envs.RedactionPolicyNone)
-	require.NoError(t, err)
+	_, session, _ := test.NewSessionBuilder().MustBuild()
 
 	contactJSON := []byte(`{
 		"uuid": "ba96bf7f-bc2a-4873-a7c7-254d1927c4e3",
@@ -446,9 +448,6 @@ func TestContactQuery(t *testing.T) {
 
 		{`uuid = ba96bf7f-bc2a-4873-a7c7-254d1927c4e3`, envs.RedactionPolicyNone, true, ""},
 		{`uuid = 3bf7edda-b926-4a78-9131-d336df77d44f`, envs.RedactionPolicyNone, false, ""},
-
-		{`id = 1234567`, envs.RedactionPolicyNone, true, ""},
-		{`id = 5678889`, envs.RedactionPolicyNone, false, ""},
 
 		{`language = ENG`, envs.RedactionPolicyNone, true, ""},
 		{`language = FRA`, envs.RedactionPolicyNone, false, ""},
@@ -509,11 +508,6 @@ func TestContactQuery(t *testing.T) {
 		{`urn = ""`, envs.RedactionPolicyURNs, false, ""},
 		{`urn != ""`, envs.RedactionPolicyURNs, true, ""},
 
-		{`group = testers`, envs.RedactionPolicyNone, true, ""},
-		{`group != testers`, envs.RedactionPolicyNone, false, ""},
-		{`group = customers`, envs.RedactionPolicyNone, false, ""},
-		{`group != customers`, envs.RedactionPolicyNone, true, ""},
-
 		{`tickets = 1`, envs.RedactionPolicyNone, true, ""},
 		{`tickets = 0`, envs.RedactionPolicyNone, false, ""},
 		{`tickets != 1`, envs.RedactionPolicyNone, false, ""},
@@ -524,6 +518,12 @@ func TestContactQuery(t *testing.T) {
 		{`age != 39`, envs.RedactionPolicyNone, false, ""},
 		{`age = 60`, envs.RedactionPolicyNone, false, ""},
 		{`age != 60`, envs.RedactionPolicyNone, true, ""},
+
+		// check querying on a field that isn't set for this contact
+		{`activation_token = ""`, envs.RedactionPolicyNone, true, ""},
+		{`activation_token != ""`, envs.RedactionPolicyNone, false, ""},
+		{`activation_token = "xx"`, envs.RedactionPolicyNone, false, ""},
+		{`activation_token != "xx"`, envs.RedactionPolicyNone, true, ""},
 	}
 
 	doQuery := func(q string, redaction envs.RedactionPolicy) (bool, error) {

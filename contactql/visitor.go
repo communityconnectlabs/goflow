@@ -28,9 +28,12 @@ const (
 	AttributeUUID       = "uuid"
 	AttributeID         = "id"
 	AttributeName       = "name"
+	AttributeStatus     = "status"
 	AttributeLanguage   = "language"
 	AttributeURN        = "urn"
 	AttributeGroup      = "group"
+	AttributeFlow       = "flow"
+	AttributeHistory    = "history"
 	AttributeTickets    = "tickets"
 	AttributeCreatedOn  = "created_on"
 	AttributeLastSeenOn = "last_seen_on"
@@ -40,18 +43,22 @@ var attributes = map[string]assets.FieldType{
 	AttributeUUID:       assets.FieldTypeText,
 	AttributeID:         assets.FieldTypeText,
 	AttributeName:       assets.FieldTypeText,
+	AttributeStatus:     assets.FieldTypeText,
 	AttributeLanguage:   assets.FieldTypeText,
 	AttributeURN:        assets.FieldTypeText,
 	AttributeGroup:      assets.FieldTypeText,
+	AttributeFlow:       assets.FieldTypeText,
+	AttributeHistory:    assets.FieldTypeText,
 	AttributeTickets:    assets.FieldTypeNumber,
 	AttributeCreatedOn:  assets.FieldTypeDatetime,
 	AttributeLastSeenOn: assets.FieldTypeDatetime,
 }
 
-// Resolver provides functions for resolving fields and groups referenced in queries
+// Resolver provides functions for resolving assets referenced in queries
 type Resolver interface {
 	ResolveField(key string) assets.Field
 	ResolveGroup(name string) assets.Group
+	ResolveFlow(name string) assets.Flow
 }
 
 type visitor struct {
@@ -85,17 +92,17 @@ func (v *visitor) VisitImplicitCondition(ctx *gen.ImplicitConditionContext) inte
 	if v.env.RedactionPolicy() == envs.RedactionPolicyURNs {
 		num, err := strconv.Atoi(value)
 		if err == nil {
-			return newCondition(AttributeID, PropertyTypeAttribute, OpEqual, strconv.Itoa(num))
+			return NewCondition(AttributeID, PropertyTypeAttribute, OpEqual, strconv.Itoa(num))
 		}
 	} else if asURN != urns.NilURN {
 		scheme, path, _, _ := asURN.ToParts()
 
-		return newCondition(scheme, PropertyTypeScheme, OpEqual, path)
+		return NewCondition(scheme, PropertyTypeScheme, OpEqual, path)
 
 	} else if implicitIsPhoneNumberRegex.MatchString(value) {
 		value = cleanPhoneNumberRegex.ReplaceAllLiteralString(value, "")
 
-		return newCondition(urns.TelScheme, PropertyTypeScheme, OpContains, value)
+		return NewCondition(urns.TelScheme, PropertyTypeScheme, OpContains, value)
 	}
 
 	// convert to contains condition only if we have the right tokens, otherwise make equals check
@@ -104,7 +111,7 @@ func (v *visitor) VisitImplicitCondition(ctx *gen.ImplicitConditionContext) inte
 		operator = OpEqual
 	}
 
-	return newCondition(AttributeName, PropertyTypeAttribute, operator, value)
+	return NewCondition(AttributeName, PropertyTypeAttribute, operator, value)
 }
 
 // expression : TEXT COMPARATOR literal
@@ -140,7 +147,7 @@ func (v *visitor) VisitCondition(ctx *gen.ConditionContext) interface{} {
 		propType = PropertyTypeField
 	}
 
-	return newCondition(propKey, propType, operator, value)
+	return NewCondition(propKey, propType, operator, value)
 }
 
 // expression : expression AND expression

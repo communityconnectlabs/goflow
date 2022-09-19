@@ -12,30 +12,44 @@ import (
 	"github.com/olivere/elastic/v7"
 )
 
+// AssetMapper is used to map engine assets to however ES identifies them
+type AssetMapper interface {
+	Flow(assets.Flow) int64
+	Group(assets.Group) int64
+}
+
+// we store contact status in elastic as single char codes
+var contactStatusCodes = map[string]string{
+	"active":   "A",
+	"blocked":  "B",
+	"stopped":  "S",
+	"archived": "V",
+}
+
 // ToElasticQuery converts a contactql query to an Elastic query
-func ToElasticQuery(env envs.Environment, query *contactql.ContactQuery) elastic.Query {
+func ToElasticQuery(env envs.Environment, mapper AssetMapper, query *contactql.ContactQuery) elastic.Query {
 	if query.Resolver() == nil {
 		panic("can only convert queries parsed with a resolver")
 	}
 
-	return nodeToElastic(env, query.Resolver(), query.Root())
+	return nodeToElastic(env, query.Resolver(), mapper, query.Root())
 }
 
-func nodeToElastic(env envs.Environment, resolver contactql.Resolver, node contactql.QueryNode) elastic.Query {
+func nodeToElastic(env envs.Environment, resolver contactql.Resolver, mapper AssetMapper, node contactql.QueryNode) elastic.Query {
 	switch n := node.(type) {
 	case *contactql.BoolCombination:
-		return boolCombinationToElastic(env, resolver, n)
+		return boolCombinationToElastic(env, resolver, mapper, n)
 	case *contactql.Condition:
-		return conditionToElastic(env, resolver, n)
+		return conditionToElastic(env, resolver, mapper, n)
 	default:
 		panic(fmt.Sprintf("unsupported node type: %T", n))
 	}
 }
 
-func boolCombinationToElastic(env envs.Environment, resolver contactql.Resolver, combination *contactql.BoolCombination) elastic.Query {
+func boolCombinationToElastic(env envs.Environment, resolver contactql.Resolver, mapper AssetMapper, combination *contactql.BoolCombination) elastic.Query {
 	queries := make([]elastic.Query, len(combination.Children()))
 	for i, child := range combination.Children() {
-		queries[i] = nodeToElastic(env, resolver, child)
+		queries[i] = nodeToElastic(env, resolver, mapper, child)
 	}
 
 	if combination.Operator() == contactql.BoolOperatorAnd {
@@ -45,12 +59,12 @@ func boolCombinationToElastic(env envs.Environment, resolver contactql.Resolver,
 	return elastic.NewBoolQuery().Should(queries...)
 }
 
-func conditionToElastic(env envs.Environment, resolver contactql.Resolver, c *contactql.Condition) elastic.Query {
+func conditionToElastic(env envs.Environment, resolver contactql.Resolver, mapper AssetMapper, c *contactql.Condition) elastic.Query {
 	switch c.PropertyType() {
 	case contactql.PropertyTypeField:
 		return fieldConditionToElastic(env, resolver, c)
 	case contactql.PropertyTypeAttribute:
-		return attributeConditionToElastic(env, resolver, c)
+		return attributeConditionToElastic(env, resolver, mapper, c)
 	case contactql.PropertyTypeScheme:
 		return schemeConditionToElastic(env, c)
 	default:
@@ -181,7 +195,7 @@ func fieldConditionToElastic(env envs.Environment, resolver contactql.Resolver, 
 	panic(fmt.Sprintf("unsupported field type: %s", fieldType))
 }
 
-func attributeConditionToElastic(env envs.Environment, resolver contactql.Resolver, c *contactql.Condition) elastic.Query {
+func attributeConditionToElastic(env envs.Environment, resolver contactql.Resolver, mapper AssetMapper, c *contactql.Condition) elastic.Query {
 	key := c.PropertyKey()
 	value := strings.ToLower(c.Value())
 	var query elastic.Query
@@ -204,7 +218,7 @@ func attributeConditionToElastic(env envs.Environment, resolver contactql.Resolv
 
 	switch c.PropertyKey() {
 	case contactql.AttributeUUID:
-		return textAttributeQuery(c, "uuid")
+		return textAttributeQuery(c, "uuid", strings.ToLower)
 	case contactql.AttributeID:
 		switch c.Operator() {
 		case contactql.OpEqual:
@@ -225,8 +239,12 @@ func attributeConditionToElastic(env envs.Environment, resolver contactql.Resolv
 		default:
 			panic(fmt.Sprintf("unsupported name attribute operator: %s", c.Operator()))
 		}
+	case contactql.AttributeStatus:
+		return textAttributeQuery(c, "status", func(v string) string {
+			return contactStatusCodes[strings.ToLower(v)]
+		})
 	case contactql.AttributeLanguage:
-		return textAttributeQuery(c, "language")
+		return textAttributeQuery(c, "language", strings.ToLower)
 	case contactql.AttributeCreatedOn:
 		value, _ := c.ValueAsDate(env)
 		start, end := dates.DayToUTCRange(value, value.Location())
@@ -299,15 +317,49 @@ func attributeConditionToElastic(env envs.Environment, resolver contactql.Resolv
 			panic(fmt.Sprintf("unsupported URN attribute operator: %s", c.Operator()))
 		}
 	case contactql.AttributeGroup:
+		// special case for set/unset
+		if (c.Operator() == contactql.OpEqual || c.Operator() == contactql.OpNotEqual) && value == "" {
+			query = elastic.NewExistsQuery("group_ids")
+			if c.Operator() == contactql.OpEqual {
+				query = not(query)
+			}
+			return query
+		}
+
 		group := c.ValueAsGroup(resolver)
 
 		switch c.Operator() {
 		case contactql.OpEqual:
-			return elastic.NewTermQuery("groups", group.UUID())
+			return elastic.NewTermQuery("group_ids", mapper.Group(group))
 		case contactql.OpNotEqual:
-			return not(elastic.NewTermQuery("groups", group.UUID()))
+			return not(elastic.NewTermQuery("group_ids", mapper.Group(group)))
 		default:
 			panic(fmt.Sprintf("unsupported group attribute operator: %s", c.Operator()))
+		}
+	case contactql.AttributeFlow, contactql.AttributeHistory:
+		fieldName := "flow_id"
+		if c.PropertyKey() == contactql.AttributeHistory {
+			fieldName = "flow_history_ids"
+		}
+
+		// special case for set/unset
+		if (c.Operator() == contactql.OpEqual || c.Operator() == contactql.OpNotEqual) && value == "" {
+			query = elastic.NewExistsQuery(fieldName)
+			if c.Operator() == contactql.OpEqual {
+				query = not(query)
+			}
+			return query
+		}
+
+		flow := c.ValueAsFlow(resolver)
+
+		switch c.Operator() {
+		case contactql.OpEqual:
+			return elastic.NewTermQuery(fieldName, mapper.Flow(flow))
+		case contactql.OpNotEqual:
+			return not(elastic.NewTermQuery(fieldName, mapper.Flow(flow)))
+		default:
+			panic(fmt.Sprintf("unsupported flow attribute operator: %s", c.Operator()))
 		}
 	case contactql.AttributeTickets:
 		return numericalAttributeQuery(c, "tickets")
@@ -354,8 +406,8 @@ func schemeConditionToElastic(env envs.Environment, c *contactql.Condition) elas
 	}
 }
 
-func textAttributeQuery(c *contactql.Condition, name string) elastic.Query {
-	value := strings.ToLower(c.Value())
+func textAttributeQuery(c *contactql.Condition, name string, tx func(string) string) elastic.Query {
+	value := tx(c.Value())
 
 	switch c.Operator() {
 	case contactql.OpEqual:

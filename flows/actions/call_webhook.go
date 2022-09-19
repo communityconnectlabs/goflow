@@ -36,16 +36,16 @@ const TypeCallWebhook string = "call_webhook"
 // accessible through `extra` on the result. The last JSON response from a webhook call in the current
 // sprint will additionally be accessible in expressions as `@webhook` regardless of size.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "call_webhook",
-//     "method": "GET",
-//     "url": "http://localhost:49998/?cmd=success",
-//     "headers": {
-//       "Authorization": "Token AAFFZZHH"
-//     },
-//     "result_name": "webhook"
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "call_webhook",
+//	  "method": "GET",
+//	  "url": "http://localhost:49998/?cmd=success",
+//	  "headers": {
+//	    "Authorization": "Token AAFFZZHH"
+//	  },
+//	  "result_name": "webhook"
+//	}
 //
 // @action call_webhook
 type CallWebhookAction struct {
@@ -83,13 +83,16 @@ func (a *CallWebhookAction) Validate() error {
 }
 
 // Execute runs this action
-func (a *CallWebhookAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *CallWebhookAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 
 	// substitute any variables in our url
 	url, err := run.EvaluateTemplate(a.URL)
 	if err != nil {
 		logEvent(events.NewError(err))
 	}
+
+	url = strings.TrimSpace(url) // some servers don't like trailing spaces in HTTP requests
+
 	if url == "" {
 		logEvent(events.NewErrorf("webhook URL evaluated to empty string"))
 		return nil
@@ -115,7 +118,7 @@ func (a *CallWebhookAction) Execute(run flows.FlowRun, step flows.Step, logModif
 }
 
 // Execute runs this action
-func (a *CallWebhookAction) call(run flows.FlowRun, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
+func (a *CallWebhookAction) call(run flows.Run, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
@@ -132,13 +135,13 @@ func (a *CallWebhookAction) call(run flows.FlowRun, step flows.Step, url, method
 		req.Header.Add(key, headerValue)
 	}
 
-	svc, err := run.Session().Engine().Services().Webhook(run.Session())
+	svc, err := run.Session().Engine().Services().Webhook(run.Session().Assets())
 	if err != nil {
 		logEvent(events.NewError(err))
 		return nil
 	}
 
-	call, err := svc.Call(run.Session(), req)
+	call, err := svc.Call(req)
 
 	if err != nil {
 		logEvent(events.NewError(err))

@@ -20,16 +20,16 @@ const TypeCallClassifier string = "call_classifier"
 // saves a result indicating whether the classification was successful, skipped or failed, and what the extracted intents
 // and entities were.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "call_classifier",
-//     "classifier": {
-//       "uuid": "1c06c884-39dd-4ce4-ad9f-9a01cbe6c000",
-//       "name": "Booking"
-//     },
-//     "input": "@input.text",
-//     "result_name": "Intent"
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "call_classifier",
+//	  "classifier": {
+//	    "uuid": "1c06c884-39dd-4ce4-ad9f-9a01cbe6c000",
+//	    "name": "Booking"
+//	  },
+//	  "input": "@input.text",
+//	  "result_name": "Intent"
+//	}
 //
 // @action call_classifier
 type CallClassifierAction struct {
@@ -52,7 +52,7 @@ func NewCallClassifier(uuid flows.ActionUUID, classifier *assets.ClassifierRefer
 }
 
 // Execute runs this action
-func (a *CallClassifierAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *CallClassifierAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	classifiers := run.Session().Assets().Classifiers()
 	classifier := classifiers.Get(a.Classifier.UUID)
 
@@ -74,7 +74,7 @@ func (a *CallClassifierAction) Execute(run flows.FlowRun, step flows.Step, logMo
 	return nil
 }
 
-func (a *CallClassifierAction) classify(run flows.FlowRun, step flows.Step, input string, classifier *flows.Classifier, logEvent flows.EventCallback) (*flows.Classification, bool) {
+func (a *CallClassifierAction) classify(run flows.Run, step flows.Step, input string, classifier *flows.Classifier, logEvent flows.EventCallback) (*flows.Classification, bool) {
 	if input == "" {
 		logEvent(events.NewErrorf("can't classify empty input, skipping classification"))
 		return nil, true
@@ -84,7 +84,7 @@ func (a *CallClassifierAction) classify(run flows.FlowRun, step flows.Step, inpu
 		return nil, false
 	}
 
-	svc, err := run.Session().Engine().Services().Classification(run.Session(), classifier)
+	svc, err := run.Session().Engine().Services().Classification(classifier)
 	if err != nil {
 		logEvent(events.NewError(err))
 		return nil, false
@@ -92,7 +92,7 @@ func (a *CallClassifierAction) classify(run flows.FlowRun, step flows.Step, inpu
 
 	httpLogger := &flows.HTTPLogger{}
 
-	classification, err := svc.Classify(run.Session(), input, httpLogger.Log)
+	classification, err := svc.Classify(run.Environment(), input, httpLogger.Log)
 
 	if len(httpLogger.Logs) > 0 {
 		logEvent(events.NewClassifierCalled(classifier.Reference(), httpLogger.Logs))
@@ -106,7 +106,7 @@ func (a *CallClassifierAction) classify(run flows.FlowRun, step flows.Step, inpu
 	return classification, false
 }
 
-func (a *CallClassifierAction) saveSuccess(run flows.FlowRun, step flows.Step, input string, classification *flows.Classification, logEvent flows.EventCallback) {
+func (a *CallClassifierAction) saveSuccess(run flows.Run, step flows.Step, input string, classification *flows.Classification, logEvent flows.EventCallback) {
 	// result value is name of top ranked intent if there is one
 	value := ""
 	if len(classification.Intents) > 0 {
@@ -117,11 +117,11 @@ func (a *CallClassifierAction) saveSuccess(run flows.FlowRun, step flows.Step, i
 	a.saveResult(run, step, a.ResultName, value, CategorySuccess, "", input, extra, logEvent)
 }
 
-func (a *CallClassifierAction) saveSkipped(run flows.FlowRun, step flows.Step, input string, logEvent flows.EventCallback) {
+func (a *CallClassifierAction) saveSkipped(run flows.Run, step flows.Step, input string, logEvent flows.EventCallback) {
 	a.saveResult(run, step, a.ResultName, "0", CategorySkipped, "", input, nil, logEvent)
 }
 
-func (a *CallClassifierAction) saveFailure(run flows.FlowRun, step flows.Step, input string, logEvent flows.EventCallback) {
+func (a *CallClassifierAction) saveFailure(run flows.Run, step flows.Step, input string, logEvent flows.EventCallback) {
 	a.saveResult(run, step, a.ResultName, "0", CategoryFailure, "", input, nil, logEvent)
 }
 

@@ -15,16 +15,16 @@ const TypeContactFieldChanged string = "contact_field_changed"
 // ContactFieldChangedEvent events are created when a custom field value of the contact has been changed.
 // A null values indicates that the field value has been cleared.
 //
-//   {
-//     "type": "contact_field_changed",
-//     "created_on": "2006-01-02T15:04:05Z",
-//     "field": {"key": "gender", "name": "Gender"},
-//     "value": {"text": "Male"}
-//   }
+//	{
+//	  "type": "contact_field_changed",
+//	  "created_on": "2006-01-02T15:04:05Z",
+//	  "field": {"key": "gender", "name": "Gender"},
+//	  "value": {"text": "Male"}
+//	}
 //
 // @event contact_field_changed
 type ContactFieldChangedEvent struct {
-	baseEvent
+	BaseEvent
 
 	Field *assets.FieldReference `json:"field" validate:"required"`
 	Value *flows.Value           `json:"value"`
@@ -33,7 +33,7 @@ type ContactFieldChangedEvent struct {
 // NewContactFieldChanged returns a new save to contact event
 func NewContactFieldChanged(field *flows.Field, value *flows.Value) *ContactFieldChangedEvent {
 	return &ContactFieldChangedEvent{
-		baseEvent: newBaseEvent(TypeContactFieldChanged),
+		BaseEvent: NewBaseEvent(TypeContactFieldChanged),
 		Field:     field.Reference(),
 		Value:     value,
 	}

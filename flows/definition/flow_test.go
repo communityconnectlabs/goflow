@@ -272,6 +272,7 @@ func TestNewFlow(t *testing.T) {
 			),
 		},
 		nil, // no UI
+		nil, // no asset
 	)
 	require.NoError(t, err)
 
@@ -464,6 +465,7 @@ func TestReadFlow(t *testing.T) {
 	assert.Equal(t, "TestFlow", flow.Name())
 	assert.Equal(t, flows.FlowTypeMessaging, flow.Type())
 	assert.Equal(t, 1, len(flow.Nodes()))
+	assert.Nil(t, flow.Asset())
 }
 
 func TestExtractTemplatesAndLocalizables(t *testing.T) {

@@ -14,15 +14,15 @@ const TypeContactLanguageChanged string = "contact_language_changed"
 
 // ContactLanguageChangedEvent events are created when the language of the contact has been changed.
 //
-//   {
-//     "type": "contact_language_changed",
-//     "created_on": "2006-01-02T15:04:05Z",
-//     "language": "eng"
-//   }
+//	{
+//	  "type": "contact_language_changed",
+//	  "created_on": "2006-01-02T15:04:05Z",
+//	  "language": "eng"
+//	}
 //
 // @event contact_language_changed
 type ContactLanguageChangedEvent struct {
-	baseEvent
+	BaseEvent
 
 	Language string `json:"language"`
 }
@@ -30,7 +30,7 @@ type ContactLanguageChangedEvent struct {
 // NewContactLanguageChanged returns a new contact language changed event
 func NewContactLanguageChanged(language envs.Language) *ContactLanguageChangedEvent {
 	return &ContactLanguageChangedEvent{
-		baseEvent: newBaseEvent(TypeContactLanguageChanged),
+		BaseEvent: NewBaseEvent(TypeContactLanguageChanged),
 		Language:  string(language),
 	}
 }

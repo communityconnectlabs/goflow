@@ -6,6 +6,7 @@ import (
 
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/stringsx"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
@@ -26,7 +27,7 @@ type flowRun struct {
 	flow    flows.Flow
 	flowRef *assets.FlowReference
 
-	parent  flows.FlowRun
+	parent  flows.Run
 	results flows.Results
 	path    Path
 	events  []flows.Event
@@ -34,7 +35,6 @@ type flowRun struct {
 
 	createdOn  time.Time
 	modifiedOn time.Time
-	expiresOn  *time.Time
 	exitedOn   *time.Time
 
 	webhook     types.XValue
@@ -42,7 +42,7 @@ type flowRun struct {
 }
 
 // NewRun initializes a new context and flow run for the passed in flow and contact
-func NewRun(session flows.Session, flow flows.Flow, parent flows.FlowRun) flows.FlowRun {
+func NewRun(session flows.Session, flow flows.Flow, parent flows.Run) flows.Run {
 	now := dates.Now()
 	r := &flowRun{
 		uuid:       flows.RunUUID(uuids.New()),
@@ -58,8 +58,6 @@ func NewRun(session flows.Session, flow flows.Flow, parent flows.FlowRun) flows.
 	}
 
 	r.environment = newRunEnvironment(session.Environment(), r)
-	r.ResetExpiration(nil)
-
 	r.webhook = types.XObjectEmpty
 	r.legacyExtra = newLegacyExtra(r)
 
@@ -78,7 +76,7 @@ func (r *flowRun) Events() []flows.Event                { return r.events }
 func (r *flowRun) Results() flows.Results { return r.results }
 func (r *flowRun) SaveResult(result *flows.Result) {
 	// truncate value if necessary
-	result.Value = utils.Truncate(result.Value, r.Environment().MaxValueLength())
+	result.Value = stringsx.Truncate(result.Value, r.Environment().MaxValueLength())
 
 	r.results.Save(result)
 	r.modifiedOn = dates.Now()
@@ -91,13 +89,7 @@ func (r *flowRun) Exit(status flows.RunStatus) {
 
 	r.status = status
 	r.exitedOn = &now
-	r.expiresOn = nil
 	r.modifiedOn = now
-
-	// if we have a parent, it's expiration should no longer include our expiration
-	if r.ParentInSession() != nil {
-		r.ParentInSession().ResetExpiration(nil)
-	}
 }
 func (r *flowRun) Status() flows.RunStatus { return r.status }
 func (r *flowRun) SetStatus(status flows.RunStatus) {
@@ -113,7 +105,7 @@ func (r *flowRun) SetWebhook(value types.XValue) {
 }
 
 // ParentInSession returns the parent of the run within the same session if one exists
-func (r *flowRun) ParentInSession() flows.FlowRun { return r.parent }
+func (r *flowRun) ParentInSession() flows.Run { return r.parent }
 
 // Parent returns either the same session parent or if this session was triggered from a trigger_flow action
 // in another session, that run
@@ -124,8 +116,8 @@ func (r *flowRun) Parent() flows.RunSummary {
 	return r.ParentInSession()
 }
 
-func (r *flowRun) Ancestors() []flows.FlowRun {
-	ancestors := make([]flows.FlowRun, 0)
+func (r *flowRun) Ancestors() []flows.Run {
+	ancestors := make([]flows.Run, 0)
 	if r.parent != nil {
 		run := r.parent.(*flowRun)
 		ancestors = append(ancestors, run)
@@ -200,44 +192,24 @@ func (r *flowRun) PathLocation() (flows.Step, flows.Node, error) {
 
 func (r *flowRun) CreatedOn() time.Time  { return r.createdOn }
 func (r *flowRun) ModifiedOn() time.Time { return r.modifiedOn }
-func (r *flowRun) ExpiresOn() *time.Time { return r.expiresOn }
-func (r *flowRun) ResetExpiration(from *time.Time) {
-	if r.Flow() != nil && r.Flow().ExpireAfterMinutes() >= 0 {
-		if from == nil {
-			now := dates.Now()
-			from = &now
-		}
-
-		expiresAfterMinutes := time.Duration(r.Flow().ExpireAfterMinutes())
-		expiresOn := from.Add(expiresAfterMinutes * time.Minute)
-
-		r.expiresOn = &expiresOn
-		r.modifiedOn = dates.Now()
-	}
-
-	if r.ParentInSession() != nil {
-		r.ParentInSession().ResetExpiration(r.expiresOn)
-	}
-}
-
-func (r *flowRun) ExitedOn() *time.Time { return r.exitedOn }
+func (r *flowRun) ExitedOn() *time.Time  { return r.exitedOn }
 
 // RootContext returns the root context for expression evaluation
 //
-//   contact:contact -> the contact
-//   fields:fields -> the custom field values of the contact
-//   urns:urns -> the URN values of the contact
-//   results:results -> the current run results
-//   input:input -> the current input from the contact
-//   run:run -> the current run
-//   child:related_run -> the last child run
-//   parent:related_run -> the parent of the run
-//   ticket:ticket -> the last opened ticket for the contact
-//   webhook:any -> the parsed JSON response of the last webhook call
-//   node:node -> the current node
-//   globals:globals -> the global values
-//   trigger:trigger -> the trigger that started this session
-//   resume:resume -> the current resume that continued this session
+//	contact:contact -> the contact
+//	fields:fields -> the custom field values of the contact
+//	urns:urns -> the URN values of the contact
+//	results:results -> the current run results
+//	input:input -> the current input from the contact
+//	run:run -> the current run
+//	child:related_run -> the last child run
+//	parent:related_run -> the parent of the run
+//	ticket:ticket -> the last opened ticket for the contact
+//	webhook:any -> the parsed JSON response of the last webhook call
+//	node:node -> the current node
+//	globals:globals -> the global values
+//	trigger:trigger -> the trigger that started this session
+//	resume:resume -> the current resume that continued this session
 //
 // @context root
 func (r *flowRun) RootContext(env envs.Environment) map[string]types.XValue {
@@ -287,14 +259,14 @@ func (r *flowRun) RootContext(env envs.Environment) map[string]types.XValue {
 
 // Context returns the properties available in expressions
 //
-//   __default__:text -> the contact name and flow UUID
-//   uuid:text -> the UUID of the run
-//   contact:contact -> the contact of the run
-//   flow:flow -> the flow of the run
-//   status:text -> the current status of the run
-//   results:results -> the results saved by the run
-//   created_on:datetime -> the creation date of the run
-//   exited_on:datetime -> the exit date of the run
+//	__default__:text -> the contact name and flow UUID
+//	uuid:text -> the UUID of the run
+//	contact:contact -> the contact of the run
+//	flow:flow -> the flow of the run
+//	status:text -> the current status of the run
+//	results:results -> the results saved by the run
+//	created_on:datetime -> the creation date of the run
+//	exited_on:datetime -> the exit date of the run
 //
 // @context run
 func (r *flowRun) Context(env envs.Environment) map[string]types.XValue {
@@ -318,8 +290,8 @@ func (r *flowRun) Context(env envs.Environment) map[string]types.XValue {
 
 // returns the context representation of the current node
 //
-//   uuid:text -> the UUID of the node
-//   visit_count:number -> the count of visits to the node in this run
+//	uuid:text -> the UUID of the node
+//	visit_count:number -> the count of visits to the node in this run
 //
 // @context node
 func (r *flowRun) nodeContext(env envs.Environment) map[string]types.XValue {
@@ -350,7 +322,7 @@ func (r *flowRun) EvaluateTemplateText(template string, escaping excellent.Escap
 
 	value, err := excellent.EvaluateTemplate(r.Environment(), ctx, template, escaping)
 	if truncate {
-		value = utils.TruncateEllipsis(value, r.Session().Engine().MaxTemplateChars())
+		value = stringsx.TruncateEllipsis(value, r.Session().Engine().MaxTemplateChars())
 	}
 	return value, err
 }
@@ -444,13 +416,12 @@ type runEnvelope struct {
 
 	CreatedOn  time.Time  `json:"created_on" validate:"required"`
 	ModifiedOn time.Time  `json:"modified_on" validate:"required"`
-	ExpiresOn  *time.Time `json:"expires_on"`
 	ExitedOn   *time.Time `json:"exited_on"`
 }
 
 // ReadRun decodes a run from the passed in JSON. Parent run UUID is returned separately as the
 // run in question might be loaded yet from the session.
-func ReadRun(session flows.Session, data json.RawMessage, missing assets.MissingCallback) (flows.FlowRun, error) {
+func ReadRun(session flows.Session, data json.RawMessage, missing assets.MissingCallback) (flows.Run, error) {
 	e := &runEnvelope{}
 	var err error
 
@@ -465,7 +436,6 @@ func ReadRun(session flows.Session, data json.RawMessage, missing assets.Missing
 		status:     e.Status,
 		createdOn:  e.CreatedOn,
 		modifiedOn: e.ModifiedOn,
-		expiresOn:  e.ExpiresOn,
 		exitedOn:   e.ExitedOn,
 	}
 
@@ -519,7 +489,6 @@ func (r *flowRun) MarshalJSON() ([]byte, error) {
 		Status:     r.status,
 		CreatedOn:  r.createdOn,
 		ModifiedOn: r.modifiedOn,
-		ExpiresOn:  r.expiresOn,
 		ExitedOn:   r.exitedOn,
 		Results:    r.results,
 	}

@@ -21,14 +21,14 @@ const TypeDial string = "dial"
 
 // DialResume is used when a session is resumed after a number was dialed.
 //
-//   {
-//     "type": "dial",
-//     "resumed_on": "2021-01-20T12:18:30Z",
-//     "dial": {
-//       "status": "answered",
-//       "duration": 15
-//     }
-//   }
+//	{
+//	  "type": "dial",
+//	  "resumed_on": "2021-01-20T12:18:30Z",
+//	  "dial": {
+//	    "status": "answered",
+//	    "duration": 15
+//	  }
+//	}
 //
 // @resume dial
 type DialResume struct {
@@ -46,7 +46,7 @@ func NewDial(env envs.Environment, contact *flows.Contact, dial *flows.Dial) *Di
 }
 
 // Apply applies our state changes and saves any events to the run
-func (r *DialResume) Apply(run flows.FlowRun, logEvent flows.EventCallback) {
+func (r *DialResume) Apply(run flows.Run, logEvent flows.EventCallback) {
 	logEvent(events.NewDialEnded(r.dial))
 
 	r.baseResume.Apply(run, logEvent)

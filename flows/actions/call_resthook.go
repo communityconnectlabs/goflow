@@ -56,11 +56,11 @@ const TypeCallResthook string = "call_resthook"
 // be created with that name, and if the resthook returns valid JSON, that will be accessible
 // through `extra` on the result.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "call_resthook",
-//     "resthook": "new-registration"
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "call_resthook",
+//	  "resthook": "new-registration"
+//	}
 //
 // @action call_resthook
 type CallResthookAction struct {
@@ -81,7 +81,7 @@ func NewCallResthook(uuid flows.ActionUUID, resthook string, resultName string) 
 }
 
 // Execute runs this action
-func (a *CallResthookAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *CallResthookAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	// NOOP if resthook doesn't exist
 	resthook := run.Session().Assets().Resthooks().FindBySlug(a.Resthook)
 	if resthook == nil {
@@ -115,13 +115,13 @@ func (a *CallResthookAction) Execute(run flows.FlowRun, step flows.Step, logModi
 
 		req.Header.Add("Content-Type", "application/json")
 
-		svc, err := run.Session().Engine().Services().Webhook(run.Session())
+		svc, err := run.Session().Engine().Services().Webhook(run.Session().Assets())
 		if err != nil {
 			logEvent(events.NewError(err))
 			return nil
 		}
 
-		call, err := svc.Call(run.Session(), req)
+		call, err := svc.Call(req)
 
 		if err != nil {
 			logEvent(events.NewError(err))

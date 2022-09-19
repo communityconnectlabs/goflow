@@ -19,11 +19,11 @@ const TypeSetContactChannel string = "set_contact_channel"
 // Because channel affinity is a property of a contact's URNs, a [event:contact_urns_changed] event will be created if any
 // changes are made to the contact's URNs.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "set_contact_channel",
-//     "channel": {"uuid": "4bb288a0-7fca-4da1-abe8-59a593aff648", "name": "Facebook Channel"}
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "set_contact_channel",
+//	  "channel": {"uuid": "4bb288a0-7fca-4da1-abe8-59a593aff648", "name": "Facebook Channel"}
+//	}
 //
 // @action set_contact_channel
 type SetContactChannelAction struct {
@@ -42,7 +42,7 @@ func NewSetContactChannel(uuid flows.ActionUUID, channel *assets.ChannelReferenc
 }
 
 // Execute runs our action
-func (a *SetContactChannelAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *SetContactChannelAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	contact := run.Contact()
 	if contact == nil {
 		logEvent(events.NewErrorf("can't execute action in session without a contact"))

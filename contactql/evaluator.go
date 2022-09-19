@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/stringsx"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/utils"
 	"github.com/shopspring/decimal"
 )
 
@@ -67,11 +67,6 @@ func evaluateCondition(env envs.Environment, resolver Resolver, c *Condition, qu
 		} else if c.operator == OpNotEqual {
 			return len(vals) > 0 // x != "" is false if x doesn't exist (i.e. true if x does exist)
 		}
-	}
-
-	// if keyed value doesn't exist on our contact then all other comparisons at this point are false
-	if len(vals) == 0 {
-		return false
 	}
 
 	// evaluate condition against each resolved value
@@ -177,8 +172,8 @@ func tokenizedPrefixMatch(objectVal string, queryVal string, length int) bool {
 
 	for _, objectToken := range objectTokens {
 		for _, queryToken := range queryTokens {
-			objectTokenVal := utils.Truncate(objectToken, length)
-			queryTokenVal := utils.Truncate(queryToken, length)
+			objectTokenVal := stringsx.Truncate(objectToken, length)
+			queryTokenVal := stringsx.Truncate(queryToken, length)
 
 			if strings.HasPrefix(objectTokenVal, queryTokenVal) {
 				return true

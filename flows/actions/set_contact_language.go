@@ -20,11 +20,11 @@ const TypeSetContactLanguage string = "set_contact_language"
 // template and white space is trimmed from the final value. An empty string clears the language.
 // A [event:contact_language_changed] event will be created with the corresponding value.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "set_contact_language",
-//     "language": "eng"
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "set_contact_language",
+//	  "language": "eng"
+//	}
 //
 // @action set_contact_language
 type SetContactLanguageAction struct {
@@ -43,7 +43,7 @@ func NewSetContactLanguage(uuid flows.ActionUUID, language string) *SetContactLa
 }
 
 // Execute runs this action
-func (a *SetContactLanguageAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *SetContactLanguageAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	if run.Contact() == nil {
 		logEvent(events.NewErrorf("can't execute action in session without a contact"))
 		return nil

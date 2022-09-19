@@ -301,20 +301,21 @@ func (c *Contact) Format(env envs.Environment) string {
 
 // Context returns the properties available in expressions
 //
-//   __default__:text -> the name or URN
-//   uuid:text -> the UUID of the contact
-//   id:text -> the numeric ID of the contact
-//   first_name:text -> the first name of the contact
-//   name:text -> the name of the contact
-//   language:text -> the language of the contact as 3-letter ISO code
-//   created_on:datetime -> the creation date of the contact
-//   last_seen_on:any -> the last seen date of the contact
-//   urns:[]text -> the URNs belonging to the contact
-//   urn:text -> the preferred URN of the contact
-//   groups:[]group -> the groups the contact belongs to
-//   fields:fields -> the custom field values of the contact
-//   channel:channel -> the preferred channel of the contact
-//   tickets:[]ticket -> the open tickets of the contact
+//	__default__:text -> the name or URN
+//	uuid:text -> the UUID of the contact
+//	id:text -> the numeric ID of the contact
+//	first_name:text -> the first name of the contact
+//	name:text -> the name of the contact
+//	language:text -> the language of the contact as 3-letter ISO code
+//	status:text -> the status of the contact
+//	created_on:datetime -> the creation date of the contact
+//	last_seen_on:any -> the last seen date of the contact
+//	urns:[]text -> the URNs belonging to the contact
+//	urn:text -> the preferred URN of the contact
+//	groups:[]group -> the groups the contact belongs to
+//	fields:fields -> the custom field values of the contact
+//	channel:channel -> the preferred channel of the contact
+//	tickets:[]ticket -> the open tickets of the contact
 //
 // @context contact
 func (c *Contact) Context(env envs.Environment) map[string]types.XValue {
@@ -346,6 +347,7 @@ func (c *Contact) Context(env envs.Environment) map[string]types.XValue {
 		"first_name":   firstName,
 		"language":     types.NewXText(string(c.language)),
 		"timezone":     timezone,
+		"status":       types.NewXText(string(c.status)),
 		"created_on":   types.NewXDateTime(c.createdOn),
 		"last_seen_on": lastSeenOn,
 		"urns":         c.urns.ToXValue(env),
@@ -467,16 +469,14 @@ func (c *Contact) ReevaluateQueryBasedGroups(env envs.Environment) ([]*Group, []
 }
 
 // QueryProperty resolves a contact query search key for this contact
+//
+// Note that this method excludes id, group and flow search attributes as those are disallowed
+// query based groups.
 func (c *Contact) QueryProperty(env envs.Environment, key string, propType contactql.PropertyType) []interface{} {
 	if propType == contactql.PropertyTypeAttribute {
 		switch key {
 		case contactql.AttributeUUID:
 			return []interface{}{string(c.uuid)}
-		case contactql.AttributeID:
-			if c.id != 0 {
-				return []interface{}{fmt.Sprintf("%d", c.id)}
-			}
-			return nil
 		case contactql.AttributeName:
 			if c.name != "" {
 				return []interface{}{c.name}
@@ -491,12 +491,6 @@ func (c *Contact) QueryProperty(env envs.Environment, key string, propType conta
 			vals := make([]interface{}, len(c.URNs()))
 			for i, urn := range c.URNs() {
 				vals[i] = urn.URN().Path()
-			}
-			return vals
-		case contactql.AttributeGroup:
-			vals := make([]interface{}, c.Groups().Count())
-			for i, group := range c.Groups().All() {
-				vals[i] = group.Name()
 			}
 			return vals
 		case contactql.AttributeTickets:

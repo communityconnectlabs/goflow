@@ -1,6 +1,7 @@
 package events_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -22,6 +23,7 @@ import (
 	"github.com/nyaruka/goflow/flows/routers/waits/hints"
 	"github.com/nyaruka/goflow/services/webhooks"
 	"github.com/nyaruka/goflow/test"
+	"github.com/nyaruka/goflow/utils"
 	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/assert"
@@ -40,6 +42,7 @@ func TestEventMarshaling(t *testing.T) {
 
 	tz, _ := time.LoadLocation("Africa/Kigali")
 	timeout := 500
+	expiresOn := time.Date(2022, 2, 3, 13, 45, 30, 0, time.UTC)
 	gender := session.Assets().Fields().Get("gender")
 	mailgun := session.Assets().Ticketers().Get("19dc6346-9623-4fe4-be80-538d493ecdf5")
 	weather := session.Assets().Topics().Get("472a7a73-96cb-4736-b567-056d987cc5b4")
@@ -61,13 +64,15 @@ func TestEventMarshaling(t *testing.T) {
 				},
 				[]*flows.HTTPLog{
 					{
-						HTTPTrace: &flows.HTTPTrace{
-							URL:        "https://send.money.com/topup",
-							StatusCode: 200,
-							Status:     flows.CallStatusSuccess,
-							Request:    "POST /topup HTTP/1.1\r\nHost: send.money.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
-							Response:   "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"errors\":[]}",
-							ElapsedMS:  12,
+						HTTPLogWithoutTime: &flows.HTTPLogWithoutTime{
+							LogWithoutTime: &httpx.LogWithoutTime{
+								URL:        "https://send.money.com/topup",
+								StatusCode: 200,
+								Request:    "POST /topup HTTP/1.1\r\nHost: send.money.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+								Response:   "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"errors\":[]}",
+								ElapsedMS:  12,
+							},
+							Status: flows.CallStatusSuccess,
 						},
 						CreatedOn: dates.Now(),
 					},
@@ -144,13 +149,15 @@ func TestEventMarshaling(t *testing.T) {
 				assets.NewClassifierReference(assets.ClassifierUUID("4b937f49-7fb7-43a5-8e57-14e2f028a471"), "Booking"),
 				[]*flows.HTTPLog{
 					{
-						HTTPTrace: &flows.HTTPTrace{
-							URL:        "https://api.wit.ai/message?v=20200513&q=hello",
-							StatusCode: 200,
-							Status:     flows.CallStatusSuccess,
-							Request:    "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: api.wit.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
-							Response:   "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
-							ElapsedMS:  12,
+						HTTPLogWithoutTime: &flows.HTTPLogWithoutTime{
+							LogWithoutTime: &httpx.LogWithoutTime{
+								URL:        "https://api.wit.ai/message?v=20200513&q=hello",
+								StatusCode: 200,
+								Request:    "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: api.wit.ai\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+								Response:   "HTTP/1.0 200 OK\r\nContent-Length: 14\r\n\r\n{\"intents\":[]}",
+								ElapsedMS:  12,
+							},
+							Status: flows.CallStatusSuccess,
 						},
 						CreatedOn: dates.Now(),
 					},
@@ -422,44 +429,101 @@ func TestEventMarshaling(t *testing.T) {
 		},
 		{
 			events.NewIVRCreated(
-				flows.NewMsgOut(
+				flows.NewIVRMsgOut(
 					urns.URN("tel:+12345678900"),
 					assets.NewChannelReference(assets.ChannelUUID("57f1078f-88aa-46f4-a59a-948a5739c03d"), "My Android Phone"),
 					"Hi there",
-					nil,
-					nil,
-					nil,
-					flows.NilMsgTopic,
+					"eng",
+					"http://example.com/hi.mp3",
 				),
 			),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"msg": {
+					"uuid": "20cc4181-48cf-4344-9751-99419796decd",
+					"urn": "tel:+12345678900",
 					"channel": {
 						"name": "My Android Phone",
 						"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
 					},
 					"text": "Hi there",
-					"urn": "tel:+12345678900",
-					"uuid": "20cc4181-48cf-4344-9751-99419796decd"
+					"text_language": "eng",
+					"attachments": ["audio:http://example.com/hi.mp3"]
 				},
 				"type": "ivr_created"
 			}`,
 		},
 		{
-			events.NewMsgWait(&timeout, hints.NewImageHint()),
+			events.NewMsgCreated(
+				flows.NewMsgOut(
+					urns.URN("tel:+12345678900"),
+					assets.NewChannelReference(assets.ChannelUUID("57f1078f-88aa-46f4-a59a-948a5739c03d"), "My Android Phone"),
+					"Hi there",
+					nil, nil, nil,
+					flows.NilMsgTopic,
+					flows.NilUnsendableReason,
+				),
+			),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
-				"hint": {"type": "image"},
+				"msg": {
+					"uuid": "04e910a5-d2e3-448b-958a-630e35c62431",
+					"urn": "tel:+12345678900",
+					"channel": {
+						"name": "My Android Phone",
+						"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+					},
+					"text": "Hi there"
+				},
+				"type": "msg_created"
+			}`,
+		},
+		{
+			events.NewMsgCreated(
+				flows.NewMsgOut(
+					urns.URN("tel:+12345678900"),
+					assets.NewChannelReference(assets.ChannelUUID("57f1078f-88aa-46f4-a59a-948a5739c03d"), "My Android Phone"),
+					"Hi there",
+					[]utils.Attachment{"image/jpeg:http://s3.amazon.com/bucket/test.jpg"},
+					[]string{"yes", "no"},
+					nil,
+					flows.MsgTopicAgent,
+					flows.UnsendableReasonContactStatus,
+				),
+			),
+			`{
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"msg": {
+					"uuid": "94f0e964-be11-4d7b-866b-323926b4c6a0",
+					"urn": "tel:+12345678900",
+					"channel": {
+						"name": "My Android Phone",
+						"uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
+					},
+					"text": "Hi there",
+					"attachments": ["image/jpeg:http://s3.amazon.com/bucket/test.jpg"],
+					"quick_replies": ["yes", "no"],
+					"topic": "agent",
+					"unsendable_reason": "contact_status"
+				},
+				"type": "msg_created"
+			}`,
+		},
+		{
+			events.NewMsgWait(&timeout, &expiresOn, hints.NewImageHint()),
+			`{
+				"type": "msg_wait",
+				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"timeout_seconds": 500,
-				"type": "msg_wait"
+				"expires_on": "2022-02-03T13:45:30Z",
+				"hint": {"type": "image"}
 			}`,
 		},
 		{
 			events.NewWaitTimedOut(),
 			`{
-				"created_on": "2018-10-18T14:20:30.000123456Z",
-				"type": "wait_timed_out"
+				"type": "wait_timed_out",
+				"created_on": "2018-10-18T14:20:30.000123456Z"
 			}`,
 		},
 		{
@@ -474,11 +538,12 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewDialWait(urns.URN("tel:+1234567890")),
+			events.NewDialWait(urns.URN("tel:+1234567890"), &expiresOn),
 			`{
 				"type": "dial_wait",
 				"created_on": "2018-10-18T14:20:30.000123456Z",
-				"urn": "tel:+1234567890"
+				"urn": "tel:+1234567890",
+				"expires_on": "2022-02-03T13:45:30Z"
 			}`,
 		},
 		{
@@ -491,20 +556,21 @@ func TestEventMarshaling(t *testing.T) {
 					flows.NewContactReference(flows.ContactUUID("b2aaf598-1bb3-4c7d-b6bb-1f8dbe2ac16f"), "Jim"),
 				},
 				"age > 20",
+				events.Exclusions{InAFlow: true},
 				false,
 				[]urns.URN{urns.URN("tel:+12345678900")},
 				json.RawMessage(`{"uuid": "779eaf3f-1c59-4374-a7cb-0eae9c5e8800"}`),
 				&flows.SessionHistory{ParentUUID: "418a704c-f33e-4924-a00e-1763d1498a13", Ancestors: 2, AncestorsSinceInput: 0},
 			),
 			`{
+				"type": "session_triggered",
+				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"contacts": [
 					{
 						"name": "Jim",
 						"uuid": "b2aaf598-1bb3-4c7d-b6bb-1f8dbe2ac16f"
 					}
 				],
-				"contact_query": "age > 20",
-				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"flow": {
 					"name": "Collect Age",
 					"uuid": "e4d441f0-24e3-4627-85fb-1e99e733baf0"
@@ -515,6 +581,11 @@ func TestEventMarshaling(t *testing.T) {
 						"uuid": "5f9fd4f7-4b0f-462a-a598-18bfc7810412"
 					}
 				],
+				"urns": [
+					"tel:+12345678900"
+				],
+				"contact_query": "age > 20",
+				"exclusions": {"in_a_flow": true},
 				"run_summary": {
 					"uuid": "779eaf3f-1c59-4374-a7cb-0eae9c5e8800"
 				},
@@ -522,11 +593,7 @@ func TestEventMarshaling(t *testing.T) {
 					"parent_uuid": "418a704c-f33e-4924-a00e-1763d1498a13",
 					"ancestors": 2,
 					"ancestors_since_input": 0
-				},
-				"type": "session_triggered",
-				"urns": [
-					"tel:+12345678900"
-				]
+				}
 			}`,
 		},
 		{
@@ -558,13 +625,15 @@ func TestEventMarshaling(t *testing.T) {
 				assets.NewTicketerReference(assets.TicketerUUID("4b937f49-7fb7-43a5-8e57-14e2f028a471"), "Support"),
 				[]*flows.HTTPLog{
 					{
-						HTTPTrace: &flows.HTTPTrace{
-							URL:        "https://tickets.com",
-							StatusCode: 200,
-							Status:     flows.CallStatusSuccess,
-							Request:    "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: tickets.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
-							Response:   "HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\r\n",
-							ElapsedMS:  12,
+						HTTPLogWithoutTime: &flows.HTTPLogWithoutTime{
+							LogWithoutTime: &httpx.LogWithoutTime{
+								URL:        "https://tickets.com",
+								StatusCode: 200,
+								Request:    "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: tickets.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
+								Response:   "HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\r\n",
+								ElapsedMS:  12,
+							},
+							Status: flows.CallStatusSuccess,
 						},
 						CreatedOn: dates.Now(),
 					},
@@ -628,16 +697,16 @@ func TestReadEvent(t *testing.T) {
 func TestWebhookCalledEventTrimming(t *testing.T) {
 	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
-	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
+	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]*httpx.MockResponse{
 		"http://temba.io/": {
-			httpx.NewMockResponse(200, nil, strings.Repeat("Y", 20000)),
+			httpx.NewMockResponse(200, nil, bytes.Repeat([]byte("Y"), 20000)),
 		},
 	}))
 
 	request, _ := http.NewRequest("GET", "http://temba.io/", strings.NewReader(strings.Repeat("X", 20000)))
 
 	svc := webhooks.NewService(http.DefaultClient, nil, nil, nil, 1024*1024)
-	call, err := svc.Call(nil, request)
+	call, err := svc.Call(request)
 	require.NoError(t, err)
 
 	assert.Equal(t, 42, len(call.ResponseTrace))
@@ -652,19 +721,42 @@ func TestWebhookCalledEventTrimming(t *testing.T) {
 	assert.Equal(t, "YYYYYYY...", event.Response[9990:])
 }
 
-func TestWebhookCalledEventNullChar(t *testing.T) {
+func TestWebhookCalledEventValid(t *testing.T) {
 	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
-	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
+	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]*httpx.MockResponse{
 		"http://temba.io/": {
-			httpx.NewMockResponse(200, nil, "abc \x00 \\u0000 \\\u0000 \\\\u0000"),
+			httpx.NewMockResponse(200, map[string]string{"Header": "hello"}, []byte(`{"foo": "bar"}`)),
 		},
 	}))
 
 	request, _ := http.NewRequest("GET", "http://temba.io/", nil)
 
 	svc := webhooks.NewService(http.DefaultClient, nil, nil, nil, 1024*1024)
-	call, err := svc.Call(nil, request)
+	call, err := svc.Call(request)
+	require.NoError(t, err)
+
+	event := events.NewWebhookCalled(call, flows.CallStatusSuccess, "")
+
+	assert.Equal(t, "http://temba.io/", event.URL)
+	assert.Equal(t, "HTTP/1.0 200 OK\r\nContent-Length: 14\r\nHeader: hello\r\n\r\n{\"foo\": \"bar\"}", event.Response)
+	assert.True(t, utf8.ValidString(event.Response))
+	assert.Equal(t, events.ExtractionValid, event.Extraction)
+}
+
+func TestWebhookCalledEventNullChar(t *testing.T) {
+	defer httpx.SetRequestor(httpx.DefaultRequestor)
+
+	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]*httpx.MockResponse{
+		"http://temba.io/": {
+			httpx.NewMockResponse(200, nil, []byte("abc \x00 \\u0000 \\\u0000 \\\\u0000")),
+		},
+	}))
+
+	request, _ := http.NewRequest("GET", "http://temba.io/", nil)
+
+	svc := webhooks.NewService(http.DefaultClient, nil, nil, nil, 1024*1024)
+	call, err := svc.Call(request)
 	require.NoError(t, err)
 
 	event := events.NewWebhookCalled(call, flows.CallStatusSuccess, "")
@@ -673,28 +765,30 @@ func TestWebhookCalledEventNullChar(t *testing.T) {
 	assert.Equal(t, "http://temba.io/", event.URL)
 	assert.Equal(t, "HTTP/1.0 200 OK\r\nContent-Length: 23\r\n\r\nabc � � \\� \\\\u0000", event.Response)
 	assert.True(t, utf8.ValidString(event.Response))
+	assert.Equal(t, events.ExtractionIgnored, event.Extraction)
 }
 
 func TestWebhookCalledEventBadUTF8(t *testing.T) {
 	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
-	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]httpx.MockResponse{
+	httpx.SetRequestor(httpx.NewMockRequestor(map[string][]*httpx.MockResponse{
 		"http://temba.io/": {
-			httpx.NewMockResponse(200, map[string]string{"Bad-Header": "\xa0\xa1"}, "\xa0\xa1"),
+			httpx.NewMockResponse(200, map[string]string{"Bad-Header": "\xa0\xa1"}, []byte("{\"foo\": \"\xa0\xa1\"}")),
 		},
 	}))
 
 	request, _ := http.NewRequest("GET", "http://temba.io/", nil)
 
 	svc := webhooks.NewService(http.DefaultClient, nil, nil, nil, 1024*1024)
-	call, err := svc.Call(nil, request)
+	call, err := svc.Call(request)
 	require.NoError(t, err)
 
 	event := events.NewWebhookCalled(call, flows.CallStatusSuccess, "")
 
 	assert.Equal(t, "http://temba.io/", event.URL)
-	assert.Equal(t, "HTTP/1.0 200 OK\r\nContent-Length: 2\r\nBad-Header: �\r\n\r\n...", event.Response)
+	assert.Equal(t, "HTTP/1.0 200 OK\r\nContent-Length: 13\r\nBad-Header: �\r\n\r\n...", event.Response)
 	assert.True(t, utf8.ValidString(event.Response))
+	assert.Equal(t, events.ExtractionCleaned, event.Extraction)
 }
 
 func TestDeprecatedEvents(t *testing.T) {

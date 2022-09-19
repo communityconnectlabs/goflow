@@ -20,12 +20,12 @@ const TypeSetContactField string = "set_contact_field"
 // template and white space is trimmed from the final value. An empty string clears the value.
 // A [event:contact_field_changed] event will be created with the corresponding value.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "set_contact_field",
-//     "field": {"key": "gender", "name": "Gender"},
-//     "value": "Female"
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "set_contact_field",
+//	  "field": {"key": "gender", "name": "Gender"},
+//	  "value": "Female"
+//	}
 //
 // @action set_contact_field
 type SetContactFieldAction struct {
@@ -46,7 +46,7 @@ func NewSetContactField(uuid flows.ActionUUID, field *assets.FieldReference, val
 }
 
 // Execute runs this action
-func (a *SetContactFieldAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *SetContactFieldAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	if run.Contact() == nil {
 		logEvent(events.NewErrorf("can't execute action in session without a contact"))
 		return nil

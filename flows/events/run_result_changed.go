@@ -17,20 +17,20 @@ const TypeRunResultChanged string = "run_result_changed"
 // the name, value and category of the result, but also the UUID of the node where
 // the result was generated.
 //
-//   {
-//     "type": "run_result_changed",
-//     "created_on": "2006-01-02T15:04:05Z",
-//     "name": "Gender",
-//     "value": "m",
-//     "category": "Male",
-//     "category_localized": "Homme",
-//     "node_uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
-//     "input": "M"
-//   }
+//	{
+//	  "type": "run_result_changed",
+//	  "created_on": "2006-01-02T15:04:05Z",
+//	  "name": "Gender",
+//	  "value": "m",
+//	  "category": "Male",
+//	  "category_localized": "Homme",
+//	  "node_uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
+//	  "input": "M"
+//	}
 //
 // @event run_result_changed
 type RunResultChangedEvent struct {
-	baseEvent
+	BaseEvent
 
 	Name              string          `json:"name" validate:"required"`
 	Value             string          `json:"value"`
@@ -43,7 +43,7 @@ type RunResultChangedEvent struct {
 // NewRunResultChanged returns a new save result event for the passed in values
 func NewRunResultChanged(result *flows.Result) *RunResultChangedEvent {
 	return &RunResultChangedEvent{
-		baseEvent:         newBaseEvent(TypeRunResultChanged),
+		BaseEvent:         NewBaseEvent(TypeRunResultChanged),
 		Name:              result.Name,
 		Value:             result.Value,
 		Category:          result.Category,

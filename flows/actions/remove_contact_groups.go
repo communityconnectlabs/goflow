@@ -20,14 +20,14 @@ const TypeRemoveContactGroups string = "remove_contact_groups"
 // for the groups which the contact is removed from. Groups can either be explicitly provided or `all_groups` can be set to true to remove
 // the contact from all non-query based groups.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "remove_contact_groups",
-//     "groups": [{
-//       "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
-//       "name": "Registered Users"
-//     }]
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "remove_contact_groups",
+//	  "groups": [{
+//	    "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d",
+//	    "name": "Registered Users"
+//	  }]
+//	}
 //
 // @action remove_contact_groups
 type RemoveContactGroupsAction struct {
@@ -56,7 +56,7 @@ func (a *RemoveContactGroupsAction) Validate() error {
 }
 
 // Execute runs the action
-func (a *RemoveContactGroupsAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *RemoveContactGroupsAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	contact := run.Contact()
 	if contact == nil {
 		logEvent(events.NewErrorf("can't execute action in session without a contact"))

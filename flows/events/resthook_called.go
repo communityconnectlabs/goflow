@@ -17,20 +17,20 @@ const TypeResthookCalled string = "resthook_called"
 // the payload that will be sent to any subscribers of that resthook. Note that this event is
 // created regardless of whether there any subscriberes for that resthook.
 //
-//   {
-//     "type": "resthook_called",
-//     "created_on": "2006-01-02T15:04:05Z",
-//     "resthook": "success",
-//     "payload": {
-//       "contact:":{
-//         "name":"Bob"
-//       }
-//     }
-//   }
+//	{
+//	  "type": "resthook_called",
+//	  "created_on": "2006-01-02T15:04:05Z",
+//	  "resthook": "success",
+//	  "payload": {
+//	    "contact:":{
+//	      "name":"Bob"
+//	    }
+//	  }
+//	}
 //
 // @event resthook_called
 type ResthookCalledEvent struct {
-	baseEvent
+	BaseEvent
 
 	Resthook string          `json:"resthook"`
 	Payload  json.RawMessage `json:"payload"`
@@ -39,7 +39,7 @@ type ResthookCalledEvent struct {
 // NewResthookCalled returns a new webhook called event
 func NewResthookCalled(resthook string, payload json.RawMessage) *ResthookCalledEvent {
 	return &ResthookCalledEvent{
-		baseEvent: newBaseEvent(TypeResthookCalled),
+		BaseEvent: NewBaseEvent(TypeResthookCalled),
 		Resthook:  resthook,
 		Payload:   payload,
 	}

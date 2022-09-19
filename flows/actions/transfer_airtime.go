@@ -22,12 +22,12 @@ const TypeTransferAirtime string = "transfer_airtime"
 //
 // An [event:airtime_transferred] event will be created if the airtime could be sent.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "transfer_airtime",
-//     "amounts": {"RWF": 500, "USD": 0.5},
-//     "result_name": "Reward Transfer"
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "transfer_airtime",
+//	  "amounts": {"RWF": 500, "USD": 0.5},
+//	  "result_name": "Reward Transfer"
+//	}
 //
 // @action transfer_airtime
 type TransferAirtimeAction struct {
@@ -48,7 +48,7 @@ func NewTransferAirtime(uuid flows.ActionUUID, amounts map[string]decimal.Decima
 }
 
 // Execute executes the transfer action
-func (a *TransferAirtimeAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *TransferAirtimeAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	transfer, err := a.transfer(run, step, logEvent)
 	if err != nil {
 		logEvent(events.NewError(err))
@@ -61,7 +61,7 @@ func (a *TransferAirtimeAction) Execute(run flows.FlowRun, step flows.Step, logM
 	return nil
 }
 
-func (a *TransferAirtimeAction) transfer(run flows.FlowRun, step flows.Step, logEvent flows.EventCallback) (*flows.AirtimeTransfer, error) {
+func (a *TransferAirtimeAction) transfer(run flows.Run, step flows.Step, logEvent flows.EventCallback) (*flows.AirtimeTransfer, error) {
 	// fail if we don't have a contact
 	contact := run.Contact()
 	if contact == nil {
@@ -81,14 +81,14 @@ func (a *TransferAirtimeAction) transfer(run flows.FlowRun, step flows.Step, log
 		sender, _ = urns.Parse("tel:" + channel.Address())
 	}
 
-	svc, err := run.Session().Engine().Services().Airtime(run.Session())
+	svc, err := run.Session().Engine().Services().Airtime(run.Session().Assets())
 	if err != nil {
 		return nil, err
 	}
 
 	httpLogger := &flows.HTTPLogger{}
 
-	transfer, err := svc.Transfer(run.Session(), sender, telURNs[0].URN(), a.Amounts, httpLogger.Log)
+	transfer, err := svc.Transfer(sender, telURNs[0].URN(), a.Amounts, httpLogger.Log)
 	if transfer != nil {
 		logEvent(events.NewAirtimeTransferred(transfer, httpLogger.Logs))
 	}
@@ -96,11 +96,11 @@ func (a *TransferAirtimeAction) transfer(run flows.FlowRun, step flows.Step, log
 	return transfer, err
 }
 
-func (a *TransferAirtimeAction) saveSuccess(run flows.FlowRun, step flows.Step, transfer *flows.AirtimeTransfer, logEvent flows.EventCallback) {
+func (a *TransferAirtimeAction) saveSuccess(run flows.Run, step flows.Step, transfer *flows.AirtimeTransfer, logEvent flows.EventCallback) {
 	a.saveResult(run, step, a.ResultName, transfer.ActualAmount.String(), CategorySuccess, "", "", nil, logEvent)
 }
 
-func (a *TransferAirtimeAction) saveFailure(run flows.FlowRun, step flows.Step, logEvent flows.EventCallback) {
+func (a *TransferAirtimeAction) saveFailure(run flows.Run, step flows.Step, logEvent flows.EventCallback) {
 	a.saveResult(run, step, a.ResultName, "0", CategoryFailure, "", "", nil, logEvent)
 }
 

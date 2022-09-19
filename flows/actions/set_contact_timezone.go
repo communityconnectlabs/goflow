@@ -20,11 +20,11 @@ const TypeSetContactTimezone string = "set_contact_timezone"
 // template and white space is trimmed from the final value. An empty string clears the timezone.
 // A [event:contact_timezone_changed] event will be created with the corresponding value.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "set_contact_timezone",
-//     "timezone": "Africa/Kigali"
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "set_contact_timezone",
+//	  "timezone": "Africa/Kigali"
+//	}
 //
 // @action set_contact_timezone
 type SetContactTimezoneAction struct {
@@ -43,7 +43,7 @@ func NewSetContactTimezone(uuid flows.ActionUUID, timezone string) *SetContactTi
 }
 
 // Execute runs this action
-func (a *SetContactTimezoneAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *SetContactTimezoneAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	if run.Contact() == nil {
 		logEvent(events.NewErrorf("can't execute action in session without a contact"))
 		return nil

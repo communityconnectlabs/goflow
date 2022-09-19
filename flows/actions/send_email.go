@@ -22,13 +22,13 @@ const TypeSendEmail string = "send_email"
 //
 // An [event:email_sent] event will be created if the email could be sent.
 //
-//   {
-//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//     "type": "send_email",
-//     "addresses": ["@urns.mailto"],
-//     "subject": "Here is your activation token",
-//     "body": "Your activation token is @contact.fields.activation_token"
-//   }
+//	{
+//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//	  "type": "send_email",
+//	  "addresses": ["@urns.mailto"],
+//	  "subject": "Here is your activation token",
+//	  "body": "Your activation token is @contact.fields.activation_token"
+//	}
 //
 // @action send_email
 type SendEmailAction struct {
@@ -51,7 +51,7 @@ func NewSendEmail(uuid flows.ActionUUID, addresses []string, subject string, bod
 }
 
 // Execute creates the email events
-func (a *SendEmailAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *SendEmailAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	localizedSubject := run.GetText(uuids.UUID(a.UUID()), "subject", a.Subject)
 	evaluatedSubject, err := run.EvaluateTemplate(localizedSubject)
 	if err != nil {
@@ -100,13 +100,13 @@ func (a *SendEmailAction) Execute(run flows.FlowRun, step flows.Step, logModifie
 		return nil
 	}
 
-	svc, err := run.Session().Engine().Services().Email(run.Session())
+	svc, err := run.Session().Engine().Services().Email(run.Session().Assets())
 	if err != nil {
 		logEvent(events.NewError(err))
 		return nil
 	}
 
-	err = svc.Send(run.Session(), evaluatedAddresses, evaluatedSubject, evaluatedBody)
+	err = svc.Send(evaluatedAddresses, evaluatedSubject, evaluatedBody)
 	if err != nil {
 		logEvent(events.NewError(errors.Wrap(err, "unable to send email")))
 	} else {

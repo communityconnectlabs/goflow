@@ -13,15 +13,15 @@ const TypeContactNameChanged string = "contact_name_changed"
 
 // ContactNameChangedEvent events are created when the name of the contact has been changed.
 //
-//   {
-//     "type": "contact_name_changed",
-//     "created_on": "2006-01-02T15:04:05Z",
-//     "name": "Bob Smith"
-//   }
+//	{
+//	  "type": "contact_name_changed",
+//	  "created_on": "2006-01-02T15:04:05Z",
+//	  "name": "Bob Smith"
+//	}
 //
 // @event contact_name_changed
 type ContactNameChangedEvent struct {
-	baseEvent
+	BaseEvent
 
 	Name string `json:"name"`
 }
@@ -29,7 +29,7 @@ type ContactNameChangedEvent struct {
 // NewContactNameChanged returns a new contact name changed event
 func NewContactNameChanged(name string) *ContactNameChangedEvent {
 	return &ContactNameChangedEvent{
-		baseEvent: newBaseEvent(TypeContactNameChanged),
+		BaseEvent: NewBaseEvent(TypeContactNameChanged),
 		Name:      name,
 	}
 }
