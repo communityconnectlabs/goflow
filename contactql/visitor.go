@@ -5,12 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/contactql/gen"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-
 	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/contactql/gen"
+	"github.com/nyaruka/goflow/envs"
 )
 
 // an implicit condition like +123-124-6546 or 1234 will be interpreted as a tel ~ condition
@@ -32,6 +31,7 @@ const (
 	AttributeLanguage   = "language"
 	AttributeURN        = "urn"
 	AttributeGroup      = "group"
+	AttributeTickets    = "tickets"
 	AttributeCreatedOn  = "created_on"
 	AttributeLastSeenOn = "last_seen_on"
 )
@@ -43,6 +43,7 @@ var attributes = map[string]assets.FieldType{
 	AttributeLanguage:   assets.FieldTypeText,
 	AttributeURN:        assets.FieldTypeText,
 	AttributeGroup:      assets.FieldTypeText,
+	AttributeTickets:    assets.FieldTypeNumber,
 	AttributeCreatedOn:  assets.FieldTypeDatetime,
 	AttributeLastSeenOn: assets.FieldTypeDatetime,
 }
@@ -56,15 +57,13 @@ type Resolver interface {
 type visitor struct {
 	gen.BaseContactQLVisitor
 
-	env      envs.Environment
-	resolver Resolver
-
+	env    envs.Environment
 	errors []error
 }
 
 // creates a new ContactQL visitor
-func newVisitor(env envs.Environment, resolver Resolver) *visitor {
-	return &visitor{env: env, resolver: resolver}
+func newVisitor(env envs.Environment) *visitor {
+	return &visitor{env: env}
 }
 
 // Visit the top level parse tree
@@ -86,17 +85,17 @@ func (v *visitor) VisitImplicitCondition(ctx *gen.ImplicitConditionContext) inte
 	if v.env.RedactionPolicy() == envs.RedactionPolicyURNs {
 		num, err := strconv.Atoi(value)
 		if err == nil {
-			return newCondition(AttributeID, PropertyTypeAttribute, nil, OpEqual, strconv.Itoa(num), attributes[AttributeID])
+			return newCondition(AttributeID, PropertyTypeAttribute, OpEqual, strconv.Itoa(num))
 		}
 	} else if asURN != urns.NilURN {
 		scheme, path, _, _ := asURN.ToParts()
 
-		return newCondition(scheme, PropertyTypeScheme, nil, OpEqual, path, assets.FieldTypeText)
+		return newCondition(scheme, PropertyTypeScheme, OpEqual, path)
 
 	} else if implicitIsPhoneNumberRegex.MatchString(value) {
 		value = cleanPhoneNumberRegex.ReplaceAllLiteralString(value, "")
 
-		return newCondition(urns.TelScheme, PropertyTypeScheme, nil, OpContains, value, assets.FieldTypeText)
+		return newCondition(urns.TelScheme, PropertyTypeScheme, OpContains, value)
 	}
 
 	// convert to contains condition only if we have the right tokens, otherwise make equals check
@@ -105,13 +104,7 @@ func (v *visitor) VisitImplicitCondition(ctx *gen.ImplicitConditionContext) inte
 		operator = OpEqual
 	}
 
-	condition := newCondition(AttributeName, PropertyTypeAttribute, nil, operator, value, attributes[AttributeName])
-
-	if err := condition.Validate(v.env, v.resolver); err != nil {
-		v.addError(err)
-	}
-
-	return condition
+	return newCondition(AttributeName, PropertyTypeAttribute, operator, value)
 }
 
 // expression : TEXT COMPARATOR literal
@@ -126,10 +119,9 @@ func (v *visitor) VisitCondition(ctx *gen.ConditionContext) interface{} {
 	}
 
 	var propType PropertyType
-	var propField assets.Field
 
 	// first try to match a fixed attribute
-	valueType, isAttribute := attributes[propKey]
+	_, isAttribute := attributes[propKey]
 	if isAttribute {
 		propType = PropertyTypeAttribute
 
@@ -140,29 +132,15 @@ func (v *visitor) VisitCondition(ctx *gen.ConditionContext) interface{} {
 	} else if urns.IsValidScheme(propKey) {
 		// second try to match a URN scheme
 		propType = PropertyTypeScheme
-		valueType = assets.FieldTypeText
 
 		if v.env.RedactionPolicy() == envs.RedactionPolicyURNs && value != "" {
 			v.addError(NewQueryError(ErrRedactedURNs, "cannot query on redacted URNs"))
 		}
 	} else {
-		field := v.resolver.ResolveField(propKey)
-		if field != nil {
-			propType = PropertyTypeField
-			propField = field
-			valueType = field.Type()
-		} else {
-			v.addError(NewQueryError(ErrUnknownProperty, "can't resolve '%s' to attribute, scheme or field", propKey).withExtra("property", propKey))
-		}
+		propType = PropertyTypeField
 	}
 
-	condition := newCondition(propKey, propType, propField, operator, value, valueType)
-
-	if err := condition.Validate(v.env, v.resolver); err != nil {
-		v.addError(err)
-	}
-
-	return condition
+	return newCondition(propKey, propType, operator, value)
 }
 
 // expression : expression AND expression

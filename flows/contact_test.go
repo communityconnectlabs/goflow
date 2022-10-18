@@ -3,7 +3,7 @@ package flows_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -41,6 +41,12 @@ func TestContact(t *testing.T) {
 				"uuid": "d605bb96-258d-4097-ad0a-080937db2212",
 				"name": "Support Tickets",
 				"type": "mailgun"
+			}
+		],
+		"topics": [
+			{
+				"uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
+				"name": "Weather"
 			}
 		]
 	}`))
@@ -130,13 +136,16 @@ func TestContact(t *testing.T) {
 		"twitterid":  nil,
 		"viber":      nil,
 		"vk":         nil,
+		"webchat":    nil,
 		"wechat":     nil,
 		"whatsapp":   nil,
 	}), flows.ContextFunc(env, contact.URNs().MapContext))
 
 	assert.Equal(t, 0, contact.Tickets().Count())
 
-	ticket := flows.OpenTicket(sa.Ticketers().Get("d605bb96-258d-4097-ad0a-080937db2212"), "New ticket", "I have issues")
+	mailgun := sa.Ticketers().Get("d605bb96-258d-4097-ad0a-080937db2212")
+	weather := sa.Topics().Get("472a7a73-96cb-4736-b567-056d987cc5b4")
+	ticket := flows.OpenTicket(mailgun, weather, "I have issues", nil)
 	contact.Tickets().Add(ticket)
 
 	assert.Equal(t, 1, contact.Tickets().Count())
@@ -304,7 +313,7 @@ func TestReevaluateQueryBasedGroups(t *testing.T) {
 		ContactAfter  json.RawMessage `json:"contact_after"`
 	}{}
 
-	testFile, err := ioutil.ReadFile("testdata/smart_groups.json")
+	testFile, err := os.ReadFile("testdata/smart_groups.json")
 	require.NoError(t, err)
 	err = jsonx.Unmarshal(testFile, &tests)
 	require.NoError(t, err)
@@ -393,7 +402,19 @@ func TestContactQuery(t *testing.T) {
 		},
 		"groups": [
 			{"uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d", "name": "Testers"},
-        	{"uuid": "4f1f98fc-27a7-4a69-bbdb-24744ba739a9", "name": "Males"}
+			{"uuid": "4f1f98fc-27a7-4a69-bbdb-24744ba739a9", "name": "Males"}
+		],
+		"tickets": [
+			{
+				"uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52",
+				"ticketer": {
+					"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
+					"name": "Support Tickets"
+				},
+				"subject": "Old ticket",
+				"body": "I have a problem",
+				"assignee": null
+			}
 		],
 		"language": "eng",
 		"timezone": "America/Guayaquil",
@@ -493,6 +514,12 @@ func TestContactQuery(t *testing.T) {
 		{`group = customers`, envs.RedactionPolicyNone, false, ""},
 		{`group != customers`, envs.RedactionPolicyNone, true, ""},
 
+		{`tickets = 1`, envs.RedactionPolicyNone, true, ""},
+		{`tickets = 0`, envs.RedactionPolicyNone, false, ""},
+		{`tickets != 1`, envs.RedactionPolicyNone, false, ""},
+		{`tickets != 0`, envs.RedactionPolicyNone, true, ""},
+		{`tickets > 0`, envs.RedactionPolicyNone, true, ""},
+
 		{`age = 39`, envs.RedactionPolicyNone, true, ""},
 		{`age != 39`, envs.RedactionPolicyNone, false, ""},
 		{`age = 60`, envs.RedactionPolicyNone, false, ""},
@@ -507,12 +534,12 @@ func TestContactQuery(t *testing.T) {
 			env = session.Environment()
 		}
 
-		query, err := contactql.ParseQuery(env, q, session.Assets())
+		parsed, err := contactql.ParseQuery(env, q, session.Assets())
 		if err != nil {
 			return false, err
 		}
 
-		return contactql.EvaluateQuery(env, query, contact)
+		return contactql.EvaluateQuery(env, parsed, contact), nil
 	}
 
 	for _, tc := range testCases {

@@ -2,6 +2,7 @@ package engine
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/greatnonprofits-nfp/goflow/assets"
@@ -88,6 +89,17 @@ func (s *session) GetRun(uuid flows.RunUUID) (flows.FlowRun, error) {
 		return run, nil
 	}
 	return nil, errors.Errorf("unable to find run with UUID '%s'", uuid)
+}
+
+func (s *session) FindStep(uuid flows.StepUUID) (flows.FlowRun, flows.Step) {
+	for _, r := range s.runs {
+		for _, t := range r.Path() {
+			if t.UUID() == uuid {
+				return r, t
+			}
+		}
+	}
+	return nil, nil
 }
 
 func (s *session) addRun(run flows.FlowRun) {
@@ -227,6 +239,10 @@ func (s *session) tryToResume(sprint flows.Sprint, waitingRun flows.FlowRun, res
 	// if flow for this run is a missing asset, we have a problem
 	if waitingRun.Flow() == nil {
 		return errors.New("can't resume run with missing flow asset")
+	}
+
+	if s.countWaits() >= s.engine.MaxResumesPerSession() {
+		return errors.Errorf("reached maximum number of resumes per session (%d)", s.Engine().MaxResumesPerSession())
 	}
 
 	// figure out where in the flow we began waiting on
@@ -373,7 +389,7 @@ func (s *session) continueUntilWait(sprint flows.Sprint, currentRun flows.FlowRu
 
 			if numNewSteps > s.Engine().MaxStepsPerSprint() {
 				// we've hit the step limit - usually a sign of a loop
-				failure(sprint, currentRun, step, errors.Errorf("step limit exceeded, stopping execution before entering '%s'", destination))
+				failure(sprint, currentRun, step, errors.Errorf("reached maximum number of steps per sprint (%d)", s.Engine().MaxStepsPerSprint()))
 				destination = noDestination
 			} else {
 				node := currentRun.Flow().GetNode(destination)
@@ -502,17 +518,24 @@ func (s *session) ensureQueryBasedGroups(logEvent flows.EventCallback) {
 		return
 	}
 
-	added, removed, errors := s.contact.ReevaluateQueryBasedGroups(s.Environment())
-
-	// add error event for each group we couldn't re-evaluate
-	for _, err := range errors {
-		logEvent(events.NewError(err))
-	}
+	added, removed := s.contact.ReevaluateQueryBasedGroups(s.Environment())
 
 	// add groups changed event for the groups we were added/removed to/from
 	if len(added) > 0 || len(removed) > 0 {
 		logEvent(events.NewContactGroupsChanged(added, removed))
 	}
+}
+
+func (s *session) countWaits() int {
+	waits := 0
+	for _, r := range s.runs {
+		for _, e := range r.Events() {
+			if strings.HasSuffix(e.Type(), "_wait") {
+				waits++
+			}
+		}
+	}
+	return waits
 }
 
 const noDestination = flows.NodeUUID("")

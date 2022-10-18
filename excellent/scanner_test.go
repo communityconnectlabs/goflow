@@ -4,8 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/excellent"
-
+	"github.com/nyaruka/goflow/excellent"
 	"github.com/stretchr/testify/assert"
 )
 

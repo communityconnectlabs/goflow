@@ -3,19 +3,19 @@ package flows_test
 import (
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	atypes "github.com/greatnonprofits-nfp/goflow/assets/static/types"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUsers(t *testing.T) {
-	ua1 := atypes.NewUser("bob@nyaruka.com", "Bob McTickets")
-	ua2 := atypes.NewUser("jim@nyaruka.com", "")
+	ua1 := static.NewUser("bob@nyaruka.com", "Bob McTickets")
+	ua2 := static.NewUser("jim@nyaruka.com", "")
 
 	ua := flows.NewUserAssets([]assets.User{ua1, ua2})
 

@@ -8,7 +8,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-07-09 16:50-0500\n"
+"POT-Creation-Date: 2021-11-09 16:39-0500\n"
 "Last-Translator: Rowan Seymour <rowanseymour@gmail.com>, 2021\n"
 "Language-Team: Spanish (https://www.transifex.com/rapidpro/teams/226/es/)\n"
 "Language: es\n"
@@ -346,6 +346,16 @@ msgstr "Devuelve `value1` si `test` es veraz o `value2` si no."
 msgid "Returns `value` if is not empty or an error, otherwise it returns `default`."
 msgstr "Devuelve `value` si no está vacío o es un error; de lo contrario, devuelve `default`."
 
+#, fuzzy
+#| msgid "Returns the minimum value in `numbers`."
+msgid "Returns a new array with the values of `array` reversed."
+msgstr "Devuelve el valor mínimo en `numbers`."
+
+#, fuzzy
+#| msgid "Returns the minimum value in `numbers`."
+msgid "Returns a new array with the values of `array` sorted."
+msgstr "Devuelve el valor mínimo en `numbers`."
+
 msgid "Returns a new datetime with the time part replaced by the `time`."
 msgstr "Devuelve una nueva fecha y hora con la parte de la hora reemplazada por `hour`."
 
@@ -411,6 +421,11 @@ msgstr "Devuelve la porción de `text` entre `start` (inclusivo) y `end` (exclus
 
 msgid "Returns the remainder of the division of `dividend` by `divisor`."
 msgstr "Devuelve el resto de la división de `dividend` por `divisor`."
+
+#, fuzzy
+#| msgid "Returns the minimum value in `numbers`."
+msgid "Returns the unique values in `array`."
+msgstr "Devuelve el valor mínimo en `numbers`."
 
 msgid "Returns the week number (1-54) of `date`."
 msgstr "Devuelve el número de semana (1-54) de `date`."
@@ -704,6 +719,11 @@ msgstr "el UUID de la ejecución"
 msgid "the UUID of the ticket"
 msgstr "el UUID del ticket"
 
+#, fuzzy
+#| msgid "the UUID of the ticket"
+msgid "the UUID of the topic"
+msgstr "el UUID del ticket"
+
 msgid "the address of the channel"
 msgstr "la dirección del canal"
 
@@ -836,6 +856,11 @@ msgstr "el nombre del grupo"
 msgid "the name of the result"
 msgstr "el nombre del resultado"
 
+#, fuzzy
+#| msgid "the name of the group"
+msgid "the name of the topic"
+msgstr "el nombre del grupo"
+
 msgid "the name of the user"
 msgstr "el nombre del usuario"
 
@@ -886,6 +911,11 @@ msgstr "el texto y los archivos adjuntos"
 
 msgid "the text part of the input"
 msgstr "la parte de texto de la entrada"
+
+#, fuzzy
+#| msgid "the keyword match if this is a keyword trigger"
+msgid "the ticket if this is a ticket trigger"
+msgstr "la concordancia de palabra clave si se trata de un activador de palabra clave"
 
 msgid "the trigger that started this session"
 msgstr "el activador que inició esta sesión"

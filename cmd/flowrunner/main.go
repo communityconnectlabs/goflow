@@ -6,28 +6,26 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
-	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/services/classification/wit"
-	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/buger/jsonparser"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
-
-	"github.com/buger/jsonparser"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/nyaruka/goflow/flows/events"
+	"github.com/nyaruka/goflow/flows/resumes"
+	"github.com/nyaruka/goflow/flows/triggers"
+	"github.com/nyaruka/goflow/services/classification/wit"
+	"github.com/nyaruka/goflow/services/webhooks"
+	"github.com/nyaruka/goflow/utils"
 	"github.com/pkg/errors"
 )
 
@@ -105,7 +103,7 @@ func createEngine(witToken string) flows.Engine {
 
 // RunFlow steps through a flow
 func RunFlow(eng flows.Engine, assetsPath string, flowUUID assets.FlowUUID, initialMsg string, contactLang envs.Language, in io.Reader, out io.Writer) (*Repro, error) {
-	assetsJSON, err := ioutil.ReadFile(assetsPath)
+	assetsJSON, err := os.ReadFile(assetsPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error reading assets file '%s'", assetsPath)
 	}
@@ -300,7 +298,7 @@ func PrintEvent(event flows.Event, out io.Writer) {
 	case *events.SessionTriggeredEvent:
 		msg = fmt.Sprintf("🏁 session triggered for '%s'", typed.Flow.Name)
 	case *events.TicketOpenedEvent:
-		msg = fmt.Sprintf("🎟️ ticket opened with subject \"%s\"", typed.Ticket.Subject)
+		msg = fmt.Sprintf("🎟️ ticket opened with topic \"%s\"", typed.Ticket.Topic.Name)
 	case *events.WaitTimedOutEvent:
 		msg = "⏲️ resuming due to wait timeout"
 	case *events.WebhookCalledEvent:

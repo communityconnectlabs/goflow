@@ -3,12 +3,11 @@ package static
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static/types"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 )
@@ -16,18 +15,19 @@ import (
 // StaticSource is an asset source which loads assets from a static JSON file
 type StaticSource struct {
 	s struct {
-		Channels    []*types.Channel          `json:"channels" validate:"omitempty,dive"`
-		Classifiers []*types.Classifier       `json:"classifiers" validate:"omitempty,dive"`
-		Fields      []*types.Field            `json:"fields" validate:"omitempty,dive"`
-		Flows       []*types.Flow             `json:"flows" validate:"omitempty,dive"`
-		Globals     []*types.Global           `json:"globals" validate:"omitempty,dive"`
-		Groups      []*types.Group            `json:"groups" validate:"omitempty,dive"`
-		Labels      []*types.Label            `json:"labels" validate:"omitempty,dive"`
+		Channels    []*Channel                `json:"channels" validate:"omitempty,dive"`
+		Classifiers []*Classifier             `json:"classifiers" validate:"omitempty,dive"`
+		Fields      []*Field                  `json:"fields" validate:"omitempty,dive"`
+		Flows       []*Flow                   `json:"flows" validate:"omitempty,dive"`
+		Globals     []*Global                 `json:"globals" validate:"omitempty,dive"`
+		Groups      []*Group                  `json:"groups" validate:"omitempty,dive"`
+		Labels      []*Label                  `json:"labels" validate:"omitempty,dive"`
 		Locations   []*envs.LocationHierarchy `json:"locations"`
-		Resthooks   []*types.Resthook         `json:"resthooks" validate:"omitempty,dive"`
-		Templates   []*types.Template         `json:"templates" validate:"omitempty,dive"`
-		Ticketers   []*types.Ticketer         `json:"ticketers" validate:"omitempty,dive"`
-		Users       []*types.User             `json:"users" validate:"omitempty,dive"`
+		Resthooks   []*Resthook               `json:"resthooks" validate:"omitempty,dive"`
+		Templates   []*Template               `json:"templates" validate:"omitempty,dive"`
+		Ticketers   []*Ticketer               `json:"ticketers" validate:"omitempty,dive"`
+		Topics      []*Topic                  `json:"topics" validate:"omitempty,dive"`
+		Users       []*User                   `json:"users" validate:"omitempty,dive"`
 	}
 }
 
@@ -47,7 +47,7 @@ func NewSource(data json.RawMessage) (*StaticSource, error) {
 
 // LoadSource loads a new static source from the given JSON file
 func LoadSource(path string) (*StaticSource, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error reading file '%s'", path)
 	}
@@ -152,6 +152,15 @@ func (s *StaticSource) Ticketers() ([]assets.Ticketer, error) {
 	set := make([]assets.Ticketer, len(s.s.Ticketers))
 	for i := range s.s.Ticketers {
 		set[i] = s.s.Ticketers[i]
+	}
+	return set, nil
+}
+
+// Topics returns all topic assets
+func (s *StaticSource) Topics() ([]assets.Topic, error) {
+	set := make([]assets.Topic, len(s.s.Topics))
+	for i := range s.s.Topics {
+		set[i] = s.s.Topics[i]
 	}
 	return set, nil
 }

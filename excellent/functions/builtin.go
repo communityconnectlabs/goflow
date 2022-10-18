@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode"
@@ -15,10 +16,9 @@ import (
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/random"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/utils"
 	"github.com/shopspring/decimal"
 )
 
@@ -102,8 +102,11 @@ func init() {
 		"time_from_parts": ThreeIntegerFunction(TimeFromParts),
 
 		// array functions
-		"join": TwoArgFunction(Join),
-		"sum":  OneArgFunction(Sum),
+		"join":    TwoArgFunction(Join),
+		"reverse": OneArrayFunction(Reverse),
+		"sort":    OneArrayFunction(Sort),
+		"sum":     OneArrayFunction(Sum),
+		"unique":  OneArrayFunction(Unique),
 
 		// encoded text functions
 		"urn_parts":        OneTextFunction(URNParts),
@@ -596,7 +599,7 @@ func WordSlice(env envs.Environment, text types.XText, args ...types.XValue) typ
 	}
 
 	delimiters := types.XTextEmpty
-	if len(args) == 3 && args[2] != nil {
+	if len(args) >= 3 && args[2] != nil {
 		delimiters, xerr = types.ToXText(env, args[2])
 		if xerr != nil {
 			return xerr
@@ -1539,17 +1542,52 @@ func Join(env envs.Environment, arg1 types.XValue, arg2 types.XValue) types.XVal
 	return types.NewXText(output.String())
 }
 
+// Reverse returns a new array with the values of `array` reversed.
+//
+//   @(reverse(array(3, 1, 2))) -> [2, 1, 3]
+//   @(reverse(array("C", "A", "B"))) -> [B, A, C]
+//
+// @function reverse(array)
+func Reverse(env envs.Environment, array *types.XArray) types.XValue {
+	reversed := make([]types.XValue, array.Count())
+	for i := 0; i < array.Count(); i++ {
+		reversed[array.Count()-(i+1)] = array.Get(i)
+	}
+	return types.NewXArray(reversed...)
+}
+
+// Sort returns a new array with the values of `array` sorted.
+//
+//   @(sort(array(3, 1, 2))) -> [1, 2, 3]
+//   @(sort(array("C", "A", "B"))) -> [A, B, C]
+//
+// @function sort(array)
+func Sort(env envs.Environment, array *types.XArray) types.XValue {
+	sorted := make([]types.XValue, array.Count())
+	for i := 0; i < array.Count(); i++ {
+		val := array.Get(i)
+
+		_, isComparable := val.(types.XComparable)
+		if !isComparable {
+			return types.NewXErrorf("%s isn't a comparable type", types.Describe(val))
+		}
+
+		sorted[i] = val
+	}
+
+	sort.SliceStable(sorted, func(i, j int) bool {
+		return sorted[i].(types.XComparable).Compare(sorted[j]) < 0
+	})
+
+	return types.NewXArray(sorted...)
+}
+
 // Sum sums the items in the given `array`.
 //
 //   @(sum(array(1, 2, "3"))) -> 6
 //
 // @function sum(array)
-func Sum(env envs.Environment, arg1 types.XValue) types.XValue {
-	array, xerr := types.ToXArray(env, arg1)
-	if xerr != nil {
-		return xerr
-	}
-
+func Sum(env envs.Environment, array *types.XArray) types.XValue {
 	total := decimal.Zero
 	for i := 0; i < array.Count(); i++ {
 		itemAsNum, xerr := types.ToXNumber(env, array.Get(i))
@@ -1561,6 +1599,33 @@ func Sum(env envs.Environment, arg1 types.XValue) types.XValue {
 	}
 
 	return types.NewXNumber(total)
+}
+
+// Unique returns the unique values in `array`.
+//
+//   @(unique(array(1, 3, 2, 3))) -> [1, 3, 2]
+//   @(unique(array("hi", "there", "hi"))) -> [hi, there]
+//
+// @function unique(array)
+func Unique(env envs.Environment, array *types.XArray) types.XValue {
+	unique := make([]types.XValue, 0, array.Count())
+	for i := 0; i < array.Count(); i++ {
+		val := array.Get(i)
+
+		seen := false
+		for j := 0; j < len(unique); j++ {
+			if (val == nil && unique[j] == nil) || types.Equals(val, unique[j]) {
+				seen = true
+				break
+			}
+		}
+
+		if !seen {
+			unique = append(unique, val)
+		}
+	}
+
+	return types.NewXArray(unique...)
 }
 
 //------------------------------------------------------------------------------------------

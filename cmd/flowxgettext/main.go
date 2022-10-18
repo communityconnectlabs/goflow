@@ -5,16 +5,14 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 
 	"github.com/buger/jsonparser"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
-	"github.com/greatnonprofits-nfp/goflow/flows/translation"
-
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/nyaruka/goflow/flows/definition/migrations"
+	"github.com/nyaruka/goflow/flows/translation"
 	"github.com/pkg/errors"
 )
 
@@ -65,7 +63,7 @@ func FlowXGetText(lang envs.Language, excludeArgs bool, paths []string, writer i
 func loadFlows(paths []string) ([]flows.Flow, error) {
 	flows := make([]flows.Flow, 0)
 	for _, path := range paths {
-		fileJSON, err := ioutil.ReadFile(path)
+		fileJSON, err := os.ReadFile(path)
 		if err != nil {
 			return nil, errors.Wrapf(err, "error reading flow file '%s'", path)
 		}
