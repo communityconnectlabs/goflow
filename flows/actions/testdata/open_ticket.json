@@ -86,6 +86,7 @@
             },
             {
                 "type": "run_result_changed",
+                "corrected": "",
                 "created_on": "2018-10-18T14:20:30.000123456Z",
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
@@ -246,7 +247,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
                 "value": "9688d21d-95aa-4bed-afc7-f31b35731a3d",
-                "category": "Success"
+                "category": "Success",
+                "corrected": ""
             }
         ],
         "contact_after": {
@@ -395,6 +397,7 @@
             },
             {
                 "type": "run_result_changed",
+                "corrected": "",
                 "created_on": "2018-10-18T14:20:30.000123456Z",
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
@@ -543,6 +546,7 @@
             },
             {
                 "type": "run_result_changed",
+                "corrected": "",
                 "created_on": "2018-10-18T14:20:30.000123456Z",
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
@@ -703,6 +707,7 @@
             },
             {
                 "type": "run_result_changed",
+                "corrected": "",
                 "created_on": "2018-10-18T14:20:30.000123456Z",
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
@@ -951,7 +956,8 @@
                 "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
                 "name": "Ticket",
                 "value": "9688d21d-95aa-4bed-afc7-f31b35731a3d",
-                "category": "Success"
+                "category": "Success",
+                "corrected": ""
             }
         ],
         "templates": [

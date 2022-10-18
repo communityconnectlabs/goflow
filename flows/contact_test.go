@@ -411,7 +411,7 @@ func TestContactQuery(t *testing.T) {
 					"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
 					"name": "Support Tickets"
 				},
-				"subject": "Old ticket",
+				"topic": null,
 				"body": "I have a problem",
 				"assignee": null
 			}

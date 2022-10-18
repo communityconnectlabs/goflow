@@ -126,8 +126,8 @@ func (b *MsgBuilder) WithParams(params *types.XObject) *MsgBuilder {
 }
 
 // WithConnection sets the channel connection for the trigger
-func (b *MsgBuilder) WithConnection(channel *assets.ChannelReference, urn urns.URN) *MsgBuilder {
-	b.t.connection = flows.NewConnection(channel, urn)
+func (b *MsgBuilder) WithConnection(channel *assets.ChannelReference, urn urns.URN, externalID string, twilioCredentials string) *MsgBuilder {
+	b.t.connection = flows.NewConnection(channel, urn, externalID, twilioCredentials)
 	return b
 }
 

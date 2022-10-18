@@ -24,6 +24,7 @@ type Classifier interface {
 	Name() string
 	Type() string
 	Intents() []string
+	Config() map[string]string
 }
 
 // ClassifierReference is used to reference a classifier
