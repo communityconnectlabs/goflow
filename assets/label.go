@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 	validator "gopkg.in/go-playground/validator.v9"
 )
 

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,8 +65,8 @@ func TestToXNumberAndInteger(t *testing.T) {
 			"foo":         types.NewXNumberFromInt(234),
 		}), types.NewXNumberFromInt(123), 123, false},
 		{types.NewXText("12345678901234567890"), types.RequireXNumberFromString("12345678901234567890"), 0, true}, // out of int range
-		{types.NewXText("1E100"), types.XNumberZero, 0, true},                                                     // scientific notation not allowed
-		{types.NewXText("1e100"), types.XNumberZero, 0, true},                                                     // scientific notation not allowed
+		{types.NewXText("1E100"), types.XNumberZero, 0, true}, // scientific notation not allowed
+		{types.NewXText("1e100"), types.XNumberZero, 0, true}, // scientific notation not allowed
 	}
 
 	env := envs.NewBuilder().Build()

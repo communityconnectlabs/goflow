@@ -4,11 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/excellent"
-	"github.com/nyaruka/goflow/excellent/functions"
-	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/nyaruka/goflow/test"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/excellent"
+	"github.com/greatnonprofits-nfp/goflow/excellent/functions"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/test"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -188,7 +188,7 @@ func TestEvaluateTemplate(t *testing.T) {
 		"string1":  types.NewXText("foo"),
 		"string2":  types.NewXText("bar"),
 		"_special": types.NewXText("🐒"),
-		"汉字":       types.NewXText("simplified chinese"),
+		"汉字":     types.NewXText("simplified chinese"),
 		"int1":     types.NewXNumberFromInt(1),
 		"int2":     types.NewXNumberFromInt(2),
 		"dec1":     types.RequireXNumberFromString("1.5"),

@@ -5,12 +5,12 @@ import (
 	"strings"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/excellent/functions"
-	"github.com/nyaruka/goflow/excellent/gen"
-	"github.com/nyaruka/goflow/excellent/operators"
-	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/nyaruka/goflow/utils"
+	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/greatnonprofits-nfp/goflow/excellent/functions"
+	"github.com/greatnonprofits-nfp/goflow/excellent/gen"
+	"github.com/greatnonprofits-nfp/goflow/excellent/operators"
+	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/greatnonprofits-nfp/goflow/utils"
 )
 
 // Escaping is a function applied to expressions in a template after they've been evaluated

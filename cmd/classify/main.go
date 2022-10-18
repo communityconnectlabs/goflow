@@ -7,10 +7,10 @@ import (
 	"os"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/goflow/assets/static"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/services/classification/luis"
-	"github.com/nyaruka/goflow/services/classification/wit"
+	"github.com/greatnonprofits-nfp/goflow/assets/static"
+	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/greatnonprofits-nfp/goflow/services/classification/luis"
+	"github.com/greatnonprofits-nfp/goflow/services/classification/wit"
 	"github.com/pkg/errors"
 )
 

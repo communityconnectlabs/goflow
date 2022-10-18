@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"github.com/nyaruka/goflow/excellent/gen"
+	"github.com/greatnonprofits-nfp/goflow/excellent/gen"
 )
 
 // VisitExpression parses and visits the given expression with the given visitor

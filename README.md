@@ -1,7 +1,7 @@
 # Goflow 
-[![Build Status](https://github.com/nyaruka/goflow/workflows/CI/badge.svg)](https://github.com/nyaruka/goflow/actions?query=workflow%3ACI) 
+[![Build Status](https://github.com/greatnonprofits-nfp/goflow/workflows/CI/badge.svg)](https://github.com/greatnonprofits-nfp/goflow/actions?query=workflow%3ACI) 
 [![codecov](https://codecov.io/gh/nyaruka/goflow/branch/main/graph/badge.svg)](https://codecov.io/gh/nyaruka/goflow) 
-[![Go Report Card](https://goreportcard.com/badge/github.com/nyaruka/goflow)](https://goreportcard.com/report/github.com/nyaruka/goflow)
+[![Go Report Card](https://goreportcard.com/badge/github.com/greatnonprofits-nfp/goflow)](https://goreportcard.com/report/github.com/greatnonprofits-nfp/goflow)
 
 ## Specification
 
@@ -89,5 +89,5 @@ You can run all the tests with:
 If you've made changes to the flow engine output, regenerate the test files with:
 
 ```
-% go test github.com/nyaruka/goflow/test -update
+% go test github.com/greatnonprofits-nfp/goflow/test -update
 ```
