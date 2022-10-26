@@ -3,9 +3,9 @@ package tools_test
 import (
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/excellent/tools"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/nyaruka/goflow/excellent/tools"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/test"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -10,9 +10,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/test"
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/random"
 	"github.com/nyaruka/gocommon/uuids"
@@ -185,10 +185,10 @@ func resolveLinks(s string, resolver urlResolver, targets map[string]bool) strin
 
 	// these events are all alias to event:webhook_called
 	ignoredTargets := map[string]bool{
-		"event:giftcard_called": true,
+		"event:giftcard_called":    true,
 		"event:shorten_url_called": true,
-		"event:lookup_called": true,
-		"event:voicecall_status": true,
+		"event:lookup_called":      true,
+		"event:voicecall_status":   true,
 	}
 	return r.ReplaceAllStringFunc(s, func(old string) string {
 		target := old[1 : len(old)-1]

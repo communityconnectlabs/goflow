@@ -10,12 +10,12 @@ import (
 
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/translation"
-	"github.com/greatnonprofits-nfp/goflow/test"
-	"github.com/greatnonprofits-nfp/goflow/utils/i18n"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/translation"
+	"github.com/nyaruka/goflow/test"
+	"github.com/nyaruka/goflow/utils/i18n"
 
 	"github.com/buger/jsonparser"
 	"github.com/stretchr/testify/assert"

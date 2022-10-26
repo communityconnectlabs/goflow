@@ -2,13 +2,13 @@ package main
 
 // generate full docs with:
 //
-// go install github.com/greatnonprofits-nfp/goflow/cmd/docgen; docgen
+// go install github.com/nyaruka/goflow/cmd/docgen; docgen
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/greatnonprofits-nfp/goflow/cmd/docgen/docs"
+	"github.com/nyaruka/goflow/cmd/docgen/docs"
 )
 
 const (

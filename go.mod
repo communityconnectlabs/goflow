@@ -1,4 +1,4 @@
-module github.com/greatnonprofits-nfp/goflow
+module github.com/nyaruka/goflow
 
 require (
 	cloud.google.com/go/dialogflow v1.8.1

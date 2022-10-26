@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/utils/smtpx"
+	"github.com/nyaruka/goflow/utils/smtpx"
 
 	"github.com/stretchr/testify/assert"
 )

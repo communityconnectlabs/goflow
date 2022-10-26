@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
 )
 
 type environment struct {

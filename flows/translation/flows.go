@@ -10,10 +10,10 @@ import (
 
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils"
-	"github.com/greatnonprofits-nfp/goflow/utils/i18n"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/utils"
+	"github.com/nyaruka/goflow/utils/i18n"
 )
 
 // describes the location of a piece of extracted text

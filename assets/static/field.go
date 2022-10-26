@@ -1,7 +1,7 @@
 package static
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/nyaruka/goflow/assets"
 )
 
 // Field is a JSON serializable implementation of a field asset

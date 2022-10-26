@@ -8,8 +8,8 @@ import (
 
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition/legacy"
-	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/nyaruka/goflow/flows/definition/legacy"
+	"github.com/nyaruka/goflow/test"
 
 	"github.com/buger/jsonparser"
 	"github.com/stretchr/testify/assert"

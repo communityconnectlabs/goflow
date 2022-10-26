@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/inspect"
+	"github.com/nyaruka/goflow/flows/routers"
 )
 
 func init() {

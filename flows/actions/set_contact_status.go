@@ -1,9 +1,9 @@
 package actions
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
-	"github.com/greatnonprofits-nfp/goflow/flows/modifiers"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
+	"github.com/nyaruka/goflow/flows/modifiers"
 )
 
 func init() {

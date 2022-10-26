@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/utils"
 	"github.com/pkg/errors"
 )
 

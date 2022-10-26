@@ -8,11 +8,11 @@ import (
 
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/functions"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/functions"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/shopspring/decimal"
 )
@@ -508,9 +508,9 @@ func HasImage(env envs.Environment, text types.XText) types.XValue {
 	extensionAllowed := []string{"jpeg", "jpg", "png", "gif"}
 	url := text.Native()
 	urlSplitted := strings.Split(url, "/")
-	filename := urlSplitted[len(urlSplitted) - 1]
+	filename := urlSplitted[len(urlSplitted)-1]
 	filenameSplitted := strings.Split(filename, ".")
-	extension := filenameSplitted[len(filenameSplitted) - 1]
+	extension := filenameSplitted[len(filenameSplitted)-1]
 
 	for _, ext := range extensionAllowed {
 		if extension == ext {

@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"github.com/greatnonprofits-nfp/goflow/excellent"
-	"github.com/greatnonprofits-nfp/goflow/excellent/gen"
+	"github.com/nyaruka/goflow/excellent"
+	"github.com/nyaruka/goflow/excellent/gen"
 )
 
 // RefactorTemplate refactors the passed in template

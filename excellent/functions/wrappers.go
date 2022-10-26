@@ -1,8 +1,8 @@
 package functions
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
 )
 
 // NumArgsCheck wraps an XFunction and checks the number of args

@@ -5,8 +5,8 @@ import (
 
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
 )
 
 // holds all property translations for a specific item, e.g.

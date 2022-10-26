@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/goflow/envs"
 )
 
 // XError is an error

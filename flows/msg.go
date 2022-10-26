@@ -5,9 +5,9 @@ import (
 
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/utils"
 
 	validator "gopkg.in/go-playground/validator.v9"
 )
@@ -54,7 +54,7 @@ type MsgOut struct {
 	QuickReplies_      []string             `json:"quick_replies,omitempty"`
 	Templating_        *MsgTemplating       `json:"templating,omitempty"`
 	Topic_             MsgTopic             `json:"topic,omitempty"`
-    TextLanguage       envs.Language        `json:"text_language,omitempty"`
+	TextLanguage       envs.Language        `json:"text_language,omitempty"`
 	ReceiveAttachment_ string               `json:"receive_attachment,omitempty"`
 	SharingConfig_     ShareableIconsConfig `json:"sharing_config,omitempty"`
 }
@@ -71,8 +71,6 @@ type ShareableIconsConfig struct {
 	Telegram  bool     `json:"telegram,omitempty"`
 	Line      bool     `json:"line,omitempty"`
 }
-
-
 
 // NewMsgIn creates a new incoming message
 func NewMsgIn(uuid MsgUUID, urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment) *MsgIn {

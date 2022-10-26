@@ -3,7 +3,7 @@ package events
 import (
 	"encoding/json"
 
-	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/nyaruka/goflow/flows"
 )
 
 func init() {

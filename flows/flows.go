@@ -1,7 +1,7 @@
 package flows
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/utils"
 
 	validator "gopkg.in/go-playground/validator.v9"
 )

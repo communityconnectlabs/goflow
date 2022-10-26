@@ -3,7 +3,7 @@ package inspect
 import (
 	"reflect"
 
-	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/nyaruka/goflow/flows"
 )
 
 // ResultContainer allows flow objects to declare that they can generate a result

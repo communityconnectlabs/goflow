@@ -1,8 +1,8 @@
 package actions
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
 	"net/http"
 	"strings"
 	"fmt"

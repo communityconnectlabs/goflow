@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/utils"
 	"github.com/shopspring/decimal"
 )
 

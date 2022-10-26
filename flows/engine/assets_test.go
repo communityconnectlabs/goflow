@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows/engine"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"

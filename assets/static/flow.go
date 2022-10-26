@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/nyaruka/goflow/assets"
 
 	"github.com/buger/jsonparser"
 	"github.com/pkg/errors"

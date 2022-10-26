@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/nyaruka/goflow/flows"
 )
 
 func init() {

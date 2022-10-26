@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/utils/smtpx"
+	"github.com/nyaruka/goflow/utils/smtpx"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"

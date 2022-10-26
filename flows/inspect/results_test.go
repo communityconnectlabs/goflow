@@ -3,10 +3,10 @@ package inspect_test
 import (
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/actions"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition"
-	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/actions"
+	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/nyaruka/goflow/flows/inspect"
 
 	"github.com/stretchr/testify/assert"
 )

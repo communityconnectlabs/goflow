@@ -3,7 +3,7 @@ package mobile
 // To build an Android Archive:
 //
 // go get golang.org/x/mobile/cmd/gomobile
-// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/greatnonprofits-nfp/goflow/mobile
+// gomobile bind -target android -javapkg=com.nyaruka.goflow -o mobile/goflow.aar github.com/nyaruka/goflow/mobile
 
 import (
 	"encoding/json"
@@ -11,17 +11,17 @@ import (
 
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition/migrations"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
-	"github.com/greatnonprofits-nfp/goflow/flows/resumes"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/waits"
-	"github.com/greatnonprofits-nfp/goflow/flows/triggers"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/definition"
+	"github.com/nyaruka/goflow/flows/definition/migrations"
+	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/nyaruka/goflow/flows/resumes"
+	"github.com/nyaruka/goflow/flows/routers/waits"
+	"github.com/nyaruka/goflow/flows/triggers"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/Masterminds/semver"
 )

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/greatnonprofits-nfp/goflow/flows"
+	"github.com/nyaruka/goflow/flows"
 )
 
 // EngineField is a struct field which is part of the flow spec (i.e. included in JSON) and optionally has a engine tag

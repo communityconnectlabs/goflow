@@ -1,6 +1,6 @@
 package flows
 
-import "github.com/greatnonprofits-nfp/goflow/assets"
+import "github.com/nyaruka/goflow/assets"
 
 // Classifier represents an NLU classifier.
 type Classifier struct {

@@ -1,13 +1,13 @@
 package main
 
-// go install github.com/greatnonprofits-nfp/goflow/cmd/exptester; exptester "@(lower(contact.name))"
+// go install github.com/nyaruka/goflow/cmd/exptester; exptester "@(lower(contact.name))"
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/test"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/test"
 )
 
 func main() {

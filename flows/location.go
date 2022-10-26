@@ -1,8 +1,8 @@
 package flows
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
 )
 
 // location levels which can be field types

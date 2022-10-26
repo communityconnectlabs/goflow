@@ -1,7 +1,7 @@
 package static
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/assets"
+	"github.com/nyaruka/goflow/assets"
 )
 
 // Topic is a JSON serializable implementation of a topic asset

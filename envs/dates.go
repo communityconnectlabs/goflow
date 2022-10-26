@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 	validator "gopkg.in/go-playground/validator.v9"

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/contactql"
-	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/contactql"
+	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/gocommon/dates"
 
 	"github.com/olivere/elastic/v7"

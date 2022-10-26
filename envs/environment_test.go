@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/gocommon/jsonx"
 
 	"github.com/stretchr/testify/assert"

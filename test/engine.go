@@ -8,9 +8,9 @@ import (
 
 	"github.com/nyaruka/gocommon/httpx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/engine"
-	"github.com/greatnonprofits-nfp/goflow/services/webhooks"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/nyaruka/goflow/services/webhooks"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"

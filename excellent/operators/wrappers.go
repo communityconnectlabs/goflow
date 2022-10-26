@@ -1,8 +1,8 @@
 package operators
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
 )
 
 // UnaryOperator is an operator which takes a single argument

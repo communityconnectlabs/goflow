@@ -3,7 +3,7 @@ package cases
 import (
 	"strings"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/goflow/envs"
 
 	"github.com/shopspring/decimal"
 )

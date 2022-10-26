@@ -2,10 +2,10 @@ package actions
 
 import (
 	"fmt"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/events"
-	"github.com/greatnonprofits-nfp/goflow/services/classification/dialogflowcl"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
+	"github.com/nyaruka/goflow/services/classification/dialogflowcl"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/pkg/errors"
 	"golang.org/x/text/language"

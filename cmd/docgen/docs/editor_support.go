@@ -9,7 +9,7 @@ import (
 
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
-	"github.com/greatnonprofits-nfp/goflow/cmd/docgen/completion"
+	"github.com/nyaruka/goflow/cmd/docgen/completion"
 
 	"github.com/pkg/errors"
 )

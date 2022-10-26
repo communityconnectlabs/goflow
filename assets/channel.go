@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/goflow/envs"
 )
 
 // ChannelUUID is the UUID of a channel

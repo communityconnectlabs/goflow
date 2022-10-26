@@ -1,8 +1,8 @@
 package tools
 
 import (
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/utils"
 )
 
 // ContextWalk traverses the given context invoking the callback for each non-nil value

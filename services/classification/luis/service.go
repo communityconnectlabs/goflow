@@ -5,8 +5,8 @@ import (
 	"sort"
 
 	"github.com/nyaruka/gocommon/httpx"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/utils"
 )
 
 // a classification service implementation for a LUIS app

@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/definition/legacy/gen"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/definition/legacy/gen"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )

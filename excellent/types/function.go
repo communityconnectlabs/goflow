@@ -2,7 +2,7 @@ package types
 
 import (
 	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/goflow/envs"
 )
 
 // XFunction is a callable function.

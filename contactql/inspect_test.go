@@ -3,10 +3,10 @@ package contactql_test
 import (
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/assets/static"
-	"github.com/greatnonprofits-nfp/goflow/contactql"
-	"github.com/greatnonprofits-nfp/goflow/envs"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
+	"github.com/nyaruka/goflow/contactql"
+	"github.com/nyaruka/goflow/envs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

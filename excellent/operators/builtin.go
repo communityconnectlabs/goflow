@@ -4,8 +4,8 @@ import (
 	"math"
 	"strings"
 
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/shopspring/decimal"
 )
 
@@ -109,7 +109,7 @@ var Exponent = numericalBinary(func(env envs.Environment, num1 types.XNumber, nu
 	d2 := num2.Native()
 
 	// TODO there is currently a bug in shopspring/decimal which means that only the integer part of the
-	// exponent is considered (see https://github.com/greatnonprofits-nfp/goflow/issues/984). If we have a whole number,
+	// exponent is considered (see https://github.com/nyaruka/goflow/issues/984). If we have a whole number,
 	// we can use the library function, otherwise fallback to float64 math.
 
 	if decimal.New(d2.IntPart(), 0).Equals(d2) {

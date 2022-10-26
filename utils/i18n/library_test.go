@@ -5,7 +5,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/greatnonprofits-nfp/goflow/utils/i18n"
+	"github.com/nyaruka/goflow/utils/i18n"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

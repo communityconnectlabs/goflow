@@ -7,20 +7,20 @@ import (
 
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/greatnonprofits-nfp/goflow/assets"
-	"github.com/greatnonprofits-nfp/goflow/envs"
-	"github.com/greatnonprofits-nfp/goflow/excellent/types"
-	"github.com/greatnonprofits-nfp/goflow/flows"
-	"github.com/greatnonprofits-nfp/goflow/flows/inspect"
-	"github.com/greatnonprofits-nfp/goflow/flows/routers/cases"
-	"github.com/greatnonprofits-nfp/goflow/utils"
+	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent/types"
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/inspect"
+	"github.com/nyaruka/goflow/flows/routers/cases"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/pkg/errors"
 	"strconv"
 	"net/http"
 	"io/ioutil"
 	"net/url"
-	"github.com/greatnonprofits-nfp/goflow/flows/inputs"
+	"github.com/nyaruka/goflow/flows/inputs"
 	"time"
 )
 
@@ -357,7 +357,7 @@ func readSwitchRouter(data json.RawMessage) (flows.Router, error) {
 		operand:             e.Operand,
 		cases:               e.Cases,
 		defaultCategoryUUID: e.DefaultCategoryUUID,
-        config:              e.Config,
+		config:              e.Config,
 	}
 
 	if err := r.unmarshal(&e.baseRouterEnvelope); err != nil {
