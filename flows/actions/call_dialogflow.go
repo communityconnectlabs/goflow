@@ -2,11 +2,11 @@ package actions
 
 import (
 	"fmt"
+	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/services/classification/dialogflowcl"
-	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/pkg/errors"
 	"golang.org/x/text/language"
 	dialogflowpb "google.golang.org/genproto/googleapis/cloud/dialogflow/v2"
@@ -80,6 +80,12 @@ func (a *CallCallDialogflowAction) Execute(run flows.FlowRun, step flows.Step, l
 	}
 	languageCode = ISO1Tag.String()
 	projectID := config["project_id"]
+	if languageCode == "zh" {
+		// rapidPro only supports one type of Chinese language code which is zho, translates to zh.
+		// zh is not supported in google only zh-cn (Simplified Chinese) and zh-hk (Hong Kong) and
+		// zh-tw Traditional. I am defaulting the Simplified for now.
+		languageCode = "zh-cn"
+	}
 	resp, err := a.DetectIntentText(projectID, languageCode, input, contactId, configStr)
 
 	if err != nil {
