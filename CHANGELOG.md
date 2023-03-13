@@ -1,3 +1,145 @@
+v0.184.4 (2023-02-27)
+-------------------------
+ * Sort should return error (instead of panic) if array has mixed types
+
+v0.184.3 (2023-02-22)
+-------------------------
+ * Re-add matching by group name in start_session actions
+
+v0.184.2 (2023-02-13)
+-------------------------
+ * Remove matching legacy vars against group names for start_session and send_broadcast actions
+
+v0.184.1 (2023-02-08)
+-------------------------
+ * Tweak BroadcastTranslations.ForContact to also return language
+
+v0.184.0 (2023-02-08)
+-------------------------
+ * Truncate quick replies that are too long
+ * Add support for resolving broadcast translations for different contacts
+
+v0.183.0 (2023-02-07)
+-------------------------
+ * Ignore importing split arguments translations
+ * Convert StringSet functions to be generic
+
+v0.182.0 (2023-02-02)
+-------------------------
+ * Reorganize ANTLR generated code as per recommendations in ANTLR README
+ * Upgrade to latest ANTLR and rebuild grammars
+ * Add support for contact queries in broadcasts
+
+v0.181.0 (2023-02-01)
+-------------------------
+ * Update to validator v10
+ * Update to nyaruka/null v2
+
+v0.180.0 (2023-01-26)
+-------------------------
+ * Make envs.Language, envs.Country and envs.Locale play nice with NULLs when persisting
+ * Fix docstring on ivr_created event
+ * Fix wording in spec migration comments
+
+v0.179.1 (2023-01-18)
+-------------------------
+ * Add migration versions to auto-generated docs
+
+v0.179.0 (2023-01-18)
+-------------------------
+ * Add 13.2.0 flow migration to replace "base" as flow language with "und"
+
+v0.178.2 (2023-01-11)
+-------------------------
+ * Fix and improve mobile bindings to work without wait objects on sessions
+
+v0.178.1 (2022-12-16)
+-------------------------
+ * Tweak envs.NewLocale(..) to allow passing NilCountry
+
+v0.178.0 (2022-12-16)
+-------------------------
+ * Replace TemplateTranslation.language and country fields with single locale field and also don't duplicate locale on MsgTemplating since it's now on the message itself
+ * Derive contact country from tel urns if no preferred channel
+ * Change msg_out.language to locale
+
+v0.177.0 (2022-12-15)
+-------------------------
+ * Reduce msg/ivr_created localization blobs to a single language
+
+v0.176.0 (2022-12-15)
+-------------------------
+ * Add localization outcome object to msg/ivr_created events to replace msg_out.text_language field
+ * Simplify getting text translations in flow actions
+
+v0.175.0 (2022-11-30)
+-------------------------
+ * Add a new issue type for use of legacy vars in start_session actions
+
+v0.174.4 (2022-11-28)
+-------------------------
+ * Update deps
+
+v0.174.3 (2022-11-18)
+-------------------------
+ * Update to latest gocommon
+
+v0.174.2
+----------
+ * Add support for parsing attachments with unavailable: prefixes
+
+v0.174.1
+----------
+ * Update to latest gocommon
+
+v0.174.0
+----------
+ * Add optional revision number to flow refs, use on run.flow
+
+v0.173.2
+----------
+ * Also fix case where translation just has different number of args
+
+v0.173.1
+----------
+ * Ignore empty string translations in flow localization sections
+
+v0.173.0
+----------
+ * Remove merging translation text arrays as it never makes sense
+
+v0.172.6
+----------
+ * Fix bubbling failing runs in case of missing flow
+
+v0.172.5
+----------
+ * Fix parsing of geo type attachments
+
+v0.172.4
+----------
+ * Make utils.Attachment smarter about parsing raw URLs
+
+v0.172.3
+----------
+ * Update dependencies
+
+v0.172.2
+----------
+ * Dial wait expiry should be based on the maximum time the forwarded call might take
+
+v0.172.1
+----------
+ * Set defaults for dial wait time limits
+
+v0.172.0
+----------
+ * Add time limits to dial waits
+
+v0.171.0
+----------
+ * Rename connection to call in IVR context
+
 v0.170.0
 ----------
  * Add unsendable reason to MsgOut and set when contact status is not active

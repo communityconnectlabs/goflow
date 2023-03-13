@@ -7,11 +7,12 @@ import (
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/assets/static"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/engine"
 	"github.com/nyaruka/goflow/test"
 	"github.com/nyaruka/goflow/utils"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -74,6 +75,7 @@ func TestMsgOut(t *testing.T) {
 		nil,
 		nil,
 		flows.MsgTopicAgent,
+		"eng-US",
 		flows.NilUnsendableReason,
 	)
 
@@ -87,7 +89,8 @@ func TestMsgOut(t *testing.T) {
 		"channel": {"uuid":"61f38f46-a856-4f90-899e-905691784159", "name":"My Android"},
 		"text": "Hi there",
 		"attachments": ["image/jpeg:https://example.com/test.jpg", "audio/mp3:https://example.com/test.mp3"],
-		"topic": "agent"
+		"topic": "agent",
+		"locale": "eng-US"
 	}`), marshaled, "JSON mismatch")
 }
 
@@ -99,8 +102,8 @@ func TestIVRMsgOut(t *testing.T) {
 		urns.URN("tel:+1234567890"),
 		assets.NewChannelReference(assets.ChannelUUID("61f38f46-a856-4f90-899e-905691784159"), "My Android"),
 		"Hi there",
-		envs.Language("eng"),
 		"https://example.com/test.mp3",
+		"eng-US",
 	)
 
 	// test marshaling our msg
@@ -113,6 +116,42 @@ func TestIVRMsgOut(t *testing.T) {
 		"channel": {"uuid":"61f38f46-a856-4f90-899e-905691784159", "name":"My Android"},
 		"text": "Hi there",
 		"attachments": ["audio:https://example.com/test.mp3"],
-		"text_language": "eng"
+		"locale": "eng-US"
 	}`), marshaled, "JSON mismatch")
+}
+
+func TestBroadcastTranslations(t *testing.T) {
+	bcastTrans := flows.BroadcastTranslations{
+		"eng": &flows.BroadcastTranslation{Text: "Hello"},
+		"fra": &flows.BroadcastTranslation{Text: "Bonjour"},
+		"spa": &flows.BroadcastTranslation{Text: "Hola"},
+	}
+	baseLanguage := envs.Language("eng")
+
+	assertTranslation := func(contactLanguage envs.Language, allowedLanguages []envs.Language, expectedText string, expectedLang envs.Language) {
+		env := envs.NewBuilder().WithAllowedLanguages(allowedLanguages).Build()
+		sa, err := engine.NewSessionAssets(env, static.NewEmptySource(), nil)
+		require.NoError(t, err)
+
+		contact := flows.NewEmptyContact(sa, "Bob", contactLanguage, nil)
+		trans, lang := bcastTrans.ForContact(env, contact, baseLanguage)
+
+		assert.Equal(t, expectedText, trans.Text)
+		assert.Equal(t, expectedLang, lang)
+	}
+
+	assertTranslation("eng", []envs.Language{"eng"}, "Hello", "eng")          // uses contact language
+	assertTranslation("fra", []envs.Language{"eng", "fra"}, "Bonjour", "fra") // uses contact language
+	assertTranslation("kin", []envs.Language{"eng", "spa"}, "Hello", "eng")   // uses default flow language
+	assertTranslation("kin", []envs.Language{"spa", "eng"}, "Hola", "spa")    // uses default flow language
+	assertTranslation("kin", []envs.Language{"kin"}, "Hello", "eng")          // uses base language
+
+	val, err := bcastTrans.Value()
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"eng": {"text": "Hello"}, "fra": {"text": "Bonjour"}, "spa": {"text": "Hola"}}`, string(val.([]byte)))
+
+	var bt flows.BroadcastTranslations
+	err = bt.Scan([]byte(`{"spa": {"text": "Adios"}}`))
+	assert.NoError(t, err)
+	assert.Equal(t, flows.BroadcastTranslations{"spa": {Text: "Adios"}}, bt)
 }

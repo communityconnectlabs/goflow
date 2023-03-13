@@ -9,6 +9,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "locale": "eng-US",
                         "text": "What is 2 + 2?",
                         "urn": "tel:+12065551212",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -73,6 +74,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "What is 2 + 2?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -90,6 +92,7 @@
                         "exited_on": null,
                         "flow": {
                             "name": "Number Test",
+                            "revision": 239,
                             "uuid": "8f107d42-7416-4cf2-9a51-9490361ad517"
                         },
                         "modified_on": "2018-07-06T12:30:09.123456789Z",
@@ -180,6 +183,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "locale": "eng-US",
                         "text": "That's incorrect. Please try again.",
                         "urn": "tel:+12065551212",
                         "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -268,6 +272,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "What is 2 + 2?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -307,6 +312,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "That's incorrect. Please try again.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -324,6 +330,7 @@
                         "exited_on": null,
                         "flow": {
                             "name": "Number Test",
+                            "revision": 239,
                             "uuid": "8f107d42-7416-4cf2-9a51-9490361ad517"
                         },
                         "modified_on": "2018-07-06T12:30:28.123456789Z",
@@ -442,6 +449,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "locale": "eng-US",
                         "text": "That's incorrect. Please try again.",
                         "urn": "tel:+12065551212",
                         "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
@@ -530,6 +538,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "What is 2 + 2?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -569,6 +578,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "That's incorrect. Please try again.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -608,6 +618,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "That's incorrect. Please try again.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
@@ -625,6 +636,7 @@
                         "exited_on": null,
                         "flow": {
                             "name": "Number Test",
+                            "revision": 239,
                             "uuid": "8f107d42-7416-4cf2-9a51-9490361ad517"
                         },
                         "modified_on": "2018-07-06T12:30:47.123456789Z",
@@ -761,6 +773,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "locale": "eng-US",
                         "text": "Sorry, you got it wrong too many times.",
                         "urn": "tel:+12065551212",
                         "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
@@ -836,6 +849,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "What is 2 + 2?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -875,6 +889,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "That's incorrect. Please try again.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -914,6 +929,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "That's incorrect. Please try again.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
@@ -953,6 +969,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "locale": "eng-US",
                                     "text": "Sorry, you got it wrong too many times.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
@@ -964,6 +981,7 @@
                         "exited_on": "2018-07-06T12:31:01.123456789Z",
                         "flow": {
                             "name": "Number Test",
+                            "revision": 239,
                             "uuid": "8f107d42-7416-4cf2-9a51-9490361ad517"
                         },
                         "modified_on": "2018-07-06T12:31:01.123456789Z",

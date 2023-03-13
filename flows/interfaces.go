@@ -138,7 +138,7 @@ type Flow interface {
 	GetNode(uuid NodeUUID) Node
 
 	Asset() assets.Flow
-	Reference() *assets.FlowReference
+	Reference(bool) *assets.FlowReference
 
 	Inspect(sa SessionAssets) *Inspection
 	ExtractTemplates() []string
@@ -246,7 +246,7 @@ type Trigger interface {
 	Environment() envs.Environment
 	Flow() *assets.FlowReference
 	Contact() *Contact
-	Connection() *Connection
+	Call() *Call
 	Batch() bool
 	Params() *types.XObject
 	History() *SessionHistory
@@ -417,9 +417,8 @@ type Run interface {
 	EvaluateTemplate(string) (string, error)
 	RootContext(envs.Environment) map[string]types.XValue
 
-	GetText(uuids.UUID, string, string) string
-	GetTextArray(uuids.UUID, string, []string) ([]string, envs.Language)
-	GetTranslatedTextArray(uuids.UUID, string, []string, []envs.Language) []string
+	GetText(uuids.UUID, string, string) (string, envs.Language)
+	GetTextArray(uuids.UUID, string, []string, []envs.Language) ([]string, envs.Language)
 
 	Snapshot() RunSummary
 	Parent() RunSummary

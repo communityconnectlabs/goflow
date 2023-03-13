@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/stringsx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
@@ -17,7 +18,6 @@ import (
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/modifiers"
 	"github.com/nyaruka/goflow/utils"
-
 	"github.com/pkg/errors"
 )
 
@@ -26,6 +26,9 @@ const resultExtraMaxBytes = 10000
 
 // max length of a message attachment (type:url)
 const maxAttachmentLength = 2048
+
+// max length of a quick reply
+const maxQuickReplyLength = 64
 
 // common category names
 const (
@@ -80,16 +83,16 @@ func (a *baseAction) Validate() error { return nil }
 func (a *baseAction) LocalizationUUID() uuids.UUID { return uuids.UUID(a.UUID_) }
 
 // helper function for actions that send a message (text + attachments) that must be localized and evalulated
-func (a *baseAction) evaluateMessage(run flows.Run, languages []envs.Language, actionText string, actionAttachments []string, actionQuickReplies []string, logEvent flows.EventCallback) (string, []utils.Attachment, []string) {
+func (a *baseAction) evaluateMessage(run flows.Run, languages []envs.Language, actionText string, actionAttachments []string, actionQuickReplies []string, logEvent flows.EventCallback) (string, []utils.Attachment, []string, envs.Language) {
 	// localize and evaluate the message text
-	localizedText := run.GetTranslatedTextArray(uuids.UUID(a.UUID()), "text", []string{actionText}, languages)[0]
-	evaluatedText, err := run.EvaluateTemplate(localizedText)
+	localizedText, txtLang := run.GetTextArray(uuids.UUID(a.UUID()), "text", []string{actionText}, languages)
+	evaluatedText, err := run.EvaluateTemplate(localizedText[0])
 	if err != nil {
 		logEvent(events.NewError(err))
 	}
 
 	// localize and evaluate the message attachments
-	translatedAttachments := run.GetTranslatedTextArray(uuids.UUID(a.UUID()), "attachments", actionAttachments, languages)
+	translatedAttachments, attLang := run.GetTextArray(uuids.UUID(a.UUID()), "attachments", actionAttachments, languages)
 	evaluatedAttachments := make([]utils.Attachment, 0, len(translatedAttachments))
 	for _, a := range translatedAttachments {
 		evaluatedAttachment, err := run.EvaluateTemplate(a)
@@ -108,7 +111,7 @@ func (a *baseAction) evaluateMessage(run flows.Run, languages []envs.Language, a
 	}
 
 	// localize and evaluate the quick replies
-	translatedQuickReplies := run.GetTranslatedTextArray(uuids.UUID(a.UUID()), "quick_replies", actionQuickReplies, languages)
+	translatedQuickReplies, qrsLang := run.GetTextArray(uuids.UUID(a.UUID()), "quick_replies", actionQuickReplies, languages)
 	evaluatedQuickReplies := make([]string, 0, len(translatedQuickReplies))
 	for _, qr := range translatedQuickReplies {
 		evaluatedQuickReply, err := run.EvaluateTemplate(qr)
@@ -119,10 +122,21 @@ func (a *baseAction) evaluateMessage(run flows.Run, languages []envs.Language, a
 			logEvent(events.NewErrorf("quick reply text evaluated to empty string, skipping"))
 			continue
 		}
-		evaluatedQuickReplies = append(evaluatedQuickReplies, evaluatedQuickReply)
+		evaluatedQuickReplies = append(evaluatedQuickReplies, stringsx.TruncateEllipsis(evaluatedQuickReply, maxQuickReplyLength))
 	}
 
-	return evaluatedText, evaluatedAttachments, evaluatedQuickReplies
+	// although it's possible for the different parts of the message to have different languages, we want to resolve
+	// a single language based on what the user actually provided for this message
+	var lang envs.Language
+	if localizedText[0] != "" {
+		lang = txtLang
+	} else if len(translatedAttachments) > 0 {
+		lang = attLang
+	} else if len(translatedQuickReplies) > 0 {
+		lang = qrsLang
+	}
+
+	return evaluatedText, evaluatedAttachments, evaluatedQuickReplies, lang
 }
 
 // helper to save a run result and log it as an event
@@ -379,6 +393,10 @@ func resolveUser(run flows.Run, ref *assets.UserReference, logEvent flows.EventC
 	}
 
 	return user
+}
+
+func currentLocale(run flows.Run, lang envs.Language) envs.Locale {
+	return envs.NewLocale(lang, run.Environment().DefaultCountry())
 }
 
 //------------------------------------------------------------------------------------------

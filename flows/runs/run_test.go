@@ -1,6 +1,7 @@
 package runs_test
 
 import (
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -12,9 +13,11 @@ import (
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/runs"
 	"github.com/nyaruka/goflow/flows/triggers"
 	"github.com/nyaruka/goflow/test"
+	"github.com/nyaruka/goflow/utils"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -126,7 +129,7 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, string(flows.RunUUID("e7187099-7d38-4f60-955c-325957214c42")), string(r.UUID()))
 		assert.Equal(t, string(flows.RunStatusCompleted), string(r.Status()))
 		assert.Equal(t, flow, r.Flow())
-		assert.Equal(t, flow.Reference(), r.FlowReference())
+		assert.Equal(t, flow.Reference(true), r.FlowReference())
 		assert.Equal(t, 10, len(r.Events()))
 		assert.Equal(t, "Parent", r.Parent().Flow().Name())
 		assert.Equal(t, 0, len(r.Ancestors())) // no parent runs within this session
@@ -303,4 +306,135 @@ func TestSaveResult(t *testing.T) {
 	run.SaveResult(flows.NewResult("Response 1", strings.Repeat("創", 700), "Blue", "Azul", "6d35528e-cae3-4e30-b842-8fe6ed7d5c02", "I like blue", nil, dates.Now()))
 
 	assert.Equal(t, strings.Repeat("創", 640), run.Results().Get("response_1").Value)
+}
+
+func TestTranslation(t *testing.T) {
+	msgAction1 := []byte(`{
+		"uuid": "0a8467eb-911a-41db-8101-ccf415c48e6a",
+		"type": "send_msg",
+		"text": "Hello",
+		"attachments": [
+			"image/jpeg:http://media.com/hello.jpg",
+			"audio/mp4:http://media.com/hello.m4a"
+		],
+		"quick_replies": [
+			"yes",
+			"no"
+		]
+	}`)
+	msgAction2 := []byte(`{
+		"uuid": "0a8467eb-911a-41db-8101-ccf415c48e6a",
+		"type": "send_msg",
+		"text": "Hello"
+	}`)
+
+	tcs := []struct {
+		description          string
+		envLangs             []envs.Language
+		contactLang          envs.Language
+		msgAction            []byte
+		expectedText         string
+		expectedAttachments  []utils.Attachment
+		expectedQuickReplies []string
+	}{
+		{
+			description:  "contact language is valid and is flow base language, msg action has all fields",
+			envLangs:     []envs.Language{"eng", "spa"},
+			contactLang:  "eng",
+			msgAction:    msgAction1,
+			expectedText: "Hello",
+			expectedAttachments: []utils.Attachment{
+				"image/jpeg:http://media.com/hello.jpg",
+				"audio/mp4:http://media.com/hello.m4a",
+			},
+			expectedQuickReplies: []string{"yes", "no"},
+		},
+		{
+			description:  "contact language is valid and translations exist, msg action has all fields",
+			envLangs:     []envs.Language{"eng", "spa"},
+			contactLang:  "spa",
+			msgAction:    msgAction1,
+			expectedText: "Hola",
+			expectedAttachments: []utils.Attachment{
+				"audio/mp4:http://media.com/hola.m4a",
+			},
+			expectedQuickReplies: []string{"si"},
+		},
+		{
+			description:  "contact language is allowed but no translations exist, msg action has all fields",
+			envLangs:     []envs.Language{"eng", "spa", "kin"},
+			contactLang:  "kin",
+			msgAction:    msgAction1,
+			expectedText: "Hello",
+			expectedAttachments: []utils.Attachment{
+				"image/jpeg:http://media.com/hello.jpg",
+				"audio/mp4:http://media.com/hello.m4a",
+			},
+			expectedQuickReplies: []string{"yes", "no"},
+		},
+		{
+			description:  "contact language is not allowed and translations exist, msg action has all fields",
+			envLangs:     []envs.Language{"eng"},
+			contactLang:  "spa",
+			msgAction:    msgAction1,
+			expectedText: "Hello",
+			expectedAttachments: []utils.Attachment{
+				"image/jpeg:http://media.com/hello.jpg",
+				"audio/mp4:http://media.com/hello.m4a",
+			},
+			expectedQuickReplies: []string{"yes", "no"},
+		},
+		{
+			description:          "contact language is valid and is flow base language, msg action only has text",
+			envLangs:             []envs.Language{"eng", "spa"},
+			contactLang:          "eng",
+			msgAction:            msgAction2,
+			expectedText:         "Hello",
+			expectedAttachments:  []utils.Attachment{},
+			expectedQuickReplies: []string{},
+		},
+		{
+			description:  "contact language is valid and translations exist, msg action only has text",
+			envLangs:     []envs.Language{"eng", "spa"},
+			contactLang:  "spa",
+			msgAction:    msgAction2,
+			expectedText: "Hola",
+			expectedAttachments: []utils.Attachment{
+				"audio/mp4:http://media.com/hola.m4a",
+			},
+			expectedQuickReplies: []string{"si"},
+		},
+		{
+			description:  "attachments and quick replies translations are single empty strings and should be ignored",
+			envLangs:     []envs.Language{"eng", "fra"},
+			contactLang:  "fra",
+			msgAction:    msgAction1,
+			expectedText: "Bonjour",
+			expectedAttachments: []utils.Attachment{
+				"image/jpeg:http://media.com/hello.jpg",
+				"audio/mp4:http://media.com/hello.m4a",
+			},
+			expectedQuickReplies: []string{"yes", "no"},
+		},
+	}
+
+	for _, tc := range tcs {
+		assetsJSON, _ := os.ReadFile("testdata/translation_assets.json")
+		assetsJSON = test.JSONReplace(assetsJSON, []string{"flows", "[0]", "nodes", "[0]", "actions", "[0]"}, tc.msgAction)
+
+		env := envs.NewBuilder().WithAllowedLanguages(tc.envLangs).Build()
+		_, _, sp := test.NewSessionBuilder().
+			WithEnvironment(env).
+			WithContact("2efa1803-ae4d-4a58-ba54-b523e53e40f3", 123, "Bob", tc.contactLang, "tel+1234567890").
+			WithAssetsJSON(assetsJSON).
+			MustBuild()
+
+		require.Len(t, sp.Events(), 1)
+		require.Equal(t, "msg_created", sp.Events()[0].Type())
+		evt := sp.Events()[0].(*events.MsgCreatedEvent)
+
+		assert.Equal(t, tc.expectedText, evt.Msg.Text(), "msg text mismatch in test '%s'", tc.description)
+		assert.Equal(t, tc.expectedAttachments, evt.Msg.Attachments(), "attachments mismatch in test case '%s'", tc.description)
+		assert.Equal(t, tc.expectedQuickReplies, evt.Msg.QuickReplies(), "quick replies mismatch in test case '%s'", tc.description)
+	}
 }

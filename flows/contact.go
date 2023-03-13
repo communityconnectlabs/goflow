@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
@@ -15,10 +16,8 @@ import (
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/utils"
-	"github.com/shopspring/decimal"
-
 	"github.com/pkg/errors"
-	validator "gopkg.in/go-playground/validator.v9"
+	"github.com/shopspring/decimal"
 )
 
 func init() {
@@ -168,12 +167,23 @@ func (c *Contact) Language() envs.Language { return c.language }
 
 // Country gets the country for this contact..
 //
-// TODO: currently this is taken from their preferred channel but probably should become an explicit field at some point
+// TODO: currently this is derived from their preferred channel or any tel URNs but probably should become an explicit
+// field at some point
 func (c *Contact) Country() envs.Country {
 	ch := c.PreferredChannel()
 	if ch != nil && ch.Country() != envs.NilCountry {
 		return ch.Country()
 	}
+
+	for _, u := range c.urns {
+		if u.urn.Scheme() == urns.TelScheme {
+			c := envs.DeriveCountryFromTel(u.urn.Path())
+			if c != envs.NilCountry {
+				return c
+			}
+		}
+	}
+
 	return envs.NilCountry
 }
 

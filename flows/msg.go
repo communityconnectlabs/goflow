@@ -1,15 +1,18 @@
 package flows
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
 	"fmt"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/utils"
-
-	validator "gopkg.in/go-playground/validator.v9"
+	"golang.org/x/exp/slices"
 )
 
 func init() {
@@ -62,7 +65,7 @@ type MsgOut struct {
 	QuickReplies_     []string         `json:"quick_replies,omitempty"`
 	Templating_       *MsgTemplating   `json:"templating,omitempty"`
 	Topic_            MsgTopic         `json:"topic,omitempty"`
-	TextLanguage      envs.Language    `json:"text_language,omitempty"`
+	Locale_           envs.Locale      `json:"locale,omitempty"`
 	UnsendableReason_ UnsendableReason `json:"unsendable_reason,omitempty"`
 }
 
@@ -80,7 +83,7 @@ func NewMsgIn(uuid MsgUUID, urn urns.URN, channel *assets.ChannelReference, text
 }
 
 // NewMsgOut creates a new outgoing message
-func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment, quickReplies []string, templating *MsgTemplating, topic MsgTopic, reason UnsendableReason) *MsgOut {
+func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment, quickReplies []string, templating *MsgTemplating, topic MsgTopic, locale envs.Locale, reason UnsendableReason) *MsgOut {
 	return &MsgOut{
 		BaseMsg: BaseMsg{
 			UUID_:        MsgUUID(uuids.New()),
@@ -92,12 +95,13 @@ func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, atta
 		QuickReplies_:     quickReplies,
 		Templating_:       templating,
 		Topic_:            topic,
+		Locale_:           locale,
 		UnsendableReason_: reason,
 	}
 }
 
 // NewIVRMsgOut creates a new outgoing message for IVR
-func NewIVRMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, textLanguage envs.Language, audioURL string) *MsgOut {
+func NewIVRMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, audioURL string, locale envs.Locale) *MsgOut {
 	var attachments []utils.Attachment
 	if audioURL != "" {
 		attachments = []utils.Attachment{utils.Attachment(fmt.Sprintf("audio:%s", audioURL))}
@@ -114,7 +118,7 @@ func NewIVRMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, t
 		QuickReplies_: nil,
 		Templating_:   nil,
 		Topic_:        NilMsgTopic,
-		TextLanguage:  textLanguage,
+		Locale_:       locale,
 	}
 }
 
@@ -157,26 +161,21 @@ func (m *MsgOut) Templating() *MsgTemplating { return m.Templating_ }
 // Topic returns the topic to use to send this message (if any)
 func (m *MsgOut) Topic() MsgTopic { return m.Topic_ }
 
+// Locale returns the locale of this message (if any)
+func (m *MsgOut) Locale() envs.Locale { return m.Locale_ }
+
 // UnsendableReason returns the reason this message can't be sent (if any)
 func (m *MsgOut) UnsendableReason() UnsendableReason { return m.UnsendableReason_ }
 
 // MsgTemplating represents any substituted message template that should be applied when sending this message
 type MsgTemplating struct {
 	Template_  *assets.TemplateReference `json:"template"`
-	Language_  envs.Language             `json:"language"`
-	Country_   envs.Country              `json:"country"`
 	Variables_ []string                  `json:"variables,omitempty"`
 	Namespace_ string                    `json:"namespace"`
 }
 
 // Template returns the template this msg template is for
 func (t MsgTemplating) Template() *assets.TemplateReference { return t.Template_ }
-
-// Language returns the language that should be used for the template
-func (t MsgTemplating) Language() envs.Language { return t.Language_ }
-
-// Country returns the country that should be used for the template
-func (t MsgTemplating) Country() envs.Country { return t.Country_ }
 
 // Variables returns the variables that should be substituted in the template
 func (t MsgTemplating) Variables() []string { return t.Variables_ }
@@ -185,12 +184,50 @@ func (t MsgTemplating) Variables() []string { return t.Variables_ }
 func (t MsgTemplating) Namespace() string { return t.Namespace_ }
 
 // NewMsgTemplating creates and returns a new msg template
-func NewMsgTemplating(template *assets.TemplateReference, language envs.Language, country envs.Country, variables []string, namespace string) *MsgTemplating {
+func NewMsgTemplating(template *assets.TemplateReference, variables []string, namespace string) *MsgTemplating {
 	return &MsgTemplating{
 		Template_:  template,
-		Language_:  language,
-		Country_:   country,
 		Variables_: variables,
 		Namespace_: namespace,
 	}
 }
+
+// BroadcastTranslation is the broadcast content in a particular language
+type BroadcastTranslation struct {
+	Text         string             `json:"text"`
+	Attachments  []utils.Attachment `json:"attachments,omitempty"`
+	QuickReplies []string           `json:"quick_replies,omitempty"`
+}
+
+type BroadcastTranslations map[envs.Language]*BroadcastTranslation
+
+// ForContact is a utility to help callers select the translation for a contact
+func (b BroadcastTranslations) ForContact(e envs.Environment, c *Contact, baseLanguage envs.Language) (*BroadcastTranslation, envs.Language) {
+	// first try the contact language if it is valid
+	if c.Language() != envs.NilLanguage && slices.Contains(e.AllowedLanguages(), c.Language()) {
+		t := b[c.Language()]
+		if t != nil {
+			return t, c.Language()
+		}
+	}
+
+	// second try the default flow language
+	t := b[e.DefaultLanguage()]
+	if t != nil {
+		return t, e.DefaultLanguage()
+	}
+
+	// finally return the base language
+	return b[baseLanguage], baseLanguage
+}
+
+// Scan supports reading translation values from JSON in database
+func (t *BroadcastTranslations) Scan(value any) error {
+	b, ok := value.([]byte)
+	if !ok {
+		return errors.New("failed type assertion to []byte")
+	}
+	return json.Unmarshal(b, &t)
+}
+
+func (t BroadcastTranslations) Value() (driver.Value, error) { return json.Marshal(t) }

@@ -142,7 +142,8 @@
                     "quick_replies": [
                         "Red",
                         "Blue"
-                    ]
+                    ],
+                    "locale": "eng-US"
                 }
             }
         ]
@@ -184,7 +185,8 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi there"
+                    "text": "Hi there",
+                    "locale": "eng-US"
                 }
             }
         ]
@@ -221,7 +223,41 @@
                     "text": "Hi there",
                     "attachments": [
                         "image/jpeg:http://exacmple.com/test.jpg"
-                    ]
+                    ],
+                    "locale": "eng-US"
+                }
+            }
+        ]
+    },
+    {
+        "description": "Quick replies truncated if they evaluate to something too long",
+        "action": {
+            "type": "send_msg",
+            "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
+            "text": "Hi there",
+            "quick_replies": [
+                "yes",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            ]
+        },
+        "events": [
+            {
+                "type": "msg_created",
+                "created_on": "2018-10-18T14:20:30.000123456Z",
+                "step_uuid": "59d74b86-3e2f-4a93-aece-b05d2fdcde0c",
+                "msg": {
+                    "uuid": "9688d21d-95aa-4bed-afc7-f31b35731a3d",
+                    "urn": "tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d&id=123",
+                    "channel": {
+                        "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
+                        "name": "My Android Phone"
+                    },
+                    "text": "Hi there",
+                    "quick_replies": [
+                        "yes",
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed ..."
+                    ],
+                    "locale": "eng-US"
                 }
             }
         ]
@@ -245,7 +281,8 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi there Ryan Lewis welcome to U-Report, the secret password is Chef"
+                    "text": "Hi there Ryan Lewis welcome to U-Report, the secret password is Chef",
+                    "locale": "eng-US"
                 }
             }
         ],
@@ -294,7 +331,8 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi there"
+                    "text": "Hi there",
+                    "locale": "eng-US"
                 }
             },
             {
@@ -308,7 +346,8 @@
                         "uuid": "8e21f093-99aa-413b-b55b-758b54308fcb",
                         "name": "Twitter Channel"
                     },
-                    "text": "Hi there"
+                    "text": "Hi there",
+                    "locale": "eng-US"
                 }
             }
         ]
@@ -329,6 +368,7 @@
                 "msg": {
                     "uuid": "9688d21d-95aa-4bed-afc7-f31b35731a3d",
                     "text": "Hi there",
+                    "locale": "eng-RW",
                     "unsendable_reason": "no_destination"
                 }
             }
@@ -364,7 +404,8 @@
                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d",
                         "name": "My Android Phone"
                     },
-                    "text": "Hi Ryan Lewis, who's a good boy?"
+                    "text": "Hi Ryan Lewis, who's a good boy?",
+                    "locale": "eng-US"
                 }
             }
         ],
@@ -442,15 +483,14 @@
                             "uuid": "5722e1fd-fe32-4e74-ac78-3cf41a6adb7e",
                             "name": "affirmation"
                         },
-                        "language": "eng",
-                        "country": "US",
                         "variables": [
                             "Ryan Lewis",
                             "boy"
                         ],
                         "namespace": ""
                     },
-                    "topic": "account"
+                    "topic": "account",
+                    "locale": "eng-US"
                 }
             }
         ],
@@ -524,14 +564,13 @@
                             "uuid": "5722e1fd-fe32-4e74-ac78-3cf41a6adb7e",
                             "name": "affirmation"
                         },
-                        "language": "spa",
-                        "country": "",
                         "variables": [
                             "Ryan Lewis",
                             "niño"
                         ],
                         "namespace": ""
-                    }
+                    },
+                    "locale": "spa"
                 }
             }
         ],
@@ -594,10 +633,9 @@
                             "uuid": "2edc8dfd-aef0-41cf-a900-8a71bdb00900",
                             "name": "wakeup"
                         },
-                        "language": "eng",
-                        "country": "",
                         "namespace": ""
-                    }
+                    },
+                    "locale": "eng"
                 }
             }
         ],
@@ -663,10 +701,9 @@
                             "uuid": "2edc8dfd-aef0-41cf-a900-8a71bdb00900",
                             "name": "wakeup"
                         },
-                        "language": "eng",
-                        "country": "",
                         "namespace": ""
-                    }
+                    },
+                    "locale": "eng"
                 }
             }
         ],
@@ -740,7 +777,8 @@
                     "quick_replies": [
                         "Si",
                         "No"
-                    ]
+                    ],
+                    "locale": "spa-US"
                 }
             }
         ],

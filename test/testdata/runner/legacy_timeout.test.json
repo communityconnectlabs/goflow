@@ -5,6 +5,7 @@
                 {
                     "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
+                        "locale": "eng-US",
                         "text": "Hi there. Do you want to take part?",
                         "unsendable_reason": "no_destination",
                         "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
@@ -70,6 +71,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "locale": "eng-US",
                                     "text": "Hi there. Do you want to take part?",
                                     "unsendable_reason": "no_destination",
                                     "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
@@ -88,6 +90,7 @@
                         "exited_on": null,
                         "flow": {
                             "name": "Legacy Timeout",
+                            "revision": 196,
                             "uuid": "eaae833a-4970-4be1-aed4-2e6295903b8f"
                         },
                         "modified_on": "2018-07-06T12:30:09.123456789Z",
@@ -229,6 +232,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "locale": "eng-US",
                                     "text": "Hi there. Do you want to take part?",
                                     "unsendable_reason": "no_destination",
                                     "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
@@ -269,6 +273,7 @@
                         "exited_on": "2018-07-06T12:30:23.123456789Z",
                         "flow": {
                             "name": "Legacy Timeout",
+                            "revision": 196,
                             "uuid": "eaae833a-4970-4be1-aed4-2e6295903b8f"
                         },
                         "modified_on": "2018-07-06T12:30:23.123456789Z",

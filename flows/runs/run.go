@@ -48,7 +48,7 @@ func NewRun(session flows.Session, flow flows.Flow, parent flows.Run) flows.Run 
 		uuid:       flows.RunUUID(uuids.New()),
 		session:    session,
 		flow:       flow,
-		flowRef:    flow.Reference(),
+		flowRef:    flow.Reference(true),
 		parent:     parent,
 		results:    flows.NewResults(),
 		status:     flows.RunStatusActive,
@@ -353,23 +353,21 @@ func (r *flowRun) getLanguages() []envs.Language {
 	return append(languages, r.flow.Language())
 }
 
-func (r *flowRun) GetText(uuid uuids.UUID, key string, native string) string {
-	textArray, _ := r.GetTextArray(uuid, key, []string{native})
-	return textArray[0]
+// GetText is a convenience version of GetTextArray for a single text values
+func (r *flowRun) GetText(uuid uuids.UUID, key string, native string) (string, envs.Language) {
+	textArray, lang := r.getText(uuid, key, []string{native}, nil)
+	return textArray[0], lang
 }
 
-func (r *flowRun) GetTextArray(uuid uuids.UUID, key string, native []string) ([]string, envs.Language) {
-	return r.getTranslatedText(uuid, key, native, r.getLanguages())
+// GetTextArray returns the localized value for the given flow definition value
+func (r *flowRun) GetTextArray(uuid uuids.UUID, key string, native []string, languages []envs.Language) ([]string, envs.Language) {
+	return r.getText(uuid, key, native, languages)
 }
 
-func (r *flowRun) GetTranslatedTextArray(uuid uuids.UUID, key string, native []string, languages []envs.Language) []string {
-	texts, _ := r.getTranslatedText(uuid, key, native, languages)
-	return texts
-}
-
-func (r *flowRun) getTranslatedText(uuid uuids.UUID, key string, native []string, languages []envs.Language) ([]string, envs.Language) {
+func (r *flowRun) getText(uuid uuids.UUID, key string, native []string, languages []envs.Language) ([]string, envs.Language) {
 	nativeLang := r.Flow().Language()
 
+	// if a preferred language list wasn't provided, default to the run preferred languages
 	if languages == nil {
 		languages = r.getLanguages()
 	}
@@ -379,19 +377,14 @@ func (r *flowRun) getTranslatedText(uuid uuids.UUID, key string, native []string
 			return native, nativeLang
 		}
 
-		textArray := r.Flow().Localization().GetItemTranslation(lang, uuid, key)
-		if textArray != nil {
-			merged := make([]string, len(native))
-			for i := range native {
-				if i < len(textArray) && textArray[i] != "" {
-					merged[i] = textArray[i]
-				} else {
-					merged[i] = native[i]
-				}
-			}
-			return merged, lang
+		translated := r.Flow().Localization().GetItemTranslation(lang, uuid, key)
+		if len(translated) == 0 {
+			continue
 		}
+
+		return translated, lang
 	}
+
 	return native, nativeLang
 }
 

@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
 )
@@ -45,7 +44,7 @@ func NewPlayAudio(uuid flows.ActionUUID, audioURL string) *PlayAudioAction {
 // Execute runs this action
 func (a *PlayAudioAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	// localize and evaluate audio URL
-	localizedAudioURL := run.GetText(uuids.UUID(a.UUID()), "audio_url", a.AudioURL)
+	localizedAudioURL, urlLang := run.GetText(uuids.UUID(a.UUID()), "audio_url", a.AudioURL)
 	evaluatedAudioURL, err := run.EvaluateTemplate(localizedAudioURL)
 	if err != nil {
 		logEvent(events.NewError(err))
@@ -58,11 +57,11 @@ func (a *PlayAudioAction) Execute(run flows.Run, step flows.Step, logModifier fl
 		return nil
 	}
 
-	// an IVR flow must have been started with a connection
-	connection := run.Session().Trigger().Connection()
+	// an IVR flow must have been started with a call
+	call := run.Session().Trigger().Call()
 
 	// if we have an audio URL, turn it into a message
-	msg := flows.NewIVRMsgOut(connection.URN(), connection.Channel(), "", envs.NilLanguage, evaluatedAudioURL)
+	msg := flows.NewIVRMsgOut(call.URN(), call.Channel(), "", evaluatedAudioURL, currentLocale(run, urlLang))
 	logEvent(events.NewIVRCreated(msg))
 
 	return nil

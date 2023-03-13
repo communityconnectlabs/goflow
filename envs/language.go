@@ -1,15 +1,17 @@
 package envs
 
 import (
-	"github.com/nyaruka/goflow/utils"
+	"database/sql/driver"
 
+	"github.com/go-playground/validator/v10"
+	"github.com/nyaruka/goflow/utils"
+	"github.com/nyaruka/null/v2"
 	"github.com/pkg/errors"
 	"golang.org/x/text/language"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 func init() {
-	utils.RegisterValidatorAlias("language", "eq=base|len=3", func(validator.FieldError) string {
+	utils.RegisterValidatorAlias("language", "len=3", func(validator.FieldError) string {
 		return "is not a valid language code"
 	})
 }
@@ -33,3 +35,9 @@ func ParseLanguage(lang string) (Language, error) {
 
 	return Language(base.ISO3()), nil
 }
+
+// Place nicely with NULLs if persisting to a database or JSON
+func (l *Language) Scan(value any) error         { return null.ScanString(value, l) }
+func (l Language) Value() (driver.Value, error)  { return null.StringValue(l) }
+func (l Language) MarshalJSON() ([]byte, error)  { return null.MarshalString(l) }
+func (l *Language) UnmarshalJSON(b []byte) error { return null.UnmarshalString(b, l) }
