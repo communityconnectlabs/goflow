@@ -11,7 +11,7 @@
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:04.123456789Z",
+                    "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
                         "channel": {
                             "name": "Nexmo",
@@ -25,7 +25,7 @@
                     "type": "msg_received"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:06.123456789Z",
+                    "created_on": "2018-07-06T12:30:04.123456789Z",
                     "input_uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5",
                     "labels": [
                         {
@@ -41,7 +41,7 @@
                     "type": "input_labels_added"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:08.123456789Z",
+                    "created_on": "2018-07-06T12:30:06.123456789Z",
                     "groups_added": [
                         {
                             "name": "Survey Audience",
@@ -56,7 +56,7 @@
                     "type": "contact_groups_changed"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:10.123456789Z",
+                    "created_on": "2018-07-06T12:30:08.123456789Z",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "type": "contact_urns_changed",
                     "urns": [
@@ -67,7 +67,7 @@
                     ]
                 },
                 {
-                    "created_on": "2018-07-06T12:30:13.123456789Z",
+                    "created_on": "2018-07-06T12:30:11.123456789Z",
                     "field": {
                         "key": "activation_token",
                         "name": "Activation Token"
@@ -79,9 +79,8 @@
                     }
                 },
                 {
-                    "attachments": null,
                     "body": "Hi Ben, Your activation token is XXX-YYY-ZZZ, your coupon is AAA-BBB-CCC",
-                    "created_on": "2018-07-06T12:30:15.123456789Z",
+                    "created_on": "2018-07-06T12:30:13.123456789Z",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "subject": "Here is your activation token",
                     "to": [
@@ -91,7 +90,7 @@
                     "type": "email_sent"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:17.123456789Z",
+                    "created_on": "2018-07-06T12:30:15.123456789Z",
                     "flow": {
                         "name": "Collect Language",
                         "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d"
@@ -108,9 +107,9 @@
                             "uuid": "820f5923-3369-41c6-b3cd-af577c0bd4b8"
                         }
                     ],
-                    "created_on": "2018-07-06T12:30:19.123456789Z",
+                    "created_on": "2018-07-06T12:30:17.123456789Z",
                     "flow": {
-                        "name": "Collect Language",
+                        "name": "Registration Flow",
                         "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d"
                     },
                     "history": {
@@ -173,7 +172,7 @@
                 },
                 {
                     "base_language": "eng",
-                    "created_on": "2018-07-06T12:30:21.123456789Z",
+                    "created_on": "2018-07-06T12:30:19.123456789Z",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "translations": {
                         "eng": {
@@ -190,7 +189,7 @@
                 },
                 {
                     "base_language": "eng",
-                    "created_on": "2018-07-06T12:30:23.123456789Z",
+                    "created_on": "2018-07-06T12:30:21.123456789Z",
                     "groups": [
                         {
                             "name": "Survey Audience",
@@ -215,7 +214,7 @@
                     "type": "broadcast_created"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:25.123456789Z",
+                    "created_on": "2018-07-06T12:30:23.123456789Z",
                     "groups_removed": [
                         {
                             "name": "Survey Audience",
@@ -226,7 +225,7 @@
                     "type": "contact_groups_changed"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:27.123456789Z",
+                    "created_on": "2018-07-06T12:30:25.123456789Z",
                     "groups_added": [
                         {
                             "name": "Survey Audience",
@@ -237,7 +236,7 @@
                     "type": "contact_groups_changed"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:29.123456789Z",
+                    "created_on": "2018-07-06T12:30:27.123456789Z",
                     "groups_removed": [
                         {
                             "name": "Survey Audience",
@@ -252,13 +251,12 @@
                     "type": "contact_groups_changed"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:31.123456789Z",
+                    "created_on": "2018-07-06T12:30:29.123456789Z",
                     "msg": {
                         "channel": {
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
-                        "sharing_config": {},
                         "text": "Hi Ben Haggerty, are you ready to complete today's survey?",
                         "urn": "tel:+12065551212",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -267,13 +265,12 @@
                     "type": "msg_created"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:33.123456789Z",
+                    "created_on": "2018-07-06T12:30:31.123456789Z",
                     "msg": {
                         "channel": {
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
-                        "sharing_config": {},
                         "text": "This is a message to each of Ben Haggerty's urns.",
                         "urn": "tel:+12065551212",
                         "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
@@ -282,13 +279,12 @@
                     "type": "msg_created"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:35.123456789Z",
+                    "created_on": "2018-07-06T12:30:33.123456789Z",
                     "msg": {
                         "channel": {
                             "name": "Facebook Channel",
                             "uuid": "4bb288a0-7fca-4da1-abe8-59a593aff648"
                         },
-                        "sharing_config": {},
                         "text": "This is a message to each of Ben Haggerty's urns.",
                         "urn": "facebook:1122334455667788",
                         "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
@@ -297,13 +293,12 @@
                     "type": "msg_created"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:37.123456789Z",
+                    "created_on": "2018-07-06T12:30:35.123456789Z",
                     "msg": {
                         "channel": {
                             "name": "Twitter Channel",
                             "uuid": "8e21f093-99aa-413b-b55b-758b54308fcb"
                         },
-                        "sharing_config": {},
                         "text": "This is a message to each of Ben Haggerty's urns.",
                         "urn": "twitter:ben_haggerty",
                         "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -312,7 +307,7 @@
                     "type": "msg_created"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:39.123456789Z",
+                    "created_on": "2018-07-06T12:30:37.123456789Z",
                     "msg": {
                         "attachments": [
                             "image/jpeg:http://s3.amazon.com/bucket/test_en.jpg?a=Kigali%20City"
@@ -325,7 +320,6 @@
                             "Yes",
                             "No"
                         ],
-                        "sharing_config": {},
                         "text": "This is a reply with attachments and quick replies",
                         "urn": "tel:+12065551212",
                         "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -335,27 +329,26 @@
                 },
                 {
                     "category": "Male",
-                    "corrected": "",
-                    "created_on": "2018-07-06T12:30:43.123456789Z",
+                    "created_on": "2018-07-06T12:30:41.123456789Z",
                     "name": "Gender",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "type": "run_result_changed",
                     "value": "m"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:45.123456789Z",
+                    "created_on": "2018-07-06T12:30:43.123456789Z",
                     "name": "Jeff Jefferson",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "type": "contact_name_changed"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:47.123456789Z",
+                    "created_on": "2018-07-06T12:30:45.123456789Z",
                     "language": "",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "type": "contact_language_changed"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:50.123456789Z",
+                    "created_on": "2018-07-06T12:30:48.123456789Z",
                     "field": {
                         "key": "gender",
                         "name": "Gender"
@@ -367,7 +360,7 @@
                     }
                 },
                 {
-                    "created_on": "2018-07-06T12:30:52.123456789Z",
+                    "created_on": "2018-07-06T12:30:50.123456789Z",
                     "groups_added": [
                         {
                             "name": "Males",
@@ -378,7 +371,7 @@
                     "type": "contact_groups_changed"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:55.123456789Z",
+                    "created_on": "2018-07-06T12:30:53.123456789Z",
                     "field": {
                         "key": "district",
                         "name": "District"
@@ -392,8 +385,9 @@
                     }
                 },
                 {
-                    "created_on": "2018-07-06T12:30:59.123456789Z",
+                    "created_on": "2018-07-06T12:30:57.123456789Z",
                     "elapsed_ms": 1000,
+                    "extraction": "valid",
                     "request": "GET /?cmd=success&name=Jeff%20Jefferson HTTP/1.1\r\nHost: localhost\r\nUser-Agent: goflow-testing\r\nAccept-Encoding: gzip\r\n\r\n",
                     "response": "HTTP/1.0 200 OK\r\nContent-Length: 16\r\n\r\n{ \"ok\": \"true\" }",
                     "retries": 0,
@@ -404,7 +398,7 @@
                     "url": "http://localhost/?cmd=success&name=Jeff%20Jefferson"
                 },
                 {
-                    "created_on": "2018-07-06T12:31:01.123456789Z",
+                    "created_on": "2018-07-06T12:30:59.123456789Z",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "type": "contact_urns_changed",
                     "urns": [
@@ -415,6 +409,7 @@
                     ]
                 }
             ],
+            "segments": [],
             "session": {
                 "contact": {
                     "created_on": "2000-01-01T00:00:00Z",
@@ -465,9 +460,6 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
-                    "links": [
-                        ""
-                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -493,7 +485,7 @@
                         "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "created_on": "2018-07-06T12:30:04.123456789Z",
+                                "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Nexmo",
@@ -507,7 +499,7 @@
                                 "type": "msg_received"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:06.123456789Z",
+                                "created_on": "2018-07-06T12:30:04.123456789Z",
                                 "input_uuid": "9bf91c2b-ce58-4cef-aacc-281e03f69ab5",
                                 "labels": [
                                     {
@@ -523,7 +515,7 @@
                                 "type": "input_labels_added"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:08.123456789Z",
+                                "created_on": "2018-07-06T12:30:06.123456789Z",
                                 "groups_added": [
                                     {
                                         "name": "Survey Audience",
@@ -538,7 +530,7 @@
                                 "type": "contact_groups_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:10.123456789Z",
+                                "created_on": "2018-07-06T12:30:08.123456789Z",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "type": "contact_urns_changed",
                                 "urns": [
@@ -549,7 +541,7 @@
                                 ]
                             },
                             {
-                                "created_on": "2018-07-06T12:30:13.123456789Z",
+                                "created_on": "2018-07-06T12:30:11.123456789Z",
                                 "field": {
                                     "key": "activation_token",
                                     "name": "Activation Token"
@@ -561,9 +553,8 @@
                                 }
                             },
                             {
-                                "attachments": null,
                                 "body": "Hi Ben, Your activation token is XXX-YYY-ZZZ, your coupon is AAA-BBB-CCC",
-                                "created_on": "2018-07-06T12:30:15.123456789Z",
+                                "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "subject": "Here is your activation token",
                                 "to": [
@@ -573,7 +564,7 @@
                                 "type": "email_sent"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:17.123456789Z",
+                                "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "flow": {
                                     "name": "Collect Language",
                                     "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d"
@@ -590,9 +581,9 @@
                                         "uuid": "820f5923-3369-41c6-b3cd-af577c0bd4b8"
                                     }
                                 ],
-                                "created_on": "2018-07-06T12:30:19.123456789Z",
+                                "created_on": "2018-07-06T12:30:17.123456789Z",
                                 "flow": {
-                                    "name": "Collect Language",
+                                    "name": "Registration Flow",
                                     "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d"
                                 },
                                 "history": {
@@ -655,7 +646,7 @@
                             },
                             {
                                 "base_language": "eng",
-                                "created_on": "2018-07-06T12:30:21.123456789Z",
+                                "created_on": "2018-07-06T12:30:19.123456789Z",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "translations": {
                                     "eng": {
@@ -672,7 +663,7 @@
                             },
                             {
                                 "base_language": "eng",
-                                "created_on": "2018-07-06T12:30:23.123456789Z",
+                                "created_on": "2018-07-06T12:30:21.123456789Z",
                                 "groups": [
                                     {
                                         "name": "Survey Audience",
@@ -697,7 +688,7 @@
                                 "type": "broadcast_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:25.123456789Z",
+                                "created_on": "2018-07-06T12:30:23.123456789Z",
                                 "groups_removed": [
                                     {
                                         "name": "Survey Audience",
@@ -708,7 +699,7 @@
                                 "type": "contact_groups_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:27.123456789Z",
+                                "created_on": "2018-07-06T12:30:25.123456789Z",
                                 "groups_added": [
                                     {
                                         "name": "Survey Audience",
@@ -719,7 +710,7 @@
                                 "type": "contact_groups_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:29.123456789Z",
+                                "created_on": "2018-07-06T12:30:27.123456789Z",
                                 "groups_removed": [
                                     {
                                         "name": "Survey Audience",
@@ -734,13 +725,12 @@
                                 "type": "contact_groups_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:31.123456789Z",
+                                "created_on": "2018-07-06T12:30:29.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
-                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty, are you ready to complete today's survey?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -749,13 +739,12 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:33.123456789Z",
+                                "created_on": "2018-07-06T12:30:31.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
-                                    "sharing_config": {},
                                     "text": "This is a message to each of Ben Haggerty's urns.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
@@ -764,13 +753,12 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:35.123456789Z",
+                                "created_on": "2018-07-06T12:30:33.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Facebook Channel",
                                         "uuid": "4bb288a0-7fca-4da1-abe8-59a593aff648"
                                     },
-                                    "sharing_config": {},
                                     "text": "This is a message to each of Ben Haggerty's urns.",
                                     "urn": "facebook:1122334455667788",
                                     "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
@@ -779,13 +767,12 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:37.123456789Z",
+                                "created_on": "2018-07-06T12:30:35.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Twitter Channel",
                                         "uuid": "8e21f093-99aa-413b-b55b-758b54308fcb"
                                     },
-                                    "sharing_config": {},
                                     "text": "This is a message to each of Ben Haggerty's urns.",
                                     "urn": "twitter:ben_haggerty",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -794,7 +781,7 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:39.123456789Z",
+                                "created_on": "2018-07-06T12:30:37.123456789Z",
                                 "msg": {
                                     "attachments": [
                                         "image/jpeg:http://s3.amazon.com/bucket/test_en.jpg?a=Kigali%20City"
@@ -807,7 +794,6 @@
                                         "Yes",
                                         "No"
                                     ],
-                                    "sharing_config": {},
                                     "text": "This is a reply with attachments and quick replies",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -817,27 +803,26 @@
                             },
                             {
                                 "category": "Male",
-                                "corrected": "",
-                                "created_on": "2018-07-06T12:30:43.123456789Z",
+                                "created_on": "2018-07-06T12:30:41.123456789Z",
                                 "name": "Gender",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "type": "run_result_changed",
                                 "value": "m"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:45.123456789Z",
+                                "created_on": "2018-07-06T12:30:43.123456789Z",
                                 "name": "Jeff Jefferson",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "type": "contact_name_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:47.123456789Z",
+                                "created_on": "2018-07-06T12:30:45.123456789Z",
                                 "language": "",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "type": "contact_language_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:50.123456789Z",
+                                "created_on": "2018-07-06T12:30:48.123456789Z",
                                 "field": {
                                     "key": "gender",
                                     "name": "Gender"
@@ -849,7 +834,7 @@
                                 }
                             },
                             {
-                                "created_on": "2018-07-06T12:30:52.123456789Z",
+                                "created_on": "2018-07-06T12:30:50.123456789Z",
                                 "groups_added": [
                                     {
                                         "name": "Males",
@@ -860,7 +845,7 @@
                                 "type": "contact_groups_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:55.123456789Z",
+                                "created_on": "2018-07-06T12:30:53.123456789Z",
                                 "field": {
                                     "key": "district",
                                     "name": "District"
@@ -874,8 +859,9 @@
                                 }
                             },
                             {
-                                "created_on": "2018-07-06T12:30:59.123456789Z",
+                                "created_on": "2018-07-06T12:30:57.123456789Z",
                                 "elapsed_ms": 1000,
+                                "extraction": "valid",
                                 "request": "GET /?cmd=success&name=Jeff%20Jefferson HTTP/1.1\r\nHost: localhost\r\nUser-Agent: goflow-testing\r\nAccept-Encoding: gzip\r\n\r\n",
                                 "response": "HTTP/1.0 200 OK\r\nContent-Length: 16\r\n\r\n{ \"ok\": \"true\" }",
                                 "retries": 0,
@@ -886,7 +872,7 @@
                                 "url": "http://localhost/?cmd=success&name=Jeff%20Jefferson"
                             },
                             {
-                                "created_on": "2018-07-06T12:31:01.123456789Z",
+                                "created_on": "2018-07-06T12:30:59.123456789Z",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "type": "contact_urns_changed",
                                 "urns": [
@@ -897,16 +883,15 @@
                                 ]
                             }
                         ],
-                        "exited_on": "2018-07-06T12:31:10.123456789Z",
-                        "expires_on": null,
+                        "exited_on": "2018-07-06T12:31:03.123456789Z",
                         "flow": {
                             "name": "All Actions",
                             "uuid": "8ca44c09-791d-453a-9799-a70dd3303306"
                         },
-                        "modified_on": "2018-07-06T12:31:10.123456789Z",
+                        "modified_on": "2018-07-06T12:31:03.123456789Z",
                         "path": [
                             {
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:01.123456789Z",
                                 "exit_uuid": "118221f7-e637-4cdb-83ca-7f0a5aae98c6",
                                 "node_uuid": "a58be63b-907d-4a1a-856b-0bb5579d7507",
                                 "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
@@ -915,8 +900,7 @@
                         "results": {
                             "gender": {
                                 "category": "Male",
-                                "corrected": "",
-                                "created_on": "2018-07-06T12:30:41.123456789Z",
+                                "created_on": "2018-07-06T12:30:39.123456789Z",
                                 "name": "Gender",
                                 "node_uuid": "a58be63b-907d-4a1a-856b-0bb5579d7507",
                                 "value": "m"
@@ -926,14 +910,13 @@
                         "uuid": "692926ea-09d6-4942-bd38-d266ec8d3716"
                     },
                     {
-                        "created_on": "2018-07-06T12:31:03.123456789Z",
-                        "exited_on": "2018-07-06T12:31:07.123456789Z",
-                        "expires_on": null,
+                        "created_on": "2018-07-06T12:31:01.123456789Z",
+                        "exited_on": "2018-07-06T12:31:02.123456789Z",
                         "flow": {
                             "name": "Registration Flow",
                             "uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d"
                         },
-                        "modified_on": "2018-07-06T12:31:07.123456789Z",
+                        "modified_on": "2018-07-06T12:31:02.123456789Z",
                         "parent_uuid": "692926ea-09d6-4942-bd38-d266ec8d3716",
                         "path": [],
                         "status": "completed",
@@ -973,9 +956,6 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
-                        "links": [
-                            ""
-                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",

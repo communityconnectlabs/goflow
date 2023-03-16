@@ -3,13 +3,12 @@
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:04.123456789Z",
+                    "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
                         "channel": {
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
-                        "sharing_config": {},
                         "text": "What is your name?",
                         "urn": "tel:+12065551212",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -18,9 +17,18 @@
                     "type": "msg_created"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:07.123456789Z",
+                    "created_on": "2018-07-06T12:30:06.123456789Z",
                     "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
                     "type": "msg_wait"
+                }
+            ],
+            "segments": [
+                {
+                    "destination_uuid": "3a430844-e259-4dcd-9a1d-7bef3168d43f",
+                    "exit_uuid": "19f677bf-2b34-48bd-8a05-3839191b51b2",
+                    "flow_uuid": "c37ae862-4802-447a-a783-1fe029a170e9",
+                    "node_uuid": "4fd923cc-b39f-4722-b1ea-22ce1ef388de",
+                    "time": "2018-07-06T12:30:04.123456789Z"
                 }
             ],
             "session": {
@@ -49,9 +57,6 @@
                 },
                 "environment": {
                     "date_format": "YYYY-MM-DD",
-                    "links": [
-                        ""
-                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -66,13 +71,12 @@
                         "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "created_on": "2018-07-06T12:30:04.123456789Z",
+                                "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
-                                    "sharing_config": {},
                                     "text": "What is your name?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -81,27 +85,26 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:07.123456789Z",
+                                "created_on": "2018-07-06T12:30:06.123456789Z",
                                 "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
                                 "type": "msg_wait"
                             }
                         ],
                         "exited_on": null,
-                        "expires_on": "2018-07-06T12:30:01.123456789Z",
                         "flow": {
                             "name": "Another Flow",
                             "uuid": "c37ae862-4802-447a-a783-1fe029a170e9"
                         },
-                        "modified_on": "2018-07-06T12:30:09.123456789Z",
+                        "modified_on": "2018-07-06T12:30:08.123456789Z",
                         "path": [
                             {
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:01.123456789Z",
                                 "exit_uuid": "19f677bf-2b34-48bd-8a05-3839191b51b2",
                                 "node_uuid": "4fd923cc-b39f-4722-b1ea-22ce1ef388de",
                                 "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:05.123456789Z",
                                 "node_uuid": "3a430844-e259-4dcd-9a1d-7bef3168d43f",
                                 "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
                             }
@@ -143,16 +146,13 @@
                     "type": "manual"
                 },
                 "type": "messaging",
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "wait": {
-                    "type": "msg"
-                }
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5"
             }
         },
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:13.123456789Z",
+                    "created_on": "2018-07-06T12:30:10.123456789Z",
                     "msg": {
                         "channel": {
                             "name": "Nexmo",
@@ -167,8 +167,7 @@
                 },
                 {
                     "category": "All Responses",
-                    "corrected": "Ryan Lewis",
-                    "created_on": "2018-07-06T12:30:17.123456789Z",
+                    "created_on": "2018-07-06T12:30:14.123456789Z",
                     "input": "Ryan Lewis",
                     "name": "Contact Name",
                     "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
@@ -176,13 +175,13 @@
                     "value": "Ryan Lewis"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:20.123456789Z",
+                    "created_on": "2018-07-06T12:30:18.123456789Z",
                     "name": "Ryan Lewis",
                     "step_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
                     "type": "contact_name_changed"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:23.123456789Z",
+                    "created_on": "2018-07-06T12:30:21.123456789Z",
                     "field": {
                         "key": "first_name",
                         "name": "First Name"
@@ -194,19 +193,28 @@
                     }
                 },
                 {
-                    "created_on": "2018-07-06T12:30:25.123456789Z",
+                    "created_on": "2018-07-06T12:30:23.123456789Z",
                     "msg": {
                         "channel": {
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
-                        "sharing_config": {},
                         "text": "Great, pleased to meet you Ryan",
                         "urn": "tel:+12065551212",
                         "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
                     },
                     "step_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
                     "type": "msg_created"
+                }
+            ],
+            "segments": [
+                {
+                    "destination_uuid": "2929d2fc-2778-4d98-a4bc-73a7345710b0",
+                    "exit_uuid": "feb35432-c156-44cc-af7b-136db6713aa4",
+                    "flow_uuid": "c37ae862-4802-447a-a783-1fe029a170e9",
+                    "node_uuid": "3a430844-e259-4dcd-9a1d-7bef3168d43f",
+                    "operand": "Ryan Lewis",
+                    "time": "2018-07-06T12:30:16.123456789Z"
                 }
             ],
             "session": {
@@ -236,9 +244,6 @@
                 },
                 "environment": {
                     "date_format": "YYYY-MM-DD",
-                    "links": [
-                        ""
-                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -264,13 +269,12 @@
                         "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "created_on": "2018-07-06T12:30:04.123456789Z",
+                                "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
-                                    "sharing_config": {},
                                     "text": "What is your name?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -279,12 +283,12 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:07.123456789Z",
+                                "created_on": "2018-07-06T12:30:06.123456789Z",
                                 "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:13.123456789Z",
+                                "created_on": "2018-07-06T12:30:10.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Nexmo",
@@ -299,8 +303,7 @@
                             },
                             {
                                 "category": "All Responses",
-                                "corrected": "Ryan Lewis",
-                                "created_on": "2018-07-06T12:30:17.123456789Z",
+                                "created_on": "2018-07-06T12:30:14.123456789Z",
                                 "input": "Ryan Lewis",
                                 "name": "Contact Name",
                                 "step_uuid": "5802813d-6c58-4292-8228-9728778b6c98",
@@ -308,13 +311,13 @@
                                 "value": "Ryan Lewis"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:20.123456789Z",
+                                "created_on": "2018-07-06T12:30:18.123456789Z",
                                 "name": "Ryan Lewis",
                                 "step_uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623",
                                 "type": "contact_name_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:23.123456789Z",
+                                "created_on": "2018-07-06T12:30:21.123456789Z",
                                 "field": {
                                     "key": "first_name",
                                     "name": "First Name"
@@ -326,13 +329,12 @@
                                 }
                             },
                             {
-                                "created_on": "2018-07-06T12:30:25.123456789Z",
+                                "created_on": "2018-07-06T12:30:23.123456789Z",
                                 "msg": {
                                     "channel": {
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
-                                    "sharing_config": {},
                                     "text": "Great, pleased to meet you Ryan",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -341,28 +343,27 @@
                                 "type": "msg_created"
                             }
                         ],
-                        "exited_on": "2018-07-06T12:30:27.123456789Z",
-                        "expires_on": null,
+                        "exited_on": "2018-07-06T12:30:25.123456789Z",
                         "flow": {
                             "name": "Another Flow",
                             "uuid": "c37ae862-4802-447a-a783-1fe029a170e9"
                         },
-                        "modified_on": "2018-07-06T12:30:27.123456789Z",
+                        "modified_on": "2018-07-06T12:30:25.123456789Z",
                         "path": [
                             {
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:01.123456789Z",
                                 "exit_uuid": "19f677bf-2b34-48bd-8a05-3839191b51b2",
                                 "node_uuid": "4fd923cc-b39f-4722-b1ea-22ce1ef388de",
                                 "uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:05.123456789Z",
                                 "exit_uuid": "feb35432-c156-44cc-af7b-136db6713aa4",
                                 "node_uuid": "3a430844-e259-4dcd-9a1d-7bef3168d43f",
                                 "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:19.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:17.123456789Z",
                                 "exit_uuid": "645dc267-40aa-4777-bda1-bb3133fba511",
                                 "node_uuid": "2929d2fc-2778-4d98-a4bc-73a7345710b0",
                                 "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
@@ -371,8 +372,7 @@
                         "results": {
                             "contact_name": {
                                 "category": "All Responses",
-                                "corrected": "Ryan Lewis",
-                                "created_on": "2018-07-06T12:30:15.123456789Z",
+                                "created_on": "2018-07-06T12:30:12.123456789Z",
                                 "input": "Ryan Lewis",
                                 "name": "Contact Name",
                                 "node_uuid": "3a430844-e259-4dcd-9a1d-7bef3168d43f",

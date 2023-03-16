@@ -56,10 +56,17 @@ func NewStartSession(uuid flows.ActionUUID, flow *assets.FlowReference, urns []u
 }
 
 // Execute runs our action
-func (a *StartSessionAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *StartSessionAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	groupRefs, contactRefs, contactQuery, urnList, err := a.resolveRecipients(run, logEvent)
 	if err != nil {
 		return err
+	}
+
+	// check that flow exists - error event if not
+	flow, err := run.Session().Assets().Flows().Get(a.Flow.UUID)
+	if err != nil {
+		logEvent(events.NewDependencyError(a.Flow))
+		return nil
 	}
 
 	// batch footgun prevention
@@ -87,6 +94,6 @@ func (a *StartSessionAction) Execute(run flows.FlowRun, step flows.Step, logModi
 
 	history := flows.NewChildHistory(run.Session())
 
-	logEvent(events.NewSessionTriggered(a.Flow, groupRefs, contactRefs, contactQuery, a.CreateContact, urnList, runSnapshot, history))
+	logEvent(events.NewSessionTriggered(flow.Reference(), groupRefs, contactRefs, contactQuery, a.CreateContact, urnList, runSnapshot, history))
 	return nil
 }

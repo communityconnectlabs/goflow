@@ -92,6 +92,7 @@ const (
 // FlowAssets provides access to flow assets
 type FlowAssets interface {
 	Get(assets.FlowUUID) (Flow, error)
+	FindByName(string) (Flow, error)
 }
 
 // SessionAssets is the assets available to a session
@@ -122,6 +123,7 @@ type Localizable interface {
 
 // Flow describes the ordered logic of actions and routers
 type Flow interface {
+	assets.Flow
 	Contextable
 
 	// spec properties
@@ -165,7 +167,7 @@ type Action interface {
 	FlowTypeRestricted
 
 	UUID() ActionUUID
-	Execute(FlowRun, Step, ModifierCallback, EventCallback) error
+	Execute(Run, Step, ModifierCallback, EventCallback) error
 	Validate() error
 }
 
@@ -188,8 +190,8 @@ type Router interface {
 
 	Validate(Flow, []Exit) error
 	AllowTimeout() bool
-	Route(FlowRun, Step, EventCallback) (ExitUUID, error)
-	RouteTimeout(FlowRun, Step, EventCallback) (ExitUUID, error)
+	Route(Run, Step, EventCallback) (ExitUUID, string, error)
+	RouteTimeout(Run, Step, EventCallback) (ExitUUID, error)
 
 	EnumerateTemplates(Localization, func(envs.Language, string))
 	EnumerateDependencies(Localization, func(envs.Language, assets.Reference))
@@ -216,15 +218,8 @@ type Wait interface {
 
 	Timeout() Timeout
 
-	Begin(FlowRun, EventCallback) ActivatedWait
-	End(Resume) error
-}
-
-// ActivatedWait is a wait once it has been activated in a session
-type ActivatedWait interface {
-	utils.Typed
-
-	TimeoutSeconds() *int
+	Begin(Run, EventCallback) bool
+	Accepts(Resume) bool
 }
 
 // Hint tells the caller what type of input the flow is expecting
@@ -245,7 +240,7 @@ type Trigger interface {
 	Contextable
 
 	Initialize(Session, EventCallback) error
-	InitializeRun(FlowRun, EventCallback) error
+	InitializeRun(Run, EventCallback) error
 
 	Environment() envs.Environment
 	Flow() *assets.FlowReference
@@ -269,7 +264,7 @@ type Resume interface {
 	utils.Typed
 	Contextable
 
-	Apply(FlowRun, EventCallback)
+	Apply(Run, EventCallback)
 
 	Environment() envs.Environment
 	Contact() *Contact
@@ -331,12 +326,21 @@ type Engine interface {
 	MaxTemplateChars() int
 }
 
+// Segment is a movement on the flow graph from an exit to another node
+type Segment interface {
+	Flow() Flow
+	Node() Node
+	Exit() Exit
+	Operand() string
+	Destination() Node
+	Time() time.Time
+}
+
 // Sprint is an interaction with the engine - i.e. a start or resume of a session
 type Sprint interface {
 	Modifiers() []Modifier
-	LogModifier(Modifier)
 	Events() []Event
-	LogEvent(Event)
+	Segments() []Segment
 }
 
 // Session represents the session of a flow run which may contain many runs
@@ -360,14 +364,13 @@ type Session interface {
 	Trigger() Trigger
 	CurrentResume() Resume
 	BatchStart() bool
-	PushFlow(Flow, FlowRun, bool)
-	Wait() ActivatedWait
+	PushFlow(Flow, Run, bool)
 
 	Resume(Resume) (Sprint, error)
-	Runs() []FlowRun
-	GetRun(RunUUID) (FlowRun, error)
-	FindStep(uuid StepUUID) (FlowRun, Step)
-	GetCurrentChild(FlowRun) FlowRun
+	Runs() []Run
+	GetRun(RunUUID) (Run, error)
+	FindStep(uuid StepUUID) (Run, Step)
+	GetCurrentChild(Run) Run
 	ParentRun() RunSummary
 	CurrentContext() *types.XObject
 	History() *SessionHistory
@@ -385,9 +388,9 @@ type RunSummary interface {
 	Results() Results
 }
 
-// FlowRun is a single contact's journey through a flow. It records the path they have taken,
+// Run is a single contact's journey through a flow. It records the path they have taken,
 // and the results that have been collected.
-type FlowRun interface {
+type Run interface {
 	Contextable
 	RunSummary
 	FlowReference() *assets.FlowReference
@@ -419,13 +422,11 @@ type FlowRun interface {
 
 	Snapshot() RunSummary
 	Parent() RunSummary
-	ParentInSession() FlowRun
-	Ancestors() []FlowRun
+	ParentInSession() Run
+	Ancestors() []Run
 
 	CreatedOn() time.Time
 	ModifiedOn() time.Time
-	ExpiresOn() *time.Time
-	ResetExpiration(*time.Time)
 	ExitedOn() *time.Time
 	Exit(RunStatus)
 }

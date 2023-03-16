@@ -32,6 +32,7 @@ debug
 dist/
 .idea/
 
+deploy
 fabric
 fabfile.*
 fabconfig.*

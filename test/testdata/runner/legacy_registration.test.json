@@ -3,9 +3,8 @@
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:04.123456789Z",
+                    "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
-                        "sharing_config": {},
                         "text": "Hi there. What is your name?",
                         "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                     },
@@ -14,8 +13,18 @@
                 },
                 {
                     "created_on": "2018-07-06T12:30:07.123456789Z",
+                    "expires_on": "2018-07-13T12:30:06.123456789Z",
                     "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
                     "type": "msg_wait"
+                }
+            ],
+            "segments": [
+                {
+                    "destination_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
+                    "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
+                    "flow_uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
+                    "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
+                    "time": "2018-07-06T12:30:04.123456789Z"
                 }
             ],
             "session": {
@@ -39,9 +48,6 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
-                    "links": [
-                        ""
-                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -56,9 +62,8 @@
                         "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "created_on": "2018-07-06T12:30:04.123456789Z",
+                                "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                                 },
@@ -67,12 +72,12 @@
                             },
                             {
                                 "created_on": "2018-07-06T12:30:07.123456789Z",
+                                "expires_on": "2018-07-13T12:30:06.123456789Z",
                                 "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
                                 "type": "msg_wait"
                             }
                         ],
                         "exited_on": null,
-                        "expires_on": "2018-07-13T12:30:01.123456789Z",
                         "flow": {
                             "name": "Registration",
                             "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
@@ -80,13 +85,13 @@
                         "modified_on": "2018-07-06T12:30:09.123456789Z",
                         "path": [
                             {
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:01.123456789Z",
                                 "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
                                 "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
                                 "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:05.123456789Z",
                                 "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
                                 "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
                             }
@@ -117,9 +122,6 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
-                        "links": [
-                            ""
-                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -137,16 +139,13 @@
                     "type": "manual"
                 },
                 "type": "messaging",
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "wait": {
-                    "type": "msg"
-                }
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5"
             }
         },
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:13.123456789Z",
+                    "created_on": "2018-07-06T12:30:11.123456789Z",
                     "msg": {
                         "text": "Bobby",
                         "urn": "tel:+12065551212",
@@ -157,8 +156,7 @@
                 },
                 {
                     "category": "All Responses",
-                    "corrected": "Bobby",
-                    "created_on": "2018-07-06T12:30:17.123456789Z",
+                    "created_on": "2018-07-06T12:30:15.123456789Z",
                     "input": "Bobby",
                     "name": "Name",
                     "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
@@ -166,15 +164,14 @@
                     "value": "Bobby"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:20.123456789Z",
+                    "created_on": "2018-07-06T12:30:19.123456789Z",
                     "name": "Bobby",
                     "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
                     "type": "contact_name_changed"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:22.123456789Z",
+                    "created_on": "2018-07-06T12:30:21.123456789Z",
                     "msg": {
-                        "sharing_config": {},
                         "text": "Ok Bobby, what age are you?",
                         "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                     },
@@ -182,9 +179,27 @@
                     "type": "msg_created"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:25.123456789Z",
+                    "created_on": "2018-07-06T12:30:26.123456789Z",
+                    "expires_on": "2018-07-13T12:30:25.123456789Z",
                     "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
                     "type": "msg_wait"
+                }
+            ],
+            "segments": [
+                {
+                    "destination_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
+                    "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
+                    "flow_uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
+                    "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
+                    "operand": "Bobby",
+                    "time": "2018-07-06T12:30:17.123456789Z"
+                },
+                {
+                    "destination_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                    "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
+                    "flow_uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
+                    "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
+                    "time": "2018-07-06T12:30:23.123456789Z"
                 }
             ],
             "session": {
@@ -209,9 +224,6 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
-                    "links": [
-                        ""
-                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -233,9 +245,8 @@
                         "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "created_on": "2018-07-06T12:30:04.123456789Z",
+                                "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                                 },
@@ -244,11 +255,12 @@
                             },
                             {
                                 "created_on": "2018-07-06T12:30:07.123456789Z",
+                                "expires_on": "2018-07-13T12:30:06.123456789Z",
                                 "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:13.123456789Z",
+                                "created_on": "2018-07-06T12:30:11.123456789Z",
                                 "msg": {
                                     "text": "Bobby",
                                     "urn": "tel:+12065551212",
@@ -259,8 +271,7 @@
                             },
                             {
                                 "category": "All Responses",
-                                "corrected": "Bobby",
-                                "created_on": "2018-07-06T12:30:17.123456789Z",
+                                "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
                                 "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
@@ -268,15 +279,14 @@
                                 "value": "Bobby"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:20.123456789Z",
+                                "created_on": "2018-07-06T12:30:19.123456789Z",
                                 "name": "Bobby",
                                 "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
                                 "type": "contact_name_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:22.123456789Z",
+                                "created_on": "2018-07-06T12:30:21.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Ok Bobby, what age are you?",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -284,33 +294,33 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:25.123456789Z",
+                                "created_on": "2018-07-06T12:30:26.123456789Z",
+                                "expires_on": "2018-07-13T12:30:25.123456789Z",
                                 "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
                                 "type": "msg_wait"
                             }
                         ],
                         "exited_on": null,
-                        "expires_on": "2018-07-13T12:30:11.123456789Z",
                         "flow": {
                             "name": "Registration",
                             "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
                         },
-                        "modified_on": "2018-07-06T12:30:27.123456789Z",
+                        "modified_on": "2018-07-06T12:30:28.123456789Z",
                         "path": [
                             {
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:01.123456789Z",
                                 "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
                                 "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
                                 "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:05.123456789Z",
                                 "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
                                 "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
                                 "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:19.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:18.123456789Z",
                                 "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
                                 "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
                                 "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
@@ -324,8 +334,7 @@
                         "results": {
                             "name": {
                                 "category": "All Responses",
-                                "corrected": "Bobby",
-                                "created_on": "2018-07-06T12:30:15.123456789Z",
+                                "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
                                 "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
@@ -358,9 +367,6 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
-                        "links": [
-                            ""
-                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -378,16 +384,13 @@
                     "type": "manual"
                 },
                 "type": "messaging",
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "wait": {
-                    "type": "msg"
-                }
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5"
             }
         },
         {
             "events": [
                 {
-                    "created_on": "2018-07-06T12:30:31.123456789Z",
+                    "created_on": "2018-07-06T12:30:30.123456789Z",
                     "msg": {
                         "text": "123",
                         "urn": "tel:+12065551212",
@@ -398,8 +401,7 @@
                 },
                 {
                     "category": "Other",
-                    "corrected": "123",
-                    "created_on": "2018-07-06T12:30:35.123456789Z",
+                    "created_on": "2018-07-06T12:30:34.123456789Z",
                     "input": "123",
                     "name": "Age",
                     "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
@@ -409,7 +411,6 @@
                 {
                     "created_on": "2018-07-06T12:30:38.123456789Z",
                     "msg": {
-                        "sharing_config": {},
                         "text": "Are you sure you're 123... maybe try again",
                         "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
                     },
@@ -417,9 +418,27 @@
                     "type": "msg_created"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:41.123456789Z",
+                    "created_on": "2018-07-06T12:30:43.123456789Z",
+                    "expires_on": "2018-07-13T12:30:42.123456789Z",
                     "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
                     "type": "msg_wait"
+                }
+            ],
+            "segments": [
+                {
+                    "destination_uuid": "050d338f-33d5-4c95-8a55-d4702c8365f5",
+                    "exit_uuid": "47063adc-04c6-478f-b13d-fad09f383e1e",
+                    "flow_uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
+                    "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                    "operand": "123",
+                    "time": "2018-07-06T12:30:36.123456789Z"
+                },
+                {
+                    "destination_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                    "exit_uuid": "6d57b815-ad64-4091-9b37-5428f6cc56bb",
+                    "flow_uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
+                    "node_uuid": "050d338f-33d5-4c95-8a55-d4702c8365f5",
+                    "time": "2018-07-06T12:30:40.123456789Z"
                 }
             ],
             "session": {
@@ -444,9 +463,6 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
-                    "links": [
-                        ""
-                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -468,9 +484,8 @@
                         "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "created_on": "2018-07-06T12:30:04.123456789Z",
+                                "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                                 },
@@ -479,11 +494,12 @@
                             },
                             {
                                 "created_on": "2018-07-06T12:30:07.123456789Z",
+                                "expires_on": "2018-07-13T12:30:06.123456789Z",
                                 "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:13.123456789Z",
+                                "created_on": "2018-07-06T12:30:11.123456789Z",
                                 "msg": {
                                     "text": "Bobby",
                                     "urn": "tel:+12065551212",
@@ -494,8 +510,7 @@
                             },
                             {
                                 "category": "All Responses",
-                                "corrected": "Bobby",
-                                "created_on": "2018-07-06T12:30:17.123456789Z",
+                                "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
                                 "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
@@ -503,15 +518,14 @@
                                 "value": "Bobby"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:20.123456789Z",
+                                "created_on": "2018-07-06T12:30:19.123456789Z",
                                 "name": "Bobby",
                                 "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
                                 "type": "contact_name_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:22.123456789Z",
+                                "created_on": "2018-07-06T12:30:21.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Ok Bobby, what age are you?",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -519,12 +533,13 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:25.123456789Z",
+                                "created_on": "2018-07-06T12:30:26.123456789Z",
+                                "expires_on": "2018-07-13T12:30:25.123456789Z",
                                 "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:31.123456789Z",
+                                "created_on": "2018-07-06T12:30:30.123456789Z",
                                 "msg": {
                                     "text": "123",
                                     "urn": "tel:+12065551212",
@@ -535,8 +550,7 @@
                             },
                             {
                                 "category": "Other",
-                                "corrected": "123",
-                                "created_on": "2018-07-06T12:30:35.123456789Z",
+                                "created_on": "2018-07-06T12:30:34.123456789Z",
                                 "input": "123",
                                 "name": "Age",
                                 "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
@@ -546,7 +560,6 @@
                             {
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Are you sure you're 123... maybe try again",
                                     "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
                                 },
@@ -554,33 +567,33 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:41.123456789Z",
+                                "created_on": "2018-07-06T12:30:43.123456789Z",
+                                "expires_on": "2018-07-13T12:30:42.123456789Z",
                                 "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
                                 "type": "msg_wait"
                             }
                         ],
                         "exited_on": null,
-                        "expires_on": "2018-07-13T12:30:29.123456789Z",
                         "flow": {
                             "name": "Registration",
                             "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
                         },
-                        "modified_on": "2018-07-06T12:30:43.123456789Z",
+                        "modified_on": "2018-07-06T12:30:45.123456789Z",
                         "path": [
                             {
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:01.123456789Z",
                                 "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
                                 "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
                                 "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:05.123456789Z",
                                 "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
                                 "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
                                 "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:19.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:18.123456789Z",
                                 "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
                                 "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
                                 "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
@@ -598,7 +611,7 @@
                                 "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:40.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:41.123456789Z",
                                 "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
                                 "uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db"
                             }
@@ -606,8 +619,7 @@
                         "results": {
                             "age": {
                                 "category": "Other",
-                                "corrected": "123",
-                                "created_on": "2018-07-06T12:30:33.123456789Z",
+                                "created_on": "2018-07-06T12:30:32.123456789Z",
                                 "input": "123",
                                 "name": "Age",
                                 "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
@@ -615,8 +627,7 @@
                             },
                             "name": {
                                 "category": "All Responses",
-                                "corrected": "Bobby",
-                                "created_on": "2018-07-06T12:30:15.123456789Z",
+                                "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
                                 "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
@@ -649,9 +660,6 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
-                        "links": [
-                            ""
-                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -669,10 +677,7 @@
                     "type": "manual"
                 },
                 "type": "messaging",
-                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5",
-                "wait": {
-                    "type": "msg"
-                }
+                "uuid": "d2f852ec-7b4e-457f-ae7f-f8b243c49ff5"
             }
         },
         {
@@ -689,7 +694,6 @@
                 },
                 {
                     "category": "10 - 100",
-                    "corrected": "18",
                     "created_on": "2018-07-06T12:30:51.123456789Z",
                     "input": "18",
                     "name": "Age",
@@ -698,9 +702,8 @@
                     "value": "18"
                 },
                 {
-                    "created_on": "2018-07-06T12:30:54.123456789Z",
+                    "created_on": "2018-07-06T12:30:55.123456789Z",
                     "msg": {
-                        "sharing_config": {},
                         "text": "Great, you are 18 years old",
                         "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f"
                     },
@@ -709,8 +712,7 @@
                 },
                 {
                     "category": "Youth",
-                    "corrected": "18",
-                    "created_on": "2018-07-06T12:30:59.123456789Z",
+                    "created_on": "2018-07-06T12:31:01.123456789Z",
                     "input": "18",
                     "name": "Response 3",
                     "step_uuid": "b6c40a98-ecfa-4266-9853-0310d032b497",
@@ -718,7 +720,7 @@
                     "value": "18"
                 },
                 {
-                    "created_on": "2018-07-06T12:31:02.123456789Z",
+                    "created_on": "2018-07-06T12:31:05.123456789Z",
                     "groups_added": [
                         {
                             "name": "Youth",
@@ -727,6 +729,31 @@
                     ],
                     "step_uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c",
                     "type": "contact_groups_changed"
+                }
+            ],
+            "segments": [
+                {
+                    "destination_uuid": "4c6e76f3-c91b-4a3c-b5fc-998e8bfd4bd8",
+                    "exit_uuid": "16772a2d-7302-4b4d-af6f-0a9eb7b68f1f",
+                    "flow_uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
+                    "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
+                    "operand": "18",
+                    "time": "2018-07-06T12:30:53.123456789Z"
+                },
+                {
+                    "destination_uuid": "45ba2955-3d64-43a6-bad9-a1eb30f6e27e",
+                    "exit_uuid": "f0942cd4-c09b-4b35-b4aa-825eb805db45",
+                    "flow_uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
+                    "node_uuid": "4c6e76f3-c91b-4a3c-b5fc-998e8bfd4bd8",
+                    "time": "2018-07-06T12:30:57.123456789Z"
+                },
+                {
+                    "destination_uuid": "0e260a3e-d506-4c21-aded-1eb63bbfd911",
+                    "exit_uuid": "83b81834-0287-4428-991d-c2a9fbfdff77",
+                    "flow_uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f",
+                    "node_uuid": "45ba2955-3d64-43a6-bad9-a1eb30f6e27e",
+                    "operand": "18",
+                    "time": "2018-07-06T12:31:03.123456789Z"
                 }
             ],
             "session": {
@@ -757,9 +784,6 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
-                    "links": [
-                        ""
-                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -781,9 +805,8 @@
                         "created_on": "2018-07-06T12:30:00.123456789Z",
                         "events": [
                             {
-                                "created_on": "2018-07-06T12:30:04.123456789Z",
+                                "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                                 },
@@ -792,11 +815,12 @@
                             },
                             {
                                 "created_on": "2018-07-06T12:30:07.123456789Z",
+                                "expires_on": "2018-07-13T12:30:06.123456789Z",
                                 "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:13.123456789Z",
+                                "created_on": "2018-07-06T12:30:11.123456789Z",
                                 "msg": {
                                     "text": "Bobby",
                                     "urn": "tel:+12065551212",
@@ -807,8 +831,7 @@
                             },
                             {
                                 "category": "All Responses",
-                                "corrected": "Bobby",
-                                "created_on": "2018-07-06T12:30:17.123456789Z",
+                                "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
                                 "step_uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034",
@@ -816,15 +839,14 @@
                                 "value": "Bobby"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:20.123456789Z",
+                                "created_on": "2018-07-06T12:30:19.123456789Z",
                                 "name": "Bobby",
                                 "step_uuid": "44fe8d72-00ed-4736-acca-bbca70987315",
                                 "type": "contact_name_changed"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:22.123456789Z",
+                                "created_on": "2018-07-06T12:30:21.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Ok Bobby, what age are you?",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -832,12 +854,13 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:25.123456789Z",
+                                "created_on": "2018-07-06T12:30:26.123456789Z",
+                                "expires_on": "2018-07-13T12:30:25.123456789Z",
                                 "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
                                 "type": "msg_wait"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:31.123456789Z",
+                                "created_on": "2018-07-06T12:30:30.123456789Z",
                                 "msg": {
                                     "text": "123",
                                     "urn": "tel:+12065551212",
@@ -848,8 +871,7 @@
                             },
                             {
                                 "category": "Other",
-                                "corrected": "123",
-                                "created_on": "2018-07-06T12:30:35.123456789Z",
+                                "created_on": "2018-07-06T12:30:34.123456789Z",
                                 "input": "123",
                                 "name": "Age",
                                 "step_uuid": "b52a7f80-f820-4163-9654-8a7258fbaae4",
@@ -859,7 +881,6 @@
                             {
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Are you sure you're 123... maybe try again",
                                     "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
                                 },
@@ -867,7 +888,8 @@
                                 "type": "msg_created"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:41.123456789Z",
+                                "created_on": "2018-07-06T12:30:43.123456789Z",
+                                "expires_on": "2018-07-13T12:30:42.123456789Z",
                                 "step_uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db",
                                 "type": "msg_wait"
                             },
@@ -883,7 +905,6 @@
                             },
                             {
                                 "category": "10 - 100",
-                                "corrected": "18",
                                 "created_on": "2018-07-06T12:30:51.123456789Z",
                                 "input": "18",
                                 "name": "Age",
@@ -892,9 +913,8 @@
                                 "value": "18"
                             },
                             {
-                                "created_on": "2018-07-06T12:30:54.123456789Z",
+                                "created_on": "2018-07-06T12:30:55.123456789Z",
                                 "msg": {
-                                    "sharing_config": {},
                                     "text": "Great, you are 18 years old",
                                     "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f"
                                 },
@@ -903,8 +923,7 @@
                             },
                             {
                                 "category": "Youth",
-                                "corrected": "18",
-                                "created_on": "2018-07-06T12:30:59.123456789Z",
+                                "created_on": "2018-07-06T12:31:01.123456789Z",
                                 "input": "18",
                                 "name": "Response 3",
                                 "step_uuid": "b6c40a98-ecfa-4266-9853-0310d032b497",
@@ -912,7 +931,7 @@
                                 "value": "18"
                             },
                             {
-                                "created_on": "2018-07-06T12:31:02.123456789Z",
+                                "created_on": "2018-07-06T12:31:05.123456789Z",
                                 "groups_added": [
                                     {
                                         "name": "Youth",
@@ -923,28 +942,27 @@
                                 "type": "contact_groups_changed"
                             }
                         ],
-                        "exited_on": "2018-07-06T12:31:04.123456789Z",
-                        "expires_on": null,
+                        "exited_on": "2018-07-06T12:31:07.123456789Z",
                         "flow": {
                             "name": "Registration",
                             "uuid": "21a5d73f-513f-455a-aa15-e3444ab45d2f"
                         },
-                        "modified_on": "2018-07-06T12:31:04.123456789Z",
+                        "modified_on": "2018-07-06T12:31:07.123456789Z",
                         "path": [
                             {
-                                "arrived_on": "2018-07-06T12:30:03.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:01.123456789Z",
                                 "exit_uuid": "1e92bd7e-f531-442d-982b-7d8ef4435400",
                                 "node_uuid": "e48228ed-085d-4c54-81f8-da2a5f4a6c24",
                                 "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:06.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:05.123456789Z",
                                 "exit_uuid": "67a730a1-20a4-42c7-9da5-b093e859c24e",
                                 "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
                                 "uuid": "4f15f627-b1e2-4851-8dbf-00ecf5d03034"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:19.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:18.123456789Z",
                                 "exit_uuid": "62b9d8fe-d1ff-4992-97d9-14e9d424f17f",
                                 "node_uuid": "1db62b2a-7885-48f8-abaf-43074c6201b5",
                                 "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
@@ -962,25 +980,25 @@
                                 "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:40.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:41.123456789Z",
                                 "exit_uuid": "16772a2d-7302-4b4d-af6f-0a9eb7b68f1f",
                                 "node_uuid": "7963b7ee-137a-4d70-92ee-f57da97cc607",
                                 "uuid": "b504fe9e-d8a8-47fd-af9c-ff2f1faac4db"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:53.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:54.123456789Z",
                                 "exit_uuid": "f0942cd4-c09b-4b35-b4aa-825eb805db45",
                                 "node_uuid": "4c6e76f3-c91b-4a3c-b5fc-998e8bfd4bd8",
                                 "uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:30:56.123456789Z",
+                                "arrived_on": "2018-07-06T12:30:58.123456789Z",
                                 "exit_uuid": "83b81834-0287-4428-991d-c2a9fbfdff77",
                                 "node_uuid": "45ba2955-3d64-43a6-bad9-a1eb30f6e27e",
                                 "uuid": "b6c40a98-ecfa-4266-9853-0310d032b497"
                             },
                             {
-                                "arrived_on": "2018-07-06T12:31:01.123456789Z",
+                                "arrived_on": "2018-07-06T12:31:04.123456789Z",
                                 "exit_uuid": "c6f4db9d-cfa5-46a0-a90d-0d4314a13188",
                                 "node_uuid": "0e260a3e-d506-4c21-aded-1eb63bbfd911",
                                 "uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c"
@@ -989,7 +1007,6 @@
                         "results": {
                             "age": {
                                 "category": "10 - 100",
-                                "corrected": "18",
                                 "created_on": "2018-07-06T12:30:49.123456789Z",
                                 "input": "18",
                                 "name": "Age",
@@ -998,8 +1015,7 @@
                             },
                             "name": {
                                 "category": "All Responses",
-                                "corrected": "Bobby",
-                                "created_on": "2018-07-06T12:30:15.123456789Z",
+                                "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
                                 "node_uuid": "797e66c1-99bf-4d65-8944-812e723be5f1",
@@ -1007,8 +1023,7 @@
                             },
                             "response_3": {
                                 "category": "Youth",
-                                "corrected": "18",
-                                "created_on": "2018-07-06T12:30:57.123456789Z",
+                                "created_on": "2018-07-06T12:30:59.123456789Z",
                                 "input": "18",
                                 "name": "Response 3",
                                 "node_uuid": "45ba2955-3d64-43a6-bad9-a1eb30f6e27e",
@@ -1041,9 +1056,6 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
-                        "links": [
-                            ""
-                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",

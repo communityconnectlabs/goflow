@@ -7,9 +7,9 @@ require (
 	github.com/blevesearch/segment v0.9.0
 	github.com/buger/jsonparser v1.0.0
 	github.com/go-mail/mail v2.3.1+incompatible
-	github.com/go-playground/universal-translator v0.17.0 // indirect
-	github.com/leodido/go-urn v1.2.0 // indirect
-	github.com/nyaruka/gocommon v1.14.1
+	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/nyaruka/gocommon v1.17.1
 	github.com/nyaruka/phonenumbers v1.0.71
 	github.com/olivere/elastic/v7 v7.0.22
 	github.com/pkg/errors v0.9.1
@@ -21,7 +21,6 @@ require (
 	google.golang.org/api v0.74.0
 	google.golang.org/genproto v0.0.0-20220615141314-f1464d18c36b
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/mail.v2 v2.3.1 // indirect
 )
@@ -31,7 +30,7 @@ require (
 	cloud.google.com/go/compute v1.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-chi/chi v4.1.2+incompatible // indirect
-	github.com/go-playground/locales v0.13.0 // indirect
+	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

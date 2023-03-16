@@ -43,11 +43,11 @@ func NewAddInputLabels(uuid flows.ActionUUID, labels []*assets.LabelReference) *
 }
 
 // Execute runs the labeling action
-func (a *AddInputLabelsAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *AddInputLabelsAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	// log error if we don't have any input that could be labeled
 	input := run.Session().Input()
 	if input == nil {
-		logEvent(events.NewErrorf("can't execute action in session without input"))
+		logEvent(events.NewErrorf("no input to add labels to"))
 		return nil
 	}
 

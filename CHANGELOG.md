@@ -1,3 +1,115 @@
+v0.152.0
+----------
+ * start_session actions should generate error event if flow asset missing
+
+v0.151.0
+----------
+ * Add flow as contactql query attribute
+
+v0.150.2
+----------
+ * Export events.BaseEvent so that callers can create their own events
+
+v0.150.1
+----------
+ * Fix bug when we remove a contact from all static groups
+
+v0.150.0
+----------
+ * If caller tries to resume with wrong resume type, don't fail session but error instead
+
+v0.149.1
+----------
+ * Update to gocommon 1.17.1
+
+v0.149.0
+----------
+ * Remove no longer used Run.expires_on
+
+v0.148.0
+----------
+ * Add expiresOn to dial waits so all wait types have it
+
+v0.147.0
+----------
+ * Add @trigger.campaign for campaign triggers
+ * Only treat start_session legacy vars as tel URNs if they are parseable phone numbers
+
+v0.146.1
+----------
+ * Update to latest gocommon
+
+v0.146.0
+----------
+ * Rename FlowRun to Run
+ * Update to latest gocommon
+
+v0.145.0
+----------
+ * Add expires_on to msg_wait events
+ * Remove activated wait objects on sessions, callers should use the wait events
+ * Tweak validation error message for min and max tags when field isn't a slice
+
+v0.144.3
+----------
+ * Fix tests broken by new scheme addition
+
+v0.144.2
+----------
+ * Update to latest gocommon to get Instagram scheme type
+
+v0.144.1
+----------
+ * Update to latest gocommon
+
+v0.144.0
+----------
+ * Add extraction field to webhook_called events
+
+v0.143.4
+----------
+ * Use WebhookCall.ResponseJSON for @webhook and @result.*.extra
+ * Updated translations from Transifex
+
+v0.143.3
+----------
+ * Add more options for customizing contact used by test.SessionBuilder
+
+v0.143.2
+----------
+ * Add test.SessionBuilder to make it easier to build sessions for testing
+
+v0.143.1
+----------
+ * Include node on segments, revert change to add segments without destinations
+
+v0.143.0
+----------
+ * For random router results, input should be raw random number, value is the bucket
+ * Include segments with no destination
+ * Add operand and time to flows.Segment
+
+v0.142.1
+----------
+ * Put back engine.NewSprint which mailroom uses for surveyor submissions
+
+v0.142.0
+----------
+ * Add Segments() to Sprint which returns all complete segments in that sprint
+ * Simplify error message that users see if they have label action with no input
+
+v0.141.0
+----------
+ * Rework Context into Scope, expose functions via a root scope, and support shadowing
+ * Cleanup function exposure in contexts and add more tests
+ * Drop unused child.run.* and parent.run.* parts of the context except .status as used subflow splits
+ * Add support for anonymous functions in excellent
+ * Fix function equality/inequality for consistency
+ * Use syntax tree for refactoring operations
+ * Excellent evaluation should parse to syntax tree as first step
+ * Let Excellent functions know their own name to make better error messages
+ * Only msg resumes should set input, all other resumes clear it
+
 v0.140.1
 ----------
  * Update locale files (adds empty cs and mn translations)
