@@ -36,7 +36,7 @@ type EmailSentEvent struct {
 // NewEmailSent returns a new email event with the passed in subject, body and emails
 func NewEmailSent(to []string, subject string, body string, attachments []utils.Attachment) *EmailSentEvent {
 	return &EmailSentEvent{
-		BaseEvent:   newBaseEvent(TypeEmailSent),
+		BaseEvent:   NewBaseEvent(TypeEmailSent),
 		To:          to,
 		Subject:     subject,
 		Body:        body,

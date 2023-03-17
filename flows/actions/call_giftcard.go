@@ -60,7 +60,7 @@ func (a *CallGiftcardAction) Validate() error {
 }
 
 // Execute runs this action
-func (a *CallGiftcardAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *CallGiftcardAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	method := "POST"
 
 	// substitute any variables in our url
@@ -95,7 +95,7 @@ func (a *CallGiftcardAction) Execute(run flows.FlowRun, step flows.Step, logModi
 }
 
 // Execute runs this action
-func (a *CallGiftcardAction) call(run flows.FlowRun, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
+func (a *CallGiftcardAction) call(run flows.Run, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {

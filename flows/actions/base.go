@@ -142,7 +142,7 @@ func (a *baseAction) evaluateMessage(run flows.Run, languages []envs.Language, a
 
 // helper to save a run result and log it as an event
 func (a *baseAction) saveResult(run flows.Run, step flows.Step, name, value, category, categoryLocalized string, input string, extra json.RawMessage, logEvent flows.EventCallback) {
-	result := flows.NewResult(name, value, category, categoryLocalized, step.NodeUUID(), input, extra, dates.Now())
+	result := flows.NewResult(name, value, category, categoryLocalized, step.NodeUUID(), input, extra, dates.Now(), "")
 	run.SaveResult(result)
 	logEvent(events.NewRunResultChanged(result))
 }
@@ -166,7 +166,7 @@ func (a *baseAction) saveWebhookResult(run flows.Run, step flows.Step, name stri
 }
 
 // helper to save a run result based on a voice call and log it as an event
-func (a *baseAction) saveVoiceCallResult(run flows.FlowRun, step flows.Step, name string, call *flows.WebhookCall, status flows.CallStatus, logEvent flows.EventCallback) {
+func (a *baseAction) saveVoiceCallResult(run flows.Run, step flows.Step, name string, call *flows.WebhookCall, status flows.CallStatus, logEvent flows.EventCallback) {
 	value := "0"
 	category := voiceCallStatusCategories[status]
 	var extra json.RawMessage

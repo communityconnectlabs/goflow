@@ -48,7 +48,7 @@ func (a *VoiceCallStatusAction) Validate() error {
 }
 
 // Execute runs this action
-func (a *VoiceCallStatusAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *VoiceCallStatusAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	callSID := run.Session().Trigger().Connection().ExternalID()
 	twilioCreds := run.Session().Trigger().Connection().TwilioCredentials()
 

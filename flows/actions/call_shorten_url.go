@@ -52,7 +52,7 @@ func (a *CallShortenURLAction) Validate() error {
 }
 
 // Execute runs this action
-func (a *CallShortenURLAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *CallShortenURLAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	// fake parameters
 	method := "GET"
 	url := utils.GetEnv(utils.ShortenURLPing, "https://cclabs.cc")
@@ -62,7 +62,7 @@ func (a *CallShortenURLAction) Execute(run flows.FlowRun, step flows.Step, logMo
 }
 
 // Execute runs this action
-func (a *CallShortenURLAction) call(run flows.FlowRun, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
+func (a *CallShortenURLAction) call(run flows.Run, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {

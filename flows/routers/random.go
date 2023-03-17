@@ -41,7 +41,7 @@ func (r *RandomRouter) Route(run flows.Run, step flows.Step, logEvent flows.Even
 	categoryNum := rand.Mul(decimal.New(int64(len(r.categories)), 0)).IntPart()
 	categoryUUID := r.categories[categoryNum].UUID()
 
-	exit, err := r.routeToCategory(run, step, categoryUUID, fmt.Sprintf("%d", categoryNum), rand.String(), nil, logEvent)
+	exit, err := r.routeToCategory(run, step, categoryUUID, fmt.Sprintf("%d", categoryNum), rand.String(), nil, logEvent, "")
 	return exit, rand.String(), err
 }
 

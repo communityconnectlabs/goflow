@@ -143,11 +143,11 @@ func (r *SwitchRouter) Route(run flows.Run, step flows.Step, logEvent flows.Even
 
 	if operand != nil {
 		asText, _ := types.ToXText(env, operand)
-        operandAsStr = asText.Native()
+		operandAsStr = asText.Native()
 		corrected = operandAsStr
 
 		// It only calls Bing Spell Checker if the text has more than 5 characters
-		if r.config != nil && r.config.EnabledSpell && len(input) > 5 {
+		if r.config != nil && r.config.EnabledSpell && len(operandAsStr) > 5 {
 			defaultLangSpellChecker := "en-US"
 			spellCheckerLangs := map[string]string{
 				"spa": "es-US",

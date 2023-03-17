@@ -52,7 +52,7 @@ func (a *CallCallDialogflowAction) Validate() error {
 	return nil
 }
 
-func (a *CallCallDialogflowAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *CallCallDialogflowAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	classifiers := run.Session().Assets().Classifiers()
 	classifier := classifiers.Get(assets.ClassifierUUID(a.DB["id"]))
 	if classifier == nil {
@@ -97,7 +97,7 @@ func (a *CallCallDialogflowAction) Execute(run flows.FlowRun, step flows.Step, l
 	return nil
 }
 
-func (a *CallCallDialogflowAction) saveSuccess(run flows.FlowRun, step flows.Step, input string, response *dialogflowpb.DetectIntentResponse, logEvent flows.EventCallback) {
+func (a *CallCallDialogflowAction) saveSuccess(run flows.Run, step flows.Step, input string, response *dialogflowpb.DetectIntentResponse, logEvent flows.EventCallback) {
 	queryResult := response.GetQueryResult()
 	value := queryResult.GetFulfillmentText()
 

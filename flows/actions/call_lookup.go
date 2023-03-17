@@ -66,7 +66,7 @@ func (a *CallLookupAction) Validate() error {
 }
 
 // Execute runs this action
-func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
+func (a *CallLookupAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	method := "POST"
 
 	// substitute any variables in our url
@@ -109,7 +109,7 @@ func (a *CallLookupAction) Execute(run flows.FlowRun, step flows.Step, logModifi
 }
 
 // Execute runs this action
-func (a *CallLookupAction) call(run flows.FlowRun, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
+func (a *CallLookupAction) call(run flows.Run, step flows.Step, url, method, body string, logEvent flows.EventCallback) error {
 	// build our request
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
