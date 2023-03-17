@@ -5,6 +5,7 @@
                 {
                     "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Hi Ben Haggerty! What is your favorite color? (red/blue)",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                     },
@@ -44,6 +45,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -60,6 +64,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty! What is your favorite color? (red/blue)",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -116,6 +121,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -150,6 +158,7 @@
                 },
                 {
                     "category": "Red",
+                    "corrected": "red",
                     "created_on": "2018-07-06T12:30:12.123456789Z",
                     "input": "red",
                     "name": "Favorite Color",
@@ -160,6 +169,7 @@
                 {
                     "created_on": "2018-07-06T12:30:16.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Red it is! What is your favorite soda? (pepsi/coke)",
                         "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
                     },
@@ -209,6 +219,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -232,6 +245,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty! What is your favorite color? (red/blue)",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -255,6 +269,7 @@
                             },
                             {
                                 "category": "Red",
+                                "corrected": "red",
                                 "created_on": "2018-07-06T12:30:12.123456789Z",
                                 "input": "red",
                                 "name": "Favorite Color",
@@ -265,6 +280,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:16.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Red it is! What is your favorite soda? (pepsi/coke)",
                                     "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
                                 },
@@ -299,6 +315,7 @@
                         "results": {
                             "favorite_color": {
                                 "category": "Red",
+                                "corrected": "red",
                                 "created_on": "2018-07-06T12:30:10.123456789Z",
                                 "input": "red",
                                 "name": "Favorite Color",
@@ -337,6 +354,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -371,6 +391,7 @@
                 },
                 {
                     "category": "Pepsi",
+                    "corrected": "pepsi",
                     "created_on": "2018-07-06T12:30:26.123456789Z",
                     "input": "pepsi",
                     "name": "Soda",
@@ -381,6 +402,7 @@
                 {
                     "created_on": "2018-07-06T12:30:30.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Great, you like pepsi. Finish by sending us a selfie!",
                         "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
                     },
@@ -433,6 +455,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -456,6 +481,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty! What is your favorite color? (red/blue)",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -479,6 +505,7 @@
                             },
                             {
                                 "category": "Red",
+                                "corrected": "red",
                                 "created_on": "2018-07-06T12:30:12.123456789Z",
                                 "input": "red",
                                 "name": "Favorite Color",
@@ -489,6 +516,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:16.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Red it is! What is your favorite soda? (pepsi/coke)",
                                     "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
                                 },
@@ -512,6 +540,7 @@
                             },
                             {
                                 "category": "Pepsi",
+                                "corrected": "pepsi",
                                 "created_on": "2018-07-06T12:30:26.123456789Z",
                                 "input": "pepsi",
                                 "name": "Soda",
@@ -522,6 +551,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:30.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Great, you like pepsi. Finish by sending us a selfie!",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
                                 },
@@ -565,6 +595,7 @@
                         "results": {
                             "favorite_color": {
                                 "category": "Red",
+                                "corrected": "red",
                                 "created_on": "2018-07-06T12:30:10.123456789Z",
                                 "input": "red",
                                 "name": "Favorite Color",
@@ -573,6 +604,7 @@
                             },
                             "soda": {
                                 "category": "Pepsi",
+                                "corrected": "pepsi",
                                 "created_on": "2018-07-06T12:30:24.123456789Z",
                                 "input": "pepsi",
                                 "name": "Soda",
@@ -611,6 +643,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -675,6 +710,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -701,6 +739,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty! What is your favorite color? (red/blue)",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -724,6 +763,7 @@
                             },
                             {
                                 "category": "Red",
+                                "corrected": "red",
                                 "created_on": "2018-07-06T12:30:12.123456789Z",
                                 "input": "red",
                                 "name": "Favorite Color",
@@ -734,6 +774,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:16.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Red it is! What is your favorite soda? (pepsi/coke)",
                                     "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
                                 },
@@ -757,6 +798,7 @@
                             },
                             {
                                 "category": "Pepsi",
+                                "corrected": "pepsi",
                                 "created_on": "2018-07-06T12:30:26.123456789Z",
                                 "input": "pepsi",
                                 "name": "Soda",
@@ -767,6 +809,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:30.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Great, you like pepsi. Finish by sending us a selfie!",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
                                 },
@@ -824,6 +867,7 @@
                         "results": {
                             "favorite_color": {
                                 "category": "Red",
+                                "corrected": "red",
                                 "created_on": "2018-07-06T12:30:10.123456789Z",
                                 "input": "red",
                                 "name": "Favorite Color",
@@ -832,6 +876,7 @@
                             },
                             "soda": {
                                 "category": "Pepsi",
+                                "corrected": "pepsi",
                                 "created_on": "2018-07-06T12:30:24.123456789Z",
                                 "input": "pepsi",
                                 "name": "Soda",
@@ -870,6 +915,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -948,6 +996,9 @@
                 "eng"
             ],
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "redaction_policy": "none",
             "time_format": "tt:mm",
             "timezone": "America/Los_Angeles"

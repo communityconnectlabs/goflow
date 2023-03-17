@@ -5,6 +5,7 @@
                 {
                     "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "You're in the subflow now. Pick a number!",
                         "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
                     },
@@ -48,6 +49,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -64,6 +68,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "You're in the subflow now. Pick a number!",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
                                 },
@@ -122,6 +127,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -156,6 +164,7 @@
                 },
                 {
                     "category": "Other",
+                    "corrected": "xx",
                     "created_on": "2018-07-06T12:30:15.123456789Z",
                     "input": "xx",
                     "name": "Number",
@@ -166,6 +175,7 @@
                 {
                     "created_on": "2018-07-06T12:30:19.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "That's not a number.. try again",
                         "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
                     },
@@ -218,6 +228,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -241,6 +254,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "You're in the subflow now. Pick a number!",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
                                 },
@@ -265,6 +279,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "xx",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "xx",
                                 "name": "Number",
@@ -275,6 +290,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:19.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "That's not a number.. try again",
                                     "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
                                 },
@@ -322,6 +338,7 @@
                         "results": {
                             "number": {
                                 "category": "Other",
+                                "corrected": "xx",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "xx",
                                 "name": "Number",
@@ -355,6 +372,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -389,6 +409,7 @@
                 },
                 {
                     "category": "Numeric",
+                    "corrected": "13",
                     "created_on": "2018-07-06T12:30:32.123456789Z",
                     "input": "13",
                     "name": "Number",
@@ -420,6 +441,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -443,6 +467,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "You're in the subflow now. Pick a number!",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
                                 },
@@ -467,6 +492,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "xx",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "xx",
                                 "name": "Number",
@@ -477,6 +503,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:19.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "That's not a number.. try again",
                                     "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
                                 },
@@ -501,6 +528,7 @@
                             },
                             {
                                 "category": "Numeric",
+                                "corrected": "13",
                                 "created_on": "2018-07-06T12:30:32.123456789Z",
                                 "input": "13",
                                 "name": "Number",
@@ -544,6 +572,7 @@
                         "results": {
                             "number": {
                                 "category": "Numeric",
+                                "corrected": "13",
                                 "created_on": "2018-07-06T12:30:30.123456789Z",
                                 "input": "13",
                                 "name": "Number",
@@ -577,6 +606,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -639,6 +671,9 @@
                 "eng"
             ],
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "max_value_length": 640,
             "number_format": {
                 "decimal_symbol": ".",

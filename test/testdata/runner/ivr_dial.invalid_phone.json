@@ -10,6 +10,7 @@
                 },
                 {
                     "category": "Failed",
+                    "corrected": "",
                     "created_on": "2018-07-06T12:30:06.123456789Z",
                     "name": "Redirect",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
@@ -43,6 +44,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "default_country": "US",
                     "max_value_length": 640,
                     "number_format": {
@@ -65,6 +69,7 @@
                             },
                             {
                                 "category": "Failed",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:06.123456789Z",
                                 "name": "Redirect",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
@@ -89,6 +94,7 @@
                         "results": {
                             "redirect": {
                                 "category": "Failed",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
                                 "name": "Redirect",
                                 "node_uuid": "75656148-9e8b-4611-82c0-7ff4b55fb44a",
@@ -106,6 +112,8 @@
                             "name": "Twilio",
                             "uuid": "a78930fe-6a40-4aa8-99c3-e61b02f45ca1"
                         },
+                        "external_id": "",
+                        "twilio_credentials": "",
                         "urn": "tel:+12065551212"
                     },
                     "contact": {
@@ -132,6 +140,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "default_country": "US",
                         "max_value_length": 640,
                         "number_format": {
@@ -161,6 +172,8 @@
                 "name": "Twilio",
                 "uuid": "a78930fe-6a40-4aa8-99c3-e61b02f45ca1"
             },
+            "external_id": "",
+            "twilio_credentials": "",
             "urn": "tel:+12065551212"
         },
         "contact": {
@@ -187,6 +200,9 @@
                 "eng"
             ],
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "default_country": "US",
             "max_value_length": 640,
             "number_format": {

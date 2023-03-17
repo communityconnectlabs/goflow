@@ -14,6 +14,7 @@
                 },
                 {
                     "category": "Ping",
+                    "corrected": "PING",
                     "created_on": "2018-07-06T12:30:06.123456789Z",
                     "input": "PING",
                     "name": "Command",
@@ -28,6 +29,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "You said PING",
                         "urn": "tel:+12065551212",
                         "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
@@ -69,6 +71,9 @@
                 },
                 "environment": {
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -101,6 +106,7 @@
                             },
                             {
                                 "category": "Ping",
+                                "corrected": "PING",
                                 "created_on": "2018-07-06T12:30:06.123456789Z",
                                 "input": "PING",
                                 "name": "Command",
@@ -115,6 +121,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "You said PING",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
@@ -146,6 +153,7 @@
                         "results": {
                             "command": {
                                 "category": "Ping",
+                                "corrected": "PING",
                                 "created_on": "2018-07-06T12:30:04.123456789Z",
                                 "input": "PING",
                                 "name": "Command",
@@ -180,6 +188,9 @@
                     },
                     "environment": {
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -229,6 +240,9 @@
         },
         "environment": {
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "redaction_policy": "none",
             "time_format": "tt:mm",
             "timezone": "America/Los_Angeles"

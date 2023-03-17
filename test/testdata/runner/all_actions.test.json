@@ -79,6 +79,7 @@
                     }
                 },
                 {
+                    "attachments": null,
                     "body": "Hi Ben, Your activation token is XXX-YYY-ZZZ, your coupon is AAA-BBB-CCC",
                     "created_on": "2018-07-06T12:30:13.123456789Z",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
@@ -257,6 +258,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Hi Ben Haggerty, are you ready to complete today's survey?",
                         "urn": "tel:+12065551212",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -271,6 +273,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "This is a message to each of Ben Haggerty's urns.",
                         "urn": "tel:+12065551212",
                         "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
@@ -285,6 +288,7 @@
                             "name": "Facebook Channel",
                             "uuid": "4bb288a0-7fca-4da1-abe8-59a593aff648"
                         },
+                        "sharing_config": {},
                         "text": "This is a message to each of Ben Haggerty's urns.",
                         "urn": "facebook:1122334455667788",
                         "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
@@ -299,6 +303,7 @@
                             "name": "Twitter Channel",
                             "uuid": "8e21f093-99aa-413b-b55b-758b54308fcb"
                         },
+                        "sharing_config": {},
                         "text": "This is a message to each of Ben Haggerty's urns.",
                         "urn": "twitter:ben_haggerty",
                         "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -320,6 +325,7 @@
                             "Yes",
                             "No"
                         ],
+                        "sharing_config": {},
                         "text": "This is a reply with attachments and quick replies",
                         "urn": "tel:+12065551212",
                         "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -329,6 +335,7 @@
                 },
                 {
                     "category": "Male",
+                    "corrected": "",
                     "created_on": "2018-07-06T12:30:41.123456789Z",
                     "name": "Gender",
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
@@ -460,6 +467,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -553,6 +563,7 @@
                                 }
                             },
                             {
+                                "attachments": null,
                                 "body": "Hi Ben, Your activation token is XXX-YYY-ZZZ, your coupon is AAA-BBB-CCC",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
@@ -731,6 +742,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hi Ben Haggerty, are you ready to complete today's survey?",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -745,6 +757,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "This is a message to each of Ben Haggerty's urns.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
@@ -759,6 +772,7 @@
                                         "name": "Facebook Channel",
                                         "uuid": "4bb288a0-7fca-4da1-abe8-59a593aff648"
                                     },
+                                    "sharing_config": {},
                                     "text": "This is a message to each of Ben Haggerty's urns.",
                                     "urn": "facebook:1122334455667788",
                                     "uuid": "970b8069-50f5-4f6f-8f41-6b2d9f33d623"
@@ -773,6 +787,7 @@
                                         "name": "Twitter Channel",
                                         "uuid": "8e21f093-99aa-413b-b55b-758b54308fcb"
                                     },
+                                    "sharing_config": {},
                                     "text": "This is a message to each of Ben Haggerty's urns.",
                                     "urn": "twitter:ben_haggerty",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -794,6 +809,7 @@
                                         "Yes",
                                         "No"
                                     ],
+                                    "sharing_config": {},
                                     "text": "This is a reply with attachments and quick replies",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -803,6 +819,7 @@
                             },
                             {
                                 "category": "Male",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:41.123456789Z",
                                 "name": "Gender",
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
@@ -900,6 +917,7 @@
                         "results": {
                             "gender": {
                                 "category": "Male",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:39.123456789Z",
                                 "name": "Gender",
                                 "node_uuid": "a58be63b-907d-4a1a-856b-0bb5579d7507",
@@ -956,6 +974,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",

@@ -5,6 +5,7 @@
                 {
                     "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Hi there. Do you want to take part?",
                         "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
                     },
@@ -53,6 +54,9 @@
                         "fra"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -69,6 +73,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi there. Do you want to take part?",
                                     "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
                                 },
@@ -132,6 +137,9 @@
                             "fra"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -161,6 +169,7 @@
                 },
                 {
                     "category": "No Response",
+                    "corrected": "",
                     "created_on": "2018-07-06T12:30:15.123456789Z",
                     "name": "Take Part",
                     "step_uuid": "688e64f9-2456-4b42-afcb-91a2073e5459",
@@ -169,6 +178,7 @@
                 },
                 {
                     "category": "Other",
+                    "corrected": "30",
                     "created_on": "2018-07-06T12:30:21.123456789Z",
                     "input": "30",
                     "name": "Older",
@@ -211,6 +221,9 @@
                         "fra"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -227,6 +240,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi there. Do you want to take part?",
                                     "uuid": "44fe8d72-00ed-4736-acca-bbca70987315"
                                 },
@@ -247,6 +261,7 @@
                             },
                             {
                                 "category": "No Response",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "name": "Take Part",
                                 "step_uuid": "688e64f9-2456-4b42-afcb-91a2073e5459",
@@ -255,6 +270,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "30",
                                 "created_on": "2018-07-06T12:30:21.123456789Z",
                                 "input": "30",
                                 "name": "Older",
@@ -292,6 +308,7 @@
                         "results": {
                             "older": {
                                 "category": "Other",
+                                "corrected": "30",
                                 "created_on": "2018-07-06T12:30:19.123456789Z",
                                 "input": "30",
                                 "name": "Older",
@@ -299,6 +316,7 @@
                                 "value": "30"
                             },
                             "take_part": {
+                                "corrected": "",
                                 "category": "No Response",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "name": "Take Part",
@@ -336,6 +354,9 @@
                             "fra"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -388,6 +409,9 @@
                 "fra"
             ],
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "time_format": "hh:mm",
             "timezone": "America/Los_Angeles"
         },

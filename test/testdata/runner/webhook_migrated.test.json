@@ -32,6 +32,9 @@
                 },
                 "environment": {
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -107,6 +110,7 @@
                 },
                 {
                     "category": "Other",
+                    "corrected": "Ryan Lewis",
                     "created_on": "2018-07-06T12:30:10.123456789Z",
                     "input": "Ryan Lewis",
                     "name": "Country Response",
@@ -129,6 +133,7 @@
                 },
                 {
                     "category": "Success",
+                    "corrected": "",
                     "created_on": "2018-07-06T12:30:20.123456789Z",
                     "extra": {
                         "exists": "valid"
@@ -141,6 +146,7 @@
                 },
                 {
                     "category": "Valid",
+                    "corrected": "valid",
                     "created_on": "2018-07-06T12:30:26.123456789Z",
                     "input": "valid",
                     "name": "Country",
@@ -183,6 +189,9 @@
                 },
                 "environment": {
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -220,6 +229,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "Ryan Lewis",
                                 "created_on": "2018-07-06T12:30:10.123456789Z",
                                 "input": "Ryan Lewis",
                                 "name": "Country Response",
@@ -242,6 +252,7 @@
                             },
                             {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:20.123456789Z",
                                 "extra": {
                                     "exists": "valid"
@@ -254,6 +265,7 @@
                             },
                             {
                                 "category": "Valid",
+                                "corrected": "valid",
                                 "created_on": "2018-07-06T12:30:26.123456789Z",
                                 "input": "valid",
                                 "name": "Country",
@@ -291,6 +303,7 @@
                         "results": {
                             "country": {
                                 "category": "Valid",
+                                "corrected": "valid",
                                 "created_on": "2018-07-06T12:30:24.123456789Z",
                                 "input": "valid",
                                 "name": "Country",
@@ -299,6 +312,7 @@
                             },
                             "country_response": {
                                 "category": "Other",
+                                "corrected": "Ryan Lewis",
                                 "created_on": "2018-07-06T12:30:08.123456789Z",
                                 "input": "Ryan Lewis",
                                 "name": "Country Response",
@@ -307,6 +321,7 @@
                             },
                             "country_webhook": {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:18.123456789Z",
                                 "extra": {
                                     "exists": "valid"

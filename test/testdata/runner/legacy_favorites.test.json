@@ -5,6 +5,7 @@
                 {
                     "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "What's your favorite color?",
                         "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                     },
@@ -46,6 +47,9 @@
                         "fra"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -62,6 +66,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "What's your favorite color?",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -118,6 +123,9 @@
                             "fra"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -156,6 +164,7 @@
                 },
                 {
                     "category": "Blue",
+                    "corrected": "I like blue!",
                     "created_on": "2018-07-06T12:30:15.123456789Z",
                     "input": "I like blue!",
                     "name": "Color",
@@ -166,6 +175,7 @@
                 {
                     "created_on": "2018-07-06T12:30:19.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "What's your favorite beer?",
                         "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
                     },
@@ -216,6 +226,9 @@
                         "fra"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -239,6 +252,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "What's your favorite color?",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -267,6 +281,7 @@
                             },
                             {
                                 "category": "Blue",
+                                "corrected": "I like blue!",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "I like blue!",
                                 "name": "Color",
@@ -277,6 +292,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:19.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "What's your favorite beer?",
                                     "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
                                 },
@@ -324,6 +340,7 @@
                         "results": {
                             "color": {
                                 "category": "Blue",
+                                "corrected": "I like blue!",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "I like blue!",
                                 "name": "Color",
@@ -355,6 +372,9 @@
                             "fra"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -393,6 +413,7 @@
                 },
                 {
                     "category": "Pilsner",
+                    "corrected": "Pilsner",
                     "created_on": "2018-07-06T12:30:32.123456789Z",
                     "input": "Pilsner",
                     "name": "Beer",
@@ -403,6 +424,7 @@
                 {
                     "created_on": "2018-07-06T12:30:36.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "If only they made Blue Pilsner !!\n\nBeer: Pilsner\nColor: blue",
                         "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f"
                     },
@@ -440,6 +462,9 @@
                         "fra"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -463,6 +488,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "What's your favorite color?",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -491,6 +517,7 @@
                             },
                             {
                                 "category": "Blue",
+                                "corrected": "I like blue!",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "I like blue!",
                                 "name": "Color",
@@ -501,6 +528,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:19.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "What's your favorite beer?",
                                     "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
                                 },
@@ -529,6 +557,7 @@
                             },
                             {
                                 "category": "Pilsner",
+                                "corrected": "Pilsner",
                                 "created_on": "2018-07-06T12:30:32.123456789Z",
                                 "input": "Pilsner",
                                 "name": "Beer",
@@ -539,6 +568,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:36.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "If only they made Blue Pilsner !!\n\nBeer: Pilsner\nColor: blue",
                                     "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f"
                                 },
@@ -587,6 +617,7 @@
                         "results": {
                             "beer": {
                                 "category": "Pilsner",
+                                "corrected": "Pilsner",
                                 "created_on": "2018-07-06T12:30:30.123456789Z",
                                 "input": "Pilsner",
                                 "name": "Beer",
@@ -595,6 +626,7 @@
                             },
                             "color": {
                                 "category": "Blue",
+                                "corrected": "I like blue!",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "I like blue!",
                                 "name": "Color",
@@ -626,6 +658,9 @@
                             "fra"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -694,6 +729,9 @@
                 "fra"
             ],
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "time_format": "hh:mm",
             "timezone": "America/Los_Angeles"
         },

@@ -9,6 +9,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Enter a backup phone number",
                         "urn": "tel:+12065551212",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -53,6 +54,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -73,6 +77,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Enter a backup phone number",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -132,6 +137,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -166,6 +174,7 @@
                 },
                 {
                     "category": "Other",
+                    "corrected": "135532",
                     "created_on": "2018-07-06T12:30:15.123456789Z",
                     "input": "135532",
                     "name": "Backup Phone",
@@ -180,6 +189,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Sorry that doesn't look like a phone number. Try again.",
                         "urn": "tel:+12065551212",
                         "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -233,6 +243,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -260,6 +273,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Enter a backup phone number",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -285,6 +299,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "135532",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "135532",
                                 "name": "Backup Phone",
@@ -299,6 +314,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Sorry that doesn't look like a phone number. Try again.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -347,6 +363,7 @@
                         "results": {
                             "backup_phone": {
                                 "category": "Other",
+                                "corrected": "135532",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "135532",
                                 "name": "Backup Phone",
@@ -380,6 +397,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -414,6 +434,7 @@
                 },
                 {
                     "category": "Has Phone",
+                    "corrected": "718-456-7890",
                     "created_on": "2018-07-06T12:30:32.123456789Z",
                     "input": "718-456-7890",
                     "name": "Backup Phone",
@@ -450,6 +471,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Ok you've added (718) 456-7890",
                         "urn": "tel:+12065551212",
                         "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
@@ -497,6 +519,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -524,6 +549,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Enter a backup phone number",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -549,6 +575,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "135532",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "135532",
                                 "name": "Backup Phone",
@@ -563,6 +590,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Sorry that doesn't look like a phone number. Try again.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -588,6 +616,7 @@
                             },
                             {
                                 "category": "Has Phone",
+                                "corrected": "718-456-7890",
                                 "created_on": "2018-07-06T12:30:32.123456789Z",
                                 "input": "718-456-7890",
                                 "name": "Backup Phone",
@@ -624,6 +653,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Ok you've added (718) 456-7890",
                                     "urn": "tel:+12065551212",
                                     "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
@@ -673,6 +703,7 @@
                         "results": {
                             "backup_phone": {
                                 "category": "Has Phone",
+                                "corrected": "718-456-7890",
                                 "created_on": "2018-07-06T12:30:30.123456789Z",
                                 "input": "718-456-7890",
                                 "name": "Backup Phone",
@@ -706,6 +737,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -768,6 +802,9 @@
                 "eng"
             ],
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "max_value_length": 640,
             "number_format": {
                 "decimal_symbol": ".",

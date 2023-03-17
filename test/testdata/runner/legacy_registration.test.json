@@ -5,6 +5,7 @@
                 {
                     "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Hi there. What is your name?",
                         "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                     },
@@ -48,6 +49,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -64,6 +68,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                                 },
@@ -122,6 +127,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -156,6 +164,7 @@
                 },
                 {
                     "category": "All Responses",
+                    "corrected": "Bobby",
                     "created_on": "2018-07-06T12:30:15.123456789Z",
                     "input": "Bobby",
                     "name": "Name",
@@ -172,6 +181,7 @@
                 {
                     "created_on": "2018-07-06T12:30:21.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Ok Bobby, what age are you?",
                         "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                     },
@@ -224,6 +234,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -247,6 +260,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                                 },
@@ -271,6 +285,7 @@
                             },
                             {
                                 "category": "All Responses",
+                                "corrected": "Bobby",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
@@ -287,6 +302,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:21.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Ok Bobby, what age are you?",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -334,6 +350,7 @@
                         "results": {
                             "name": {
                                 "category": "All Responses",
+                                "corrected": "Bobby",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
@@ -367,6 +384,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -401,6 +421,7 @@
                 },
                 {
                     "category": "Other",
+                    "corrected": "123",
                     "created_on": "2018-07-06T12:30:34.123456789Z",
                     "input": "123",
                     "name": "Age",
@@ -411,6 +432,7 @@
                 {
                     "created_on": "2018-07-06T12:30:38.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Are you sure you're 123... maybe try again",
                         "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
                     },
@@ -463,6 +485,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -486,6 +511,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                                 },
@@ -510,6 +536,7 @@
                             },
                             {
                                 "category": "All Responses",
+                                "corrected": "Bobby",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
@@ -526,6 +553,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:21.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Ok Bobby, what age are you?",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -550,6 +578,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "123",
                                 "created_on": "2018-07-06T12:30:34.123456789Z",
                                 "input": "123",
                                 "name": "Age",
@@ -560,6 +589,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Are you sure you're 123... maybe try again",
                                     "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
                                 },
@@ -619,6 +649,7 @@
                         "results": {
                             "age": {
                                 "category": "Other",
+                                "corrected": "123",
                                 "created_on": "2018-07-06T12:30:32.123456789Z",
                                 "input": "123",
                                 "name": "Age",
@@ -627,6 +658,7 @@
                             },
                             "name": {
                                 "category": "All Responses",
+                                "corrected": "Bobby",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
@@ -660,6 +692,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -694,6 +729,7 @@
                 },
                 {
                     "category": "10 - 100",
+                    "corrected": "18",
                     "created_on": "2018-07-06T12:30:51.123456789Z",
                     "input": "18",
                     "name": "Age",
@@ -704,6 +740,7 @@
                 {
                     "created_on": "2018-07-06T12:30:55.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Great, you are 18 years old",
                         "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f"
                     },
@@ -712,6 +749,7 @@
                 },
                 {
                     "category": "Youth",
+                    "corrected": "18",
                     "created_on": "2018-07-06T12:31:01.123456789Z",
                     "input": "18",
                     "name": "Response 3",
@@ -784,6 +822,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -807,6 +848,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Hi there. What is your name?",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
                                 },
@@ -831,6 +873,7 @@
                             },
                             {
                                 "category": "All Responses",
+                                "corrected": "Bobby",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
@@ -847,6 +890,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:21.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Ok Bobby, what age are you?",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -871,6 +915,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "123",
                                 "created_on": "2018-07-06T12:30:34.123456789Z",
                                 "input": "123",
                                 "name": "Age",
@@ -881,6 +926,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Are you sure you're 123... maybe try again",
                                     "uuid": "27b67219-e599-4697-b62c-3c781ca3b5da"
                                 },
@@ -905,6 +951,7 @@
                             },
                             {
                                 "category": "10 - 100",
+                                "corrected": "18",
                                 "created_on": "2018-07-06T12:30:51.123456789Z",
                                 "input": "18",
                                 "name": "Age",
@@ -915,6 +962,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:55.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Great, you are 18 years old",
                                     "uuid": "3ceb7525-c2e1-40b0-bec9-e032f4f9af5f"
                                 },
@@ -923,6 +971,7 @@
                             },
                             {
                                 "category": "Youth",
+                                "corrected": "18",
                                 "created_on": "2018-07-06T12:31:01.123456789Z",
                                 "input": "18",
                                 "name": "Response 3",
@@ -1007,6 +1056,7 @@
                         "results": {
                             "age": {
                                 "category": "10 - 100",
+                                "corrected": "18",
                                 "created_on": "2018-07-06T12:30:49.123456789Z",
                                 "input": "18",
                                 "name": "Age",
@@ -1015,6 +1065,7 @@
                             },
                             "name": {
                                 "category": "All Responses",
+                                "corrected": "Bobby",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "Bobby",
                                 "name": "Name",
@@ -1023,6 +1074,7 @@
                             },
                             "response_3": {
                                 "category": "Youth",
+                                "corrected": "18",
                                 "created_on": "2018-07-06T12:30:59.123456789Z",
                                 "input": "18",
                                 "name": "Response 3",
@@ -1056,6 +1108,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -1127,6 +1182,9 @@
                 "eng"
             ],
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "max_value_length": 640,
             "number_format": {
                 "decimal_symbol": ".",

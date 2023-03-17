@@ -5,6 +5,7 @@
                 {
                     "created_on": "2018-07-06T12:30:02.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Enter command: name or exit",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                     },
@@ -48,6 +49,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -64,6 +68,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Enter command: name or exit",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -122,6 +127,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -156,6 +164,7 @@
                 },
                 {
                     "category": "Name",
+                    "corrected": "name",
                     "created_on": "2018-07-06T12:30:15.123456789Z",
                     "input": "name",
                     "name": "Command",
@@ -177,6 +186,7 @@
                 {
                     "created_on": "2018-07-06T12:30:24.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Clearing name",
                         "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
                     },
@@ -203,6 +213,7 @@
                 {
                     "created_on": "2018-07-06T12:30:38.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Enter command: name or exit",
                         "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                     },
@@ -268,6 +279,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -291,6 +305,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Enter command: name or exit",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -315,6 +330,7 @@
                             },
                             {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -362,6 +378,7 @@
                         "results": {
                             "command": {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -378,6 +395,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:24.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Clearing name",
                                     "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
                                 },
@@ -437,6 +455,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Enter command: name or exit",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -496,6 +515,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -530,6 +552,7 @@
                 },
                 {
                     "category": "Name",
+                    "corrected": "name",
                     "created_on": "2018-07-06T12:30:51.123456789Z",
                     "input": "name",
                     "name": "Command",
@@ -551,6 +574,7 @@
                 {
                     "created_on": "2018-07-06T12:31:02.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Clearing name",
                         "uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005"
                     },
@@ -571,6 +595,7 @@
                 {
                     "created_on": "2018-07-06T12:31:16.123456789Z",
                     "msg": {
+                        "sharing_config": {},
                         "text": "Enter command: name or exit",
                         "uuid": "f3cbd795-9bb3-4331-ba82-c15b24dd577f"
                     },
@@ -636,6 +661,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -659,6 +687,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Enter command: name or exit",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -683,6 +712,7 @@
                             },
                             {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -730,6 +760,7 @@
                         "results": {
                             "command": {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -746,6 +777,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:24.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Clearing name",
                                     "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
                                 },
@@ -805,6 +837,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Enter command: name or exit",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -829,6 +862,7 @@
                             },
                             {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:51.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -877,6 +911,7 @@
                         "results": {
                             "command": {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:49.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -893,6 +928,7 @@
                             {
                                 "created_on": "2018-07-06T12:31:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Clearing name",
                                     "uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005"
                                 },
@@ -946,6 +982,7 @@
                             {
                                 "created_on": "2018-07-06T12:31:16.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Enter command: name or exit",
                                     "uuid": "f3cbd795-9bb3-4331-ba82-c15b24dd577f"
                                 },
@@ -1005,6 +1042,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -1039,6 +1079,7 @@
                 },
                 {
                     "category": "Exit",
+                    "corrected": "exit",
                     "created_on": "2018-07-06T12:31:29.123456789Z",
                     "input": "exit",
                     "name": "Command",
@@ -1069,6 +1110,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -1092,6 +1136,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Enter command: name or exit",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
                                 },
@@ -1116,6 +1161,7 @@
                             },
                             {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:15.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -1163,6 +1209,7 @@
                         "results": {
                             "command": {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:13.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -1179,6 +1226,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:24.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Clearing name",
                                     "uuid": "a4d15ed4-5b24-407f-b86e-4b881f09a186"
                                 },
@@ -1238,6 +1286,7 @@
                             {
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Enter command: name or exit",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
                                 },
@@ -1262,6 +1311,7 @@
                             },
                             {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:51.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -1310,6 +1360,7 @@
                         "results": {
                             "command": {
                                 "category": "Name",
+                                "corrected": "name",
                                 "created_on": "2018-07-06T12:30:49.123456789Z",
                                 "input": "name",
                                 "name": "Command",
@@ -1326,6 +1377,7 @@
                             {
                                 "created_on": "2018-07-06T12:31:02.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Clearing name",
                                     "uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005"
                                 },
@@ -1379,6 +1431,7 @@
                             {
                                 "created_on": "2018-07-06T12:31:16.123456789Z",
                                 "msg": {
+                                    "sharing_config": {},
                                     "text": "Enter command: name or exit",
                                     "uuid": "f3cbd795-9bb3-4331-ba82-c15b24dd577f"
                                 },
@@ -1403,6 +1456,7 @@
                             },
                             {
                                 "category": "Exit",
+                                "corrected": "exit",
                                 "created_on": "2018-07-06T12:31:29.123456789Z",
                                 "input": "exit",
                                 "name": "Command",
@@ -1435,6 +1489,7 @@
                         "results": {
                             "command": {
                                 "category": "Exit",
+                                "corrected": "exit",
                                 "created_on": "2018-07-06T12:31:27.123456789Z",
                                 "input": "exit",
                                 "name": "Command",
@@ -1468,6 +1523,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -1539,6 +1597,9 @@
                 "eng"
             ],
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "max_value_length": 640,
             "number_format": {
                 "decimal_symbol": ".",

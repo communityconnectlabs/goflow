@@ -17,6 +17,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Extra: {address: {city: Seattle, state: WA}}",
                         "urn": "tel:+12065551212",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -26,6 +27,7 @@
                 },
                 {
                     "category": "Valid",
+                    "corrected": "Ben Haggerty",
                     "created_on": "2018-07-06T12:30:08.123456789Z",
                     "extra": {
                         "0": "Ben Haggerty",
@@ -45,6 +47,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Extra: {0: Ben Haggerty, 1: Ben, 2: Haggerty, address: {city: Seattle, state: WA}, name_check: {\"0\":\"Ben Haggerty\",\"1\":\"Ben\",\"2\":\"Haggerty\"}}",
                         "urn": "tel:+12065551212",
                         "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -67,6 +70,7 @@
                 },
                 {
                     "category": "Success",
+                    "corrected": "",
                     "created_on": "2018-07-06T12:30:20.123456789Z",
                     "extra": {
                         "ok": "true"
@@ -84,6 +88,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Extra: {0: Ben Haggerty, 1: Ben, 2: Haggerty, address: {city: Seattle, state: WA}, name_check: {\"0\":\"Ben Haggerty\",\"1\":\"Ben\",\"2\":\"Haggerty\"}, ok: true, webhook: { \"ok\": \"true\" }}",
                         "urn": "tel:+12065551212",
                         "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -129,6 +134,9 @@
                 },
                 "environment": {
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -149,6 +157,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Extra: {address: {city: Seattle, state: WA}}",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -158,6 +167,7 @@
                             },
                             {
                                 "category": "Valid",
+                                "corrected": "Ben Haggerty",
                                 "created_on": "2018-07-06T12:30:08.123456789Z",
                                 "extra": {
                                     "0": "Ben Haggerty",
@@ -177,6 +187,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Extra: {0: Ben Haggerty, 1: Ben, 2: Haggerty, address: {city: Seattle, state: WA}, name_check: {\"0\":\"Ben Haggerty\",\"1\":\"Ben\",\"2\":\"Haggerty\"}}",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -199,6 +210,7 @@
                             },
                             {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:20.123456789Z",
                                 "extra": {
                                     "ok": "true"
@@ -216,6 +228,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Extra: {0: Ben Haggerty, 1: Ben, 2: Haggerty, address: {city: Seattle, state: WA}, name_check: {\"0\":\"Ben Haggerty\",\"1\":\"Ben\",\"2\":\"Haggerty\"}, ok: true, webhook: { \"ok\": \"true\" }}",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -257,6 +270,7 @@
                         "results": {
                             "name_check": {
                                 "category": "Valid",
+                                "corrected": "Ben Haggerty",
                                 "created_on": "2018-07-06T12:30:06.123456789Z",
                                 "extra": {
                                     "0": "Ben Haggerty",
@@ -270,6 +284,7 @@
                             },
                             "webhook": {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:18.123456789Z",
                                 "extra": {
                                     "ok": "true"
@@ -333,6 +348,7 @@
                 },
                 {
                     "category": "",
+                    "corrected": "Ryan Lewis",
                     "created_on": "2018-07-06T12:30:32.123456789Z",
                     "input": "Ryan Lewis",
                     "name": "Continue",
@@ -347,6 +363,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Extra: {0: Ben Haggerty, 1: Ben, 2: Haggerty, address: {city: Seattle, state: WA}, name_check: {\n                        \"0\": \"Ben Haggerty\",\n                        \"1\": \"Ben\",\n                        \"2\": \"Haggerty\"\n                    }, ok: true, webhook: {\n                        \"ok\": \"true\"\n                    }}",
                         "urn": "tel:+12065551212",
                         "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
@@ -381,6 +398,9 @@
                 },
                 "environment": {
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -412,6 +432,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Extra: {address: {city: Seattle, state: WA}}",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -421,6 +442,7 @@
                             },
                             {
                                 "category": "Valid",
+                                "corrected": "Ben Haggerty",
                                 "created_on": "2018-07-06T12:30:08.123456789Z",
                                 "extra": {
                                     "0": "Ben Haggerty",
@@ -440,6 +462,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Extra: {0: Ben Haggerty, 1: Ben, 2: Haggerty, address: {city: Seattle, state: WA}, name_check: {\"0\":\"Ben Haggerty\",\"1\":\"Ben\",\"2\":\"Haggerty\"}}",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5ecda5fc-951c-437b-a17e-f85e49829fb9"
@@ -462,6 +485,7 @@
                             },
                             {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:20.123456789Z",
                                 "extra": {
                                     "ok": "true"
@@ -479,6 +503,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Extra: {0: Ben Haggerty, 1: Ben, 2: Haggerty, address: {city: Seattle, state: WA}, name_check: {\"0\":\"Ben Haggerty\",\"1\":\"Ben\",\"2\":\"Haggerty\"}, ok: true, webhook: { \"ok\": \"true\" }}",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -507,6 +532,7 @@
                             },
                             {
                                 "category": "",
+                                "corrected": "Ryan Lewis",
                                 "created_on": "2018-07-06T12:30:32.123456789Z",
                                 "input": "Ryan Lewis",
                                 "name": "Continue",
@@ -521,6 +547,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Extra: {0: Ben Haggerty, 1: Ben, 2: Haggerty, address: {city: Seattle, state: WA}, name_check: {\n                        \"0\": \"Ben Haggerty\",\n                        \"1\": \"Ben\",\n                        \"2\": \"Haggerty\"\n                    }, ok: true, webhook: {\n                        \"ok\": \"true\"\n                    }}",
                                     "urn": "tel:+12065551212",
                                     "uuid": "b88ce93d-4360-4455-a691-235cbe720980"
@@ -563,6 +590,7 @@
                         ],
                         "results": {
                             "continue": {
+                                "corrected": "Ryan Lewis",
                                 "created_on": "2018-07-06T12:30:30.123456789Z",
                                 "input": "Ryan Lewis",
                                 "name": "Continue",
@@ -571,6 +599,7 @@
                             },
                             "name_check": {
                                 "category": "Valid",
+                                "corrected": "Ben Haggerty",
                                 "created_on": "2018-07-06T12:30:06.123456789Z",
                                 "extra": {
                                     "0": "Ben Haggerty",
@@ -584,6 +613,7 @@
                             },
                             "webhook": {
                                 "category": "Success",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:18.123456789Z",
                                 "extra": {
                                     "ok": "true"

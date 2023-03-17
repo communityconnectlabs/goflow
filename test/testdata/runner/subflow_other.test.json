@@ -9,6 +9,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Hi there, let's go to the child.",
                         "urn": "tel:+12065551212",
                         "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -34,6 +35,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Welcome to the child, say yes or no!",
                         "urn": "tel:+12065551212",
                         "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -92,6 +94,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -112,6 +117,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hi there, let's go to the child.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -163,6 +169,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Welcome to the child, say yes or no!",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -230,6 +237,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -268,6 +278,7 @@
                 },
                 {
                     "category": "Other",
+                    "corrected": "neither",
                     "created_on": "2018-07-06T12:30:22.123456789Z",
                     "input": "neither",
                     "name": "Answer",
@@ -282,6 +293,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Nope, that's neither.",
                         "urn": "tel:+12065551212",
                         "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
@@ -342,6 +354,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -373,6 +388,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hi there, let's go to the child.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -424,6 +440,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Welcome to the child, say yes or no!",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -452,6 +469,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "neither",
                                 "created_on": "2018-07-06T12:30:22.123456789Z",
                                 "input": "neither",
                                 "name": "Answer",
@@ -466,6 +484,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Nope, that's neither.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
@@ -514,6 +533,7 @@
                         "results": {
                             "answer": {
                                 "category": "Other",
+                                "corrected": "neither",
                                 "created_on": "2018-07-06T12:30:20.123456789Z",
                                 "input": "neither",
                                 "name": "Answer",
@@ -555,6 +575,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -593,6 +616,7 @@
                 },
                 {
                     "category": "Yes",
+                    "corrected": "yes",
                     "created_on": "2018-07-06T12:30:38.123456789Z",
                     "input": "yes",
                     "name": "Answer",
@@ -607,6 +631,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "You said yes",
                         "urn": "tel:+12065551212",
                         "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
@@ -621,6 +646,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Hooray, you did it and said yes. Say yes or no!",
                         "urn": "tel:+12065551212",
                         "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
@@ -689,6 +715,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -720,6 +749,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hi there, let's go to the child.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -745,6 +775,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hooray, you did it and said yes. Say yes or no!",
                                     "urn": "tel:+12065551212",
                                     "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
@@ -802,6 +833,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Welcome to the child, say yes or no!",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -830,6 +862,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "neither",
                                 "created_on": "2018-07-06T12:30:22.123456789Z",
                                 "input": "neither",
                                 "name": "Answer",
@@ -844,6 +877,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Nope, that's neither.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
@@ -872,6 +906,7 @@
                             },
                             {
                                 "category": "Yes",
+                                "corrected": "yes",
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "input": "yes",
                                 "name": "Answer",
@@ -886,6 +921,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "You said yes",
                                     "urn": "tel:+12065551212",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
@@ -936,6 +972,7 @@
                         "results": {
                             "answer": {
                                 "category": "Yes",
+                                "corrected": "yes",
                                 "created_on": "2018-07-06T12:30:36.123456789Z",
                                 "input": "yes",
                                 "name": "Answer",
@@ -977,6 +1014,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -1015,6 +1055,7 @@
                 },
                 {
                     "category": "Other",
+                    "corrected": "never",
                     "created_on": "2018-07-06T12:30:59.123456789Z",
                     "input": "never",
                     "name": "Answer",
@@ -1029,6 +1070,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Nope, that's neither",
                         "urn": "tel:+12065551212",
                         "uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005"
@@ -1089,6 +1131,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -1120,6 +1165,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hi there, let's go to the child.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -1145,6 +1191,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hooray, you did it and said yes. Say yes or no!",
                                     "urn": "tel:+12065551212",
                                     "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
@@ -1173,6 +1220,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "never",
                                 "created_on": "2018-07-06T12:30:59.123456789Z",
                                 "input": "never",
                                 "name": "Answer",
@@ -1187,6 +1235,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Nope, that's neither",
                                     "urn": "tel:+12065551212",
                                     "uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005"
@@ -1246,6 +1295,7 @@
                         "results": {
                             "answer": {
                                 "category": "Other",
+                                "corrected": "never",
                                 "created_on": "2018-07-06T12:30:57.123456789Z",
                                 "input": "never",
                                 "name": "Answer",
@@ -1266,6 +1316,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Welcome to the child, say yes or no!",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -1294,6 +1345,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "neither",
                                 "created_on": "2018-07-06T12:30:22.123456789Z",
                                 "input": "neither",
                                 "name": "Answer",
@@ -1308,6 +1360,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Nope, that's neither.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
@@ -1336,6 +1389,7 @@
                             },
                             {
                                 "category": "Yes",
+                                "corrected": "yes",
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "input": "yes",
                                 "name": "Answer",
@@ -1350,6 +1404,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "You said yes",
                                     "urn": "tel:+12065551212",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
@@ -1400,6 +1455,7 @@
                         "results": {
                             "answer": {
                                 "category": "Yes",
+                                "corrected": "yes",
                                 "created_on": "2018-07-06T12:30:36.123456789Z",
                                 "input": "yes",
                                 "name": "Answer",
@@ -1441,6 +1497,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -1479,6 +1538,7 @@
                 },
                 {
                     "category": "No",
+                    "corrected": "no",
                     "created_on": "2018-07-06T12:31:15.123456789Z",
                     "input": "no",
                     "name": "Answer",
@@ -1493,6 +1553,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "All Done! You said yes in the child and no here.",
                         "urn": "tel:+12065551212",
                         "uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c"
@@ -1541,6 +1602,9 @@
                         "eng"
                     ],
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -1572,6 +1636,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hi there, let's go to the child.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "c34b6c7d-fa06-4563-92a3-d648ab64bccb"
@@ -1597,6 +1662,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Hooray, you did it and said yes. Say yes or no!",
                                     "urn": "tel:+12065551212",
                                     "uuid": "8ed05195-68cc-47fa-8e78-3bde7b3370ae"
@@ -1625,6 +1691,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "never",
                                 "created_on": "2018-07-06T12:30:59.123456789Z",
                                 "input": "never",
                                 "name": "Answer",
@@ -1639,6 +1706,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Nope, that's neither",
                                     "urn": "tel:+12065551212",
                                     "uuid": "f5e0f002-41fc-4565-8d9f-e51d30290005"
@@ -1667,6 +1735,7 @@
                             },
                             {
                                 "category": "No",
+                                "corrected": "no",
                                 "created_on": "2018-07-06T12:31:15.123456789Z",
                                 "input": "no",
                                 "name": "Answer",
@@ -1681,6 +1750,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "All Done! You said yes in the child and no here.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "658fd57d-f132-4ae4-8ab7-4a517a86045c"
@@ -1742,6 +1812,7 @@
                         "results": {
                             "answer": {
                                 "category": "No",
+                                "corrected": "no",
                                 "created_on": "2018-07-06T12:31:13.123456789Z",
                                 "input": "no",
                                 "name": "Answer",
@@ -1762,6 +1833,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Welcome to the child, say yes or no!",
                                     "urn": "tel:+12065551212",
                                     "uuid": "312d3af0-a565-4c96-ba00-bd7f0d08e671"
@@ -1790,6 +1862,7 @@
                             },
                             {
                                 "category": "Other",
+                                "corrected": "neither",
                                 "created_on": "2018-07-06T12:30:22.123456789Z",
                                 "input": "neither",
                                 "name": "Answer",
@@ -1804,6 +1877,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Nope, that's neither.",
                                     "urn": "tel:+12065551212",
                                     "uuid": "1b5491ec-2b83-445d-bebe-b4a1f677cf4c"
@@ -1832,6 +1906,7 @@
                             },
                             {
                                 "category": "Yes",
+                                "corrected": "yes",
                                 "created_on": "2018-07-06T12:30:38.123456789Z",
                                 "input": "yes",
                                 "name": "Answer",
@@ -1846,6 +1921,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "You said yes",
                                     "urn": "tel:+12065551212",
                                     "uuid": "688e64f9-2456-4b42-afcb-91a2073e5459"
@@ -1896,6 +1972,7 @@
                         "results": {
                             "answer": {
                                 "category": "Yes",
+                                "corrected": "yes",
                                 "created_on": "2018-07-06T12:30:36.123456789Z",
                                 "input": "yes",
                                 "name": "Answer",
@@ -1937,6 +2014,9 @@
                             "eng"
                         ],
                         "date_format": "YYYY-MM-DD",
+                        "links": [
+                            ""
+                        ],
                         "max_value_length": 640,
                         "number_format": {
                             "decimal_symbol": ".",
@@ -2041,6 +2121,9 @@
                 "eng"
             ],
             "date_format": "YYYY-MM-DD",
+            "links": [
+                ""
+            ],
             "time_format": "hh:mm",
             "timezone": "America/Los_Angeles"
         },

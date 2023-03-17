@@ -80,6 +80,7 @@
                 },
                 {
                     "category": "Failure",
+                    "corrected": "",
                     "created_on": "2018-07-06T12:30:14.123456789Z",
                     "extra": {
                         "errors": [
@@ -99,6 +100,7 @@
                             "name": "Android Channel",
                             "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                         },
+                        "sharing_config": {},
                         "text": "Resthook: {\"errors\":[\"bad_request\"]}",
                         "urn": "tel:+12065551212",
                         "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
@@ -132,6 +134,9 @@
                 },
                 "environment": {
                     "date_format": "YYYY-MM-DD",
+                    "links": [
+                        ""
+                    ],
                     "max_value_length": 640,
                     "number_format": {
                         "decimal_symbol": ".",
@@ -209,6 +214,7 @@
                             },
                             {
                                 "category": "Failure",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:14.123456789Z",
                                 "extra": {
                                     "errors": [
@@ -228,6 +234,7 @@
                                         "name": "Android Channel",
                                         "uuid": "57f1078f-88aa-46f4-a59a-948a5739c03d"
                                     },
+                                    "sharing_config": {},
                                     "text": "Resthook: {\"errors\":[\"bad_request\"]}",
                                     "urn": "tel:+12065551212",
                                     "uuid": "5802813d-6c58-4292-8228-9728778b6c98"
@@ -259,6 +266,7 @@
                         "results": {
                             "response_1": {
                                 "category": "Failure",
+                                "corrected": "",
                                 "created_on": "2018-07-06T12:30:12.123456789Z",
                                 "extra": {
                                     "errors": [
