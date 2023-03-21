@@ -48,7 +48,7 @@ jobs:
 
     - name: Build docs
       run: |
-        go install github.com/greatnonprofits-nfp/goflow/cmd/docgen
+        go install github.com/nyaruka/goflow/cmd/docgen
         docgen
         tar -zcf docs.tar.gz docs
 
