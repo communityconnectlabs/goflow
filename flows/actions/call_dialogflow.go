@@ -84,7 +84,7 @@ func (a *CallCallDialogflowAction) Execute(run flows.Run, step flows.Step, logMo
 		// rapidPro only supports one type of Chinese language code which is zho, translates to zh.
 		// zh is not supported in google only zh-cn (Simplified Chinese) and zh-hk (Hong Kong) and
 		// zh-tw Traditional. I am defaulting the Simplified for now.
-		languageCode = "zh-cn"
+		languageCode = "zh-tw"
 	}
 	resp, err := a.DetectIntentText(projectID, languageCode, input, contactId, configStr)
 
