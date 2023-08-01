@@ -3,6 +3,7 @@ package functions
 import (
 	"bytes"
 	"fmt"
+	"github.com/pkg/errors"
 	"html"
 	"math"
 	"net/url"
@@ -135,6 +136,7 @@ func init() {
 		"extract_object": MinArgsCheck(2, ExtractObject),
 		"foreach":        MinArgsCheck(2, ForEach),
 		"foreach_value":  MinArgsCheck(2, ForEachValue),
+		"foreach_format": MinArgsCheck(2, ForEachFormat),
 	}
 
 	for name, fn := range builtin {
@@ -2157,6 +2159,62 @@ func ForEachValue(env envs.Environment, args ...types.XValue) types.XValue {
 
 	return types.NewXObject(result)
 }
+
+// ForEachFormat creates a new string by applying `join` to each property value of `object` placed in formatted string.
+//
+// If the given function takes more than one argument, you can pass additional arguments after the function.
+//
+//   @(foreach_format(array("a", "b", "c"), "%s\n")) -> "a\nb\nc\n"
+//
+// @function foreach_format(array, pattern, [args...])
+func ForEachFormat(env envs.Environment, args ...types.XValue) types.XValue {
+	var otherArgs []types.XValue
+	var resultBuilder strings.Builder
+
+	array, xerr := types.ToXArray(env, args[0])
+	if xerr != nil {
+		return xerr
+	}
+
+	pattern, xerr := types.ToXText(env, args[1])
+	if xerr != nil {
+		return xerr
+	}
+
+	if strings.Count(pattern.Native(), "%s") != 1 {
+		return types.NewXError(errors.New("There must be one '%s' in the pattern"))
+	}
+
+	var function *types.XFunction
+	var isFunction bool
+	if len(args) >= 3 {
+		function, isFunction = args[2].(*types.XFunction)
+		if !isFunction {
+			function = types.NewXFunction("extract", TwoArgFunction(Extract))
+			otherArgs = args[2:]
+		} else {
+			otherArgs = args[3:]
+		}
+	} else {
+		function = types.NewXFunction("text", OneArgFunction(Text))
+		otherArgs = []types.XValue{}
+	}
+
+
+	for i := 0; i < array.Count(); i++ {
+		oldItem := array.Get(i)
+		funcArgs := append([]types.XValue{oldItem}, otherArgs...)
+
+		newItem := function.Call(env, funcArgs)
+		if types.IsXError(newItem) {
+			return newItem
+		}
+		resultBuilder.WriteString(fmt.Sprintf(pattern.Native(), newItem.Format(env)))
+	}
+
+	return types.NewXText(resultBuilder.String())
+}
+
 
 // LegacyAdd simulates our old + operator, which operated differently based on whether
 // one of the parameters was a date or not. If one is a date, then the other side is
