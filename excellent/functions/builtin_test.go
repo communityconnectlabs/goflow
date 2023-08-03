@@ -237,6 +237,12 @@ func TestFunctions(t *testing.T) {
 		},
 		{"extract_object", dmy, []types.XValue{}, ERROR},
 
+		{"extract_nested_values", dmy, []types.XValue{types.NewXArray(xs("a"), xs("b")), xs("")}, types.NewXArray(xs("a"), xs("b"))},
+		{"extract_nested_values", dmy, []types.XValue{types.NewXArray(
+			types.NewXObject(map[string]types.XValue{"a": xs("x")}),
+			types.NewXObject(map[string]types.XValue{"a": xs("y")}),
+		), xs("*.a")}, types.NewXArray(xs("x"), xs("y"))},
+
 		{"epoch", dmy, []types.XValue{xdt(time.Date(2017, 6, 12, 16, 56, 59, 0, time.UTC))}, xn("1497286619")},
 		{"epoch", dmy, []types.XValue{ERROR}, ERROR},
 		{"epoch", dmy, []types.XValue{}, ERROR},
@@ -273,15 +279,13 @@ func TestFunctions(t *testing.T) {
 
 		{"foreach_format", dmy, []types.XValue{ERROR, xs("%s"), xf("upper")}, ERROR},
 		{"foreach_format", dmy, []types.XValue{types.NewXArray(xs("a"), xs("b")), xs("%s")}, types.NewXText("ab")},
-		{"foreach_format", dmy, []types.XValue{types.NewXArray(xs("a"), xs("b")), xs("%s%s"), xf("upper")}, ERROR},
-		{"foreach_format", dmy, []types.XValue{types.NewXArray(xs("a"), xs("b")), xs("%s"), xf("upper")}, types.NewXText("AB")},
+		{"foreach_format", dmy, []types.XValue{types.NewXArray(xs("a"), xs("b")), xs("%s%s")}, ERROR},
 		{"foreach_format", dmy, []types.XValue{
 			types.NewXArray(
 				types.NewXObject(map[string]types.XValue{"a": xs("x")}),
 				types.NewXObject(map[string]types.XValue{"a": xs("y")}),
 			),
 			xs("%s"),
-			xf("extract"),
 			xs("a"),
 		},
 			types.NewXText("xy"),
