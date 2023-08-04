@@ -3,11 +3,13 @@ package functions
 import (
 	"bytes"
 	"fmt"
+	"github.com/pkg/errors"
 	"html"
 	"math"
 	"net/url"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -126,15 +128,17 @@ func init() {
 		"format_urn":      OneTextFunction(FormatURN),
 
 		// utility functions
-		"is_error":       OneArgFunction(IsError),
-		"count":          OneArgFunction(Count),
-		"default":        TwoArgFunction(Default),
-		"legacy_add":     TwoArgFunction(LegacyAdd),
-		"read_chars":     OneTextFunction(ReadChars),
-		"extract":        TwoArgFunction(Extract),
-		"extract_object": MinArgsCheck(2, ExtractObject),
-		"foreach":        MinArgsCheck(2, ForEach),
-		"foreach_value":  MinArgsCheck(2, ForEachValue),
+		"is_error":              OneArgFunction(IsError),
+		"count":                 OneArgFunction(Count),
+		"default":               TwoArgFunction(Default),
+		"legacy_add":            TwoArgFunction(LegacyAdd),
+		"read_chars":            OneTextFunction(ReadChars),
+		"extract":               TwoArgFunction(Extract),
+		"extract_object":        MinArgsCheck(2, ExtractObject),
+		"extract_nested_values": TwoArgFunction(ExtractNestedValues),
+		"foreach":               MinArgsCheck(2, ForEach),
+		"foreach_value":         MinArgsCheck(2, ForEachValue),
+		"foreach_format":        MinAndMaxArgsCheck(2, 3, ForEachFormat),
 	}
 
 	for name, fn := range builtin {
@@ -2156,6 +2160,141 @@ func ForEachValue(env envs.Environment, args ...types.XValue) types.XValue {
 	}
 
 	return types.NewXObject(result)
+}
+
+// ForEachFormat creates a new string by applying `join` to each property value of `object` placed in formatted string.
+//
+// If the given function takes more than one argument, you can pass additional arguments after the function.
+//
+//   @(foreach_format(array("a", "b", "c"), "%s\n")) -> a\nb\nc\n
+//
+// @function foreach_format(array, pattern, [args...])
+func ForEachFormat(env envs.Environment, args ...types.XValue) types.XValue {
+	var resultBuilder strings.Builder
+	var nestedValues types.XValue
+
+	array, xerr := types.ToXArray(env, args[0])
+	if xerr != nil {
+		return xerr
+	}
+
+	pattern, xerr := types.ToXText(env, args[1])
+	if xerr != nil {
+		return xerr
+	}
+
+	if strings.Count(pattern.Native(), "%s") != 1 {
+		return types.NewXError(errors.New("There must be one '%s' in the pattern"))
+	}
+
+	if len(args) == 3 {
+		path, xerr := types.ToXText(env, args[2])
+		if types.IsXError(xerr) {
+			return xerr
+		}
+		if !strings.HasPrefix(path.Native(), "*.") && path.Native() != "" {
+			path = types.NewXText("*." + path.Native())
+		}
+		nestedValues = ExtractNestedValues(env, array, path)
+	} else {
+		nestedValues = ExtractNestedValues(env, array, types.NewXText(""))
+	}
+
+	if types.IsXError(nestedValues) {
+		return nestedValues
+	}
+
+	unnestedArray, xerr := types.ToXArray(env, nestedValues)
+	if types.IsXError(xerr) {
+		return xerr
+	}
+
+	for _, item := range unnestedArray.Values() {
+		resultBuilder.WriteString(fmt.Sprintf(pattern.Native(), item.Format(env)))
+	}
+
+	return types.NewXText(resultBuilder.String())
+}
+
+type stackItem struct {
+	item types.XValue
+	path []string
+}
+
+// ExtractNestedValues creates an array by selecting properties of `object` or `array` following provided path.
+//
+//   @(extract_nested_values(contact, "name")) -> [Ryan Lewis]
+//   @(extract_nested_values(contact.groups[0], "name")) -> [Testers]
+//
+// @function extract_nested_values(object, path)
+func ExtractNestedValues(env envs.Environment, _obj types.XValue, _path types.XValue) types.XValue {
+	path, xerr := types.ToXText(env, _path)
+	if types.IsXError(xerr) {
+		return xerr
+	}
+
+	pathArr := strings.Split(path.Native(), ".")
+	if path.Native() == "" || len(pathArr) == 0 {
+		// If the path is empty, return the data as a single value array
+		obj, xerr := types.ToXObject(env, _obj)
+		if !types.IsXError(xerr) {
+			return types.NewXArray(obj)
+		}
+		return _obj
+	}
+
+	stack := []stackItem{{_obj, pathArr}}
+	result := []types.XValue{}
+
+	for len(stack) > 0 {
+		currentItem := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+
+		if len(currentItem.path) == 0 {
+			result = append(result, currentItem.item)
+			continue
+		}
+
+		isArray := false
+		currentKey := currentItem.path[0]
+		currentObj, xerr := types.ToXObject(env, currentItem.item)
+		currentObjs := types.NewXArray()
+
+		if types.IsXError(xerr) {
+			currentObjs, xerr = types.ToXArray(env, currentItem.item)
+			if types.IsXError(xerr) {
+				return types.NewXError(errors.New("Unable to parse object."))
+			}
+			isArray = true
+		}
+
+		if isArray {
+			if currentKey == "*" {
+				// If the current key is "*", add all array elements to the stack
+				for _, nestedData := range currentObjs.Values() {
+					stack = append(stack, stackItem{nestedData, currentItem.path[1:]})
+				}
+			} else {
+				// Otherwise, try to interpret the current key as an integer (array index)
+				// and add the corresponding array element to the stack
+				idx, err := strconv.Atoi(currentKey)
+				if err == nil && idx >= 0 && idx < currentObjs.Count() {
+					stack = append(stack, stackItem{currentObjs.Get(idx), currentItem.path[1:]})
+				}
+			}
+		} else {
+			if nestedItem, found := currentObj.Get(currentKey); found {
+				stack = append(stack, stackItem{nestedItem, currentItem.path[1:]})
+			}
+		}
+	}
+
+	// reverse answers to avoid stack order
+	for i, j := 0, len(result)-1; i < j; i, j = i+1, j-1 {
+		result[i], result[j] = result[j], result[i]
+	}
+
+	return types.NewXArray(result...)
 }
 
 // LegacyAdd simulates our old + operator, which operated differently based on whether

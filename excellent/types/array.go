@@ -44,6 +44,11 @@ func (x *XArray) Get(index int) XValue {
 	return x.values()[index]
 }
 
+// Values is called when you need to execute range over values
+func (x *XArray) Values() []XValue {
+	return x.values()
+}
+
 // Count is called when the length of this object is requested in an expression
 func (x *XArray) Count() int {
 	return len(x.values())
