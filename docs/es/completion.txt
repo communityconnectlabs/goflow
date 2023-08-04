@@ -1,0 +1,261 @@
+contact -> el contacto (defaults to el nombre o URN)
+contact.uuid -> el UUID del contacto
+contact.id -> el ID numérico del contacto
+contact.first_name -> el nombre del contacto
+contact.name -> el nombre del contacto
+contact.language -> el idioma del contacto como código ISO de 3 letras
+contact.created_on -> la fecha de creación del contacto
+contact.last_seen_on -> la fecha de última vista del contacto
+contact.urns -> las URN pertenecientes al contacto
+contact.urns[0] -> first of las URN pertenecientes al contacto
+contact.urn -> la URN preferida del contacto
+contact.groups -> los grupos a los que pertenece el contacto
+contact.groups[0] -> first of los grupos a los que pertenece el contacto
+contact.groups[0].uuid -> el UUID del grupo
+contact.groups[0].name -> el nombre del grupo
+contact.fields -> los valores de campo personalizados del contacto
+contact.fields.age -> age para el contacto
+contact.fields.gender -> gender para el contacto
+contact.channel -> el canal preferido del contacto (defaults to el nombre)
+contact.channel.uuid -> el UUID del canal
+contact.channel.name -> el nombre del canal
+contact.channel.address -> la dirección del canal
+contact.tickets -> los tickets abiertos del contacto
+contact.tickets[0] -> first of los tickets abiertos del contacto
+contact.tickets[0].uuid -> el UUID del ticket
+contact.tickets[0].subject -> el asunto del ticket
+contact.tickets[0].body -> el cuerpo del ticket
+fields -> los valores de campo personalizados del contacto
+fields.age -> age para el contacto
+fields.gender -> gender para el contacto
+urns -> los valores URN del contacto
+urns.discord -> Discord URN para el contacto
+urns.ext -> Ext URN para el contacto
+urns.facebook -> Facebook URN para el contacto
+urns.fcm -> Fcm URN para el contacto
+urns.freshchat -> Freshchat URN para el contacto
+urns.instagram -> Instagram URN para el contacto
+urns.jiochat -> Jiochat URN para el contacto
+urns.line -> Line URN para el contacto
+urns.mailto -> Mailto URN para el contacto
+urns.rocketchat -> Rocketchat URN para el contacto
+urns.tel -> Tel URN para el contacto
+urns.telegram -> Telegram URN para el contacto
+urns.twitter -> Twitter URN para el contacto
+urns.twitterid -> Twitterid URN para el contacto
+urns.viber -> Viber URN para el contacto
+urns.vk -> Vk URN para el contacto
+urns.webchat -> Webchat URN para el contacto
+urns.wechat -> Wechat URN para el contacto
+urns.whatsapp -> Whatsapp URN para el contacto
+results -> los resultados de la ejecución actual
+results.response_1 -> el resultado de response_1 (defaults to el valor)
+results.response_1.name -> el nombre del resultado
+results.response_1.value -> el valor del resultado
+results.response_1.category -> la categoría del resultado
+results.response_1.category_localized -> la categoría localizada del resultado
+results.response_1.input -> la entrada del resultado
+results.response_1.corrected -> the input corrected by Bing Spell Checker
+results.response_1.extra -> los datos adicionales del resultado, como una respuesta de webhook
+results.response_1.node_uuid -> el UUID del nodo en el flujo que generó el resultado
+results.response_1.created_on -> la fecha de creación del resultado
+input -> la entrada actual del contacto (defaults to el texto y los archivos adjuntos)
+input.uuid -> el UUID de la entrada
+input.created_on -> la fecha de creación de la entrada
+input.channel -> el canal en el que se recibió la entrada (defaults to el nombre)
+input.channel.uuid -> el UUID del canal
+input.channel.name -> el nombre del canal
+input.channel.address -> la dirección del canal
+input.urn -> el contacto URN en el que se recibió la entrada
+input.text -> la parte de texto de la entrada
+input.attachments -> cualquier archivo adjunto en la entrada
+input.attachments[0] -> first of cualquier archivo adjunto en la entrada
+input.external_id -> el ID externo de la entrada
+run -> la ejecución actual (defaults to el nombre del contacto y el UUID del flujo)
+run.uuid -> el UUID de la ejecución
+run.contact -> el contacto de la ejecución (defaults to el nombre o URN)
+run.contact.uuid -> el UUID del contacto
+run.contact.id -> el ID numérico del contacto
+run.contact.first_name -> el nombre del contacto
+run.contact.name -> el nombre del contacto
+run.contact.language -> el idioma del contacto como código ISO de 3 letras
+run.contact.created_on -> la fecha de creación del contacto
+run.contact.last_seen_on -> la fecha de última vista del contacto
+run.contact.urns -> las URN pertenecientes al contacto
+run.contact.urns[0] -> first of las URN pertenecientes al contacto
+run.contact.urn -> la URN preferida del contacto
+run.contact.groups -> los grupos a los que pertenece el contacto
+run.contact.groups[0] -> first of los grupos a los que pertenece el contacto
+run.contact.groups[0].uuid -> el UUID del grupo
+run.contact.groups[0].name -> el nombre del grupo
+run.contact.fields -> los valores de campo personalizados del contacto
+run.contact.fields.age -> age para el contacto
+run.contact.fields.gender -> gender para el contacto
+run.contact.channel -> el canal preferido del contacto (defaults to el nombre)
+run.contact.channel.uuid -> el UUID del canal
+run.contact.channel.name -> el nombre del canal
+run.contact.channel.address -> la dirección del canal
+run.contact.tickets -> los tickets abiertos del contacto
+run.contact.tickets[0] -> first of los tickets abiertos del contacto
+run.contact.tickets[0].uuid -> el UUID del ticket
+run.contact.tickets[0].subject -> el asunto del ticket
+run.contact.tickets[0].body -> el cuerpo del ticket
+run.flow -> el flujo de la ejecución (defaults to el nombre)
+run.flow.uuid -> el UUID del flujo
+run.flow.name -> el nombre del flujo
+run.flow.revision -> el número de revisión del flujo
+run.status -> el estado actual de la ejecución
+run.results -> los resultados guardados por la ejecución
+run.results.response_1 -> el resultado de response_1 (defaults to el valor)
+run.results.response_1.name -> el nombre del resultado
+run.results.response_1.value -> el valor del resultado
+run.results.response_1.category -> la categoría del resultado
+run.results.response_1.category_localized -> la categoría localizada del resultado
+run.results.response_1.input -> la entrada del resultado
+run.results.response_1.corrected -> the input corrected by Bing Spell Checker
+run.results.response_1.extra -> los datos adicionales del resultado, como una respuesta de webhook
+run.results.response_1.node_uuid -> el UUID del nodo en el flujo que generó el resultado
+run.results.response_1.created_on -> la fecha de creación del resultado
+run.created_on -> la fecha de creación de la ejecución
+run.exited_on -> la fecha de salida de la ejecución
+child -> la última ejecución de hijo (defaults to el nombre del contacto y el UUID del flujo)
+child.uuid -> el UUID de la ejecución
+child.contact -> el contacto de la ejecución (defaults to el nombre o URN)
+child.contact.uuid -> el UUID del contacto
+child.contact.id -> el ID numérico del contacto
+child.contact.first_name -> el nombre del contacto
+child.contact.name -> el nombre del contacto
+child.contact.language -> el idioma del contacto como código ISO de 3 letras
+child.contact.created_on -> la fecha de creación del contacto
+child.contact.last_seen_on -> la fecha de última vista del contacto
+child.contact.urns -> las URN pertenecientes al contacto
+child.contact.urns[0] -> first of las URN pertenecientes al contacto
+child.contact.urn -> la URN preferida del contacto
+child.contact.groups -> los grupos a los que pertenece el contacto
+child.contact.groups[0] -> first of los grupos a los que pertenece el contacto
+child.contact.groups[0].uuid -> el UUID del grupo
+child.contact.groups[0].name -> el nombre del grupo
+child.contact.fields -> los valores de campo personalizados del contacto
+child.contact.fields.age -> age para el contacto
+child.contact.fields.gender -> gender para el contacto
+child.contact.channel -> el canal preferido del contacto (defaults to el nombre)
+child.contact.channel.uuid -> el UUID del canal
+child.contact.channel.name -> el nombre del canal
+child.contact.channel.address -> la dirección del canal
+child.contact.tickets -> los tickets abiertos del contacto
+child.contact.tickets[0] -> first of los tickets abiertos del contacto
+child.contact.tickets[0].uuid -> el UUID del ticket
+child.contact.tickets[0].subject -> el asunto del ticket
+child.contact.tickets[0].body -> el cuerpo del ticket
+child.flow -> el flujo de la ejecución (defaults to el nombre)
+child.flow.uuid -> el UUID del flujo
+child.flow.name -> el nombre del flujo
+child.flow.revision -> el número de revisión del flujo
+child.fields -> los valores de campo personalizados de la ejecución
+child.fields.age -> age para el contacto
+child.fields.gender -> gender para el contacto
+child.urns -> los valores URN de la ejecución
+child.urns.discord -> Discord URN para el contacto
+child.urns.ext -> Ext URN para el contacto
+child.urns.facebook -> Facebook URN para el contacto
+child.urns.fcm -> Fcm URN para el contacto
+child.urns.freshchat -> Freshchat URN para el contacto
+child.urns.instagram -> Instagram URN para el contacto
+child.urns.jiochat -> Jiochat URN para el contacto
+child.urns.line -> Line URN para el contacto
+child.urns.mailto -> Mailto URN para el contacto
+child.urns.rocketchat -> Rocketchat URN para el contacto
+child.urns.tel -> Tel URN para el contacto
+child.urns.telegram -> Telegram URN para el contacto
+child.urns.twitter -> Twitter URN para el contacto
+child.urns.twitterid -> Twitterid URN para el contacto
+child.urns.viber -> Viber URN para el contacto
+child.urns.vk -> Vk URN para el contacto
+child.urns.webchat -> Webchat URN para el contacto
+child.urns.wechat -> Wechat URN para el contacto
+child.urns.whatsapp -> Whatsapp URN para el contacto
+child.results -> los resultados guardados por la ejecución
+child.status -> el estado actual de la ejecución
+parent -> el padre de la ejecución (defaults to el nombre del contacto y el UUID del flujo)
+parent.uuid -> el UUID de la ejecución
+parent.contact -> el contacto de la ejecución (defaults to el nombre o URN)
+parent.contact.uuid -> el UUID del contacto
+parent.contact.id -> el ID numérico del contacto
+parent.contact.first_name -> el nombre del contacto
+parent.contact.name -> el nombre del contacto
+parent.contact.language -> el idioma del contacto como código ISO de 3 letras
+parent.contact.created_on -> la fecha de creación del contacto
+parent.contact.last_seen_on -> la fecha de última vista del contacto
+parent.contact.urns -> las URN pertenecientes al contacto
+parent.contact.urns[0] -> first of las URN pertenecientes al contacto
+parent.contact.urn -> la URN preferida del contacto
+parent.contact.groups -> los grupos a los que pertenece el contacto
+parent.contact.groups[0] -> first of los grupos a los que pertenece el contacto
+parent.contact.groups[0].uuid -> el UUID del grupo
+parent.contact.groups[0].name -> el nombre del grupo
+parent.contact.fields -> los valores de campo personalizados del contacto
+parent.contact.fields.age -> age para el contacto
+parent.contact.fields.gender -> gender para el contacto
+parent.contact.channel -> el canal preferido del contacto (defaults to el nombre)
+parent.contact.channel.uuid -> el UUID del canal
+parent.contact.channel.name -> el nombre del canal
+parent.contact.channel.address -> la dirección del canal
+parent.contact.tickets -> los tickets abiertos del contacto
+parent.contact.tickets[0] -> first of los tickets abiertos del contacto
+parent.contact.tickets[0].uuid -> el UUID del ticket
+parent.contact.tickets[0].subject -> el asunto del ticket
+parent.contact.tickets[0].body -> el cuerpo del ticket
+parent.flow -> el flujo de la ejecución (defaults to el nombre)
+parent.flow.uuid -> el UUID del flujo
+parent.flow.name -> el nombre del flujo
+parent.flow.revision -> el número de revisión del flujo
+parent.fields -> los valores de campo personalizados de la ejecución
+parent.fields.age -> age para el contacto
+parent.fields.gender -> gender para el contacto
+parent.urns -> los valores URN de la ejecución
+parent.urns.discord -> Discord URN para el contacto
+parent.urns.ext -> Ext URN para el contacto
+parent.urns.facebook -> Facebook URN para el contacto
+parent.urns.fcm -> Fcm URN para el contacto
+parent.urns.freshchat -> Freshchat URN para el contacto
+parent.urns.instagram -> Instagram URN para el contacto
+parent.urns.jiochat -> Jiochat URN para el contacto
+parent.urns.line -> Line URN para el contacto
+parent.urns.mailto -> Mailto URN para el contacto
+parent.urns.rocketchat -> Rocketchat URN para el contacto
+parent.urns.tel -> Tel URN para el contacto
+parent.urns.telegram -> Telegram URN para el contacto
+parent.urns.twitter -> Twitter URN para el contacto
+parent.urns.twitterid -> Twitterid URN para el contacto
+parent.urns.viber -> Viber URN para el contacto
+parent.urns.vk -> Vk URN para el contacto
+parent.urns.webchat -> Webchat URN para el contacto
+parent.urns.wechat -> Wechat URN para el contacto
+parent.urns.whatsapp -> Whatsapp URN para el contacto
+parent.results -> los resultados guardados por la ejecución
+parent.status -> el estado actual de la ejecución
+ticket -> el último ticket que se ha abierto para el contacto
+ticket.uuid -> el UUID del ticket
+ticket.subject -> el asunto del ticket
+ticket.body -> el cuerpo del ticket
+webhook -> la respuesta JSON analizada de la última llamada de webhook
+node -> el nodo actual
+node.uuid -> el UUID del nodo
+node.visit_count -> el recuento de visitas al nodo en esta ejecución
+globals -> los valores globales
+globals.org_name -> el valor global org_name
+trigger -> el activador que inició esta sesión
+trigger.type -> el tipo de activador que inició esta sesión
+trigger.params -> los parámetros pasados al activador
+trigger.keyword -> la concordancia de palabra clave si se trata de un activador de palabra clave
+trigger.user -> el usuario que inició esta sesión si se trata de un activador manual (defaults to el nombre o correo)
+trigger.user.email -> el correo del usuario
+trigger.user.name -> el nombre del usuario
+trigger.user.first_name -> el nombre del usuario
+trigger.origin -> el origen de esta sesión si se trata de un activador manual
+trigger.ticket -> the ticket if this is a ticket trigger
+trigger.ticket.uuid -> el UUID del ticket
+trigger.ticket.subject -> el asunto del ticket
+trigger.ticket.body -> el cuerpo del ticket
+resume -> la reanudación actual que continuó esta sesión
+resume.type -> el tipo de reanudación que reanudó esta sesión

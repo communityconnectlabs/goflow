@@ -1,0 +1,2430 @@
+{
+    "context": {
+        "types": [
+            {
+                "name": "fields",
+                "key_source": "fields",
+                "property_template": {
+                    "key": "{key}",
+                    "help": "{key} pro kontakt",
+                    "type": "any"
+                }
+            },
+            {
+                "name": "results",
+                "key_source": "results",
+                "property_template": {
+                    "key": "{key}",
+                    "help": "výsledek pro {key}",
+                    "type": "result"
+                }
+            },
+            {
+                "name": "globals",
+                "key_source": "globals",
+                "property_template": {
+                    "key": "{key}",
+                    "help": "globální hodnota {key}",
+                    "type": "text"
+                }
+            },
+            {
+                "name": "urns",
+                "properties": [
+                    {
+                        "key": "discord",
+                        "help": "Discord URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "ext",
+                        "help": "Ext URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "facebook",
+                        "help": "Facebook URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "fcm",
+                        "help": "Fcm URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "freshchat",
+                        "help": "Freshchat URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "instagram",
+                        "help": "Instagram URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "jiochat",
+                        "help": "Jiochat URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "line",
+                        "help": "Line URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "mailto",
+                        "help": "Mailto URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "rocketchat",
+                        "help": "Rocketchat URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "tel",
+                        "help": "Tel URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "telegram",
+                        "help": "Telegram URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "twitter",
+                        "help": "Twitter URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "twitterid",
+                        "help": "Twitterid URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "viber",
+                        "help": "Viber URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "vk",
+                        "help": "Vk URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "webchat",
+                        "help": "Webchat URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "wechat",
+                        "help": "Wechat URN pro kontakt",
+                        "type": "text"
+                    },
+                    {
+                        "key": "whatsapp",
+                        "help": "Whatsapp URN pro kontakt",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "name": "channel",
+                "properties": [
+                    {
+                        "key": "__default__",
+                        "help": "název",
+                        "type": "text"
+                    },
+                    {
+                        "key": "uuid",
+                        "help": "UUID kanálu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "name",
+                        "help": "název kanálu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "address",
+                        "help": "adresa kanálu",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "name": "contact",
+                "properties": [
+                    {
+                        "key": "__default__",
+                        "help": "Název URN",
+                        "type": "text"
+                    },
+                    {
+                        "key": "uuid",
+                        "help": "UUID kontaktu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "id",
+                        "help": "číselné ID kontaktu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "first_name",
+                        "help": "jméno kontaktu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "name",
+                        "help": "jméno kontaktu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "language",
+                        "help": "jazyk kontaktu jako 3-písmenný kód ISO.",
+                        "type": "text"
+                    },
+                    {
+                        "key": "created_on",
+                        "help": "datum vytvoření kontaktu",
+                        "type": "datetime"
+                    },
+                    {
+                        "key": "last_seen_on",
+                        "help": "datum posledního setkání s kontaktem",
+                        "type": "any"
+                    },
+                    {
+                        "key": "urns",
+                        "help": "čísla URN náležející ke kontaktu",
+                        "type": "text",
+                        "array": true
+                    },
+                    {
+                        "key": "urn",
+                        "help": "preferované URN kontaktu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "groups",
+                        "help": "skupiny, do kterých kontakt patří",
+                        "type": "group",
+                        "array": true
+                    },
+                    {
+                        "key": "fields",
+                        "help": "hodnoty vlastního pole kontaktu",
+                        "type": "fields"
+                    },
+                    {
+                        "key": "channel",
+                        "help": "preferovaný kanál kontaktu",
+                        "type": "channel"
+                    },
+                    {
+                        "key": "tickets",
+                        "help": "otevřené tikety kontaktu",
+                        "type": "ticket",
+                        "array": true
+                    }
+                ]
+            },
+            {
+                "name": "flow",
+                "properties": [
+                    {
+                        "key": "__default__",
+                        "help": "název",
+                        "type": "text"
+                    },
+                    {
+                        "key": "uuid",
+                        "help": "UUID toku",
+                        "type": "text"
+                    },
+                    {
+                        "key": "name",
+                        "help": "název toku",
+                        "type": "text"
+                    },
+                    {
+                        "key": "revision",
+                        "help": "číslo revize toku",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "name": "group",
+                "properties": [
+                    {
+                        "key": "uuid",
+                        "help": "UUID skupiny",
+                        "type": "text"
+                    },
+                    {
+                        "key": "name",
+                        "help": "název skupiny",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "name": "input",
+                "properties": [
+                    {
+                        "key": "__default__",
+                        "help": "text a přílohy",
+                        "type": "text"
+                    },
+                    {
+                        "key": "uuid",
+                        "help": "UUID vstupu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "created_on",
+                        "help": "datum vytvoření vstupu",
+                        "type": "datetime"
+                    },
+                    {
+                        "key": "channel",
+                        "help": "kanál, na kterém byl vstup přijat",
+                        "type": "channel"
+                    },
+                    {
+                        "key": "urn",
+                        "help": "URN kontaktu, na kterém byl vstup přijat.",
+                        "type": "text"
+                    },
+                    {
+                        "key": "text",
+                        "help": "textová část vstupu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "attachments",
+                        "help": "všechny přílohy na vstupu",
+                        "type": "text",
+                        "array": true
+                    },
+                    {
+                        "key": "external_id",
+                        "help": "externí ID vstupu",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "name": "node",
+                "properties": [
+                    {
+                        "key": "uuid",
+                        "help": "UUID uzlu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "visit_count",
+                        "help": "počet návštěv uzlu v tomto běhu.",
+                        "type": "number"
+                    }
+                ]
+            },
+            {
+                "name": "related_run",
+                "properties": [
+                    {
+                        "key": "__default__",
+                        "help": "jméno kontaktu a identifikátor UUID toku",
+                        "type": "text"
+                    },
+                    {
+                        "key": "uuid",
+                        "help": "UUID běhu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "contact",
+                        "help": "kontakt běhu",
+                        "type": "contact"
+                    },
+                    {
+                        "key": "flow",
+                        "help": "tok běhu",
+                        "type": "flow"
+                    },
+                    {
+                        "key": "fields",
+                        "help": "hodnoty vlastního pole běhu",
+                        "type": "fields"
+                    },
+                    {
+                        "key": "urns",
+                        "help": "hodnoty URN běhu",
+                        "type": "urns"
+                    },
+                    {
+                        "key": "results",
+                        "help": "výsledky uložené při běhu",
+                        "type": "any"
+                    },
+                    {
+                        "key": "status",
+                        "help": "aktuální stav běhu",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "name": "result",
+                "properties": [
+                    {
+                        "key": "__default__",
+                        "help": "hodnota",
+                        "type": "text"
+                    },
+                    {
+                        "key": "name",
+                        "help": "název výsledku",
+                        "type": "text"
+                    },
+                    {
+                        "key": "value",
+                        "help": "hodnota výsledku",
+                        "type": "text"
+                    },
+                    {
+                        "key": "category",
+                        "help": "kategorie výsledku",
+                        "type": "text"
+                    },
+                    {
+                        "key": "category_localized",
+                        "help": "lokalizovaná kategorie výsledku",
+                        "type": "text"
+                    },
+                    {
+                        "key": "input",
+                        "help": "zadání výsledku",
+                        "type": "text"
+                    },
+                    {
+                        "key": "corrected",
+                        "help": "the input corrected by Bing Spell Checker",
+                        "type": "text"
+                    },
+                    {
+                        "key": "extra",
+                        "help": "další data výsledku, jako je odpověď webhooku.",
+                        "type": "any"
+                    },
+                    {
+                        "key": "node_uuid",
+                        "help": "UUID uzlu v toku, který vygeneroval výsledek.",
+                        "type": "text"
+                    },
+                    {
+                        "key": "created_on",
+                        "help": "datum vytvoření výsledku",
+                        "type": "datetime"
+                    }
+                ]
+            },
+            {
+                "name": "resume",
+                "properties": [
+                    {
+                        "key": "type",
+                        "help": "typ obnovení, které obnovilo tuto relaci.",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "name": "run",
+                "properties": [
+                    {
+                        "key": "__default__",
+                        "help": "jméno kontaktu a identifikátor UUID toku",
+                        "type": "text"
+                    },
+                    {
+                        "key": "uuid",
+                        "help": "UUID běhu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "contact",
+                        "help": "kontakt běhu",
+                        "type": "contact"
+                    },
+                    {
+                        "key": "flow",
+                        "help": "tok běhu",
+                        "type": "flow"
+                    },
+                    {
+                        "key": "status",
+                        "help": "aktuální stav běhu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "results",
+                        "help": "výsledky uložené při běhu",
+                        "type": "results"
+                    },
+                    {
+                        "key": "created_on",
+                        "help": "datum vytvoření běhu",
+                        "type": "datetime"
+                    },
+                    {
+                        "key": "exited_on",
+                        "help": "datum ukončení běhu",
+                        "type": "datetime"
+                    }
+                ]
+            },
+            {
+                "name": "ticket",
+                "properties": [
+                    {
+                        "key": "uuid",
+                        "help": "UUID tiketu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "subject",
+                        "help": "předmět tiketu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "body",
+                        "help": "tělo tiketu",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "name": "topic",
+                "properties": [
+                    {
+                        "key": "__default__",
+                        "help": "název",
+                        "type": "text"
+                    },
+                    {
+                        "key": "uuid",
+                        "help": "UUID tématu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "name",
+                        "help": "název tématu",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "name": "trigger",
+                "properties": [
+                    {
+                        "key": "type",
+                        "help": "typ spouštěče, který zahájil tuto relaci",
+                        "type": "text"
+                    },
+                    {
+                        "key": "params",
+                        "help": "parametry předané spouštěči",
+                        "type": "any"
+                    },
+                    {
+                        "key": "keyword",
+                        "help": "shoda klíčového slova, pokud se jedná o spouštěč klíčového slova.",
+                        "type": "text"
+                    },
+                    {
+                        "key": "user",
+                        "help": "uživatele, který zahájil tuto relaci, pokud se jedná o ruční spouštění.",
+                        "type": "user"
+                    },
+                    {
+                        "key": "origin",
+                        "help": "původ této relace, pokud se jedná o ruční spouštění.",
+                        "type": "text"
+                    },
+                    {
+                        "key": "ticket",
+                        "help": "tiket, pokud se jedná o spouštěč tiketů",
+                        "type": "ticket"
+                    }
+                ]
+            },
+            {
+                "name": "user",
+                "properties": [
+                    {
+                        "key": "__default__",
+                        "help": "název e-mailu",
+                        "type": "text"
+                    },
+                    {
+                        "key": "email",
+                        "help": "e-mailová adresa uživatele",
+                        "type": "text"
+                    },
+                    {
+                        "key": "name",
+                        "help": "Jméno uživatele",
+                        "type": "text"
+                    },
+                    {
+                        "key": "first_name",
+                        "help": "křestní jméno uživatele",
+                        "type": "text"
+                    }
+                ]
+            }
+        ],
+        "root": [
+            {
+                "key": "contact",
+                "help": "kontakt",
+                "type": "contact"
+            },
+            {
+                "key": "fields",
+                "help": "hodnoty vlastního pole kontaktu",
+                "type": "fields"
+            },
+            {
+                "key": "urns",
+                "help": "hodnoty URN kontaktu",
+                "type": "urns"
+            },
+            {
+                "key": "results",
+                "help": "výsledky aktuálního běhu",
+                "type": "results"
+            },
+            {
+                "key": "input",
+                "help": "aktuální vstup z kontaktu",
+                "type": "input"
+            },
+            {
+                "key": "run",
+                "help": "aktuální běh",
+                "type": "run"
+            },
+            {
+                "key": "child",
+                "help": "poslední běh podřazeného",
+                "type": "related_run"
+            },
+            {
+                "key": "parent",
+                "help": "nadřízený běhu",
+                "type": "related_run"
+            },
+            {
+                "key": "ticket",
+                "help": "poslední otevřený tiket pro kontakt",
+                "type": "ticket"
+            },
+            {
+                "key": "webhook",
+                "help": "zpracovaná odpověď JSON posledního volání webhooku.",
+                "type": "any"
+            },
+            {
+                "key": "node",
+                "help": "aktuální uzel",
+                "type": "node"
+            },
+            {
+                "key": "globals",
+                "help": "globální hodnoty",
+                "type": "globals"
+            },
+            {
+                "key": "trigger",
+                "help": "spouštěč, který zahájil tuto relaci",
+                "type": "trigger"
+            },
+            {
+                "key": "resume",
+                "help": "aktuální pokračování, které navázalo na toto sezení.",
+                "type": "resume"
+            }
+        ],
+        "root_no_session": [
+            {
+                "key": "contact",
+                "help": "kontakt",
+                "type": "contact"
+            },
+            {
+                "key": "fields",
+                "help": "hodnoty vlastního pole kontaktu",
+                "type": "fields"
+            },
+            {
+                "key": "urns",
+                "help": "hodnoty URN kontaktu",
+                "type": "urns"
+            },
+            {
+                "key": "globals",
+                "help": "globální hodnoty",
+                "type": "globals"
+            }
+        ]
+    },
+    "functions": [
+        {
+            "signature": "abs(number)",
+            "summary": "Vrací absolutní hodnotu `number`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(abs(-10))",
+                    "output": "10"
+                },
+                {
+                    "template": "@(abs(10.5))",
+                    "output": "10.5"
+                },
+                {
+                    "template": "@(abs(\"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "and(values...)",
+            "summary": "Vrací, zda jsou všechny zadané `values` pravdivé.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(and(true))",
+                    "output": "true"
+                },
+                {
+                    "template": "@(and(true, false, true))",
+                    "output": "false"
+                }
+            ]
+        },
+        {
+            "signature": "array(values...)",
+            "summary": "Přijme více `values` a vrátí je jako pole.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(array(\"a\", \"b\", 356)[1])",
+                    "output": "b"
+                },
+                {
+                    "template": "@(join(array(\"a\", \"b\", \"c\"), \"|\"))",
+                    "output": "a|b|c"
+                },
+                {
+                    "template": "@(count(array()))",
+                    "output": "0"
+                },
+                {
+                    "template": "@(count(array(\"a\", \"b\")))",
+                    "output": "2"
+                }
+            ]
+        },
+        {
+            "signature": "attachment_parts(attachment)",
+            "summary": "Rozebere přílohu na jednotlivé části",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(attachment_parts(\"image/jpeg:https://example.com/test.jpg\"))",
+                    "output": "{content_type: image/jpeg, url: https://example.com/test.jpg}"
+                }
+            ]
+        },
+        {
+            "signature": "boolean(value)",
+            "summary": "Pokusí se převést `value` na logickou hodnotu.",
+            "detail": "Pokud hodnotu nelze převést, je vrácena chyba.",
+            "examples": [
+                {
+                    "template": "@(boolean(array(1, 2)))",
+                    "output": "true"
+                },
+                {
+                    "template": "@(boolean(\"FALSE\"))",
+                    "output": "false"
+                },
+                {
+                    "template": "@(boolean(1 / 0))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "char(code)",
+            "summary": "Vrací znak pro zadaný UNICODE `code`.",
+            "detail": "Je inverzní k [function:code].",
+            "examples": [
+                {
+                    "template": "@(char(33))",
+                    "output": "!"
+                },
+                {
+                    "template": "@(char(128512))",
+                    "output": "😀"
+                },
+                {
+                    "template": "@(char(\"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "clean(text)",
+            "summary": "Odstraní z `text` všechny netisknutelné znaky.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(clean(\"😃 Hello \\nwo\\tr\\rld\"))",
+                    "output": "😃 Hello world"
+                },
+                {
+                    "template": "@(clean(123))",
+                    "output": "123"
+                }
+            ]
+        },
+        {
+            "signature": "code(text)",
+            "summary": "Vrací kód UNICODE pro první znak `text`.",
+            "detail": "Je inverzní k [function:char].",
+            "examples": [
+                {
+                    "template": "@(code(\"a\"))",
+                    "output": "97"
+                },
+                {
+                    "template": "@(code(\"abc\"))",
+                    "output": "97"
+                },
+                {
+                    "template": "@(code(\"😀\"))",
+                    "output": "128512"
+                },
+                {
+                    "template": "@(code(\"15\"))",
+                    "output": "49"
+                },
+                {
+                    "template": "@(code(15))",
+                    "output": "49"
+                },
+                {
+                    "template": "@(code(\"\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "count(value)",
+            "summary": "Vrací počet položek v daném poli nebo vlastností objektu.",
+            "detail": "Pokud bude předána položka, která není spočitatelná, vrátí chybu.",
+            "examples": [
+                {
+                    "template": "@(count(contact.fields))",
+                    "output": "6"
+                },
+                {
+                    "template": "@(count(array()))",
+                    "output": "0"
+                },
+                {
+                    "template": "@(count(array(\"a\", \"b\", \"c\")))",
+                    "output": "3"
+                },
+                {
+                    "template": "@(count(1234))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "date(value)",
+            "summary": "Pokusí se převést `value` na datum.",
+            "detail": "Pokud se jedná o text, bude zpracován na datum s použitím výchozího formátu data.\nPokud hodnotu nelze převést, je vrácena chyba.",
+            "examples": [
+                {
+                    "template": "@(date(\"1979-07-18\"))",
+                    "output": "1979-07-18"
+                },
+                {
+                    "template": "@(date(\"1979-07-18T10:30:45.123456Z\"))",
+                    "output": "1979-07-18"
+                },
+                {
+                    "template": "@(date(\"10/05/2010\"))",
+                    "output": "2010-05-10"
+                },
+                {
+                    "template": "@(date(\"NOT DATE\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "date_from_parts(year, month, day)",
+            "summary": "Vytvoří datum z `rok`, `měsíc` a `den`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(date_from_parts(2017, 1, 15))",
+                    "output": "2017-01-15"
+                },
+                {
+                    "template": "@(date_from_parts(2017, 2, 31))",
+                    "output": "2017-03-03"
+                },
+                {
+                    "template": "@(date_from_parts(2017, 13, 15))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "datetime(value)",
+            "summary": "Pokusí se převést `value` na datetime.",
+            "detail": "Pokud se jedná o text, bude zpracován na datum s použitím výchozího formátu data a času. Pokud hodnotu nelze převést, je vrácena chyba.",
+            "examples": [
+                {
+                    "template": "@(datetime(\"1979-07-18\"))",
+                    "output": "1979-07-18T00:00:00.000000-05:00"
+                },
+                {
+                    "template": "@(datetime(\"1979-07-18T10:30:45.123456Z\"))",
+                    "output": "1979-07-18T10:30:45.123456Z"
+                },
+                {
+                    "template": "@(datetime(\"10/05/2010\"))",
+                    "output": "2010-05-10T00:00:00.000000-05:00"
+                },
+                {
+                    "template": "@(datetime(\"NOT DATE\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "datetime_add(datetime, offset, unit)",
+            "summary": "Vypočítá hodnotu data získanou přičtením čísla `offset` o `jednotku` k hodnotě `datetime`.",
+            "detail": "Platné délky jsou \"Y\" pro roky, \"M\" pro měsíce, \"W\" pro týdny, \"D\" pro dny, \"h\" pro hodiny, \"m\" pro minuty, \"s\" pro sekundy.",
+            "examples": [
+                {
+                    "template": "@(datetime_add(\"2017-01-15\", 5, \"D\"))",
+                    "output": "2017-01-20T00:00:00.000000-05:00"
+                },
+                {
+                    "template": "@(datetime_add(\"2017-01-15 10:45\", 30, \"m\"))",
+                    "output": "2017-01-15T11:15:00.000000-05:00"
+                }
+            ]
+        },
+        {
+            "signature": "datetime_diff(date1, date2, unit)",
+            "summary": "Vrací dobu trvání mezi `date1` a `date2` v zadané `unit`.",
+            "detail": "Platné doby trvání jsou \"Y\" pro roky, \"M\" pro měsíce, \"W\" pro týdny, \"D\" pro dny, \"h\" pro hodiny, \"m\" pro minuty, \"s\" pro sekundy.",
+            "examples": [
+                {
+                    "template": "@(datetime_diff(\"2017-01-15\", \"2017-01-17\", \"D\"))",
+                    "output": "2"
+                },
+                {
+                    "template": "@(datetime_diff(\"2017-01-15\", \"2017-05-15\", \"W\"))",
+                    "output": "17"
+                },
+                {
+                    "template": "@(datetime_diff(\"2017-01-15\", \"2017-05-15\", \"M\"))",
+                    "output": "4"
+                },
+                {
+                    "template": "@(datetime_diff(\"2017-01-17 10:50\", \"2017-01-17 12:30\", \"h\"))",
+                    "output": "1"
+                },
+                {
+                    "template": "@(datetime_diff(\"2017-01-17\", \"2015-12-17\", \"Y\"))",
+                    "output": "-2"
+                }
+            ]
+        },
+        {
+            "signature": "datetime_from_epoch(seconds)",
+            "summary": "Převede UNIX čas epoch `sekundy` na nové datum.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(datetime_from_epoch(1497286619))",
+                    "output": "2017-06-12T11:56:59.000000-05:00"
+                },
+                {
+                    "template": "@(datetime_from_epoch(1497286619.123456))",
+                    "output": "2017-06-12T11:56:59.123456-05:00"
+                }
+            ]
+        },
+        {
+            "signature": "default(value, default)",
+            "summary": "Vrací `value`, pokud není prázdný nebo se jedná o chybu, jinak vrací `default`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(default(undeclared.var, \"default_value\"))",
+                    "output": "default_value"
+                },
+                {
+                    "template": "@(default(\"10\", \"20\"))",
+                    "output": "10"
+                },
+                {
+                    "template": "@(default(\"\", \"value\"))",
+                    "output": "value"
+                },
+                {
+                    "template": "@(default(\"  \", \"value\"))",
+                    "output": "\\x20\\x20"
+                },
+                {
+                    "template": "@(default(datetime(\"invalid-date\"), \"today\"))",
+                    "output": "today"
+                },
+                {
+                    "template": "@(default(format_urn(\"invalid-urn\"), \"ok\"))",
+                    "output": "ok"
+                }
+            ]
+        },
+        {
+            "signature": "epoch(date)",
+            "summary": "Převede `date` na epoch čas systému UNIX.",
+            "detail": "Vrácené číslo může obsahovat zlomky sekund.",
+            "examples": [
+                {
+                    "template": "@(epoch(\"2017-06-12T16:56:59.000000Z\"))",
+                    "output": "1497286619"
+                },
+                {
+                    "template": "@(epoch(\"2017-06-12T18:56:59.000000+02:00\"))",
+                    "output": "1497286619"
+                },
+                {
+                    "template": "@(epoch(\"2017-06-12T16:56:59.123456Z\"))",
+                    "output": "1497286619.123456"
+                },
+                {
+                    "template": "@(round_down(epoch(\"2017-06-12T16:56:59.123456Z\")))",
+                    "output": "1497286619"
+                }
+            ]
+        },
+        {
+            "signature": "extract(object, properties)",
+            "summary": "Vezme objekt a extrahuje pojmenovanou vlastnost.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(extract(contact, \"name\"))",
+                    "output": "Ryan Lewis"
+                },
+                {
+                    "template": "@(extract(contact.groups[0], \"name\"))",
+                    "output": "Testers"
+                }
+            ]
+        },
+        {
+            "signature": "extract_nested_values(object, path)",
+            "summary": "Creates an array by selecting properties of `object` or `array` following provided path.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(extract_nested_values(contact, \"name\"))",
+                    "output": "[Ryan Lewis]"
+                },
+                {
+                    "template": "@(extract_nested_values(contact.groups[0], \"name\"))",
+                    "output": "[Testers]"
+                }
+            ]
+        },
+        {
+            "signature": "extract_object(object, properties...)",
+            "summary": "Vezme objekt a vrátí nový objekt extrakcí pouze pojmenovaných vlastností.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(extract_object(contact.groups[0], \"name\"))",
+                    "output": "{name: Testers}"
+                }
+            ]
+        },
+        {
+            "signature": "field(text, index, delimiter)",
+            "summary": "Rozdělí `text` pomocí zadaného `delimiter` a vrátí pole na `index`.",
+            "detail": "Index začíná na nule. Při dělení mezerou se za oddělovač považují všechny mezery.",
+            "examples": [
+                {
+                    "template": "@(field(\"a,b,c\", 1, \",\"))",
+                    "output": "b"
+                },
+                {
+                    "template": "@(field(\"a,,b,c\", 1, \",\"))",
+                    "output": ""
+                },
+                {
+                    "template": "@(field(\"a   b c\", 1, \" \"))",
+                    "output": "b"
+                },
+                {
+                    "template": "@(field(\"a\t\tb\tc\td\", 1, \"\t\"))",
+                    "output": ""
+                },
+                {
+                    "template": "@(field(\"a\\t\\tb\\tc\\td\", 1, \" \"))",
+                    "output": ""
+                },
+                {
+                    "template": "@(field(\"a,b,c\", \"foo\", \",\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "foreach(values, func, [args...])",
+            "summary": "Vytvoří nové pole použitím `func` na každou hodnotu v `values`.",
+            "detail": "Pokud daná funkce přijímá více než jeden argument, můžete za funkci předat další argumenty.",
+            "examples": [
+                {
+                    "template": "@(foreach(array(\"a\", \"b\", \"c\"), upper))",
+                    "output": "[A, B, C]"
+                },
+                {
+                    "template": "@(foreach(array(\"a\", \"b\", \"c\"), (x) => x & \"1\"))",
+                    "output": "[a1, b1, c1]"
+                },
+                {
+                    "template": "@(foreach(array(\"a\", \"b\", \"c\"), (x) => object(\"v\", x)))",
+                    "output": "[{v: a}, {v: b}, {v: c}]"
+                },
+                {
+                    "template": "@(foreach(array(\"the man\", \"fox\", \"jumped up\"), word, 0))",
+                    "output": "[the, fox, jumped]"
+                }
+            ]
+        },
+        {
+            "signature": "foreach_format(array, pattern, [args...])",
+            "summary": "Creates a new string by applying `join` to each property value of `object` placed in formatted string.",
+            "detail": "Pokud daná funkce přijímá více než jeden argument, můžete za funkci předat další argumenty.",
+            "examples": [
+                {
+                    "template": "@(foreach_format(array(\"a\", \"b\", \"c\"), \"%s\\n\"))",
+                    "output": "a\\nb\\nc\\n"
+                }
+            ]
+        },
+        {
+            "signature": "foreach_value(object, func, [args...])",
+            "summary": "Vytvoří nový objekt použitím `func` na každou hodnotu vlastnosti `object`.",
+            "detail": "Pokud daná funkce přijímá více než jeden argument, můžete za funkci předat další argumenty.",
+            "examples": [
+                {
+                    "template": "@(foreach_value(object(\"a\", \"x\", \"b\", \"y\"), upper))",
+                    "output": "{a: X, b: Y}"
+                },
+                {
+                    "template": "@(foreach_value(object(\"a\", \"hi there\", \"b\", \"good bye\"), word, 1))",
+                    "output": "{a: there, b: bye}"
+                }
+            ]
+        },
+        {
+            "signature": "format(value)",
+            "summary": "Formats `value` according to its type.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(format(1234.5670))",
+                    "output": "1,234.567"
+                },
+                {
+                    "template": "@(format(now()))",
+                    "output": "11-04-2018 13:24"
+                },
+                {
+                    "template": "@(format(today()))",
+                    "output": "11-04-2018"
+                }
+            ]
+        },
+        {
+            "signature": "format_date(date, [,format])",
+            "summary": "Formátuje `date` jako text podle zadaného `formátu`.",
+            "detail": "Pokud není zadán `formát`, použije se výchozí formát prostředí. Formát\nse může skládat z následujících znaků. Znaky ' ', ':', ',', 'T', '-'.\na '_' se ignorují. Jakýkoli jiný znak je chybou.\n\n* `YY` - poslední dvě číslice roku 0-99\n* `YYYY` - čtyři číslice roku 0000-9999\n* `M` - měsíc 1-12\n* `MM` - měsíc, doplněný nulou 01-12\n* `MMM` - měsíc leden-prosinec (lokalizovaný)\n* `MMMM` - měsíc leden-prosinec (lokalizovaný)\n* `D` - den v měsíci, 1-31\n* `DD` - den v měsíci, doplněný nulou 01-31\n* `EEE` - den v týdnu Po-Ne (lokalizováno)\n* `EEEE` - den v týdnu pondělí-neděle (lokalizované)",
+            "examples": [
+                {
+                    "template": "@(format_date(\"1979-07-18T15:00:00.000000Z\"))",
+                    "output": "18-07-1979"
+                },
+                {
+                    "template": "@(format_date(\"1979-07-18T15:00:00.000000Z\", \"YYYY-MM-DD\"))",
+                    "output": "1979-07-18"
+                },
+                {
+                    "template": "@(format_date(\"2010-05-10T19:50:00.000000Z\", \"YYYY M DD\"))",
+                    "output": "2010 5 10"
+                },
+                {
+                    "template": "@(format_date(\"1979-07-18T15:00:00.000000Z\", \"YYYY\"))",
+                    "output": "1979"
+                },
+                {
+                    "template": "@(format_date(\"1979-07-18T15:00:00.000000Z\", \"M\"))",
+                    "output": "7"
+                },
+                {
+                    "template": "@(format_date(\"NOT DATE\", \"YYYY-MM-DD\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "format_datetime(datetime [,format [,timezone]])",
+            "summary": "Formátuje `datetime` jako text podle zadaného `formátu`.",
+            "detail": "Pokud není zadán `formát`, použije se výchozí formát prostředí. Formátovací řetězec se může skládat z následujících znaků. Znaky ' ', ':', ',', 'T', '-' a '_' se ignorují. Jakýkoli jiný znak je chybou.\n\n* `YY` - poslední dvě číslice roku 0-99\n* `YYYY` - čtyři číslice roku 0000-9999\n* `M` - měsíc 1-12\n* `MM` - měsíc, doplněný nulou 01-12\n* `MMM` - měsíc leden-prosinec (lokalizovaný)\n* `MMMM` - měsíc leden-prosinec (lokalizovaný)\n* `D` - den v měsíci, 1-31\n* `DD` - den v měsíci, doplněný nulou 01-31\n* `EEE` - den v týdnu Po-Ne (lokalizováno)\n* `EEEE` - den v týdnu pondělí-neděle (lokalizované)\n* `h` - hodina dne 1-12\n* `hh` - hodina dne, doplněná nulou 01-12\n* `t` - čtyřiadvacátá hodina dne 0-23\n* `tt` - čtyřiadvacet hodin dne, doplněno nulou 00-23\n* `m` - minuta 0-59\n* `mm` - minuta, doplněná nulou 00-59\n* `s` - sekunda 0-59\n* `ss` - sekunda, s nulovým polštářkem 00-59\n* `fff` - milisekundy\n* `ffffff` - mikrosekundy\n* `fffffffff` - nanosekundy\n* `aa` - am nebo pm (lokalizované)\n* `AA` - AM nebo PM (lokalizované)\n* `Z` - hodinový a minutový posun od UTC nebo Z pro UTC\n* `ZZZ` - hodinový a minutový posun od UTC\n\nČasové pásmo by mělo být název lokality uvedený v databázi časových pásem IANA, například \"America/Guayaquil\" nebo \"America/Los_Angeles\". Pokud není zadáno, použije se aktuální časové pásmo. Pokud časové pásmo není rozpoznáno, bude vrácena chyba.",
+            "examples": [
+                {
+                    "template": "@(format_datetime(\"1979-07-18T15:00:00.000000Z\"))",
+                    "output": "18-07-1979 10:00"
+                },
+                {
+                    "template": "@(format_datetime(\"1979-07-18T15:00:00.000000Z\", \"YYYY-MM-DD\"))",
+                    "output": "1979-07-18"
+                },
+                {
+                    "template": "@(format_datetime(\"2010-05-10T19:50:00.000000Z\", \"YYYY M DD tt:mm\"))",
+                    "output": "2010 5 10 14:50"
+                },
+                {
+                    "template": "@(format_datetime(\"2010-05-10T19:50:00.000000Z\", \"YYYY-MM-DD hh:mm AA\", \"America/Los_Angeles\"))",
+                    "output": "2010-05-10 12:50 PM"
+                },
+                {
+                    "template": "@(format_datetime(\"1979-07-18T15:00:00.000000Z\", \"YYYY\"))",
+                    "output": "1979"
+                },
+                {
+                    "template": "@(format_datetime(\"1979-07-18T15:00:00.000000Z\", \"M\"))",
+                    "output": "7"
+                },
+                {
+                    "template": "@(format_datetime(\"NOT DATE\", \"YYYY-MM-DD\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "format_location(location)",
+            "summary": "Formátuje zadané `místo` jako jeho název.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(format_location(\"Rwanda\"))",
+                    "output": "Rwanda"
+                },
+                {
+                    "template": "@(format_location(\"Rwanda > Kigali\"))",
+                    "output": "Kigali"
+                }
+            ]
+        },
+        {
+            "signature": "format_number(number, places [, humanize])",
+            "summary": "Formátuje `číslo` na zadaný počet desetinných míst.",
+            "detail": "Nepovinný třetí argument `humanize` může být false, aby se zakázalo použití oddělovačů tisíců.",
+            "examples": [
+                {
+                    "template": "@(format_number(1234))",
+                    "output": "1,234"
+                },
+                {
+                    "template": "@(format_number(1234.5670))",
+                    "output": "1,234.567"
+                },
+                {
+                    "template": "@(format_number(1234.5670, 2, true))",
+                    "output": "1,234.57"
+                },
+                {
+                    "template": "@(format_number(1234.5678, 0, false))",
+                    "output": "1235"
+                },
+                {
+                    "template": "@(format_number(\"foo\", 2, false))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "format_time(time [,format])",
+            "summary": "Formátuje `čas` jako text podle zadaného `formátu`.",
+            "detail": "Pokud není zadán `formát`, použije se výchozí formát prostředí. Formátovací řetězec se může skládat z následujících znaků. Znaky ' ', ':', ',', 'T', '-' a '_' se ignorují. Jakýkoli jiný znak je chybou.\n\n* `h` - hodina dne 1-12\n* `hh` - hodina dne, doplněná nulou 01-12\n* `t` - čtyřiadvacátá hodina dne 0-23\n* `tt` - čtyřiadvacátá hodina dne, doplněná nulou 00-23\n* `m` - minuta 0-59\n* `mm` - minuta, doplněná nulou 00-59\n* `s` - sekunda 0-59\n* `ss` - sekunda, s nulovým polštářkem 00-59\n* `fff` - milisekundy\n* `ffffff` - mikrosekundy\n* `fffffffff` - nanosekundy\n* `aa` - am nebo pm (lokalizované)\n* `AA` - AM nebo PM (lokalizované)",
+            "examples": [
+                {
+                    "template": "@(format_time(\"14:50:30.000000\"))",
+                    "output": "14:50"
+                },
+                {
+                    "template": "@(format_time(\"14:50:30.000000\", \"h:mm aa\"))",
+                    "output": "2:50 pm"
+                },
+                {
+                    "template": "@(format_time(\"15:00:27.000000\", \"s\"))",
+                    "output": "27"
+                },
+                {
+                    "template": "@(format_time(\"NOT TIME\", \"hh:mm\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "format_urn(urn)",
+            "summary": "Formátuje `urn` do lidsky přívětivého textu.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(format_urn(\"tel:+250781234567\"))",
+                    "output": "0781 234 567"
+                },
+                {
+                    "template": "@(format_urn(\"twitter:134252511151#billy_bob\"))",
+                    "output": "billy_bob"
+                },
+                {
+                    "template": "@(format_urn(contact.urn))",
+                    "output": "(202) 456-1111"
+                },
+                {
+                    "template": "@(format_urn(urns.tel))",
+                    "output": "(202) 456-1111"
+                },
+                {
+                    "template": "@(format_urn(urns.mailto))",
+                    "output": "foo@bar.com"
+                },
+                {
+                    "template": "@(format_urn(\"NOT URN\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "html_decode(text)",
+            "summary": "HTML dekóduje `text`",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(html_decode(\"Red &amp; Blue\"))",
+                    "output": "Red & Blue"
+                },
+                {
+                    "template": "@(html_decode(\"5 + 10\"))",
+                    "output": "5 + 10"
+                }
+            ]
+        },
+        {
+            "signature": "if(test, value1, value2)",
+            "summary": "Vrací `value1`, pokud je `test` pravdivý, nebo `value2`, pokud není.",
+            "detail": "Pokud je prvním argumentem chyba, je tato chyba vrácena.",
+            "examples": [
+                {
+                    "template": "@(if(1 = 1, \"foo\", \"bar\"))",
+                    "output": "foo"
+                },
+                {
+                    "template": "@(if(\"foo\" > \"bar\", \"foo\", \"bar\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "is_error(value)",
+            "summary": "Vrací, zda `value` je chyba",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(is_error(datetime(\"foo\")))",
+                    "output": "true"
+                },
+                {
+                    "template": "@(is_error(run.not.existing))",
+                    "output": "true"
+                },
+                {
+                    "template": "@(is_error(\"hello\"))",
+                    "output": "false"
+                }
+            ]
+        },
+        {
+            "signature": "join(array, separator)",
+            "summary": "Spojí zadaný řetězec `array` s `separator` a vytvoří z něj text.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(join(array(\"a\", \"b\", \"c\"), \"|\"))",
+                    "output": "a|b|c"
+                },
+                {
+                    "template": "@(join(split(\"a.b.c\", \".\"), \" \"))",
+                    "output": "a b c"
+                }
+            ]
+        },
+        {
+            "signature": "json(value)",
+            "summary": "Vrací JSON reprezentaci hodnoty `value`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(json(\"string\"))",
+                    "output": "\"string\""
+                },
+                {
+                    "template": "@(json(10))",
+                    "output": "10"
+                },
+                {
+                    "template": "@(json(null))",
+                    "output": "null"
+                },
+                {
+                    "template": "@(json(contact.uuid))",
+                    "output": "\"5d76d86b-3bb9-4d5a-b822-c9d86f5d8e4f\""
+                }
+            ]
+        },
+        {
+            "signature": "lower(text)",
+            "summary": "Převede `text` na malá písmena.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(lower(\"HellO\"))",
+                    "output": "hello"
+                },
+                {
+                    "template": "@(lower(\"hello\"))",
+                    "output": "hello"
+                },
+                {
+                    "template": "@(lower(\"123\"))",
+                    "output": "123"
+                },
+                {
+                    "template": "@(lower(\"😀\"))",
+                    "output": "😀"
+                }
+            ]
+        },
+        {
+            "signature": "max(numbers...)",
+            "summary": "Vrací maximální hodnotu v `numbers`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(max(1, 2))",
+                    "output": "2"
+                },
+                {
+                    "template": "@(max(1, -1, 10))",
+                    "output": "10"
+                },
+                {
+                    "template": "@(max(1, 10, \"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "mean(numbers...)",
+            "summary": "Vrací aritmetický průměr `numbers`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(mean(1, 2))",
+                    "output": "1.5"
+                },
+                {
+                    "template": "@(mean(1, 2, 6))",
+                    "output": "3"
+                },
+                {
+                    "template": "@(mean(1, \"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "min(numbers...)",
+            "summary": "Vrací minimální hodnotu v `numbers`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(min(1, 2))",
+                    "output": "1"
+                },
+                {
+                    "template": "@(min(2, 2, -10))",
+                    "output": "-10"
+                },
+                {
+                    "template": "@(min(1, 2, \"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "mod(dividend, divisor)",
+            "summary": "Vrací zbytek dělení čísla `dividend` číslem `divisor`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(mod(5, 2))",
+                    "output": "1"
+                },
+                {
+                    "template": "@(mod(4, 2))",
+                    "output": "0"
+                },
+                {
+                    "template": "@(mod(5, \"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "now()",
+            "summary": "Vrátí aktuální datum a čas v aktuálním časovém pásmu.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(now())",
+                    "output": "2018-04-11T13:24:30.123456-05:00"
+                }
+            ]
+        },
+        {
+            "signature": "number(value)",
+            "summary": "Pokusí se převést `value` na číslo.",
+            "detail": "Pokud hodnotu nelze převést, je vrácena chyba.",
+            "examples": [
+                {
+                    "template": "@(number(10))",
+                    "output": "10"
+                },
+                {
+                    "template": "@(number(\"123.45000\"))",
+                    "output": "123.45"
+                },
+                {
+                    "template": "@(number(\"what?\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "object(pairs...)",
+            "summary": "Přijímá dvojice názvů vlastností a vrací je jako nový objekt.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(object())",
+                    "output": "{}"
+                },
+                {
+                    "template": "@(object(\"a\", 123, \"b\", \"hello\"))",
+                    "output": "{a: 123, b: hello}"
+                },
+                {
+                    "template": "@(object(\"a\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "or(values...)",
+            "summary": "Vrací, zda je některá ze zadaných `value` pravdivá.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(or(true))",
+                    "output": "true"
+                },
+                {
+                    "template": "@(or(true, false, true))",
+                    "output": "true"
+                }
+            ]
+        },
+        {
+            "signature": "parse_datetime(text, format [,timezone])",
+            "summary": "Zpracuje `text` na datum pomocí zadaného `format`.",
+            "detail": "Formátovací řetězec se může skládat z následujících znaků. Znaky\n' ', ':', ',', \"T\", \"-\" a \"_\" se ignorují. Jakýkoli jiný znak je chybou.\n\n* `YY` - poslední dvě číslice roku 0-99\n* `YYYY` - čtyři číslice roku 0000-9999\n* `M` - měsíc 1-12\n* `MM` - měsíc, doplněný nulou 01-12\n* `D` - den v měsíci, 1-31\n* `DD` - den v měsíci, s nulou 01-31\n* `h` - hodina dne 1-12\n* `hh` - hodina dne 01-12\n* `t` - čtyřiadvacátá hodina dne 1-23\n* `tt` - čtyřiadvacátá hodina dne, doplněná nulou 01-23\n* `m` - minuta 0-59\n* `mm` - minuta, doplněná nulou 00-59\n* `s` - sekunda 0-59\n* `ss` - sekunda, s nulovým polštářkem 00-59\n* `fff` - milisekundy\n* `ffffff` - mikrosekundy\n* `fffffffff` - nanosekundy\n* `aa` - am nebo pm\n* `AA` - AM nebo PM\n* `Z` - hodinový a minutový posun od UTC nebo Z pro UTC\n* `ZZZ` - hodinový a minutový posun od UTC\n\nČasové pásmo by mělo být názvem místa, jak je uvedeno v databázi časových pásem IANA, například \"America/Guayaquil\" nebo \"America/Los_Angeles\". Pokud není zadáno, použije se aktuální časové pásmo. Pokud časové pásmo není rozpoznáno, bude vrácena chyba.\n\nVšimněte si, že zlomkové sekundy budou analyzovány i bez explicitního identifikátoru formátu. Zlomkové sekundy byste měli zadávat pouze v případě, že chcete potvrdit počet míst ve vstupním formátu.\n\nFunkce parse_datetime vrátí chybu, pokud není schopna převést text na datum.",
+            "examples": [
+                {
+                    "template": "@(parse_datetime(\"1979-07-18\", \"YYYY-MM-DD\"))",
+                    "output": "1979-07-18T00:00:00.000000-05:00"
+                },
+                {
+                    "template": "@(parse_datetime(\"2010 5 10\", \"YYYY M DD\"))",
+                    "output": "2010-05-10T00:00:00.000000-05:00"
+                },
+                {
+                    "template": "@(parse_datetime(\"2010 5 10 12:50\", \"YYYY M DD tt:mm\", \"America/Los_Angeles\"))",
+                    "output": "2010-05-10T12:50:00.000000-07:00"
+                },
+                {
+                    "template": "@(parse_datetime(\"NOT DATE\", \"YYYY-MM-DD\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "parse_json(text)",
+            "summary": "Pokusí se analyzovat `text` jako JSON.",
+            "detail": "Pokud zadaný `text` není platný JSON, je vrácena chyba.",
+            "examples": [
+                {
+                    "template": "@(parse_json(\"{\\\"foo\\\": \\\"bar\\\"}\").foo)",
+                    "output": "bar"
+                },
+                {
+                    "template": "@(parse_json(\"[1,2,3,4]\")[2])",
+                    "output": "3"
+                },
+                {
+                    "template": "@(parse_json(\"invalid json\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "parse_time(text, format)",
+            "summary": "Zpracuje `text` do času pomocí zadaného `format`.",
+            "detail": "Formátovací řetězec se může skládat z následujících znaků. Znaky\n' ', ':', ',', \"T\", \"-\" a \"_\" se ignorují. Jakýkoli jiný znak je chybou.\n\n* `h` - hodina dne 1-12\n* `hh` - hodina dne, doplněná nulou 01-12\n* `t` - čtyřiadvacátá hodina dne 1-23\n* `tt` - čtyřiadvacátá hodina dne, doplněná nulou 01-23\n* `m` - minuta 0-59\n* `mm` - minuta, doplněná nulou 00-59\n* `s` - sekunda 0-59\n* `ss` - sekunda, s nulovým polštářkem 00-59\n* `fff` - milisekundy\n* `ffffff` - mikrosekundy\n* `fffffffff` - nanosekundy\n* `aa` - am nebo pm\n* `AA` - AM nebo PM\n\nVšimněte si, že zlomkové sekundy budou analyzovány i bez explicitního identifikátoru formátu.\nZlomkové sekundy byste měli zadávat pouze v případě, že chcete potvrdit počet míst ve vstupním formátu.\n\nFunkce parse_time vrátí chybu, pokud není schopna převést text na čas.",
+            "examples": [
+                {
+                    "template": "@(parse_time(\"15:28\", \"tt:mm\"))",
+                    "output": "15:28:00.000000"
+                },
+                {
+                    "template": "@(parse_time(\"2:40 pm\", \"h:mm aa\"))",
+                    "output": "14:40:00.000000"
+                },
+                {
+                    "template": "@(parse_time(\"NOT TIME\", \"tt:mm\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "percent(number)",
+            "summary": "Formátuje `číslo` jako procento.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(percent(0.54234))",
+                    "output": "54%"
+                },
+                {
+                    "template": "@(percent(1.2))",
+                    "output": "120%"
+                },
+                {
+                    "template": "@(percent(\"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "rand()",
+            "summary": "Vrátí jedno náhodné číslo v rozsahu [0.0-1.0).",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(rand())",
+                    "output": "0.6075520156746239"
+                },
+                {
+                    "template": "@(rand())",
+                    "output": "0.48467757094734026"
+                }
+            ]
+        },
+        {
+            "signature": "rand_between()",
+            "summary": "Jedno náhodné celé číslo v zadaném rozsahu včetně.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(rand_between(1, 10))",
+                    "output": "10"
+                },
+                {
+                    "template": "@(rand_between(1, 10))",
+                    "output": "2"
+                }
+            ]
+        },
+        {
+            "signature": "read_chars(text)",
+            "summary": "Převádí `text` do podoby, kterou mohou číst systémy IVR.",
+            "detail": "ReadChars rozdělí čísla tak, aby byla srozumitelnější. To zahrnuje i dělení na 3 nebo 4 části, pokud je to vhodné.",
+            "examples": [
+                {
+                    "template": "@(read_chars(\"1234\"))",
+                    "output": "1 2 3 4"
+                },
+                {
+                    "template": "@(read_chars(\"abc\"))",
+                    "output": "a b c"
+                },
+                {
+                    "template": "@(read_chars(\"abcdef\"))",
+                    "output": "a b c , d e f"
+                }
+            ]
+        },
+        {
+            "signature": "regex_match(text, pattern [,group])",
+            "summary": "Vrací první shodu regulárního výrazu `pattern` v `text`.",
+            "detail": "Nepovinný třetí parametr `group` určuje, která odpovídající skupina bude vrácena.",
+            "examples": [
+                {
+                    "template": "@(regex_match(\"sda34dfddg67\", \"\\d+\"))",
+                    "output": "34"
+                },
+                {
+                    "template": "@(regex_match(\"Bob Smith\", \"(\\w+) (\\w+)\", 1))",
+                    "output": "Bob"
+                },
+                {
+                    "template": "@(regex_match(\"Bob Smith\", \"(\\w+) (\\w+)\", 2))",
+                    "output": "Smith"
+                },
+                {
+                    "template": "@(regex_match(\"Bob Smith\", \"(\\w+) (\\w+)\", 5))",
+                    "output": "ERROR"
+                },
+                {
+                    "template": "@(regex_match(\"abc\", \"[\\.\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "remove_first_word(text)",
+            "summary": "Odstraní první slovo v `text`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(remove_first_word(\"foo bar\"))",
+                    "output": "bar"
+                },
+                {
+                    "template": "@(remove_first_word(\"Hi there. I'm a flow!\"))",
+                    "output": "there. I'm a flow!"
+                }
+            ]
+        },
+        {
+            "signature": "repeat(text, count)",
+            "summary": "Vrací `text` opakovaný `count` krát.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(repeat(\"*\", 8))",
+                    "output": "********"
+                },
+                {
+                    "template": "@(repeat(\"*\", \"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "replace(text, needle, replacement [, count])",
+            "summary": "Nahradí až `count` výskytů `needle` pomocí `replacement` v `text`.",
+            "detail": "Pokud je hodnota `count` vynechána nebo je menší než 0, jsou nahrazeny všechny výskyty.",
+            "examples": [
+                {
+                    "template": "@(replace(\"foo bar foo\", \"foo\", \"zap\"))",
+                    "output": "zap bar zap"
+                },
+                {
+                    "template": "@(replace(\"foo bar foo\", \"foo\", \"zap\", 1))",
+                    "output": "zap bar foo"
+                },
+                {
+                    "template": "@(replace(\"foo bar\", \"baz\", \"zap\"))",
+                    "output": "foo bar"
+                }
+            ]
+        },
+        {
+            "signature": "replace_time(datetime)",
+            "summary": "Vrátí nový datetime s časovou částí nahrazenou hodnotou `time`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(replace_time(now(), \"10:30\"))",
+                    "output": "2018-04-11T10:30:00.000000-05:00"
+                },
+                {
+                    "template": "@(replace_time(\"2017-01-15\", \"10:30\"))",
+                    "output": "2017-01-15T10:30:00.000000-05:00"
+                },
+                {
+                    "template": "@(replace_time(\"foo\", \"10:30\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "reverse(array)",
+            "summary": "Vrátí nové pole s obrácenými hodnotami pole `array`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(reverse(array(3, 1, 2)))",
+                    "output": "[2, 1, 3]"
+                },
+                {
+                    "template": "@(reverse(array(\"C\", \"A\", \"B\")))",
+                    "output": "[B, A, C]"
+                }
+            ]
+        },
+        {
+            "signature": "round(number [,places])",
+            "summary": "Zaokrouhlí `number` na nejbližší hodnotu.",
+            "detail": "Jako `místa` můžete volitelně zadat počet desetinných míst, na která se má zaokrouhlovat. Pokud `místa` < 0, zaokrouhlí se celočíselná část na nejbližších 10^(-míst).",
+            "examples": [
+                {
+                    "template": "@(round(12))",
+                    "output": "12"
+                },
+                {
+                    "template": "@(round(12.141))",
+                    "output": "12"
+                },
+                {
+                    "template": "@(round(12.6))",
+                    "output": "13"
+                },
+                {
+                    "template": "@(round(12.141, 2))",
+                    "output": "12.14"
+                },
+                {
+                    "template": "@(round(12.146, 2))",
+                    "output": "12.15"
+                },
+                {
+                    "template": "@(round(12.146, -1))",
+                    "output": "10"
+                },
+                {
+                    "template": "@(round(\"notnum\", 2))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "round_down(number [,places])",
+            "summary": "Zaokrouhlí `number` na nejbližší celé číslo.",
+            "detail": "Jako `places` můžete volitelně zadat počet desetinných míst, na která se má zaokrouhlovat.",
+            "examples": [
+                {
+                    "template": "@(round_down(12))",
+                    "output": "12"
+                },
+                {
+                    "template": "@(round_down(12.141))",
+                    "output": "12"
+                },
+                {
+                    "template": "@(round_down(12.6))",
+                    "output": "12"
+                },
+                {
+                    "template": "@(round_down(12.141, 2))",
+                    "output": "12.14"
+                },
+                {
+                    "template": "@(round_down(12.146, 2))",
+                    "output": "12.14"
+                },
+                {
+                    "template": "@(round_down(\"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "round_up(number [,places])",
+            "summary": "Zaokrouhlí `number` na nejbližší celé číslo.",
+            "detail": "Jako `places` můžete volitelně zadat počet desetinných míst, na která se má zaokrouhlovat.",
+            "examples": [
+                {
+                    "template": "@(round_up(12))",
+                    "output": "12"
+                },
+                {
+                    "template": "@(round_up(12.141))",
+                    "output": "13"
+                },
+                {
+                    "template": "@(round_up(12.6))",
+                    "output": "13"
+                },
+                {
+                    "template": "@(round_up(12.141, 2))",
+                    "output": "12.15"
+                },
+                {
+                    "template": "@(round_up(12.146, 2))",
+                    "output": "12.15"
+                },
+                {
+                    "template": "@(round_up(\"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "sort(array)",
+            "summary": "Vrátí nové pole s hodnotami `array` seřazenými.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(sort(array(3, 1, 2)))",
+                    "output": "[1, 2, 3]"
+                },
+                {
+                    "template": "@(sort(array(\"C\", \"A\", \"B\")))",
+                    "output": "[A, B, C]"
+                }
+            ]
+        },
+        {
+            "signature": "split(text, [,delimiters])",
+            "summary": "Rozdělí `text` na pole oddělených slov.",
+            "detail": "Prázdné hodnoty jsou z vráceného seznamu odstraněny. K dispozici je nepovinný koncový parametr `delimiters`, což\nje řetězec znaků, který se používá k rozdělení textu na slova.",
+            "examples": [
+                {
+                    "template": "@(split(\"a b c\"))",
+                    "output": "[a, b, c]"
+                },
+                {
+                    "template": "@(split(\"a\", \" \"))",
+                    "output": "[a]"
+                },
+                {
+                    "template": "@(split(\"abc..d\", \".\"))",
+                    "output": "[abc, d]"
+                },
+                {
+                    "template": "@(split(\"a.b.c.\", \".\"))",
+                    "output": "[a, b, c]"
+                },
+                {
+                    "template": "@(split(\"a|b,c  d\", \" .|,\"))",
+                    "output": "[a, b, c, d]"
+                }
+            ]
+        },
+        {
+            "signature": "sum(array)",
+            "summary": "Sečte položky v zadaném poli `array`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(sum(array(1, 2, \"3\")))",
+                    "output": "6"
+                }
+            ]
+        },
+        {
+            "signature": "text(value)",
+            "summary": "Pokusí se převést `value` na text.",
+            "detail": "Pokud hodnotu nelze převést, je vrácena chyba.",
+            "examples": [
+                {
+                    "template": "@(text(3 = 3))",
+                    "output": "true"
+                },
+                {
+                    "template": "@(json(text(123.45)))",
+                    "output": "\"123.45\""
+                },
+                {
+                    "template": "@(text(1 / 0))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "text_compare(text1, text2)",
+            "summary": "Vrací pořadí slovníku `text1` a `text2`.",
+            "detail": "Návratová hodnota bude -1, pokud je `text1` před `text2`, 0, pokud jsou stejné, a 1, pokud je `text1` za `text2`.",
+            "examples": [
+                {
+                    "template": "@(text_compare(\"abc\", \"abc\"))",
+                    "output": "0"
+                },
+                {
+                    "template": "@(text_compare(\"abc\", \"def\"))",
+                    "output": "-1"
+                },
+                {
+                    "template": "@(text_compare(\"zzz\", \"aaa\"))",
+                    "output": "1"
+                }
+            ]
+        },
+        {
+            "signature": "text_length(value)",
+            "summary": "Vrací délku (počet znaků) hodnoty `value` po převodu na text.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(text_length(\"abc\"))",
+                    "output": "3"
+                },
+                {
+                    "template": "@(text_length(array(2, 3)))",
+                    "output": "6"
+                }
+            ]
+        },
+        {
+            "signature": "text_slice(text, start [, end])",
+            "summary": "Vrací část `text` mezi `start` (včetně) a `end` (bez).",
+            "detail": "Pokud není zadán `konec`, bude zahrnut celý zbytek `textu`. Záporné hodnoty pro `start` nebo `end` začínají na konci `text`.",
+            "examples": [
+                {
+                    "template": "@(text_slice(\"hello\", 2))",
+                    "output": "llo"
+                },
+                {
+                    "template": "@(text_slice(\"hello\", 1, 3))",
+                    "output": "el"
+                },
+                {
+                    "template": "@(text_slice(\"hello😁\", -3, -1))",
+                    "output": "lo"
+                },
+                {
+                    "template": "@(text_slice(\"hello\", 7))",
+                    "output": ""
+                }
+            ]
+        },
+        {
+            "signature": "time(value)",
+            "summary": "Pokusí se převést `value` na čas.",
+            "detail": "Pokud se jedná o text, bude zpracován na čas s použitím výchozího formátu času.\nPokud hodnotu nelze převést, je vrácena chyba.",
+            "examples": [
+                {
+                    "template": "@(time(\"10:30\"))",
+                    "output": "10:30:00.000000"
+                },
+                {
+                    "template": "@(time(\"10:30:45 PM\"))",
+                    "output": "22:30:45.000000"
+                },
+                {
+                    "template": "@(time(datetime(\"1979-07-18T10:30:45.123456Z\")))",
+                    "output": "10:30:45.123456"
+                },
+                {
+                    "template": "@(time(\"what?\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "time_from_parts(hour, minute, second)",
+            "summary": "Vytvoří čas z `hour`, `minute` a `second`",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(time_from_parts(14, 40, 15))",
+                    "output": "14:40:15.000000"
+                },
+                {
+                    "template": "@(time_from_parts(8, 10, 0))",
+                    "output": "08:10:00.000000"
+                },
+                {
+                    "template": "@(time_from_parts(25, 0, 0))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "title(text)",
+            "summary": "Píše každé slovo v `text` velkými písmeny.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(title(\"foo\"))",
+                    "output": "Foo"
+                },
+                {
+                    "template": "@(title(\"ryan lewis\"))",
+                    "output": "Ryan Lewis"
+                },
+                {
+                    "template": "@(title(\"RYAN LEWIS\"))",
+                    "output": "Ryan Lewis"
+                },
+                {
+                    "template": "@(title(123))",
+                    "output": "123"
+                }
+            ]
+        },
+        {
+            "signature": "today()",
+            "summary": "Vrátí aktuální datum v časovém pásmu prostředí.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(today())",
+                    "output": "2018-04-11"
+                }
+            ]
+        },
+        {
+            "signature": "trim(text, [,chars])",
+            "summary": "Odstraní mezery z obou konců `text`.",
+            "detail": "K dispozici je nepovinný koncový parametr `chars`, což je řetězec znaků, které mají být odstraněny místo mezer.",
+            "examples": [
+                {
+                    "template": "@(trim(\" hello world    \"))",
+                    "output": "hello world"
+                },
+                {
+                    "template": "@(trim(\"+123157568\", \"+\"))",
+                    "output": "123157568"
+                }
+            ]
+        },
+        {
+            "signature": "trim_left(text, [,chars])",
+            "summary": "Odstraní mezery z konce `text`.",
+            "detail": "K dispozici je nepovinný koncový parametr `chars`, což je řetězec znaků, které mají být odstraněny místo mezer.",
+            "examples": [
+                {
+                    "template": "@(\"*\" & trim_left(\" hello world   \") & \"*\")",
+                    "output": "*hello world   *"
+                },
+                {
+                    "template": "@(trim_left(\"+12345+\", \"+\"))",
+                    "output": "12345+"
+                }
+            ]
+        },
+        {
+            "signature": "trim_right(text, [,chars])",
+            "summary": "Odstraní mezery z konce `text`.",
+            "detail": "K dispozici je nepovinný koncový parametr `chars`, což je řetězec znaků, které mají být odstraněny místo mezer.",
+            "examples": [
+                {
+                    "template": "@(\"*\" & trim_right(\" hello world   \") & \"*\")",
+                    "output": "* hello world*"
+                },
+                {
+                    "template": "@(trim_right(\"+12345+\", \"+\"))",
+                    "output": "+12345"
+                }
+            ]
+        },
+        {
+            "signature": "tz(date)",
+            "summary": "Vrací název časové zóny `date`.",
+            "detail": "Pokud datum neobsahuje informace o časovém pásmu, bude vráceno aktuální časové pásmo.",
+            "examples": [
+                {
+                    "template": "@(tz(\"2017-01-15T02:15:18.123456Z\"))",
+                    "output": "UTC"
+                },
+                {
+                    "template": "@(tz(\"2017-01-15 02:15:18PM\"))",
+                    "output": "America/Guayaquil"
+                },
+                {
+                    "template": "@(tz(\"2017-01-15\"))",
+                    "output": "America/Guayaquil"
+                },
+                {
+                    "template": "@(tz(\"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "tz_offset(date)",
+            "summary": "Vrací posun časového pásma `date`.",
+            "detail": "Posun je vrácen ve formátu `[+/-]HH:MM`. Pokud datum neobsahuje informace o časové zóně, bude vrácen aktuální časový posun.",
+            "examples": [
+                {
+                    "template": "@(tz_offset(\"2017-01-15T02:15:18.123456Z\"))",
+                    "output": "+0000"
+                },
+                {
+                    "template": "@(tz_offset(\"2017-01-15 02:15:18PM\"))",
+                    "output": "-0500"
+                },
+                {
+                    "template": "@(tz_offset(\"2017-01-15\"))",
+                    "output": "-0500"
+                },
+                {
+                    "template": "@(tz_offset(\"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "unique(array)",
+            "summary": "Vrátí jedinečné hodnoty v poli `array`.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(unique(array(1, 3, 2, 3)))",
+                    "output": "[1, 3, 2]"
+                },
+                {
+                    "template": "@(unique(array(\"hi\", \"there\", \"hi\")))",
+                    "output": "[hi, there]"
+                }
+            ]
+        },
+        {
+            "signature": "upper(text)",
+            "summary": "Převede `text` na velká písmena.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(upper(\"Asdf\"))",
+                    "output": "ASDF"
+                },
+                {
+                    "template": "@(upper(123))",
+                    "output": "123"
+                }
+            ]
+        },
+        {
+            "signature": "url_encode(text)",
+            "summary": "Zakóduje `text` pro použití jako parametr URL.",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(url_encode(\"two & words\"))",
+                    "output": "two%20%26%20words"
+                },
+                {
+                    "template": "@(url_encode(10))",
+                    "output": "10"
+                }
+            ]
+        },
+        {
+            "signature": "urn_parts(urn)",
+            "summary": "Rozebere URN na jednotlivé části",
+            "detail": "",
+            "examples": [
+                {
+                    "template": "@(urn_parts(\"tel:+593979012345\"))",
+                    "output": "{display: , path: +593979012345, scheme: tel}"
+                },
+                {
+                    "template": "@(urn_parts(\"twitterid:3263621177#bobby\"))",
+                    "output": "{display: bobby, path: 3263621177, scheme: twitterid}"
+                },
+                {
+                    "template": "@(urn_parts(\"not a urn\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "week_number(date)",
+            "summary": "Vrací číslo týdne (1-54) pro `date`.",
+            "detail": "Za začátek týdne se považuje neděle a týden obsahující 1. leden je týdnem číslo 1.",
+            "examples": [
+                {
+                    "template": "@(week_number(\"2019-01-01\"))",
+                    "output": "1"
+                },
+                {
+                    "template": "@(week_number(\"2019-07-23T16:56:59.000000Z\"))",
+                    "output": "30"
+                },
+                {
+                    "template": "@(week_number(\"xx\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "weekday(date)",
+            "summary": "Vrací den v týdnu pro `date`.",
+            "detail": "Týden začíná nedělí, takže neděle vrací 0, pondělí 1 atd.",
+            "examples": [
+                {
+                    "template": "@(weekday(\"2017-01-15\"))",
+                    "output": "0"
+                },
+                {
+                    "template": "@(weekday(\"foo\"))",
+                    "output": "ERROR"
+                }
+            ]
+        },
+        {
+            "signature": "word(text, index [,delimiters])",
+            "summary": "Vrátí slovo v `index` v `text`.",
+            "detail": "Indexy začínají od nuly. K dispozici je nepovinný poslední parametr `delimiters`, což je řetězec znaků, který se používá k rozdělení textu na slova.",
+            "examples": [
+                {
+                    "template": "@(word(\"bee cat dog\", 0))",
+                    "output": "bee"
+                },
+                {
+                    "template": "@(word(\"bee.cat,dog\", 0))",
+                    "output": "bee"
+                },
+                {
+                    "template": "@(word(\"bee.cat,dog\", 1))",
+                    "output": "cat"
+                },
+                {
+                    "template": "@(word(\"bee.cat,dog\", 2))",
+                    "output": "dog"
+                },
+                {
+                    "template": "@(word(\"bee.cat,dog\", -1))",
+                    "output": "dog"
+                },
+                {
+                    "template": "@(word(\"bee.cat,dog\", -2))",
+                    "output": "cat"
+                },
+                {
+                    "template": "@(word(\"bee.*cat,dog\", 1, \".*=|\"))",
+                    "output": "cat,dog"
+                },
+                {
+                    "template": "@(word(\"O'Grady O'Flaggerty\", 1, \" \"))",
+                    "output": "O'Flaggerty"
+                }
+            ]
+        },
+        {
+            "signature": "word_count(text [,delimiters])",
+            "summary": "Vrací počet slov v `text`.",
+            "detail": "K dispozici je nepovinný konečný parametr `delimiters`, což je řetězec znaků, který se používá k rozdělení textu na slova.",
+            "examples": [
+                {
+                    "template": "@(word_count(\"foo bar\"))",
+                    "output": "2"
+                },
+                {
+                    "template": "@(word_count(10))",
+                    "output": "1"
+                },
+                {
+                    "template": "@(word_count(\"\"))",
+                    "output": "0"
+                },
+                {
+                    "template": "@(word_count(\"😀😃😄😁\"))",
+                    "output": "4"
+                },
+                {
+                    "template": "@(word_count(\"bee.*cat,dog\", \".*=|\"))",
+                    "output": "2"
+                },
+                {
+                    "template": "@(word_count(\"O'Grady O'Flaggerty\", \" \"))",
+                    "output": "2"
+                }
+            ]
+        },
+        {
+            "signature": "word_slice(text, start, end [,delimiters])",
+            "summary": "Extrahuje dílčí posloupnost slov z `text`.",
+            "detail": "Vrácená slova jsou slova od `start` až po `end`, ale bez něj. Indexy začínají nulou a záporná hodnota konce znamená, že by měla být vrácena všechna slova po začátku. K dispozici je nepovinný koncový parametr `delimiters`, což je řetězec znaků použitý k rozdělení textu na slova.",
+            "examples": [
+                {
+                    "template": "@(word_slice(\"bee cat dog\", 0, 1))",
+                    "output": "bee"
+                },
+                {
+                    "template": "@(word_slice(\"bee cat dog\", 0, 2))",
+                    "output": "bee cat"
+                },
+                {
+                    "template": "@(word_slice(\"bee cat dog\", 1, -1))",
+                    "output": "cat dog"
+                },
+                {
+                    "template": "@(word_slice(\"bee cat dog\", 1))",
+                    "output": "cat dog"
+                },
+                {
+                    "template": "@(word_slice(\"bee cat dog\", 2, 3))",
+                    "output": "dog"
+                },
+                {
+                    "template": "@(word_slice(\"bee cat dog\", 3, 10))",
+                    "output": ""
+                },
+                {
+                    "template": "@(word_slice(\"bee.*cat,dog\", 1, -1, \".*=|,\"))",
+                    "output": "cat dog"
+                },
+                {
+                    "template": "@(word_slice(\"O'Grady O'Flaggerty\", 1, 2, \" \"))",
+                    "output": "O'Flaggerty"
+                }
+            ]
+        }
+    ]
+}

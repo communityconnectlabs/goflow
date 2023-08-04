@@ -1,0 +1,261 @@
+contact -> kontakt (defaults to Název URN)
+contact.uuid -> UUID kontaktu
+contact.id -> číselné ID kontaktu
+contact.first_name -> jméno kontaktu
+contact.name -> jméno kontaktu
+contact.language -> jazyk kontaktu jako 3-písmenný kód ISO.
+contact.created_on -> datum vytvoření kontaktu
+contact.last_seen_on -> datum posledního setkání s kontaktem
+contact.urns -> čísla URN náležející ke kontaktu
+contact.urns[0] -> first of čísla URN náležející ke kontaktu
+contact.urn -> preferované URN kontaktu
+contact.groups -> skupiny, do kterých kontakt patří
+contact.groups[0] -> first of skupiny, do kterých kontakt patří
+contact.groups[0].uuid -> UUID skupiny
+contact.groups[0].name -> název skupiny
+contact.fields -> hodnoty vlastního pole kontaktu
+contact.fields.age -> age pro kontakt
+contact.fields.gender -> gender pro kontakt
+contact.channel -> preferovaný kanál kontaktu (defaults to název)
+contact.channel.uuid -> UUID kanálu
+contact.channel.name -> název kanálu
+contact.channel.address -> adresa kanálu
+contact.tickets -> otevřené tikety kontaktu
+contact.tickets[0] -> first of otevřené tikety kontaktu
+contact.tickets[0].uuid -> UUID tiketu
+contact.tickets[0].subject -> předmět tiketu
+contact.tickets[0].body -> tělo tiketu
+fields -> hodnoty vlastního pole kontaktu
+fields.age -> age pro kontakt
+fields.gender -> gender pro kontakt
+urns -> hodnoty URN kontaktu
+urns.discord -> Discord URN pro kontakt
+urns.ext -> Ext URN pro kontakt
+urns.facebook -> Facebook URN pro kontakt
+urns.fcm -> Fcm URN pro kontakt
+urns.freshchat -> Freshchat URN pro kontakt
+urns.instagram -> Instagram URN pro kontakt
+urns.jiochat -> Jiochat URN pro kontakt
+urns.line -> Line URN pro kontakt
+urns.mailto -> Mailto URN pro kontakt
+urns.rocketchat -> Rocketchat URN pro kontakt
+urns.tel -> Tel URN pro kontakt
+urns.telegram -> Telegram URN pro kontakt
+urns.twitter -> Twitter URN pro kontakt
+urns.twitterid -> Twitterid URN pro kontakt
+urns.viber -> Viber URN pro kontakt
+urns.vk -> Vk URN pro kontakt
+urns.webchat -> Webchat URN pro kontakt
+urns.wechat -> Wechat URN pro kontakt
+urns.whatsapp -> Whatsapp URN pro kontakt
+results -> výsledky aktuálního běhu
+results.response_1 -> výsledek pro response_1 (defaults to hodnota)
+results.response_1.name -> název výsledku
+results.response_1.value -> hodnota výsledku
+results.response_1.category -> kategorie výsledku
+results.response_1.category_localized -> lokalizovaná kategorie výsledku
+results.response_1.input -> zadání výsledku
+results.response_1.corrected -> the input corrected by Bing Spell Checker
+results.response_1.extra -> další data výsledku, jako je odpověď webhooku.
+results.response_1.node_uuid -> UUID uzlu v toku, který vygeneroval výsledek.
+results.response_1.created_on -> datum vytvoření výsledku
+input -> aktuální vstup z kontaktu (defaults to text a přílohy)
+input.uuid -> UUID vstupu
+input.created_on -> datum vytvoření vstupu
+input.channel -> kanál, na kterém byl vstup přijat (defaults to název)
+input.channel.uuid -> UUID kanálu
+input.channel.name -> název kanálu
+input.channel.address -> adresa kanálu
+input.urn -> URN kontaktu, na kterém byl vstup přijat.
+input.text -> textová část vstupu
+input.attachments -> všechny přílohy na vstupu
+input.attachments[0] -> first of všechny přílohy na vstupu
+input.external_id -> externí ID vstupu
+run -> aktuální běh (defaults to jméno kontaktu a identifikátor UUID toku)
+run.uuid -> UUID běhu
+run.contact -> kontakt běhu (defaults to Název URN)
+run.contact.uuid -> UUID kontaktu
+run.contact.id -> číselné ID kontaktu
+run.contact.first_name -> jméno kontaktu
+run.contact.name -> jméno kontaktu
+run.contact.language -> jazyk kontaktu jako 3-písmenný kód ISO.
+run.contact.created_on -> datum vytvoření kontaktu
+run.contact.last_seen_on -> datum posledního setkání s kontaktem
+run.contact.urns -> čísla URN náležející ke kontaktu
+run.contact.urns[0] -> first of čísla URN náležející ke kontaktu
+run.contact.urn -> preferované URN kontaktu
+run.contact.groups -> skupiny, do kterých kontakt patří
+run.contact.groups[0] -> first of skupiny, do kterých kontakt patří
+run.contact.groups[0].uuid -> UUID skupiny
+run.contact.groups[0].name -> název skupiny
+run.contact.fields -> hodnoty vlastního pole kontaktu
+run.contact.fields.age -> age pro kontakt
+run.contact.fields.gender -> gender pro kontakt
+run.contact.channel -> preferovaný kanál kontaktu (defaults to název)
+run.contact.channel.uuid -> UUID kanálu
+run.contact.channel.name -> název kanálu
+run.contact.channel.address -> adresa kanálu
+run.contact.tickets -> otevřené tikety kontaktu
+run.contact.tickets[0] -> first of otevřené tikety kontaktu
+run.contact.tickets[0].uuid -> UUID tiketu
+run.contact.tickets[0].subject -> předmět tiketu
+run.contact.tickets[0].body -> tělo tiketu
+run.flow -> tok běhu (defaults to název)
+run.flow.uuid -> UUID toku
+run.flow.name -> název toku
+run.flow.revision -> číslo revize toku
+run.status -> aktuální stav běhu
+run.results -> výsledky uložené při běhu
+run.results.response_1 -> výsledek pro response_1 (defaults to hodnota)
+run.results.response_1.name -> název výsledku
+run.results.response_1.value -> hodnota výsledku
+run.results.response_1.category -> kategorie výsledku
+run.results.response_1.category_localized -> lokalizovaná kategorie výsledku
+run.results.response_1.input -> zadání výsledku
+run.results.response_1.corrected -> the input corrected by Bing Spell Checker
+run.results.response_1.extra -> další data výsledku, jako je odpověď webhooku.
+run.results.response_1.node_uuid -> UUID uzlu v toku, který vygeneroval výsledek.
+run.results.response_1.created_on -> datum vytvoření výsledku
+run.created_on -> datum vytvoření běhu
+run.exited_on -> datum ukončení běhu
+child -> poslední běh podřazeného (defaults to jméno kontaktu a identifikátor UUID toku)
+child.uuid -> UUID běhu
+child.contact -> kontakt běhu (defaults to Název URN)
+child.contact.uuid -> UUID kontaktu
+child.contact.id -> číselné ID kontaktu
+child.contact.first_name -> jméno kontaktu
+child.contact.name -> jméno kontaktu
+child.contact.language -> jazyk kontaktu jako 3-písmenný kód ISO.
+child.contact.created_on -> datum vytvoření kontaktu
+child.contact.last_seen_on -> datum posledního setkání s kontaktem
+child.contact.urns -> čísla URN náležející ke kontaktu
+child.contact.urns[0] -> first of čísla URN náležející ke kontaktu
+child.contact.urn -> preferované URN kontaktu
+child.contact.groups -> skupiny, do kterých kontakt patří
+child.contact.groups[0] -> first of skupiny, do kterých kontakt patří
+child.contact.groups[0].uuid -> UUID skupiny
+child.contact.groups[0].name -> název skupiny
+child.contact.fields -> hodnoty vlastního pole kontaktu
+child.contact.fields.age -> age pro kontakt
+child.contact.fields.gender -> gender pro kontakt
+child.contact.channel -> preferovaný kanál kontaktu (defaults to název)
+child.contact.channel.uuid -> UUID kanálu
+child.contact.channel.name -> název kanálu
+child.contact.channel.address -> adresa kanálu
+child.contact.tickets -> otevřené tikety kontaktu
+child.contact.tickets[0] -> first of otevřené tikety kontaktu
+child.contact.tickets[0].uuid -> UUID tiketu
+child.contact.tickets[0].subject -> předmět tiketu
+child.contact.tickets[0].body -> tělo tiketu
+child.flow -> tok běhu (defaults to název)
+child.flow.uuid -> UUID toku
+child.flow.name -> název toku
+child.flow.revision -> číslo revize toku
+child.fields -> hodnoty vlastního pole běhu
+child.fields.age -> age pro kontakt
+child.fields.gender -> gender pro kontakt
+child.urns -> hodnoty URN běhu
+child.urns.discord -> Discord URN pro kontakt
+child.urns.ext -> Ext URN pro kontakt
+child.urns.facebook -> Facebook URN pro kontakt
+child.urns.fcm -> Fcm URN pro kontakt
+child.urns.freshchat -> Freshchat URN pro kontakt
+child.urns.instagram -> Instagram URN pro kontakt
+child.urns.jiochat -> Jiochat URN pro kontakt
+child.urns.line -> Line URN pro kontakt
+child.urns.mailto -> Mailto URN pro kontakt
+child.urns.rocketchat -> Rocketchat URN pro kontakt
+child.urns.tel -> Tel URN pro kontakt
+child.urns.telegram -> Telegram URN pro kontakt
+child.urns.twitter -> Twitter URN pro kontakt
+child.urns.twitterid -> Twitterid URN pro kontakt
+child.urns.viber -> Viber URN pro kontakt
+child.urns.vk -> Vk URN pro kontakt
+child.urns.webchat -> Webchat URN pro kontakt
+child.urns.wechat -> Wechat URN pro kontakt
+child.urns.whatsapp -> Whatsapp URN pro kontakt
+child.results -> výsledky uložené při běhu
+child.status -> aktuální stav běhu
+parent -> nadřízený běhu (defaults to jméno kontaktu a identifikátor UUID toku)
+parent.uuid -> UUID běhu
+parent.contact -> kontakt běhu (defaults to Název URN)
+parent.contact.uuid -> UUID kontaktu
+parent.contact.id -> číselné ID kontaktu
+parent.contact.first_name -> jméno kontaktu
+parent.contact.name -> jméno kontaktu
+parent.contact.language -> jazyk kontaktu jako 3-písmenný kód ISO.
+parent.contact.created_on -> datum vytvoření kontaktu
+parent.contact.last_seen_on -> datum posledního setkání s kontaktem
+parent.contact.urns -> čísla URN náležející ke kontaktu
+parent.contact.urns[0] -> first of čísla URN náležející ke kontaktu
+parent.contact.urn -> preferované URN kontaktu
+parent.contact.groups -> skupiny, do kterých kontakt patří
+parent.contact.groups[0] -> first of skupiny, do kterých kontakt patří
+parent.contact.groups[0].uuid -> UUID skupiny
+parent.contact.groups[0].name -> název skupiny
+parent.contact.fields -> hodnoty vlastního pole kontaktu
+parent.contact.fields.age -> age pro kontakt
+parent.contact.fields.gender -> gender pro kontakt
+parent.contact.channel -> preferovaný kanál kontaktu (defaults to název)
+parent.contact.channel.uuid -> UUID kanálu
+parent.contact.channel.name -> název kanálu
+parent.contact.channel.address -> adresa kanálu
+parent.contact.tickets -> otevřené tikety kontaktu
+parent.contact.tickets[0] -> first of otevřené tikety kontaktu
+parent.contact.tickets[0].uuid -> UUID tiketu
+parent.contact.tickets[0].subject -> předmět tiketu
+parent.contact.tickets[0].body -> tělo tiketu
+parent.flow -> tok běhu (defaults to název)
+parent.flow.uuid -> UUID toku
+parent.flow.name -> název toku
+parent.flow.revision -> číslo revize toku
+parent.fields -> hodnoty vlastního pole běhu
+parent.fields.age -> age pro kontakt
+parent.fields.gender -> gender pro kontakt
+parent.urns -> hodnoty URN běhu
+parent.urns.discord -> Discord URN pro kontakt
+parent.urns.ext -> Ext URN pro kontakt
+parent.urns.facebook -> Facebook URN pro kontakt
+parent.urns.fcm -> Fcm URN pro kontakt
+parent.urns.freshchat -> Freshchat URN pro kontakt
+parent.urns.instagram -> Instagram URN pro kontakt
+parent.urns.jiochat -> Jiochat URN pro kontakt
+parent.urns.line -> Line URN pro kontakt
+parent.urns.mailto -> Mailto URN pro kontakt
+parent.urns.rocketchat -> Rocketchat URN pro kontakt
+parent.urns.tel -> Tel URN pro kontakt
+parent.urns.telegram -> Telegram URN pro kontakt
+parent.urns.twitter -> Twitter URN pro kontakt
+parent.urns.twitterid -> Twitterid URN pro kontakt
+parent.urns.viber -> Viber URN pro kontakt
+parent.urns.vk -> Vk URN pro kontakt
+parent.urns.webchat -> Webchat URN pro kontakt
+parent.urns.wechat -> Wechat URN pro kontakt
+parent.urns.whatsapp -> Whatsapp URN pro kontakt
+parent.results -> výsledky uložené při běhu
+parent.status -> aktuální stav běhu
+ticket -> poslední otevřený tiket pro kontakt
+ticket.uuid -> UUID tiketu
+ticket.subject -> předmět tiketu
+ticket.body -> tělo tiketu
+webhook -> zpracovaná odpověď JSON posledního volání webhooku.
+node -> aktuální uzel
+node.uuid -> UUID uzlu
+node.visit_count -> počet návštěv uzlu v tomto běhu.
+globals -> globální hodnoty
+globals.org_name -> globální hodnota org_name
+trigger -> spouštěč, který zahájil tuto relaci
+trigger.type -> typ spouštěče, který zahájil tuto relaci
+trigger.params -> parametry předané spouštěči
+trigger.keyword -> shoda klíčového slova, pokud se jedná o spouštěč klíčového slova.
+trigger.user -> uživatele, který zahájil tuto relaci, pokud se jedná o ruční spouštění. (defaults to název e-mailu)
+trigger.user.email -> e-mailová adresa uživatele
+trigger.user.name -> Jméno uživatele
+trigger.user.first_name -> křestní jméno uživatele
+trigger.origin -> původ této relace, pokud se jedná o ruční spouštění.
+trigger.ticket -> tiket, pokud se jedná o spouštěč tiketů
+trigger.ticket.uuid -> UUID tiketu
+trigger.ticket.subject -> předmět tiketu
+trigger.ticket.body -> tělo tiketu
+resume -> aktuální pokračování, které navázalo na toto sezení.
+resume.type -> typ obnovení, které obnovilo tuto relaci.
