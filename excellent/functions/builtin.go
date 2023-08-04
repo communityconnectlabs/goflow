@@ -2199,10 +2199,10 @@ func ForEachFormat(env envs.Environment, args ...types.XValue) types.XValue {
 	} else {
 		nestedValues = ExtractNestedValues(env, array, types.NewXText(""))
 	}
+
 	if types.IsXError(nestedValues) {
 		return nestedValues
 	}
-
 
 	unnestedArray, xerr := types.ToXArray(env, nestedValues)
 	if types.IsXError(xerr) {
@@ -2233,8 +2233,8 @@ func ExtractNestedValues(env envs.Environment, _obj types.XValue, _path types.XV
 		return xerr
 	}
 
-	path_arr := strings.Split(path.Native(), ".")
-	if path.Native() == "" || len(path_arr) == 0 {
+	pathArr := strings.Split(path.Native(), ".")
+	if path.Native() == "" || len(pathArr) == 0 {
 		// If the path is empty, return the data as a single value array
 		obj, xerr := types.ToXObject(env, _obj)
 		if !types.IsXError(xerr) {
@@ -2243,12 +2243,12 @@ func ExtractNestedValues(env envs.Environment, _obj types.XValue, _path types.XV
 		return _obj
 	}
 
-	stack := []stackItem{{_obj, path_arr}}
+	stack := []stackItem{{_obj, pathArr}}
 	result := []types.XValue{}
 
 	for len(stack) > 0 {
-		currentItem := stack[len(stack) - 1]
-		stack = stack[:len(stack) - 1]
+		currentItem := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
 
 		if len(currentItem.path) == 0 {
 			result = append(result, currentItem.item)
@@ -2259,6 +2259,7 @@ func ExtractNestedValues(env envs.Environment, _obj types.XValue, _path types.XV
 		currentKey := currentItem.path[0]
 		currentObj, xerr := types.ToXObject(env, currentItem.item)
 		currentObjs := types.NewXArray()
+
 		if types.IsXError(xerr) {
 			currentObjs, xerr = types.ToXArray(env, currentItem.item)
 			if types.IsXError(xerr) {
