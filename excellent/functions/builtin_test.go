@@ -237,11 +237,23 @@ func TestFunctions(t *testing.T) {
 		},
 		{"extract_object", dmy, []types.XValue{}, ERROR},
 
-		{"extract_nested_values", dmy, []types.XValue{types.NewXArray(xs("a"), xs("b")), xs("")}, types.NewXArray(xs("a"), xs("b"))},
-		{"extract_nested_values", dmy, []types.XValue{types.NewXArray(
+		{"extract_nested_values", dmy, []types.XValue{xa(xs("a"), xs("b")), xs("")}, xa(xs("a"), xs("b"))},
+		{"extract_nested_values", dmy, []types.XValue{xa(
 			types.NewXObject(map[string]types.XValue{"a": xs("x")}),
 			types.NewXObject(map[string]types.XValue{"a": xs("y")}),
-		), xs("*.a")}, types.NewXArray(xs("x"), xs("y"))},
+		), xs("*.a")}, xa(xs("x"), xs("y"))},
+		{"extract_nested_values", dmy, []types.XValue{xa(
+			types.NewXObject(map[string]types.XValue{"a": xs("x"), "b": xs("o")}),
+			types.NewXObject(map[string]types.XValue{"a": xs("y"), "b": xs("p")}),
+		), xs("*.[a, b]")}, xa(xa(xs("x"), xs("o")), xa(xs("y"), xs("p")))},
+		{"extract_nested_values", dmy, []types.XValue{xa(
+			types.NewXObject(map[string]types.XValue{"a": xs("x"), "b": xs("o")}),
+			types.NewXObject(map[string]types.XValue{"a": xs("y"), "b": xs("p")}),
+		), xs("[a, b]")}, xa(xa(xs("x"), xs("o")), xa(xs("y"), xs("p")))},
+		{"extract_nested_values", dmy, []types.XValue{xa(
+			types.NewXObject(map[string]types.XValue{"a": xs("x"), "b": xs("o")}),
+			types.NewXObject(map[string]types.XValue{"a": xs("y"), "b": xs("p")}),
+		), xs("*.[a, b].x")}, ERROR},
 
 		{"epoch", dmy, []types.XValue{xdt(time.Date(2017, 6, 12, 16, 56, 59, 0, time.UTC))}, xn("1497286619")},
 		{"epoch", dmy, []types.XValue{ERROR}, ERROR},
@@ -277,11 +289,10 @@ func TestFunctions(t *testing.T) {
 		{"foreach_value", dmy, []types.XValue{types.NewXObject(map[string]types.XValue{"a": xs("x"), "b": xs("y")}), ERROR}, ERROR},
 		{"foreach_value", dmy, []types.XValue{types.NewXObject(map[string]types.XValue{"a": xs("x"), "b": xs("y")}), xf("abs")}, ERROR},
 
-		{"foreach_format", dmy, []types.XValue{ERROR, xs("%s"), xf("upper")}, ERROR},
-		{"foreach_format", dmy, []types.XValue{types.NewXArray(xs("a"), xs("b")), xs("%s")}, types.NewXText("ab")},
-		{"foreach_format", dmy, []types.XValue{types.NewXArray(xs("a"), xs("b")), xs("%s%s")}, ERROR},
+		{"foreach_format", dmy, []types.XValue{xa(xs("a"), xs("b")), xs("%s")}, types.NewXText("ab")},
+		{"foreach_format", dmy, []types.XValue{xa(xs("a"), xs("b")), xs("%s%s")}, ERROR},
 		{"foreach_format", dmy, []types.XValue{
-			types.NewXArray(
+			xa(
 				types.NewXObject(map[string]types.XValue{"a": xs("x")}),
 				types.NewXObject(map[string]types.XValue{"a": xs("y")}),
 			),
@@ -289,6 +300,23 @@ func TestFunctions(t *testing.T) {
 			xs("a"),
 		},
 			types.NewXText("xy"),
+		},
+		{"foreach_format", dmy, []types.XValue{
+			xa(
+				types.NewXObject(map[string]types.XValue{"a": xs("x"), "b": xi(1)}),
+				types.NewXObject(map[string]types.XValue{"a": xs("y"), "b": xi(2)}),
+			),
+			xs("%s-%s "),
+			xs("*.[a,b]"),
+		},
+			types.NewXText("x-1 y-2 "),
+		},
+		{"foreach_format", dmy, []types.XValue{
+			xa(types.NewXObject(map[string]types.XValue{"a": xs("x"), "b": xi(1)})),
+			xs("%s"),
+			xs("[a].*"),
+		},
+			ERROR,
 		},
 
 		{"format", dmy, []types.XValue{xn("1234")}, xs("1,234")},
