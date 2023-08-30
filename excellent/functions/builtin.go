@@ -3,7 +3,6 @@ package functions
 import (
 	"bytes"
 	"fmt"
-	"github.com/pkg/errors"
 	"html"
 	"math"
 	"net/url"
@@ -14,6 +13,8 @@ import (
 	"time"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/pkg/errors"
 
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/random"
@@ -2167,6 +2168,8 @@ func ForEachValue(env envs.Environment, args ...types.XValue) types.XValue {
 // If the given function takes more than one argument, you can pass additional arguments after the function.
 //
 //   @(foreach_format(array("a", "b", "c"), "%s\n")) -> a\nb\nc\n
+//   @(foreach_format(array(object("a", 1), object("a", 2)), "%s\n", "*.a")) -> 1\n2\n
+//   @(foreach_format(array(object("a", 1, "b", "x"), object("a", 2, "b", "y")), "%s-%s\n", "*.[a,b]")) -> 1-x\n2-y\n
 //
 // @function foreach_format(array, pattern, [args...])
 func ForEachFormat(env envs.Environment, args ...types.XValue) types.XValue {
@@ -2183,23 +2186,30 @@ func ForEachFormat(env envs.Environment, args ...types.XValue) types.XValue {
 		return xerr
 	}
 
-	if strings.Count(pattern.Native(), "%s") != 1 {
-		return types.NewXError(errors.New("There must be one '%s' in the pattern"))
-	}
-
+	path := types.NewXText("")
+	valuesNum := 1
 	if len(args) == 3 {
-		path, xerr := types.ToXText(env, args[2])
+		path, xerr = types.ToXText(env, args[2])
 		if types.IsXError(xerr) {
 			return xerr
 		}
-		if !strings.HasPrefix(path.Native(), "*.") && path.Native() != "" {
-			path = types.NewXText("*." + path.Native())
+
+		pathKeys := strings.Split(path.Native(), ".")
+		lastKey := path.Native()
+		if len(pathKeys) > 0 {
+			lastKey = pathKeys[len(pathKeys)-1]
 		}
-		nestedValues = ExtractNestedValues(env, array, path)
-	} else {
-		nestedValues = ExtractNestedValues(env, array, types.NewXText(""))
+
+		if strings.HasPrefix(lastKey, "[") && strings.HasSuffix(lastKey, "]") {
+			valuesNum = len(strings.Split(lastKey, ","))
+		}
 	}
 
+	if strings.Count(pattern.Native(), "%s") != valuesNum {
+		return types.NewXError(errors.New("The number of '%s' must be equal to the number of values to be selected."))
+	}
+
+	nestedValues = ExtractNestedValues(env, array, path)
 	if types.IsXError(nestedValues) {
 		return nestedValues
 	}
@@ -2210,7 +2220,23 @@ func ForEachFormat(env envs.Environment, args ...types.XValue) types.XValue {
 	}
 
 	for _, item := range unnestedArray.Values() {
-		resultBuilder.WriteString(fmt.Sprintf(pattern.Native(), item.Format(env)))
+		if valuesNum == 1 {
+			resultBuilder.WriteString(fmt.Sprintf(pattern.Native(), item.Format(env)))
+		} else {
+			items, xerr := types.ToXArray(env, item)
+			formatedValues := make([]interface{}, valuesNum)
+			if types.IsXError(xerr) {
+				return types.NewXErrorf("An error occured when tried to parse values array. %s", xerr.Format(env))
+			}
+
+			for index, nestedData := range items.Values() {
+				if index < valuesNum {
+					formatedValues[index] = nestedData.Format(env)
+				}
+			}
+
+			resultBuilder.WriteString(fmt.Sprintf(pattern.Native(), formatedValues...))
+		}
 	}
 
 	return types.NewXText(resultBuilder.String())
@@ -2243,6 +2269,10 @@ func ExtractNestedValues(env envs.Environment, _obj types.XValue, _path types.XV
 		return _obj
 	}
 
+	if strings.ContainsAny(strings.Join(pathArr[:len(pathArr)-1], "."), "[]") {
+		return types.NewXErrorf("Multiple values can be selected only at final stage.")
+	}
+
 	stack := []stackItem{{_obj, pathArr}}
 	result := []types.XValue{}
 
@@ -2269,21 +2299,40 @@ func ExtractNestedValues(env envs.Environment, _obj types.XValue, _path types.XV
 		}
 
 		if isArray {
-			if currentKey == "*" {
+			if idx, err := strconv.Atoi(currentKey); err == nil {
+				// Try to interpret the current key as an integer (array index)
+				// and add the corresponding array element to the stack
+				if idx >= 0 && idx < currentObjs.Count() {
+					stack = append(stack, stackItem{currentObjs.Get(idx), currentItem.path[1:]})
+				}
+			} else if currentKey == "*" {
 				// If the current key is "*", add all array elements to the stack
 				for _, nestedData := range currentObjs.Values() {
 					stack = append(stack, stackItem{nestedData, currentItem.path[1:]})
 				}
 			} else {
-				// Otherwise, try to interpret the current key as an integer (array index)
-				// and add the corresponding array element to the stack
-				idx, err := strconv.Atoi(currentKey)
-				if err == nil && idx >= 0 && idx < currentObjs.Count() {
-					stack = append(stack, stackItem{currentObjs.Get(idx), currentItem.path[1:]})
+				// Otherwise, unnest array items with the same path
+				for _, nestedData := range currentObjs.Values() {
+					stack = append(stack, stackItem{nestedData, currentItem.path})
 				}
 			}
 		} else {
-			if nestedItem, found := currentObj.Get(currentKey); found {
+			if strings.HasPrefix(currentKey, "[") && strings.HasSuffix(currentKey, "]") {
+				currentKeySplit := strings.Split(currentKey[1:len(currentKey)-1], ",")
+				selectedValues := make([]types.XValue, len(currentKeySplit))
+				hasAnyItemSelected := false
+				for i, currKey := range currentKeySplit {
+					if nestedItem, found := currentObj.Get(strings.Trim(currKey, " ")); found {
+						selectedValues[i] = nestedItem
+						hasAnyItemSelected = true
+					} else {
+						selectedValues[i] = types.NewXText("")
+					}
+				}
+				if hasAnyItemSelected {
+					stack = append(stack, stackItem{types.NewXArray(selectedValues...), currentItem.path[1:]})
+				}
+			} else if nestedItem, found := currentObj.Get(currentKey); found {
 				stack = append(stack, stackItem{nestedItem, currentItem.path[1:]})
 			}
 		}
