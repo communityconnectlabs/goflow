@@ -10,7 +10,7 @@ before_install:
  - sudo apt-get install -y pandoc
 
 script:
- - go test -p=1 -coverprofile=coverage.text -covermode=atomic github.com/greatnonprofits-nfp/goflow/...
+ - go test -p=1 -coverprofile=coverage.text -covermode=atomic github.com/communityconnectlabs/goflow/...
 
 after_success:
  - bash <(curl -s https://codecov.io/bash)
