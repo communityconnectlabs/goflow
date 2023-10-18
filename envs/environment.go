@@ -37,6 +37,7 @@ type Environment interface {
 	RedactionPolicy() RedactionPolicy
 	MaxValueLength() int
 	Links() []string
+	Config() map[string]interface{}
 
 	DefaultLanguage() Language
 	DefaultLocale() Locale
@@ -59,6 +60,7 @@ type environment struct {
 	redactionPolicy  RedactionPolicy
 	maxValueLength   int
 	links            []string
+	config           map[string]interface{}
 }
 
 func (e *environment) DateFormat() DateFormat           { return e.dateFormat }
@@ -70,6 +72,7 @@ func (e *environment) NumberFormat() *NumberFormat      { return e.numberFormat 
 func (e *environment) RedactionPolicy() RedactionPolicy { return e.redactionPolicy }
 func (e *environment) MaxValueLength() int              { return e.maxValueLength }
 func (e *environment) Links() []string                  { return e.links }
+func (e *environment) Config() map[string]interface{}   { return e.config }
 
 // DefaultLanguage is the first allowed language
 func (e *environment) DefaultLanguage() Language {
@@ -101,15 +104,16 @@ func (e *environment) Equal(other Environment) bool {
 //------------------------------------------------------------------------------------------
 
 type envEnvelope struct {
-	DateFormat       DateFormat      `json:"date_format" validate:"date_format"`
-	TimeFormat       TimeFormat      `json:"time_format" validate:"time_format"`
-	Timezone         string          `json:"timezone"`
-	AllowedLanguages []Language      `json:"allowed_languages,omitempty" validate:"omitempty,dive,language"`
-	NumberFormat     *NumberFormat   `json:"number_format,omitempty"`
-	DefaultCountry   Country         `json:"default_country,omitempty" validate:"omitempty,country"`
-	RedactionPolicy  RedactionPolicy `json:"redaction_policy" validate:"omitempty,eq=none|eq=urns"`
-	MaxValuelength   int             `json:"max_value_length"`
-	Links            []string        `json:"links"`
+	DateFormat       DateFormat             `json:"date_format" validate:"date_format"`
+	TimeFormat       TimeFormat             `json:"time_format" validate:"time_format"`
+	Timezone         string                 `json:"timezone"`
+	AllowedLanguages []Language             `json:"allowed_languages,omitempty" validate:"omitempty,dive,language"`
+	NumberFormat     *NumberFormat          `json:"number_format,omitempty"`
+	DefaultCountry   Country                `json:"default_country,omitempty" validate:"omitempty,country"`
+	RedactionPolicy  RedactionPolicy        `json:"redaction_policy" validate:"omitempty,eq=none|eq=urns"`
+	MaxValuelength   int                    `json:"max_value_length"`
+	Links            []string               `json:"links"`
+	Config           map[string]interface{} `json:"config"`
 }
 
 // ReadEnvironment reads an environment from the given JSON
@@ -130,6 +134,7 @@ func ReadEnvironment(data json.RawMessage) (Environment, error) {
 	env.redactionPolicy = envelope.RedactionPolicy
 	env.maxValueLength = envelope.MaxValuelength
 	env.links = envelope.Links
+	env.config = envelope.Config
 
 	tz, err := time.LoadLocation(envelope.Timezone)
 	if err != nil {
@@ -151,6 +156,7 @@ func (e *environment) toEnvelope() *envEnvelope {
 		RedactionPolicy:  e.redactionPolicy,
 		MaxValuelength:   e.maxValueLength,
 		Links:            e.links,
+		Config:           e.config,
 	}
 }
 
@@ -181,6 +187,7 @@ func NewBuilder() *EnvironmentBuilder {
 			maxValueLength:   640,
 			redactionPolicy:  RedactionPolicyNone,
 			links:            []string{""},
+			config:           map[string]interface{}{},
 		},
 	}
 }
