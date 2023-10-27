@@ -364,11 +364,11 @@ type Destination struct {
 }
 
 // ResolveDestinations resolves possible URN/channel destinations
-func (c *Contact) ResolveDestinations(all bool) []Destination {
+func (c *Contact) ResolveDestinations(all bool, defaultChannelUUID string) []Destination {
 	destinations := []Destination{}
 
 	for _, u := range c.urns {
-		channel := c.assets.Channels().GetForURN(u, assets.ChannelRoleSend)
+		channel := c.assets.Channels().GetForURN(u, assets.ChannelRoleSend, defaultChannelUUID)
 		if channel != nil {
 			destinations = append(destinations, Destination{URN: u, Channel: channel})
 			if !all {
@@ -381,7 +381,7 @@ func (c *Contact) ResolveDestinations(all bool) []Destination {
 
 // PreferredURN gets the preferred URN for this contact, i.e. the URN we would use for sending
 func (c *Contact) PreferredURN() *ContactURN {
-	destinations := c.ResolveDestinations(false)
+	destinations := c.ResolveDestinations(false, "")
 	if len(destinations) > 0 {
 		return destinations[0].URN
 	}
@@ -390,7 +390,7 @@ func (c *Contact) PreferredURN() *ContactURN {
 
 // PreferredChannel gets the preferred channel for this contact, i.e. the channel we would use for sending
 func (c *Contact) PreferredChannel() *Channel {
-	destinations := c.ResolveDestinations(false)
+	destinations := c.ResolveDestinations(false, "")
 	if len(destinations) > 0 {
 		return destinations[0].Channel
 	}

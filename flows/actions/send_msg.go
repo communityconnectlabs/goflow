@@ -1,12 +1,12 @@
 package actions
 
 import (
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 )
 
 func init() {
@@ -97,7 +97,11 @@ func (a *SendMsgAction) Execute(run flows.Run, step flows.Step, logModifier flow
 
 	evaluatedText, evaluatedAttachments, evaluatedQuickReplies := a.evaluateMessage(run, nil, a.Text, a.Attachments, a.QuickReplies, logEvent)
 
-	destinations := run.Contact().ResolveDestinations(a.AllURNs)
+	smsPreferredChannelUUID := run.Environment().Config()["sms_default_channel"]
+	if smsPreferredChannelUUID == nil {
+		smsPreferredChannelUUID = ""
+	}
+	destinations := run.Contact().ResolveDestinations(a.AllURNs, smsPreferredChannelUUID.(string))
 
 	sa := run.Session().Assets()
 
