@@ -42,7 +42,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "UTC"
+                    "timezone": "UTC",
+                    "config": {}
                 },
                 "runs": [
                     {
@@ -199,7 +200,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "UTC"
+                    "timezone": "UTC",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2000-01-01T00:00:00Z",

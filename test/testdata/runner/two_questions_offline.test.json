@@ -55,7 +55,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "runs": [
                     {
@@ -131,7 +132,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Two Questions",
@@ -229,7 +231,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2018-10-18T11:30:28.281119-05:00",
@@ -364,7 +367,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Two Questions",
@@ -465,7 +469,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2018-10-18T11:30:32.52256-05:00",
@@ -653,7 +658,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Two Questions",
@@ -720,7 +726,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "attachments": [
@@ -925,7 +932,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Two Questions",
@@ -1001,7 +1009,8 @@
             ],
             "redaction_policy": "none",
             "time_format": "tt:mm",
-            "timezone": "America/Los_Angeles"
+            "timezone": "America/Los_Angeles",
+            "config": {}
         },
         "flow": {
             "name": "Two Questions",

@@ -64,7 +64,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "runs": [
                     {
@@ -147,7 +148,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Number Test",
@@ -261,7 +263,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2021-01-11T16:14:09.76643-05:00",
@@ -421,7 +424,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Number Test",
@@ -535,7 +539,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2021-01-11T16:14:12.725289-05:00",
@@ -754,7 +759,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Number Test",
@@ -855,7 +861,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2021-01-11T16:14:22.220885-05:00",
@@ -1122,7 +1129,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Number Test",
@@ -1196,7 +1204,8 @@
             },
             "redaction_policy": "none",
             "time_format": "tt:mm",
-            "timezone": "America/Los_Angeles"
+            "timezone": "America/Los_Angeles",
+            "config": {}
         },
         "flow": {
             "name": "Number Test",

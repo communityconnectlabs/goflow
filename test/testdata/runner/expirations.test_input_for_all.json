@@ -81,7 +81,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "runs": [
                     {
@@ -223,7 +224,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Expiration Test A",
@@ -324,7 +326,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2020-10-12T15:38:17.508225-05:00",
@@ -533,7 +536,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Expiration Test A",
@@ -634,7 +638,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2020-10-12T15:38:23.165294-05:00",
@@ -903,7 +908,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Expiration Test A",
@@ -972,7 +978,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2020-10-12T15:38:29.501371-05:00",
@@ -1273,7 +1280,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Expiration Test A",
@@ -1347,7 +1355,8 @@
             },
             "redaction_policy": "none",
             "time_format": "tt:mm",
-            "timezone": "America/Los_Angeles"
+            "timezone": "America/Los_Angeles",
+            "config": {}
         },
         "flow": {
             "name": "Expiration Test A",

@@ -57,7 +57,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "hh:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "runs": [
                     {
@@ -133,7 +134,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "hh:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Favorites",
@@ -236,7 +238,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "hh:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2000-01-01T00:00:00Z",
@@ -382,7 +385,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "hh:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Favorites",
@@ -472,7 +476,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "hh:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2000-01-01T00:00:00Z",
@@ -668,7 +673,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "hh:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Favorites",
@@ -733,7 +739,8 @@
                 ""
             ],
             "time_format": "hh:mm",
-            "timezone": "America/Los_Angeles"
+            "timezone": "America/Los_Angeles",
+            "config": {}
         },
         "flow": {
             "name": "Favorites",

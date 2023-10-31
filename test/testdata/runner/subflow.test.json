@@ -89,7 +89,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "hh:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "runs": [
                     {
@@ -220,7 +221,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "hh:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Registration",
@@ -348,7 +350,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "hh:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "channel": {
@@ -569,7 +572,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "hh:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Registration",
@@ -631,7 +635,8 @@
                 ""
             ],
             "time_format": "hh:mm",
-            "timezone": "America/Los_Angeles"
+            "timezone": "America/Los_Angeles",
+            "config": {}
         },
         "flow": {
             "name": "Registration",

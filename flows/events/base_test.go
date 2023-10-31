@@ -9,6 +9,11 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
@@ -17,11 +22,6 @@ import (
 	"github.com/nyaruka/goflow/flows/routers/waits/hints"
 	"github.com/nyaruka/goflow/services/webhooks"
 	"github.com/nyaruka/goflow/test"
-	"github.com/nyaruka/gocommon/dates"
-	"github.com/nyaruka/gocommon/httpx"
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/assert"
@@ -394,7 +394,8 @@ func TestEventMarshaling(t *testing.T) {
 					},
 					"redaction_policy": "none",
 					"time_format": "tt:mm",
-					"timezone": "America/Guayaquil"
+					"timezone": "America/Guayaquil",
+					"config": {}
 				},
 				"type": "environment_refreshed"
 			}`,
