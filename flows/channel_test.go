@@ -87,7 +87,7 @@ func TestChannelSetGetForURN(t *testing.T) {
 	assert.Nil(t, rwOnly.GetForURN(flows.NewContactURN(urns.URN("tel:+593971234567"), nil), assets.ChannelRoleSend, ""))
 
 	// but use them if they do
-	assert.Equal(t, claro, all.GetForURN(flows.NewContactURN(urns.URN("tel:+57971234567"), nil), assets.ChannelRoleSend, ""))
+	assert.Equal(t, claro, all.GetForURN(flows.NewContactURN(urns.URN("tel:+57971234567"), nil), assets.ChannelRoleSend, string(claro.UUID())))
 
 	// or if they're implicitly international by having no country
 	assert.Equal(t, twilio, twOnly.GetForURN(flows.NewContactURN(urns.URN("tel:+57971234567"), nil), assets.ChannelRoleSend, ""))
