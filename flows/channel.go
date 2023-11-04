@@ -108,13 +108,15 @@ func (s *ChannelAssets) GetForURN(urn *ContactURN, role assets.ChannelRole, defa
 	// if caller has told us which channel to use for this URN, use that
 	if urn.Channel() != nil && urn.Channel().HasRole(role) {
 		return s.getDelegate(urn.Channel(), role)
-	} else if defaultChannelUUID != "" {
-		channel := s.Get(assets.ChannelUUID(defaultChannelUUID))
-		return s.getDelegate(channel, role)
 	}
 
 	// tel is a special case because we do number based matching
 	if urn.URN().Scheme() == urns.TelScheme {
+		if defaultChannelUUID != "" {
+			channel := s.Get(assets.ChannelUUID(defaultChannelUUID))
+			return s.getDelegate(channel, role)
+		}
+
 		countryCode := envs.DeriveCountryFromTel(urn.URN().Path())
 		candidates := make([]*Channel, 0)
 
