@@ -144,7 +144,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "UTC"
+                    "timezone": "UTC",
+                    "config": {}
                 },
                 "runs": [
                     {

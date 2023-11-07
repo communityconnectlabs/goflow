@@ -73,7 +73,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "hh:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "runs": [
                     {
@@ -159,7 +160,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "hh:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Two Questions",
@@ -192,7 +194,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "hh:mm",
-                        "timezone": "America/New_York"
+                        "timezone": "America/New_York",
+                        "config": {}
                     },
                     "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                     "type": "environment_refreshed"
@@ -327,7 +330,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "hh:mm",
-                    "timezone": "America/New_York"
+                    "timezone": "America/New_York",
+                    "config": {}
                 },
                 "input": {
                     "channel": {
@@ -387,7 +391,8 @@
                                     },
                                     "redaction_policy": "none",
                                     "time_format": "hh:mm",
-                                    "timezone": "America/New_York"
+                                    "timezone": "America/New_York",
+                                    "config": {}
                                 },
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "type": "environment_refreshed"
@@ -542,7 +547,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "hh:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Two Questions",
@@ -662,7 +668,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "hh:mm",
-                    "timezone": "America/New_York"
+                    "timezone": "America/New_York",
+                    "config": {}
                 },
                 "input": {
                     "channel": {
@@ -722,7 +729,8 @@
                                     },
                                     "redaction_policy": "none",
                                     "time_format": "hh:mm",
-                                    "timezone": "America/New_York"
+                                    "timezone": "America/New_York",
+                                    "config": {}
                                 },
                                 "step_uuid": "8720f157-ca1c-432f-9c0b-2014ddc77094",
                                 "type": "environment_refreshed"
@@ -947,7 +955,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "hh:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Two Questions",
@@ -996,7 +1005,8 @@
                     ""
                 ],
                 "time_format": "hh:mm",
-                "timezone": "America/New_York"
+                "timezone": "America/New_York",
+                "config": {}
             },
             "msg": {
                 "channel": {
@@ -1054,7 +1064,8 @@
                 ""
             ],
             "time_format": "hh:mm",
-            "timezone": "America/Los_Angeles"
+            "timezone": "America/Los_Angeles",
+            "config": {}
         },
         "flow": {
             "name": "Two Questions",

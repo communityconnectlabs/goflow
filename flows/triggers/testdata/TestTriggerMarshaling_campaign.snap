@@ -12,7 +12,8 @@
         "max_value_length": 640,
         "links": [
             ""
-        ]
+        ],
+        "config": {}
     },
     "flow": {
         "uuid": "7c37d7e5-6468-4b31-8109-ced2ef8b5ddc",
