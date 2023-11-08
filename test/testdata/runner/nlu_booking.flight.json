@@ -58,7 +58,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "runs": [
                     {
@@ -135,7 +136,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "NLU Test",
@@ -297,7 +299,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "input": {
                     "created_on": "2019-10-04T12:20:49.046879-05:00",
@@ -541,7 +544,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "NLU Test",
@@ -598,7 +602,8 @@
             },
             "redaction_policy": "none",
             "time_format": "tt:mm",
-            "timezone": "America/Los_Angeles"
+            "timezone": "America/Los_Angeles",
+            "config": {}
         },
         "flow": {
             "name": "NLU Test",

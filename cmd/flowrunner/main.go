@@ -153,7 +153,7 @@ func RunFlow(eng flows.Engine, assetsPath string, flowUUID assets.FlowUUID, init
 
 		// if we're starting a voice flow we need a channel connection
 		if flow.Type() == flows.FlowTypeVoice {
-			channel := sa.Channels().GetForURN(flows.NewContactURN(urns.URN("tel:+12065551212"), nil), assets.ChannelRoleCall)
+			channel := sa.Channels().GetForURN(flows.NewContactURN(urns.URN("tel:+12065551212"), nil), assets.ChannelRoleCall, "")
 			tb = tb.WithConnection(channel.Reference(), urns.URN("tel:+12065551212"), "", "")
 		}
 

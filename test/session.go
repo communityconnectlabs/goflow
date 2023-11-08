@@ -393,7 +393,8 @@ var sessionTrigger = `{
         "default_country": "US",
         "redaction_policy": "none",
         "time_format": "tt:mm",
-        "timezone": "America/Guayaquil"
+        "timezone": "America/Guayaquil",
+		"config": {}
     },
     "params": {"source": "website","address": {"state": "WA"}}
 }`
@@ -504,7 +505,8 @@ var voiceSessionTrigger = `{
         ],
         "redaction_policy": "none",
         "time_format": "hh:mm",
-        "timezone": "America/Guayaquil"
+        "timezone": "America/Guayaquil",
+		"config": {}
     }
 }`
 

@@ -24,7 +24,8 @@ const TypeEnvironmentRefreshed string = "environment_refreshed"
 //       "date_format": "YYYY-MM-DD",
 //       "time_format": "hh:mm",
 //       "timezone": "Africa/Kigali",
-//       "allowed_languages": ["eng", "fra"]
+//       "allowed_languages": ["eng", "fra"],
+//       "config": {}
 //     }
 //   }
 //

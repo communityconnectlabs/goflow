@@ -5,6 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
@@ -12,9 +15,6 @@ import (
 	"github.com/nyaruka/goflow/flows/runs"
 	"github.com/nyaruka/goflow/flows/triggers"
 	"github.com/nyaruka/goflow/test"
-	"github.com/nyaruka/gocommon/dates"
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/uuids"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -103,7 +103,8 @@ var sessionTrigger = `{
         ],
         "redaction_policy": "none",
         "time_format": "hh:mm",
-        "timezone": "America/Guayaquil"
+        "timezone": "America/Guayaquil",
+		"config": {}
     }
 }`
 

@@ -67,7 +67,8 @@
                     },
                     "redaction_policy": "none",
                     "time_format": "tt:mm",
-                    "timezone": "America/Los_Angeles"
+                    "timezone": "America/Los_Angeles",
+                    "config": {}
                 },
                 "runs": [
                     {
@@ -156,7 +157,8 @@
                         },
                         "redaction_policy": "none",
                         "time_format": "tt:mm",
-                        "timezone": "America/Los_Angeles"
+                        "timezone": "America/Los_Angeles",
+                        "config": {}
                     },
                     "flow": {
                         "name": "Field Clear",
