@@ -21,7 +21,7 @@ const TypeFeedbackRequested string = "feedback_requested"
 //       "channel": {"uuid": "61602f3e-f603-4c70-8a8f-c477505bf4bf", "name": "Twilio"},
 //       "urn": "tel:+12065551212",
 //       "star_rating_question": "How would you rate us?",
-//       "comment_question": "Please, leave a comment.",
+//       "comment_question": "Please, leave a comment."
 //     }
 //   }
 //
@@ -35,7 +35,7 @@ type FeedbackRequestedEvent struct {
 // NewMsgCreated creates a new outgoing msg event to a single contact
 func NewFeedbackRequestCreated(feedback *flows.FeedbackRequest) *FeedbackRequestedEvent {
 	return &FeedbackRequestedEvent{
-		BaseEvent: NewBaseEvent(TypeFeedbackRequested),
+		BaseEvent:       NewBaseEvent(TypeFeedbackRequested),
 		FeedbackRequest: feedback,
 	}
 }

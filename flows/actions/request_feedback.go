@@ -17,14 +17,14 @@ const TypeRequestFeedback string = "request_feedback"
 
 // RequestFeedbackAction can be used to send a request feedback form to contact.
 //
-// An [event:request_feedback] event will be created if the form could be sent.
+// An [event:feedback_requested] event will be created if the form could be sent.
 //
-//	{
-//	  "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
-//	  "type": "request_feedback",
-//	  "star_rating_question": "How would you rate us?",
-//	  "comment_question": "Please, leave a comment.",
-//	}
+//   {
+//     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
+//     "type": "request_feedback",
+//     "star_rating_question": "How would you rate us?",
+//     "comment_question": "Please, leave a comment."
+//   }
 //
 // @action request_feedback
 type RequestFeedbackAction struct {
@@ -59,6 +59,6 @@ func (a *RequestFeedbackAction) Execute(run flows.Run, step flows.Step, logModif
 
 		fmt.Print("Musy robyty")
 	}
-	
+
 	return nil
 }
