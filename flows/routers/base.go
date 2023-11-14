@@ -182,7 +182,23 @@ func (r *baseRouter) routeToCategory(run flows.Run, step flows.Step, categoryUUI
 		var extraJSON json.RawMessage
 		if extra != nil {
 			extraJSON, _ = jsonx.Marshal(extra)
+		} else {
+			var _json map[string]json.RawMessage
+			var _feedback map[string]interface{}
+			if err := jsonx.Unmarshal(json.RawMessage(operand), &_json); err == nil {
+				if feedbackResponse, ok := _json["feedback_response"]; ok {
+					extraJSON = feedbackResponse
+					if err := jsonx.Unmarshal(feedbackResponse, &_feedback); err == nil {
+						if comment, ok := _feedback["comment_answer"]; ok {
+							if newOperand, ok := comment.(string); ok {
+								operand = newOperand
+							}
+						}
+					}
+				}
+			}
 		}
+
 		result := flows.NewResult(r.resultName, match, category.Name(), localizedCategory, step.NodeUUID(), operand, extraJSON, dates.Now(), corrected)
 		run.SaveResult(result)
 		logEvent(events.NewRunResultChanged(result))

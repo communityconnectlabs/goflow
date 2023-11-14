@@ -28,6 +28,7 @@ const (
 	MsgTopicAccount  MsgTopic = "account"
 	MsgTopicPurchase MsgTopic = "purchase"
 	MsgTopicAgent    MsgTopic = "agent"
+	MsgTopicFeedback MsgTopic = "feedback"
 )
 
 // BaseMsg represents a incoming or outgoing message with the session contact
