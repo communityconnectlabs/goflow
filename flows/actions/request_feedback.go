@@ -1,8 +1,6 @@
 package actions
 
 import (
-	"fmt"
-
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
@@ -49,8 +47,6 @@ func (a *RequestFeedbackAction) Execute(run flows.Run, step flows.Step, logModif
 	}
 	destinations := run.Contact().ResolveDestinations(false, smsPreferredChannelUUID.(string))
 
-	fmt.Print("Robe")
-
 	// create a new feedback request for each URN+channel destination
 	for _, dest := range destinations {
 		var channelRef *assets.ChannelReference
@@ -60,8 +56,6 @@ func (a *RequestFeedbackAction) Execute(run flows.Run, step flows.Step, logModif
 
 		feedback_request := flows.NewFeedbackRequest(dest.URN.URN(), channelRef, a.StarRatingQuestion, a.CommentQuestion)
 		logEvent(events.NewFeedbackRequestCreated(feedback_request))
-
-		fmt.Print("Musy robyty")
 	}
 
 	return nil
