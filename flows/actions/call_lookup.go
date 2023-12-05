@@ -2,10 +2,11 @@ package actions
 
 import (
 	"encoding/json"
-	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/events"
 	"net/http"
 	"strings"
+
+	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/utils"
 )
 
@@ -31,6 +32,7 @@ const TypeCallLookup string = "call_lookup"
 //     		"rule": {"type": "equals", "verbose_name": "equals"},
 //     		"value": "Marcus"
 //     }],
+//     "return_all": true,
 //     "result_name": "lookup"
 //   }
 //
@@ -41,6 +43,7 @@ type CallLookupAction struct {
 
 	DB         map[string]string `json:"lookup_db"`
 	Queries    []LookupQuery     `json:"lookup_queries"`
+	ReturnAll  bool              `json:"return_all"`
 	ResultName string            `json:"result_name,omitempty"`
 }
 
@@ -51,11 +54,12 @@ type LookupQuery struct {
 }
 
 // NewCallLookupAction creates a new call lookup action
-func NewCallLookupAction(uuid flows.ActionUUID, lookupDb map[string]string, lookupQueries []LookupQuery, resultName string) *CallLookupAction {
+func NewCallLookupAction(uuid flows.ActionUUID, lookupDb map[string]string, lookupQueries []LookupQuery, returnAll bool, resultName string) *CallLookupAction {
 	return &CallLookupAction{
 		baseAction: newBaseAction(TypeCallLookup, uuid),
 		DB:         lookupDb,
 		Queries:    lookupQueries,
+		ReturnAll:  returnAll,
 		ResultName: resultName,
 	}
 }
@@ -102,6 +106,7 @@ func (a *CallLookupAction) Execute(run flows.Run, step flows.Step, logModifier f
 	body["queries"] = queries
 	body["db"] = a.DB["id"]
 	body["flow_step"] = true
+	body["return_all"] = a.ReturnAll
 
 	b, _ := json.Marshal(body)
 
