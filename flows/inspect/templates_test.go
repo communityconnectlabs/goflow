@@ -87,6 +87,7 @@ func TestTemplatePaths(t *testing.T) {
 		"$.nodes[*].actions[@.type=\"play_audio\"].audio_url",
 		"$.nodes[*].actions[@.type=\"remove_contact_groups\"].groups[*].name_match",
 		"$.nodes[*].actions[@.type=\"request_feedback\"].comment_question",
+		"$.nodes[*].actions[@.type=\"request_feedback\"].sms_question",
 		"$.nodes[*].actions[@.type=\"request_feedback\"].star_rating_question",
 		"$.nodes[*].actions[@.type=\"say_msg\"].text",
 		"$.nodes[*].actions[@.type=\"send_broadcast\"].attachments[*]",
