@@ -21,7 +21,8 @@ const TypeRequestFeedback string = "request_feedback"
 //     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
 //     "type": "request_feedback",
 //     "star_rating_question": "How would you rate us?",
-//     "comment_question": "Please, leave a comment."
+//     "comment_question": "Please, leave a comment.",
+//     "sms_question": "Please rate us from 1 to 5",
 //   }
 //
 // @action request_feedback
@@ -31,6 +32,7 @@ type RequestFeedbackAction struct {
 
 	StarRatingQuestion string `json:"star_rating_question" validate:"required" engine:"localized,evaluated"`
 	CommentQuestion    string `json:"comment_question" validate:"required" engine:"localized,evaluated"`
+	SMSQuestion        string `json:"sms_question" validate:"required" engine:"localized,evaluated"`
 }
 
 // Execute runs this action
@@ -54,7 +56,7 @@ func (a *RequestFeedbackAction) Execute(run flows.Run, step flows.Step, logModif
 			channelRef = assets.NewChannelReference(dest.Channel.UUID(), dest.Channel.Name())
 		}
 
-		feedback_request := flows.NewFeedbackRequest(dest.URN.URN(), channelRef, a.StarRatingQuestion, a.CommentQuestion)
+		feedback_request := flows.NewFeedbackRequest(dest.URN.URN(), channelRef, a.StarRatingQuestion, a.CommentQuestion, a.SMSQuestion)
 		logEvent(events.NewFeedbackRequestCreated(feedback_request))
 	}
 
