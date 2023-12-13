@@ -22,7 +22,7 @@ const TypeRequestFeedback string = "request_feedback"
 //     "type": "request_feedback",
 //     "star_rating_question": "How would you rate us?",
 //     "comment_question": "Please, leave a comment.",
-//     "sms_question": "Please rate us from 1 to 5",
+//     "sms_question": "Please rate us from 1 to 5"
 //   }
 //
 // @action request_feedback
