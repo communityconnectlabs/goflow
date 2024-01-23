@@ -71,6 +71,10 @@ func (a *SendBroadcastAction) Execute(run flows.Run, step flows.Step, logModifie
 	languages := append([]envs.Language{run.Flow().Language()}, run.Flow().Localization().Languages()...)
 
 	orgLinks := run.Environment().Links()
+	orgShortenerCustomLink := run.Environment().Config()["shortener_custom_domain"]
+	if orgShortenerCustomLink == nil {
+		orgShortenerCustomLink = ""
+	}
 
 	// evaluate the broadcast in each language we have translations for
 	for _, language := range languages {
@@ -78,7 +82,7 @@ func (a *SendBroadcastAction) Execute(run flows.Run, step flows.Step, logModifie
 
 		evaluatedText, evaluatedAttachments, evaluatedQuickReplies := a.evaluateMessage(run, languages, a.Text, a.Attachments, a.QuickReplies, logEvent)
 
-		text := generateTextWithShortenLinks(evaluatedText, orgLinks, string(run.Contact().UUID()), string(run.Flow().UUID()))
+		text := generateTextWithShortenLinks(evaluatedText, orgLinks, string(run.Contact().UUID()), string(run.Flow().UUID()), orgShortenerCustomLink.(string))
 
 		translations[language] = &events.BroadcastTranslation{
 			Text:         text,
