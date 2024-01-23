@@ -106,10 +106,14 @@ func (a *SendMsgAction) Execute(run flows.Run, step flows.Step, logModifier flow
 	sa := run.Session().Assets()
 
 	orgLinks := run.Environment().Links()
+	orgShortenerCustomLink := run.Environment().Config()["shortener_custom_domain"]
+	if orgShortenerCustomLink == nil {
+		orgShortenerCustomLink = ""
+	}
 
 	contactUUID := string(run.Contact().UUID())
 
-	evaluatedText = generateTextWithShortenLinks(evaluatedText, orgLinks, contactUUID, string(run.Flow().UUID()))
+	evaluatedText = generateTextWithShortenLinks(evaluatedText, orgLinks, contactUUID, string(run.Flow().UUID()), orgShortenerCustomLink.(string))
 
 	// create a new message for each URN+channel destination
 	for _, dest := range destinations {
@@ -142,7 +146,7 @@ func (a *SendMsgAction) Execute(run flows.Run, step flows.Step, logModifier flow
 					evaluatedVariables[i] = sub
 				}
 
-				evaluatedText = generateTextWithShortenLinks(translation.Substitute(evaluatedVariables), orgLinks, contactUUID, string(run.Flow().UUID()))
+				evaluatedText = generateTextWithShortenLinks(translation.Substitute(evaluatedVariables), orgLinks, contactUUID, string(run.Flow().UUID()), orgShortenerCustomLink.(string))
 				templating = flows.NewMsgTemplating(a.Templating.Template, translation.Language(), translation.Country(), evaluatedVariables, translation.Namespace())
 			}
 		}

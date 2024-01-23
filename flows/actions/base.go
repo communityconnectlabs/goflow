@@ -17,10 +17,10 @@ import (
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/utils"
 
-	"github.com/pkg/errors"
-	"net/http"
-	"io/ioutil"
 	"github.com/buger/jsonparser"
+	"github.com/pkg/errors"
+	"io/ioutil"
+	"net/http"
 )
 
 // max number of bytes to be saved to extra on a result
@@ -440,8 +440,11 @@ func findDestinationInLinks(dest string, links []string) (string, string) {
 	return "", ""
 }
 
-func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID string, flowUUID string) string {
+func generateTextWithShortenLinks(text string, orgLinks []string, contactUUID string, flowUUID string, host string) string {
 	URLshHost := utils.GetEnv(utils.URLshHost, "")
+	if host != "" {
+		URLshHost = host
+	}
 	URLshToken := utils.GetEnv(utils.URLshToken, "")
 	mailroomDomain := utils.GetEnv(utils.MailroomDomain, "")
 
