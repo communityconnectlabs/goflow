@@ -50,7 +50,7 @@ func (a *VoiceCallStatusAction) Validate() error {
 // Execute runs this action
 func (a *VoiceCallStatusAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	callSID := run.Session().Trigger().Connection().ExternalID()
-	mailroomDomain := utils.GetEnv(utils.MailroomDomain, "")
+	mailroomDomain := utils.GetEnv(utils.MailroomDomain, "example.com")
 	channelUUID := run.Session().Contact().PreferredChannel().UUID()
 
 	url := fmt.Sprintf("https://%s/mr/ivr/c/%s/voice-call-status?external_id=%s", mailroomDomain, channelUUID, callSID)

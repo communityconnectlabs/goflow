@@ -14,3 +14,5 @@ total-coverage:
 test-cover-total:
 	make test
 	make total-coverage
+
+.PHONY: test coverage-report test-cover total-coverage test-cover-total
