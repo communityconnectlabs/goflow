@@ -1,12 +1,12 @@
 package actions
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
+	"github.com/nyaruka/goflow/utils"
 	"net/http"
-	"strings"
-	"fmt"
-	"encoding/json"
 	"time"
 )
 
@@ -50,31 +50,16 @@ func (a *VoiceCallStatusAction) Validate() error {
 // Execute runs this action
 func (a *VoiceCallStatusAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	callSID := run.Session().Trigger().Connection().ExternalID()
-	twilioCreds := run.Session().Trigger().Connection().TwilioCredentials()
+	mailroomDomain := utils.GetEnv(utils.MailroomDomain, "example.com")
+	channelUUID := run.Session().Contact().PreferredChannel().UUID()
 
-	run.Session().Trigger().Connection().Channel().Type()
-
-	credentials := strings.Split(twilioCreds, ":")
-
-	// whether we don't have the credentials
-	if len(credentials) != 2 {
-		return nil
-	}
-
-	accountSID := credentials[0]
-	accountToken := credentials[1]
-
-	method := "GET"
-	url := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Calls/%s.json", accountSID, callSID)
-	body := ""
+	url := fmt.Sprintf("https://%s/mr/ivr/c/%s/voice-call-status?external_id=%s", mailroomDomain, channelUUID, callSID)
 
 	// build our request
-	req, err := http.NewRequest(method, url, strings.NewReader(body))
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
 	}
-
-	req.SetBasicAuth(accountSID, accountToken)
 
 	svc, err := run.Session().Engine().Services().Webhook(run.Session())
 	if err != nil {
@@ -90,13 +75,13 @@ func (a *VoiceCallStatusAction) Execute(run flows.Run, step flows.Step, logModif
 	if call != nil {
 		status := voiceCallStatus(call, err)
 
-		// whether status is empty, try 3x before goes to failure
+		// whether status is empty, try 5x before goes to failure
 		if status == "" {
-			sleepFor := int(5 * time.Second)
-			maxTries := 2
+			sleepFor := int(1 * time.Second)
+			maxTries := 4
 
 			for i := 0; i <= maxTries; i++ {
-				time.Sleep(time.Duration(i * sleepFor))
+				time.Sleep(time.Duration(sleepFor))
 
 				call, _ := svc.Call(run.Session(), req)
 				status = voiceCallStatus(call, err)
@@ -146,6 +131,7 @@ func voiceCallStatus(call *flows.WebhookCall, err error) flows.CallStatus {
 	voiceStatusCategories := map[string]flows.CallStatus{
 		"human":               flows.CallStatusVoiceHuman,
 		"unknown":             flows.CallStatusVoiceUnknown,
+		"machine":             flows.CallStatusMachineEndOther,
 		"machine_end_beep":    flows.CallStatusMachineEndBeep,
 		"machine_end_silence": flows.CallStatusMachineEndSilence,
 		"machine_end_other":   flows.CallStatusMachineEndOther,
