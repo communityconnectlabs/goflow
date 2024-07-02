@@ -83,8 +83,8 @@ func (a *VoiceCallStatusAction) Execute(run flows.Run, step flows.Step, logModif
 			for i := 0; i <= maxTries; i++ {
 				time.Sleep(time.Duration(sleepFor))
 
-				call, _ := svc.Call(run.Session(), req)
-				status = voiceCallStatus(call, err)
+				loopCall, callErr := svc.Call(run.Session(), req)
+				status = voiceCallStatus(loopCall, callErr)
 
 				if status != "" {
 					break
