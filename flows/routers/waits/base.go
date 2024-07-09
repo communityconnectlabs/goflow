@@ -2,13 +2,12 @@ package waits
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
 type readFunc func(data json.RawMessage) (flows.Wait, error)
@@ -48,7 +47,12 @@ func newBaseWait(typeName string, timeout *Timeout) baseWait {
 func (w *baseWait) Type() string { return w.type_ }
 
 // Timeout returns the timeout of this wait or nil if no timeout is set
-func (w *baseWait) Timeout() flows.Timeout { return w.timeout }
+func (w *baseWait) Timeout() flows.Timeout {
+	if w.timeout == nil {
+		return nil
+	}
+	return w.timeout
+}
 
 func (w *baseWait) expiresOn(run flows.Run) *time.Time {
 	expiresAfterMins := run.Flow().ExpireAfterMinutes()
@@ -65,11 +69,11 @@ func (w *baseWait) expiresOn(run flows.Run) *time.Time {
 
 type baseWaitEnvelope struct {
 	Type    string   `json:"type"              validate:"required"`
-	Timeout *Timeout `json:"timeout,omitempty" validate:"omitempty,dive"`
+	Timeout *Timeout `json:"timeout,omitempty" validate:"omitempty"`
 }
 
 // ReadWait reads a wait from the given JSON
-func ReadWait(data json.RawMessage) (flows.Wait, error) {
+func ReadWait(data []byte) (flows.Wait, error) {
 	typeName, err := utils.ReadTypeFromJSON(data)
 	if err != nil {
 		return nil, err
@@ -77,7 +81,7 @@ func ReadWait(data json.RawMessage) (flows.Wait, error) {
 
 	f := registeredTypes[typeName]
 	if f == nil {
-		return nil, errors.Errorf("unknown type: '%s'", typeName)
+		return nil, fmt.Errorf("unknown type: '%s'", typeName)
 	}
 	return f(data)
 }

@@ -2,6 +2,7 @@ package actions_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
@@ -30,18 +32,19 @@ import (
 	"github.com/nyaruka/goflow/test"
 	"github.com/nyaruka/goflow/utils"
 	"github.com/nyaruka/goflow/utils/smtpx"
-
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-var contactJSON = `{
+var defaultContactJSON = []byte(`{
 	"uuid": "5d76d86b-3bb9-4d5a-b822-c9d86f5d8e4f",
 	"name": "Ryan Lewis",
 	"language": "eng",
 	"timezone": "America/Guayaquil",
-	"urns": [],
+	"urns": [
+		"tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d&id=123",
+		"twitterid:54784326227#nyaruka"
+	],
 	"groups": [
 		{"uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d", "name": "Testers"},
 		{"uuid": "0ec97956-c451-48a0-a180-1ce766623e31", "name": "Males"}
@@ -52,7 +55,7 @@ var contactJSON = `{
 		}
 	},
 	"created_on": "2018-06-20T11:40:30.123456789-00:00"
-}`
+}`)
 
 func TestActionTypes(t *testing.T) {
 	assetsJSON, err := os.ReadFile("testdata/_assets.json")
@@ -79,8 +82,8 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		Description  string               `json:"description"`
 		HTTPMocks    *httpx.MockRequestor `json:"http_mocks,omitempty"`
 		SMTPError    string               `json:"smtp_error,omitempty"`
-		NoContact    bool                 `json:"no_contact,omitempty"`
-		NoURNs       bool                 `json:"no_urns,omitempty"`
+		Contact      json.RawMessage      `json:"contact,omitempty"`
+		HasTicket    bool                 `json:"has_ticket,omitempty"`
 		NoInput      bool                 `json:"no_input,omitempty"`
 		RedactURNs   bool                 `json:"redact_urns,omitempty"`
 		AsBatch      bool                 `json:"as_batch,omitempty"`
@@ -99,8 +102,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		Inspection        json.RawMessage `json:"inspection,omitempty"`
 	}{}
 
-	err = jsonx.Unmarshal(testFile, &tests)
-	require.NoError(t, err)
+	jsonx.MustUnmarshal(testFile, &tests)
 
 	defer dates.SetNowSource(dates.DefaultNowSource)
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
@@ -137,22 +139,22 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		// inject the action into a suitable node's actions in that flow
 		actionsPath := []string{"flows", fmt.Sprintf("[%d]", flowIndex), "nodes", "[0]", "actions"}
 		actionsJson := []byte(fmt.Sprintf("[%s]", string(tc.Action)))
-		assetsJSON = test.JSONReplace(assetsJSON, actionsPath, actionsJson)
+		testAssetsJSON := test.JSONReplace(assetsJSON, actionsPath, actionsJson)
 
 		// if we have a localization section, inject that too
 		if tc.Localization != nil {
 			localizationPath := []string{"flows", fmt.Sprintf("[%d]", flowIndex), "localization"}
-			assetsJSON = test.JSONReplace(assetsJSON, localizationPath, tc.Localization)
+			testAssetsJSON = test.JSONReplace(testAssetsJSON, localizationPath, tc.Localization)
 		}
 
 		// create session assets
-		sa, err := test.CreateSessionAssets(assetsJSON, "")
+		sa, err := test.CreateSessionAssets(testAssetsJSON, "")
 		require.NoError(t, err, "unable to create session assets in %s", testName)
 
 		// now try to read the flow, and if we expect a read error, check that
 		flow, err := sa.Flows().Get(flowUUID)
 		if tc.ReadError != "" {
-			rootErr := errors.Cause(err)
+			rootErr := test.RootError(err)
 			assert.EqualError(t, rootErr, tc.ReadError, "read error mismatch in %s", testName)
 			continue
 		} else {
@@ -160,26 +162,26 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		}
 
 		// optionally load our contact
-		var contact *flows.Contact
-		if !tc.NoContact {
-			contact, err = flows.ReadContact(sa, json.RawMessage(contactJSON), assets.PanicOnMissing)
-			require.NoError(t, err)
+		contactJSON := defaultContactJSON
+		if tc.Contact != nil {
+			contactJSON = tc.Contact
+		}
 
-			// optionally give our contact some URNs
-			if !tc.NoURNs {
-				channel := sa.Channels().Get("57f1078f-88aa-46f4-a59a-948a5739c03d")
-				contact.AddURN(urns.URN("tel:+12065551212?channel=57f1078f-88aa-46f4-a59a-948a5739c03d&id=123"), channel)
-				contact.AddURN(urns.URN("twitterid:54784326227#nyaruka"), nil)
-			}
+		contact, err := flows.ReadContact(sa, contactJSON, assets.PanicOnMissing)
+		require.NoError(t, err)
 
-			// and switch their language
-			if tc.Localization != nil {
-				contact.SetLanguage(envs.Language("spa"))
-			}
+		if tc.HasTicket {
+			topic := sa.Topics().Get("0d9a2c56-6fc2-4f27-93c5-a6322e26b740")
+			contact.SetTicket(flows.NewTicket("7f44b065-ec28-4d7a-bbb4-0bda3b75b19d", topic, "Help", nil))
+		}
+
+		// and switch their language
+		if tc.Localization != nil {
+			contact.SetLanguage(i18n.Language("spa"))
 		}
 
 		envBuilder := envs.NewBuilder().
-			WithAllowedLanguages([]envs.Language{"eng", "spa"}).
+			WithAllowedLanguages("eng", "spa").
 			WithDefaultCountry("RW")
 
 		if tc.RedactURNs {
@@ -224,10 +226,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 				if c.Type() == "wit" {
 					return wit.NewService(http.DefaultClient, nil, c, "123456789"), nil
 				}
-				return nil, errors.Errorf("no classification service available for %s", c.Reference())
-			}).
-			WithTicketServiceFactory(func(t *flows.Ticketer) (flows.TicketService, error) {
-				return test.NewTicketService(t), nil
+				return nil, fmt.Errorf("no classification service available for %s", c.Reference())
 			}).
 			WithAirtimeServiceFactory(func(flows.SessionAssets) (flows.AirtimeService, error) {
 				return dtone.NewService(http.DefaultClient, nil, "nyaruka", "123456789"), nil
@@ -257,7 +256,7 @@ func testActionType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		actual.Events, _ = jsonx.Marshal(runEvents[ignoreEventCount:])
 
 		if tc.Webhook != nil {
-			actual.Webhook, _ = jsonx.Marshal(run.Webhook())
+			actual.Webhook = jsonx.MustMarshal(run.Webhook())
 		}
 		if tc.ContactAfter != nil {
 			actual.ContactAfter, _ = jsonx.Marshal(session.Contact())
@@ -438,7 +437,6 @@ func TestConstructors(t *testing.T) {
 		{
 			actions.NewOpenTicket(
 				actionUUID,
-				assets.NewTicketerReference(assets.TicketerUUID("0baee364-07a7-4c93-9778-9f55a35903bb"), "Support Tickets"),
 				assets.NewTopicReference("472a7a73-96cb-4736-b567-056d987cc5b4", "Weather"),
 				"Where are my cookies?",
 				assets.NewUserReference("bob@nyaruka.com", "Bob McTickets"),
@@ -447,10 +445,6 @@ func TestConstructors(t *testing.T) {
 			`{
 				"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
 				"type": "open_ticket",
-				"ticketer": {
-					"uuid": "0baee364-07a7-4c93-9778-9f55a35903bb",
-					"name": "Support Tickets"
-				},
 				"topic": {
 					"uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
 					"name": "Weather"
@@ -559,6 +553,20 @@ func TestConstructors(t *testing.T) {
 			"addresses": ["bob@example.com"],
 			"subject": "Hi there",
 			"body": "So I was thinking..."
+		}`,
+		},
+		{
+			actions.NewRequestOptIn(
+				actionUUID,
+				assets.NewOptInReference("248be71d-78e9-4d71-a6c4-9981d369e5cb", "Joke Of The Day"),
+			),
+			`{
+			"type": "request_optin",
+			"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
+			"optin": {
+				"uuid": "248be71d-78e9-4d71-a6c4-9981d369e5cb",
+				"name": "Joke Of The Day"
+			}
 		}`,
 		},
 		{
@@ -755,8 +763,9 @@ func TestResthookPayload(t *testing.T) {
 	require.NoError(t, err)
 	run := session.Runs()[0]
 
-	payload, err := run.EvaluateTemplate(actions.ResthookPayload)
-	require.NoError(t, err)
+	log := test.NewEventLog()
+	payload, _ := run.EvaluateTemplate(actions.ResthookPayload, log.Log)
+	require.NoError(t, log.Error())
 
 	pretty, err := jsonx.MarshalPretty(json.RawMessage(payload))
 	require.NoError(t, err)
@@ -810,7 +819,7 @@ func TestStartSessionLoopProtection(t *testing.T) {
 	require.NoError(t, err)
 
 	flow := assets.NewFlowReference("5472a1c3-63e1-484f-8485-cc8ecb16a058", "Inception")
-	contact := flows.NewEmptyContact(sa, "Bob", envs.Language("eng"), nil)
+	contact := flows.NewEmptyContact(sa, "Bob", i18n.Language("eng"), nil)
 
 	eng := engine.NewBuilder().Build()
 	_, sprint, err := eng.NewSession(sa, triggers.NewBuilder(env, flow, contact).Manual().Build())
@@ -937,7 +946,7 @@ func TestStartSessionLoopProtectionWithInput(t *testing.T) {
 	require.NoError(t, err)
 
 	flow := assets.NewFlowReference("5472a1c3-63e1-484f-8485-cc8ecb16a058", "Inception")
-	contact := flows.NewEmptyContact(sa, "Bob", envs.Language("eng"), nil)
+	contact := flows.NewEmptyContact(sa, "Bob", i18n.Language("eng"), nil)
 
 	eng := engine.NewBuilder().Build()
 	session, sprint, err := eng.NewSession(sa, triggers.NewBuilder(env, flow, contact).Manual().Build())

@@ -8,27 +8,19 @@ import (
 	"strings"
 
 	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/stringsx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
-	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/modifiers"
 	"github.com/nyaruka/goflow/utils"
-	"github.com/pkg/errors"
 )
 
 // max number of bytes to be saved to extra on a result
 const resultExtraMaxBytes = 10000
-
-// max length of a message attachment (type:url)
-const maxAttachmentLength = 2048
-
-// max length of a quick reply
-const maxQuickReplyLength = 64
 
 // common category names
 const (
@@ -83,28 +75,23 @@ func (a *baseAction) Validate() error { return nil }
 func (a *baseAction) LocalizationUUID() uuids.UUID { return uuids.UUID(a.UUID_) }
 
 // helper function for actions that send a message (text + attachments) that must be localized and evalulated
-func (a *baseAction) evaluateMessage(run flows.Run, languages []envs.Language, actionText string, actionAttachments []string, actionQuickReplies []string, logEvent flows.EventCallback) (string, []utils.Attachment, []string, envs.Language) {
+func (a *baseAction) evaluateMessage(run flows.Run, languages []i18n.Language, actionText string, actionAttachments []string, actionQuickReplies []string, logEvent flows.EventCallback) (*flows.MsgContent, i18n.Language) {
 	// localize and evaluate the message text
 	localizedText, txtLang := run.GetTextArray(uuids.UUID(a.UUID()), "text", []string{actionText}, languages)
-	evaluatedText, err := run.EvaluateTemplate(localizedText[0])
-	if err != nil {
-		logEvent(events.NewError(err))
-	}
+	evaluatedText, _ := run.EvaluateTemplate(localizedText[0], logEvent)
 
 	// localize and evaluate the message attachments
 	translatedAttachments, attLang := run.GetTextArray(uuids.UUID(a.UUID()), "attachments", actionAttachments, languages)
 	evaluatedAttachments := make([]utils.Attachment, 0, len(translatedAttachments))
 	for _, a := range translatedAttachments {
-		evaluatedAttachment, err := run.EvaluateTemplate(a)
-		if err != nil {
-			logEvent(events.NewError(err))
-		}
+		evaluatedAttachment, _ := run.EvaluateTemplate(a, logEvent)
+		evaluatedAttachment = strings.TrimSpace(evaluatedAttachment)
 		if evaluatedAttachment == "" {
 			logEvent(events.NewErrorf("attachment text evaluated to empty string, skipping"))
 			continue
 		}
-		if len(evaluatedAttachment) > maxAttachmentLength {
-			logEvent(events.NewErrorf("evaluated attachment is longer than %d limit, skipping", maxAttachmentLength))
+		if len(evaluatedAttachment) > flows.MaxAttachmentLength {
+			logEvent(events.NewErrorf("evaluated attachment is longer than %d limit, skipping", flows.MaxAttachmentLength))
 			continue
 		}
 		evaluatedAttachments = append(evaluatedAttachments, utils.Attachment(evaluatedAttachment))
@@ -114,20 +101,17 @@ func (a *baseAction) evaluateMessage(run flows.Run, languages []envs.Language, a
 	translatedQuickReplies, qrsLang := run.GetTextArray(uuids.UUID(a.UUID()), "quick_replies", actionQuickReplies, languages)
 	evaluatedQuickReplies := make([]string, 0, len(translatedQuickReplies))
 	for _, qr := range translatedQuickReplies {
-		evaluatedQuickReply, err := run.EvaluateTemplate(qr)
-		if err != nil {
-			logEvent(events.NewError(err))
-		}
+		evaluatedQuickReply, _ := run.EvaluateTemplate(qr, logEvent)
 		if evaluatedQuickReply == "" {
 			logEvent(events.NewErrorf("quick reply text evaluated to empty string, skipping"))
 			continue
 		}
-		evaluatedQuickReplies = append(evaluatedQuickReplies, stringsx.TruncateEllipsis(evaluatedQuickReply, maxQuickReplyLength))
+		evaluatedQuickReplies = append(evaluatedQuickReplies, stringsx.TruncateEllipsis(evaluatedQuickReply, flows.MaxQuickReplyLength))
 	}
 
 	// although it's possible for the different parts of the message to have different languages, we want to resolve
 	// a single language based on what the user actually provided for this message
-	var lang envs.Language
+	var lang i18n.Language
 	if localizedText[0] != "" {
 		lang = txtLang
 	} else if len(translatedAttachments) > 0 {
@@ -136,7 +120,7 @@ func (a *baseAction) evaluateMessage(run flows.Run, languages []envs.Language, a
 		lang = qrsLang
 	}
 
-	return evaluatedText, evaluatedAttachments, evaluatedQuickReplies, lang
+	return &flows.MsgContent{Text: evaluatedText, Attachments: evaluatedAttachments, QuickReplies: evaluatedQuickReplies}, lang
 }
 
 // helper to save a run result and log it as an event
@@ -164,21 +148,12 @@ func (a *baseAction) saveWebhookResult(run flows.Run, step flows.Step, name stri
 	a.saveResult(run, step, name, value, category, "", input, extra, logEvent)
 }
 
-func (a *baseAction) updateWebhook(run flows.Run, call *flows.WebhookCall) {
-	parsed := types.JSONToXValue(call.ResponseJSON)
-
-	switch typed := parsed.(type) {
-	case nil, types.XError:
-		run.SetWebhook(types.XObjectEmpty)
-	default:
-		run.SetWebhook(typed)
-	}
-}
-
 // helper to apply a contact modifier
 func (a *baseAction) applyModifier(run flows.Run, mod flows.Modifier, logModifier flows.ModifierCallback, logEvent flows.EventCallback) bool {
 	logModifier(mod)
-	return modifiers.Apply(run.Environment(), run.Session().Engine().Services(), run.Session().Assets(), run.Contact(), mod, logEvent)
+
+	s := run.Session()
+	return modifiers.Apply(s.Engine(), s.MergedEnvironment(), s.Assets(), run.Contact(), mod, logEvent)
 }
 
 // helper to log a failure
@@ -248,10 +223,7 @@ func (a *otherContactsAction) resolveRecipients(run flows.Run, logEvent flows.Ev
 
 	// evaluate the legacy variables
 	for _, legacyVar := range a.LegacyVars {
-		evaluatedLegacyVar, err := run.EvaluateTemplate(legacyVar)
-		if err != nil {
-			logEvent(events.NewError(err))
-		}
+		evaluatedLegacyVar, _ := run.EvaluateTemplate(legacyVar, logEvent)
 
 		evaluatedLegacyVar = strings.TrimSpace(evaluatedLegacyVar)
 
@@ -266,13 +238,12 @@ func (a *otherContactsAction) resolveRecipients(run flows.Run, logEvent flows.Ev
 			// next up try it as a URN
 			urn := urns.URN(evaluatedLegacyVar)
 			if urn.Validate() == nil {
-				urn = urn.Normalize(string(run.Environment().DefaultCountry()))
-				urnList = append(urnList, urn)
+				urnList = append(urnList, urn.Normalize())
 			} else {
 				// if that fails, try to parse as phone number
-				parsedTel := utils.ParsePhoneNumber(evaluatedLegacyVar, string(run.Environment().DefaultCountry()))
+				parsedTel := utils.ParsePhoneNumber(evaluatedLegacyVar, run.Session().MergedEnvironment().DefaultCountry())
 				if parsedTel != "" {
-					urn, _ := urns.NewURNFromParts(urns.TelScheme, parsedTel, "", "")
+					urn, _ := urns.New(urns.Phone, parsedTel)
 					urnList = append(urnList, urn)
 				} else {
 					logEvent(events.NewErrorf("'%s' couldn't be resolved to a contact, group or URN", evaluatedLegacyVar))
@@ -282,7 +253,7 @@ func (a *otherContactsAction) resolveRecipients(run flows.Run, logEvent flows.Ev
 	}
 
 	// evaluate contact query
-	contactQuery, _ := run.EvaluateTemplateText(a.ContactQuery, flows.ContactQueryEscaping, true)
+	contactQuery, _ := run.EvaluateTemplateText(a.ContactQuery, flows.ContactQueryEscaping, true, logEvent)
 	contactQuery = strings.TrimSpace(contactQuery)
 
 	return groupRefs, contactRefs, contactQuery, urnList, nil
@@ -305,10 +276,9 @@ func resolveGroups(run flows.Run, references []*assets.GroupReference, logEvent 
 
 		if ref.Variable() {
 			// is an expression that evaluates to an existing group's name
-			evaluatedName, err := run.EvaluateTemplate(ref.NameMatch)
-			if err != nil {
-				logEvent(events.NewError(err))
-			} else {
+			evaluatedName, ok := run.EvaluateTemplate(ref.NameMatch, logEvent)
+			if ok {
+
 				// look up the set of all groups to see if such a group exists
 				group = groupAssets.FindByName(evaluatedName)
 				if group == nil {
@@ -341,10 +311,8 @@ func resolveLabels(run flows.Run, references []*assets.LabelReference, logEvent 
 
 		if ref.Variable() {
 			// is an expression that evaluates to an existing label's name
-			evaluatedName, err := run.EvaluateTemplate(ref.NameMatch)
-			if err != nil {
-				logEvent(events.NewError(err))
-			} else {
+			evaluatedName, ok := run.EvaluateTemplate(ref.NameMatch, logEvent)
+			if ok {
 				// look up the set of all labels to see if such a label exists
 				label = labelAssets.FindByName(evaluatedName)
 				if label == nil {
@@ -374,10 +342,8 @@ func resolveUser(run flows.Run, ref *assets.UserReference, logEvent flows.EventC
 
 	if ref.Variable() {
 		// is an expression that evaluates to an existing user's email
-		evaluatedEmail, err := run.EvaluateTemplate(ref.EmailMatch)
-		if err != nil {
-			logEvent(events.NewError(err))
-		} else {
+		evaluatedEmail, ok := run.EvaluateTemplate(ref.EmailMatch, logEvent)
+		if ok {
 			// look up to see if such a user exists
 			user = userAssets.Get(evaluatedEmail)
 			if user == nil {
@@ -395,8 +361,8 @@ func resolveUser(run flows.Run, ref *assets.UserReference, logEvent flows.EventC
 	return user
 }
 
-func currentLocale(run flows.Run, lang envs.Language) envs.Locale {
-	return envs.NewLocale(lang, run.Environment().DefaultCountry())
+func currentLocale(run flows.Run, lang i18n.Language) i18n.Locale {
+	return i18n.NewLocale(lang, run.Session().MergedEnvironment().DefaultCountry())
 }
 
 //------------------------------------------------------------------------------------------
@@ -412,7 +378,7 @@ func ReadAction(data json.RawMessage) (flows.Action, error) {
 
 	f := registeredTypes[typeName]
 	if f == nil {
-		return nil, errors.Errorf("unknown type: '%s'", typeName)
+		return nil, fmt.Errorf("unknown type: '%s'", typeName)
 	}
 
 	action := f()

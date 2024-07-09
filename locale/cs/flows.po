@@ -6,7 +6,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-01-18 13:23-0500\n"
+"POT-Creation-Date: 2024-03-04 15:09-0500\n"
 "Last-Translator: trendspotter <jirka.p@volny.cz>, 2021\n"
 "Language-Team: Czech (https://www.transifex.com/rapidpro/teams/226/cs/)\n"
 "Language: cs\n"
@@ -330,6 +330,11 @@ msgstr "Vrací `value1`, pokud je `test` pravdivý, nebo `value2`, pokud není."
 msgid "Returns `value` if is not empty or an error, otherwise it returns `default`."
 msgstr "Vrací `value`, pokud není prázdný nebo se jedná o chybu, jinak vrací `default`."
 
+#, fuzzy
+#| msgid "Returns a new array with the values of `array` sorted."
+msgid "Returns a new array with the items from `array` that when passed to `func` return true."
+msgstr "Vrátí nové pole s hodnotami `array` seřazenými."
+
 msgid "Returns a new array with the values of `array` reversed."
 msgstr "Vrátí nové pole s obrácenými hodnotami pole `array`."
 
@@ -418,6 +423,11 @@ msgstr "Vrací číslo týdne (1-54) pro `date`."
 
 msgid "Returns the word at `index` in `text`."
 msgstr "Vrátí slovo v `index` v `text`."
+
+#, fuzzy
+#| msgid "Returns the JSON representation of `value`."
+msgid "Returns whether `array` contains `value`."
+msgstr "Vrací JSON reprezentaci hodnoty `value`."
 
 msgid "Returns whether `value` is an error"
 msgstr "Vrací, zda `value` je chyba"
@@ -638,6 +648,9 @@ msgid ""
 "\"m\" for minutes, \"s\" for seconds."
 msgstr "Platné doby trvání jsou \"Y\" pro roky, \"M\" pro měsíce, \"W\" pro týdny, \"D\" pro dny, \"h\" pro hodiny, \"m\" pro minuty, \"s\" pro sekundy."
 
+msgid "Values in `array` must be a sortable type and be of the same type."
+msgstr ""
+
 msgid "You can optionally pass in the number of decimal places to round to as `places`."
 msgstr "Jako `places` můžete volitelně zadat počet desetinných míst, na která se má zaokrouhlovat."
 
@@ -678,6 +691,11 @@ msgstr "UUID uzlu"
 
 msgid "the UUID of the node in the flow that generated the result"
 msgstr "UUID uzlu v toku, který vygeneroval výsledek."
+
+#, fuzzy
+#| msgid "the UUID of the topic"
+msgid "the UUID of the optin"
+msgstr "UUID tématu"
 
 msgid "the UUID of the run"
 msgstr "UUID běhu"
@@ -760,9 +778,6 @@ msgstr "datum ukončení běhu"
 msgid "the external ID of the input"
 msgstr "externí ID vstupu"
 
-msgid "the extra data of the result such as a webhook response"
-msgstr "další data výsledku, jako je odpověď webhooku."
-
 msgid "the first name of the contact"
 msgstr "jméno kontaktu"
 
@@ -793,14 +808,21 @@ msgstr "jazyk kontaktu jako 3-písmenný kód ISO."
 msgid "the last child run"
 msgstr "poslední běh podřazeného"
 
-msgid "the last opened ticket for the contact"
-msgstr "poslední otevřený tiket pro kontakt"
-
 msgid "the last seen date of the contact"
 msgstr "datum posledního setkání s kontaktem"
 
+#, fuzzy
+#| msgid "the last child run"
+msgid "the last webhook call "
+msgstr "poslední běh podřazeného"
+
 msgid "the localized category of the result"
 msgstr "lokalizovaná kategorie výsledku"
+
+#, fuzzy
+#| msgid "the name or URN"
+msgid "the method and URL"
+msgstr "Název URN"
 
 msgid "the name"
 msgstr "název"
@@ -816,6 +838,11 @@ msgstr "název toku"
 
 msgid "the name of the group"
 msgstr "název skupiny"
+
+#, fuzzy
+#| msgid "the name of the topic"
+msgid "the name of the optin"
+msgstr "název tématu"
 
 msgid "the name of the result"
 msgstr "název výsledku"
@@ -835,8 +862,15 @@ msgstr "název e-mailu"
 msgid "the numeric ID of the contact"
 msgstr "číselné ID kontaktu"
 
-msgid "the open tickets of the contact"
+#, fuzzy
+#| msgid "the open tickets of the contact"
+msgid "the open ticket for the contact"
 msgstr "otevřené tikety kontaktu"
+
+#, fuzzy
+#| msgid "the creation date of the result"
+msgid "the optional extra data of the result"
+msgstr "datum vytvoření výsledku"
 
 msgid "the origin of this session if this is a manual trigger"
 msgstr "původ této relace, pokud se jedná o ruční spouštění."
@@ -847,14 +881,22 @@ msgstr "parametry předané spouštěči"
 msgid "the parent of the run"
 msgstr "nadřízený běhu"
 
-msgid "the parsed JSON response of the last webhook call"
-msgstr "zpracovaná odpověď JSON posledního volání webhooku."
-
 msgid "the preferred URN of the contact"
 msgstr "preferované URN kontaktu"
 
 msgid "the preferred channel of the contact"
 msgstr "preferovaný kanál kontaktu"
+
+msgid "the response body if valid JSON"
+msgstr ""
+
+msgid "the response headers"
+msgstr ""
+
+#, fuzzy
+#| msgid "the current status of the run"
+msgid "the response status code"
+msgstr "aktuální stav běhu"
 
 msgid "the result for {key}"
 msgstr "výsledek pro {key}"
@@ -905,3 +947,12 @@ msgstr "{key} pro kontakt"
 
 msgid "{type} URN for the contact"
 msgstr "{type} URN pro kontakt"
+
+#~ msgid "the extra data of the result such as a webhook response"
+#~ msgstr "další data výsledku, jako je odpověď webhooku."
+
+#~ msgid "the last opened ticket for the contact"
+#~ msgstr "poslední otevřený tiket pro kontakt"
+
+#~ msgid "the parsed JSON response of the last webhook call"
+#~ msgstr "zpracovaná odpověď JSON posledního volání webhooku."

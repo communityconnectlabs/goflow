@@ -11,9 +11,9 @@ type Source interface {
 	Groups() ([]Group, error)
 	Labels() ([]Label, error)
 	Locations() ([]LocationHierarchy, error)
+	OptIns() ([]OptIn, error)
 	Resthooks() ([]Resthook, error)
 	Templates() ([]Template, error)
-	Ticketers() ([]Ticketer, error)
 	Topics() ([]Topic, error)
 	Users() ([]User, error)
 }

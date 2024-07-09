@@ -39,7 +39,7 @@
                     ],
                     "date_format": "YYYY-MM-DD",
                     "default_country": "US",
-                    "max_value_length": 640,
+                    "input_collation": "default",
                     "number_format": {
                         "decimal_symbol": ".",
                         "digit_grouping_symbol": ","
@@ -88,13 +88,6 @@
                         },
                         "urn": "tel:+12065551212"
                     },
-                    "connection": {
-                        "channel": {
-                            "name": "Twilio",
-                            "uuid": "a78930fe-6a40-4aa8-99c3-e61b02f45ca1"
-                        },
-                        "urn": "tel:+12065551212"
-                    },
                     "contact": {
                         "created_on": "2018-01-01T12:00:00Z",
                         "fields": {
@@ -120,7 +113,7 @@
                         ],
                         "date_format": "YYYY-MM-DD",
                         "default_country": "US",
-                        "max_value_length": 640,
+                        "input_collation": "default",
                         "number_format": {
                             "decimal_symbol": ".",
                             "digit_grouping_symbol": ","
@@ -188,7 +181,7 @@
                     ],
                     "date_format": "YYYY-MM-DD",
                     "default_country": "US",
-                    "max_value_length": 640,
+                    "input_collation": "default",
                     "number_format": {
                         "decimal_symbol": ".",
                         "digit_grouping_symbol": ","
@@ -266,13 +259,6 @@
                         },
                         "urn": "tel:+12065551212"
                     },
-                    "connection": {
-                        "channel": {
-                            "name": "Twilio",
-                            "uuid": "a78930fe-6a40-4aa8-99c3-e61b02f45ca1"
-                        },
-                        "urn": "tel:+12065551212"
-                    },
                     "contact": {
                         "created_on": "2018-01-01T12:00:00Z",
                         "fields": {
@@ -298,7 +284,7 @@
                         ],
                         "date_format": "YYYY-MM-DD",
                         "default_country": "US",
-                        "max_value_length": 640,
+                        "input_collation": "default",
                         "number_format": {
                             "decimal_symbol": ".",
                             "digit_grouping_symbol": ","
@@ -330,7 +316,7 @@
         }
     ],
     "trigger": {
-        "connection": {
+        "call": {
             "channel": {
                 "name": "Twilio",
                 "uuid": "a78930fe-6a40-4aa8-99c3-e61b02f45ca1"
@@ -362,7 +348,6 @@
             ],
             "date_format": "YYYY-MM-DD",
             "default_country": "US",
-            "max_value_length": 640,
             "number_format": {
                 "decimal_symbol": ".",
                 "digit_grouping_symbol": ","

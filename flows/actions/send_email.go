@@ -1,13 +1,13 @@
 package actions
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -53,10 +53,7 @@ func NewSendEmail(uuid flows.ActionUUID, addresses []string, subject string, bod
 // Execute creates the email events
 func (a *SendEmailAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
 	localizedSubject, _ := run.GetText(uuids.UUID(a.UUID()), "subject", a.Subject)
-	evaluatedSubject, err := run.EvaluateTemplate(localizedSubject)
-	if err != nil {
-		logEvent(events.NewError(err))
-	}
+	evaluatedSubject, _ := run.EvaluateTemplate(localizedSubject, logEvent)
 
 	// make sure the subject is single line - replace '\t\n\r\f\v' to ' '
 	evaluatedSubject = regexp.MustCompile(`\s+`).ReplaceAllString(evaluatedSubject, " ")
@@ -68,10 +65,7 @@ func (a *SendEmailAction) Execute(run flows.Run, step flows.Step, logModifier fl
 	}
 
 	localizedBody, _ := run.GetText(uuids.UUID(a.UUID()), "body", a.Body)
-	evaluatedBody, err := run.EvaluateTemplate(localizedBody)
-	if err != nil {
-		logEvent(events.NewError(err))
-	}
+	evaluatedBody, _ := run.EvaluateTemplate(localizedBody, logEvent)
 	if evaluatedBody == "" {
 		logEvent(events.NewErrorf("email body evaluated to empty string, skipping"))
 		return nil
@@ -80,10 +74,7 @@ func (a *SendEmailAction) Execute(run flows.Run, step flows.Step, logModifier fl
 	evaluatedAddresses := make([]string, 0)
 
 	for _, address := range a.Addresses {
-		evaluatedAddress, err := run.EvaluateTemplate(address)
-		if err != nil {
-			logEvent(events.NewError(err))
-		}
+		evaluatedAddress, _ := run.EvaluateTemplate(address, logEvent)
 		if evaluatedAddress == "" {
 			logEvent(events.NewErrorf("email address evaluated to empty string, skipping"))
 			continue
@@ -108,7 +99,7 @@ func (a *SendEmailAction) Execute(run flows.Run, step flows.Step, logModifier fl
 
 	err = svc.Send(evaluatedAddresses, evaluatedSubject, evaluatedBody)
 	if err != nil {
-		logEvent(events.NewError(errors.Wrap(err, "unable to send email")))
+		logEvent(events.NewError(fmt.Errorf("unable to send email: %w", err)))
 	} else {
 		logEvent(events.NewEmailSent(evaluatedAddresses, evaluatedSubject, evaluatedBody))
 	}

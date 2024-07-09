@@ -3,6 +3,7 @@ package flows
 import (
 	"fmt"
 	"net/url"
+	"slices"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/nyaruka/gocommon/urns"
@@ -90,7 +91,7 @@ func (u *ContactURN) SetChannel(channel *Channel) {
 		parsedQuery.Del("channel")
 	}
 
-	urn, _ := urns.NewURNFromParts(scheme, path, parsedQuery.Encode(), display)
+	urn, _ := urns.NewFromParts(scheme, path, parsedQuery, display)
 	u.urn = urn
 }
 
@@ -111,7 +112,7 @@ func (u *ContactURN) withoutQuery(redact bool) urns.URN {
 		return urns.URN(fmt.Sprintf("%s:%s", scheme, redacted))
 	}
 
-	urn, _ := urns.NewURNFromParts(scheme, path, "", display)
+	urn, _ := urns.NewFromParts(scheme, path, nil, display)
 
 	return urn
 }
@@ -173,11 +174,11 @@ func (l URNList) clone() URNList {
 	return urns
 }
 
-// WithScheme returns a new URN list containing of only URNs of the given scheme
-func (l URNList) WithScheme(scheme string) URNList {
+// WithScheme returns a new URN list containing of only URNs of the given schemes
+func (l URNList) WithScheme(schemes ...string) URNList {
 	var matching URNList
 	for _, u := range l {
-		if u.urn.Scheme() == scheme {
+		if slices.Contains(schemes, u.urn.Scheme()) {
 			matching = append(matching, u)
 		}
 	}
@@ -207,9 +208,9 @@ func (l URNList) MapContext(env envs.Environment) map[string]types.XValue {
 	}
 
 	// and add nils for all other schemes
-	for scheme := range urns.ValidSchemes {
-		if _, seen := byScheme[scheme]; !seen {
-			byScheme[scheme] = nil
+	for _, scheme := range urns.Schemes {
+		if _, seen := byScheme[scheme.Prefix]; !seen {
+			byScheme[scheme.Prefix] = nil
 		}
 	}
 

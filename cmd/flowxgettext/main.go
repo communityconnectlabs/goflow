@@ -8,12 +8,11 @@ import (
 	"os"
 
 	"github.com/buger/jsonparser"
-	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/definition"
 	"github.com/nyaruka/goflow/flows/definition/migrations"
 	"github.com/nyaruka/goflow/flows/translation"
-	"github.com/pkg/errors"
 )
 
 const usage = `usage: flowxgettext [flags] <flowfile>...`
@@ -32,13 +31,13 @@ func main() {
 		flags.PrintDefaults()
 		os.Exit(1)
 	}
-	if err := FlowXGetText(envs.Language(lang), excludeArgs, args, os.Stdout); err != nil {
+	if err := FlowXGetText(i18n.Language(lang), excludeArgs, args, os.Stdout); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 }
 
-func FlowXGetText(lang envs.Language, excludeArgs bool, paths []string, writer io.Writer) error {
+func FlowXGetText(lang i18n.Language, excludeArgs bool, paths []string, writer io.Writer) error {
 	sources, err := loadFlows(paths)
 	if err != nil {
 		return err
@@ -65,7 +64,7 @@ func loadFlows(paths []string) ([]flows.Flow, error) {
 	for _, path := range paths {
 		fileJSON, err := os.ReadFile(path)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error reading flow file '%s'", path)
+			return nil, fmt.Errorf("error reading flow file '%s': %w", path, err)
 		}
 
 		var flowDefs []json.RawMessage
@@ -84,7 +83,7 @@ func loadFlows(paths []string) ([]flows.Flow, error) {
 		for _, flowDef := range flowDefs {
 			flow, err := definition.ReadFlow(flowDef, &migrations.Config{BaseMediaURL: "http://temba.io"})
 			if err != nil {
-				return nil, errors.Wrapf(err, "error reading flow '%s'", path)
+				return nil, fmt.Errorf("error reading flow '%s': %w", path, err)
 			}
 			flows = append(flows, flow)
 		}

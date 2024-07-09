@@ -2,38 +2,32 @@ package routers
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/routers/waits"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
-type readFunc func(json.RawMessage) (flows.Router, error)
-
-var registeredTypes = map[string]readFunc{}
+var registeredTypes = map[string](func() flows.Router){}
 
 // registers a new type of router
-func registerType(name string, f readFunc) {
-	registeredTypes[name] = f
+func registerType(name string, initFunc func() flows.Router) {
+	registeredTypes[name] = initFunc
 }
 
-// RegisteredTypes gets the registered types of router
-func RegisteredTypes() []string {
-	typeNames := make([]string, 0, len(registeredTypes))
-	for typeName := range registeredTypes {
-		typeNames = append(typeNames, typeName)
-	}
-	return typeNames
+// RegisteredTypes gets the registered types
+func RegisteredTypes() map[string](func() flows.Router) {
+	return registeredTypes
 }
 
 // baseRouter is the base class for all router types
@@ -60,18 +54,18 @@ func (r *baseRouter) Categories() []flows.Category { return r.categories }
 
 // AllowTimeout returns whether this router can be resumed at with a timeout
 func (r *baseRouter) AllowTimeout() bool {
-	return r.wait != nil && !utils.IsNil(r.wait.Timeout())
+	return r.wait != nil && r.wait.Timeout() != nil
 }
 
 // ResultName returns the name which the result of this router should be saved as (if any)
 func (r *baseRouter) ResultName() string { return r.resultName }
 
 // EnumerateTemplates enumerates all expressions on this object and its children
-func (r *baseRouter) EnumerateTemplates(localization flows.Localization, include func(envs.Language, string)) {
+func (r *baseRouter) EnumerateTemplates(localization flows.Localization, include func(i18n.Language, string)) {
 }
 
 // EnumerateDependencies enumerates all dependencies on this object
-func (r *baseRouter) EnumerateDependencies(localization flows.Localization, include func(envs.Language, assets.Reference)) {
+func (r *baseRouter) EnumerateDependencies(localization flows.Localization, include func(i18n.Language, assets.Reference)) {
 }
 
 // EnumerateResults enumerates all potential results on this object
@@ -99,18 +93,18 @@ func (r *baseRouter) EnumerateLocalizables(include func(uuids.UUID, string, []st
 func (r *baseRouter) validate(flow flows.Flow, exits []flows.Exit) error {
 	// check wait timeout category is valid
 	if r.AllowTimeout() && !r.isValidCategory(r.wait.Timeout().CategoryUUID()) {
-		return errors.Errorf("timeout category %s is not a valid category", r.wait.Timeout().CategoryUUID())
+		return fmt.Errorf("timeout category %s is not a valid category", r.wait.Timeout().CategoryUUID())
 	}
 
 	// check each category points to a valid exit
 	for _, c := range r.categories {
 		if c.ExitUUID() != "" && !r.isValidExit(c.ExitUUID(), exits) {
-			return errors.Errorf("category exit %s is not a valid exit", c.ExitUUID())
+			return fmt.Errorf("category exit %s is not a valid exit", c.ExitUUID())
 		}
 	}
 
 	if r.wait != nil && !flow.Type().Allows(r.wait) {
-		return errors.Errorf("wait type '%s' is not allowed in a flow of type '%s'", r.wait.Type(), flow.Type())
+		return fmt.Errorf("wait type '%s' is not allowed in a flow of type '%s'", r.wait.Type(), flow.Type())
 	}
 
 	return nil
@@ -171,7 +165,7 @@ func (r *baseRouter) routeToCategory(run flows.Run, step flows.Step, categoryUUI
 	}
 
 	if category == nil {
-		return "", errors.Errorf("category %s is not a valid category", categoryUUID)
+		return "", fmt.Errorf("category %s is not a valid category", categoryUUID)
 	}
 
 	// save result if we have a result name
@@ -211,10 +205,11 @@ func ReadRouter(data json.RawMessage) (flows.Router, error) {
 
 	f := registeredTypes[typeName]
 	if f == nil {
-		return nil, errors.Errorf("unknown type: '%s'", typeName)
+		return nil, fmt.Errorf("unknown type: '%s'", typeName)
 	}
 
-	return f(data)
+	router := f()
+	return router, utils.UnmarshalAndValidate(data, router)
 }
 
 func (r *baseRouter) unmarshal(e *baseRouterEnvelope) error {
@@ -234,7 +229,7 @@ func (r *baseRouter) unmarshal(e *baseRouterEnvelope) error {
 	if e.Wait != nil {
 		r.wait, err = waits.ReadWait(e.Wait)
 		if err != nil {
-			return errors.Wrap(err, "unable to read wait")
+			return fmt.Errorf("unable to read wait: %w", err)
 		}
 	}
 

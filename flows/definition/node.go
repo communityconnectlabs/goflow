@@ -2,18 +2,17 @@ package definition
 
 import (
 	"encoding/json"
+	"fmt"
 
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/actions"
 	"github.com/nyaruka/goflow/flows/inspect"
 	"github.com/nyaruka/goflow/flows/routers"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
 type node struct {
@@ -44,24 +43,24 @@ func (n *node) Validate(flow flows.Flow, seenUUIDs map[uuids.UUID]bool) error {
 
 		// check that this action is valid for this flow type
 		if !flow.Type().Allows(action) {
-			return errors.Errorf("action type '%s' is not allowed in a flow of type '%s'", action.Type(), flow.Type())
+			return fmt.Errorf("action type '%s' is not allowed in a flow of type '%s'", action.Type(), flow.Type())
 		}
 
 		uuidAlreadySeen := seenUUIDs[uuids.UUID(action.UUID())]
 		if uuidAlreadySeen {
-			return errors.Errorf("action UUID %s isn't unique", action.UUID())
+			return fmt.Errorf("action UUID %s isn't unique", action.UUID())
 		}
 		seenUUIDs[uuids.UUID(action.UUID())] = true
 
 		if err := action.Validate(); err != nil {
-			return errors.Wrapf(err, "invalid action[uuid=%s, type=%s]", action.UUID(), action.Type())
+			return fmt.Errorf("invalid action[uuid=%s, type=%s]: %w", action.UUID(), action.Type(), err)
 		}
 	}
 
 	// check the router if there is one
 	if n.Router() != nil {
 		if err := n.Router().Validate(flow, n.Exits()); err != nil {
-			return errors.Wrap(err, "invalid router")
+			return fmt.Errorf("invalid router: %w", err)
 		}
 	}
 
@@ -69,12 +68,12 @@ func (n *node) Validate(flow flows.Flow, seenUUIDs map[uuids.UUID]bool) error {
 	for _, exit := range n.Exits() {
 		uuidAlreadySeen := seenUUIDs[uuids.UUID(exit.UUID())]
 		if uuidAlreadySeen {
-			return errors.Errorf("exit UUID %s isn't unique", exit.UUID())
+			return fmt.Errorf("exit UUID %s isn't unique", exit.UUID())
 		}
 		seenUUIDs[uuids.UUID(exit.UUID())] = true
 
 		if exit.DestinationUUID() != "" && flow.GetNode(exit.DestinationUUID()) == nil {
-			return errors.Errorf("destination %s of exit[uuid=%s] isn't a known node", exit.DestinationUUID(), exit.UUID())
+			return fmt.Errorf("destination %s of exit[uuid=%s] isn't a known node", exit.DestinationUUID(), exit.UUID())
 		}
 	}
 
@@ -82,30 +81,30 @@ func (n *node) Validate(flow flows.Flow, seenUUIDs map[uuids.UUID]bool) error {
 }
 
 // EnumerateTemplates enumerates all expressions on this object
-func (n *node) EnumerateTemplates(localization flows.Localization, include func(flows.Action, flows.Router, envs.Language, string)) {
+func (n *node) EnumerateTemplates(localization flows.Localization, include func(flows.Action, flows.Router, i18n.Language, string)) {
 	for _, action := range n.actions {
-		inspect.Templates(action, localization, func(l envs.Language, t string) {
+		inspect.Templates(action, localization, func(l i18n.Language, t string) {
 			include(action, nil, l, t)
 		})
 	}
 
 	if n.router != nil {
-		n.router.EnumerateTemplates(localization, func(l envs.Language, t string) {
+		n.router.EnumerateTemplates(localization, func(l i18n.Language, t string) {
 			include(nil, n.router, l, t)
 		})
 	}
 }
 
 // EnumerateDependencies enumerates all dependencies on this object
-func (n *node) EnumerateDependencies(localization flows.Localization, include func(flows.Action, flows.Router, envs.Language, assets.Reference)) {
+func (n *node) EnumerateDependencies(localization flows.Localization, include func(flows.Action, flows.Router, i18n.Language, assets.Reference)) {
 	for _, action := range n.actions {
-		inspect.Dependencies(action, localization, func(l envs.Language, r assets.Reference) {
+		inspect.Dependencies(action, localization, func(l i18n.Language, r assets.Reference) {
 			include(action, nil, l, r)
 		})
 	}
 
 	if n.router != nil {
-		n.router.EnumerateDependencies(localization, func(l envs.Language, r assets.Reference) {
+		n.router.EnumerateDependencies(localization, func(l i18n.Language, r assets.Reference) {
 			include(nil, n.router, l, r)
 		})
 	}
@@ -143,9 +142,9 @@ func (n *node) EnumerateLocalizables(include func(uuids.UUID, string, []string, 
 
 type nodeEnvelope struct {
 	UUID    flows.NodeUUID    `json:"uuid"               validate:"required,uuid4"`
-	Actions []json.RawMessage `json:"actions,omitempty"`
+	Actions []json.RawMessage `json:"actions,omitempty"  validate:"dive,required"`
 	Router  json.RawMessage   `json:"router,omitempty"`
-	Exits   []*exit           `json:"exits"              validate:"required,min=1"`
+	Exits   []*exit           `json:"exits"              validate:"required,min=1,dive,required"`
 }
 
 // UnmarshalJSON unmarshals a flow node from the given JSON
@@ -153,7 +152,7 @@ func (n *node) UnmarshalJSON(data []byte) error {
 	e := &nodeEnvelope{}
 	err := utils.UnmarshalAndValidate(data, e)
 	if err != nil {
-		return errors.Wrap(err, "unable to read node")
+		return fmt.Errorf("unable to read node: %w", err)
 	}
 
 	n.uuid = e.UUID
@@ -162,7 +161,7 @@ func (n *node) UnmarshalJSON(data []byte) error {
 	if e.Router != nil {
 		n.router, err = routers.ReadRouter(e.Router)
 		if err != nil {
-			return errors.Wrap(err, "unable to read router")
+			return fmt.Errorf("unable to read router: %w", err)
 		}
 	}
 
@@ -171,7 +170,7 @@ func (n *node) UnmarshalJSON(data []byte) error {
 	for i := range e.Actions {
 		n.actions[i], err = actions.ReadAction(e.Actions[i])
 		if err != nil {
-			return errors.Wrap(err, "unable to read action")
+			return fmt.Errorf("unable to read action: %w", err)
 		}
 	}
 

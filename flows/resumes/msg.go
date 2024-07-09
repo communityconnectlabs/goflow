@@ -64,7 +64,7 @@ func (r *MsgResume) Apply(run flows.Run, logEvent flows.EventCallback) {
 	r.baseResume.Apply(run, logEvent)
 
 	// update our input
-	input := inputs.NewMsg(run.Session().Assets(), r.msg, r.ResumedOn())
+	input := inputs.NewMsg(run.Session(), r.msg, r.ResumedOn())
 
 	run.Session().SetInput(input)
 
@@ -79,7 +79,7 @@ var _ flows.Resume = (*MsgResume)(nil)
 
 type msgResumeEnvelope struct {
 	baseResumeEnvelope
-	Msg *flows.MsgIn `json:"msg" validate:"required,dive"`
+	Msg *flows.MsgIn `json:"msg" validate:"required"`
 }
 
 func readMsgResume(sessionAssets flows.SessionAssets, data json.RawMessage, missing assets.MissingCallback) (flows.Resume, error) {

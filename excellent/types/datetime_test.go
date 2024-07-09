@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -8,13 +9,12 @@ import (
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestXDateTime(t *testing.T) {
 	env := envs.NewBuilder().WithDateFormat(envs.DateFormatDayMonthYear).Build()
-	env2 := envs.NewBuilder().WithDateFormat(envs.DateFormatYearMonthDay).WithAllowedLanguages([]envs.Language{"spa"}).Build()
+	env2 := envs.NewBuilder().WithDateFormat(envs.DateFormatYearMonthDay).WithAllowedLanguages("spa").Build()
 
 	assert.True(t, types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 123456789, time.UTC)).Truthy())
 
@@ -62,10 +62,12 @@ func TestXDateTime(t *testing.T) {
 	assert.Equal(t, la, d2.Native().Location())
 
 	// test unmarshaling
-	var date types.XDateTime
-	err = jsonx.Unmarshal([]byte(`"2018-04-09T17:01:30Z"`), &date)
+	foo := &struct {
+		Val *types.XDateTime `json:"val"`
+	}{}
+	err = jsonx.Unmarshal([]byte(`{"val": "2018-04-09T17:01:30Z"}`), foo)
 	assert.NoError(t, err)
-	assert.Equal(t, types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)), date)
+	assert.Equal(t, types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)).Native(), foo.Val.Native())
 
 	// test marshaling
 	data, err := jsonx.Marshal(types.NewXDateTime(time.Date(2018, 4, 9, 17, 1, 30, 0, time.UTC)))
@@ -76,11 +78,11 @@ func TestXDateTime(t *testing.T) {
 func TestToXDateTime(t *testing.T) {
 	var tests = []struct {
 		value    types.XValue
-		expected types.XDateTime
+		expected *types.XDateTime
 		hasError bool
 	}{
 		{nil, types.XDateTimeZero, true},
-		{types.NewXError(errors.Errorf("Error")), types.XDateTimeZero, true},
+		{types.NewXError(fmt.Errorf("Error")), types.XDateTimeZero, true},
 		{types.NewXNumberFromInt(123), types.XDateTimeZero, true},
 		{types.NewXText("2018-06-05"), types.NewXDateTime(time.Date(2018, 6, 5, 0, 0, 0, 0, time.UTC)), false},
 		{types.NewXText("wha?"), types.XDateTimeZero, true},
@@ -98,9 +100,9 @@ func TestToXDateTime(t *testing.T) {
 		result, err := types.ToXDateTime(env, test.value)
 
 		if test.hasError {
-			assert.Error(t, err, "expected error for input %T{%s}", test.value, test.value)
+			assert.Error(t, err.Native(), "expected error for input %T{%s}", test.value, test.value)
 		} else {
-			assert.NoError(t, err, "unexpected error for input %T{%s}", test.value, test.value)
+			assert.NoError(t, err.Native(), "unexpected error for input %T{%s}", test.value, test.value)
 			assert.Equal(t, test.expected.Native(), result.Native(), "result mismatch for input %T{%s}", test.value, test.value)
 		}
 	}
@@ -112,6 +114,6 @@ func TestToXDateTimeWithTimeFill(t *testing.T) {
 
 	env := envs.NewBuilder().Build()
 	result, err := types.ToXDateTimeWithTimeFill(env, types.NewXText("2018/12/20"))
-	assert.NoError(t, err)
+	assert.NoError(t, err.Native())
 	assert.Equal(t, types.NewXDateTime(time.Date(2018, 12, 20, 13, 36, 30, 123456789, time.UTC)), result)
 }

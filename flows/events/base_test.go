@@ -12,6 +12,7 @@ import (
 
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
@@ -25,7 +26,6 @@ import (
 	"github.com/nyaruka/goflow/test"
 	"github.com/nyaruka/goflow/utils"
 	"github.com/shopspring/decimal"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -44,10 +44,11 @@ func TestEventMarshaling(t *testing.T) {
 	timeout := 500
 	expiresOn := time.Date(2022, 2, 3, 13, 45, 30, 0, time.UTC)
 	gender := session.Assets().Fields().Get("gender")
-	mailgun := session.Assets().Ticketers().Get("19dc6346-9623-4fe4-be80-538d493ecdf5")
+	jotd := session.Assets().OptIns().Get("248be71d-78e9-4d71-a6c4-9981d369e5cb")
 	weather := session.Assets().Topics().Get("472a7a73-96cb-4736-b567-056d987cc5b4")
 	user := session.Assets().Users().Get("bob@nyaruka.com")
-	ticket := flows.NewTicket("7481888c-07dd-47dc-bf22-ef7448696ffe", mailgun, weather, "Where are my cookies?", "1243252", user)
+	facebook := session.Assets().Channels().Get("4bb288a0-7fca-4da1-abe8-59a593aff648")
+	ticket := flows.NewTicket("7481888c-07dd-47dc-bf22-ef7448696ffe", weather, "Where are my cookies?", user)
 
 	eventTests := []struct {
 		event     flows.Event
@@ -56,6 +57,8 @@ func TestEventMarshaling(t *testing.T) {
 		{
 			events.NewAirtimeTransferred(
 				&flows.AirtimeTransfer{
+					UUID:          "4c2d9b7a-e02c-4e6a-ab18-06df4cb5666d",
+					ExternalID:    "98765432",
 					Sender:        urns.URN("tel:+593979099111"),
 					Recipient:     urns.URN("tel:+593979099222"),
 					Currency:      "USD",
@@ -83,6 +86,7 @@ func TestEventMarshaling(t *testing.T) {
         	    "created_on": "2018-10-18T14:20:30.000123456Z",
         	    "currency": "USD",
         	    "desired_amount": 1.2,
+				"external_id": "98765432",
 				"http_logs": [
 					{
 						"url": "https://send.money.com/topup",
@@ -97,7 +101,8 @@ func TestEventMarshaling(t *testing.T) {
 				],
 				"recipient": "tel:+593979099222",
         	    "sender": "tel:+593979099111",
-				"type": "airtime_transferred"
+				"type": "airtime_transferred",
+				"transfer_uuid": "4c2d9b7a-e02c-4e6a-ab18-06df4cb5666d"
 			}`,
 		},
 		{
@@ -106,7 +111,7 @@ func TestEventMarshaling(t *testing.T) {
 					"eng": {Text: "Hello", Attachments: nil, QuickReplies: nil},
 					"spa": {Text: "Hola", Attachments: nil, QuickReplies: nil},
 				},
-				envs.Language("eng"),
+				i18n.Language("eng"),
 				[]*assets.GroupReference{
 					assets.NewGroupReference(assets.GroupUUID("5f9fd4f7-4b0f-462a-a598-18bfc7810412"), "Supervisors"),
 				},
@@ -260,7 +265,7 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
-			events.NewContactLanguageChanged(envs.Language("fra")),
+			events.NewContactLanguageChanged(i18n.Language("fra")),
 			`{
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"language": "fra",
@@ -303,33 +308,18 @@ func TestEventMarshaling(t *testing.T) {
 					"last_seen_on": "2017-12-31T11:35:10.035757258-02:00",
 					"name": "Ryan Lewis",
 					"status": "active",
-					"tickets": [
-						{
-							"body": "I have a problem",
-							"ticketer": {
-								"name": "Support Tickets",
-								"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
-							},
-							"topic": null,
-							"uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52"
+					"ticket": {
+						"assignee": {
+							"email": "bob@nyaruka.com",
+							"name": "Bob"
 						},
-						{
-							"assignee": {
-								"email": "bob@nyaruka.com",
-								"name": "Bob"
-							},
-							"body": "What day is it?",
-							"ticketer": {
-								"name": "Support Tickets",
-								"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
-							},
-							"topic": {
-								"uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
-                    			"name": "Weather"
-							},
-							"uuid": "78d1fe0d-7e39-461e-81c3-a6a25f15ed69"
-						}
-					],
+						"body": "What day is it?",
+						"topic": {
+							"uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
+							"name": "Weather"
+						},
+						"uuid": "78d1fe0d-7e39-461e-81c3-a6a25f15ed69"
+					},
 					"timezone": "America/Guayaquil",
 					"urns": [
 						"tel:+12024561111?channel=57f1078f-88aa-46f4-a59a-948a5739c03d",
@@ -393,7 +383,7 @@ func TestEventMarshaling(t *testing.T) {
 					],
 					"date_format": "DD-MM-YYYY",
 					"default_country": "US",
-					"max_value_length": 640,
+					"input_collation": "default",
 					"number_format": {
 						"decimal_symbol": ".",
 						"digit_grouping_symbol": ","
@@ -460,10 +450,10 @@ func TestEventMarshaling(t *testing.T) {
 				flows.NewMsgOut(
 					urns.URN("tel:+12345678900"),
 					assets.NewChannelReference(assets.ChannelUUID("57f1078f-88aa-46f4-a59a-948a5739c03d"), "My Android Phone"),
-					"Hi there",
-					nil, nil, nil,
+					&flows.MsgContent{Text: "Hi there"},
+					nil,
 					flows.NilMsgTopic,
-					envs.NilLocale,
+					i18n.NilLocale,
 					flows.NilUnsendableReason,
 				),
 			),
@@ -486,9 +476,11 @@ func TestEventMarshaling(t *testing.T) {
 				flows.NewMsgOut(
 					urns.URN("tel:+12345678900"),
 					assets.NewChannelReference(assets.ChannelUUID("57f1078f-88aa-46f4-a59a-948a5739c03d"), "My Android Phone"),
-					"Hi there",
-					[]utils.Attachment{"image/jpeg:http://s3.amazon.com/bucket/test.jpg"},
-					[]string{"yes", "no"},
+					&flows.MsgContent{
+						Text:         "Hi there",
+						Attachments:  []utils.Attachment{"image/jpeg:http://s3.amazon.com/bucket/test.jpg"},
+						QuickReplies: []string{"yes", "no"},
+					},
 					nil,
 					flows.MsgTopicAgent,
 					"eng-US",
@@ -554,6 +546,22 @@ func TestEventMarshaling(t *testing.T) {
 			}`,
 		},
 		{
+			events.NewOptInRequested(jotd, facebook, urns.URN("facebook:1234567890")),
+			`{
+				"type": "optin_requested",
+				"created_on": "2018-10-18T14:20:30.000123456Z",
+				"optin": {
+					"uuid": "248be71d-78e9-4d71-a6c4-9981d369e5cb",
+					"name": "Joke Of The Day"
+				},
+				"channel": {
+					"uuid": "4bb288a0-7fca-4da1-abe8-59a593aff648",
+					"name": "Facebook Channel"
+				},
+				"urn": "facebook:1234567890"
+			}`,
+		},
+		{
 			events.NewSessionTriggered(
 				assets.NewFlowReference(assets.FlowUUID("e4d441f0-24e3-4627-85fb-1e99e733baf0"), "Collect Age"),
 				[]*assets.GroupReference{
@@ -610,62 +618,16 @@ func TestEventMarshaling(t *testing.T) {
 				"created_on": "2018-10-18T14:20:30.000123456Z",
 				"ticket": {
 					"uuid": "7481888c-07dd-47dc-bf22-ef7448696ffe",
-					"ticketer": {
-						"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
-						"name": "Support Tickets"
-					},
 					"topic": {
 						"uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
          				"name": "Weather"
 					},
 					"body": "Where are my cookies?",
-					"external_id": "1243252",
 					"assignee": {
 						"email": "bob@nyaruka.com",
 						"name": "Bob"
 					}
 				}
-			}`,
-		},
-		{
-			events.NewTicketerCalled(
-				assets.NewTicketerReference(assets.TicketerUUID("4b937f49-7fb7-43a5-8e57-14e2f028a471"), "Support"),
-				[]*flows.HTTPLog{
-					{
-						HTTPLogWithoutTime: &flows.HTTPLogWithoutTime{
-							LogWithoutTime: &httpx.LogWithoutTime{
-								URL:        "https://tickets.com",
-								StatusCode: 200,
-								Request:    "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: tickets.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
-								Response:   "HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\r\n",
-								ElapsedMS:  12,
-							},
-							Status: flows.CallStatusSuccess,
-						},
-						CreatedOn: dates.Now(),
-					},
-				},
-			),
-			`{
-				"type": "service_called",
-				"created_on": "2018-10-18T14:20:30.000123456Z",
-				"service": "ticketer",
-				"ticketer": {
-					"uuid": "4b937f49-7fb7-43a5-8e57-14e2f028a471",
-					"name": "Support"
-				},
-				"http_logs": [
-					{
-						"url": "https://tickets.com",
-						"status_code": 200,
-						"status": "success",
-						"request": "GET /message?v=20200513&q=hello HTTP/1.1\r\nHost: tickets.com\r\nUser-Agent: Go-http-client/1.1\r\nAccept-Encoding: gzip\r\n\r\n",
-						"response": "HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\r\n",
-						"elapsed_ms": 12,
-						"retries": 0,
-						"created_on": "2018-10-18T14:20:30.000123456Z"
-					}
-				]
 			}`,
 		},
 	}

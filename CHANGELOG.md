@@ -1,3 +1,370 @@
+v0.218.3 (2024-07-04)
+-------------------------
+ * Change flos.NewMsgOut to take flows.MsgContent
+
+v0.218.2 (2024-07-04)
+-------------------------
+ * Move code to generate templating into flows.Template
+
+v0.218.1 (2024-07-03)
+-------------------------
+ * Remove namespace on template translations as it's not needed by engine and can be added by mailroom when queueing
+ * Move functionality to generate preview content for template message from send_msg action to TemplateTranslation
+
+v0.218.0 (2024-07-03)
+-------------------------
+ * Rework broadcast translation selection to merge across text, attachments and quick replies
+
+v0.217.0 (2024-06-26)
+-------------------------
+ * Drop db support on flows.BroadcastTranslations
+
+v0.216.4 (2024-06-14)
+-------------------------
+ * Revert adding support for sending airtime to WhatsApp
+
+v0.216.3 (2024-06-12)
+-------------------------
+ * Use empty value for airtime failure result
+
+v0.216.2 (2024-06-12)
+-------------------------
+ * Save airtime transfer transaction id as result and on event as external_id
+ * Remove support for old template component types
+
+v0.216.1 (2024-06-12)
+-------------------------
+ * Add transfer UUID field to airtime transfer
+
+v0.216.0 (2024-06-11)
+-------------------------
+ * Support sending for WhatsApp URNs
+ * Update DT One requests
+
+v0.215.1 (2024-06-10)
+-------------------------
+ * Support template component types like header/* and body/*
+
+v0.215.0 (2024-06-06)
+-------------------------
+ * Support template header components of type image, video or document and use as attachments on preview message
+
+v0.214.6 (2024-06-05)
+-------------------------
+ * Update goreleaser config to v2
+
+v0.214.5 (2024-05-24)
+-------------------------
+ * Make date parsing stricter
+
+v0.214.4 (2024-05-22)
+-------------------------
+ * Ensure QueryError always has a code and use `syntax` as code for all parser errors
+
+v0.214.3 (2024-05-21)
+-------------------------
+ * Tweak type of extra on query errors
+
+v0.214.2 (2024-05-21)
+-------------------------
+ * Use std library errors
+
+v0.214.1 (2024-05-20)
+-------------------------
+ * Move elastic utils to gocommon
+
+v0.214.0 (2024-05-17)
+-------------------------
+ * Rewrite contactql query conversion to ES to use simple maps instead of unmaintained library
+
+v0.213.3 (2024-05-17)
+-------------------------
+ * Merge pull request #1255 from nyaruka/migration_fix
+ * Fix migrating directly from 13.2 to 13.5
+
+v0.213.2 (2024-05-16)
+-------------------------
+ * Tweak releaser config
+
+v0.213.1 (2024-05-16)
+-------------------------
+ * Switch to use goreleaser and update actions to latest versions
+
+v0.213.0 (2024-05-15)
+-------------------------
+ * Normalize contactql queries with type prefixes
+
+v0.212.0 (2024-05-15)
+-------------------------
+ * Add support for contactql conditions with properties prefixed by their type
+ * Update to latest ANTLR4
+
+v0.211.2 (2024-05-09)
+-------------------------
+ * Update gocommom
+
+v0.211.1 (2024-05-09)
+-------------------------
+ * Update to latest gocommon
+
+v0.211.0 (2024-05-08)
+-------------------------
+ * Update to latest gocommon
+ * Remove old urn modifier which was replaced by the urns modifier
+
+v0.210.0 (2024-04-25)
+-------------------------
+ * Add new 13.5 flow spec which changes send_msg to use single list of variables
+
+v0.209.2 (2024-04-17)
+-------------------------
+ * Remove deprecated params in templating
+
+v0.209.1 (2024-04-16)
+-------------------------
+ * Re-include legacy .params field on components temporarily
+
+v0.209.0 (2024-04-16)
+-------------------------
+ * Rework the format of MsgTemplating
+
+v0.208.0 (2024-04-15)
+-------------------------
+ * Update to latest decimal library that fixes .Pow
+ * Rework template assets to use variables instead of component specific param lists
+
+v0.207.3 (2024-03-20)
+-------------------------
+ * Remove no longer used templating.params
+
+v0.207.2 (2024-03-20)
+-------------------------
+ * Include component name on templating
+
+v0.207.1 (2024-03-20)
+-------------------------
+ * Drop support for variables in display parts of template components
+
+v0.207.0 (2024-03-20)
+-------------------------
+ * Rework template components... again
+
+v0.206.4 (2024-03-19)
+-------------------------
+ * Add type and display fields to temmplate components
+
+v0.206.3 (2024-03-15)
+-------------------------
+ * Truncate quick replies for template preview messages
+
+v0.206.2 (2024-03-14)
+-------------------------
+ * Update to go 1.22
+ * Mark @child.run.status as deprecated in context
+ * Reorg of expression refactoring code into its own package
+
+v0.206.1 (2024-03-05)
+-------------------------
+ * Remove no longer used uuid property from msg.templating
+
+v0.206.0 (2024-03-05)
+-------------------------
+ * Instead of supporting both variables and components in send_msg actions, add 13.4 migration
+
+v0.205.0 (2024-03-05)
+-------------------------
+ * Support excluding deprecated object properties from marshalling
+ * Deprecate undocumented multi-match result fields
+ * Update autocompletion docs for results extra
+
+v0.204.1 (2024-03-04)
+-------------------------
+ * Update docs for @webhook
+
+v0.204.0 (2024-03-04)
+-------------------------
+ * Make @webhook an object with headers and json properties
+
+v0.203.0 (2024-02-27)
+-------------------------
+ * Rework semd_msg templating to have a simpler structure in flow definitions and fix enumerating templates and localizable strings
+
+v0.202.1 (2024-02-23)
+-------------------------
+ * Limit use of reflect nil checking
+
+v0.202.0 (2024-02-20)
+-------------------------
+ * Add warnings from template eval functions and recorded as events
+ * Add excellent.Evaluator and move top level evaluation functions to methods on that
+ * Rework xvalues to be passed by pointer and have a base struct
+ * Rework router reading to be like action reading (and allow for enumeration of types)
+
+v0.201.0 (2024-02-12)
+-------------------------
+ * Replace template translation content and params by the components fields
+
+v0.200.1 (2024-01-30)
+-------------------------
+ * Support more WA templates components
+
+v0.200.0 (2024-01-22)
+-------------------------
+ * Rework template assets to use params instead of variables
+
+v0.199.0 (2024-01-17)
+-------------------------
+ * Replace flows.MsgTemplating variables by params
+
+v0.198.0 (2024-01-02)
+-------------------------
+ * Update deps
+ * Remove ticketers
+
+v0.197.7 (2023-12-12)
+-------------------------
+ * Merge pull request #1198 from nyaruka/trim_attachments
+ * Trim whitespace from evaluated message attachments
+
+v0.197.6 (2023-11-27)
+-------------------------
+ * Update to latest gocommon
+ * Rework template translation finding
+
+v0.197.5 (2023-11-20)
+-------------------------
+ * Update deps
+
+v0.197.4 (2023-11-13)
+-------------------------
+ * Tweak Arabic Variants collation
+ * Update depedencies
+
+v0.197.3 (2023-10-30)
+-------------------------
+ * Update to latest gocommon
+
+v0.197.2 (2023-10-27)
+-------------------------
+ * Less panics, more validation errors for invalid flow defs
+
+v0.197.1 (2023-10-12)
+-------------------------
+ * Update deps
+
+v0.197.0 (2023-10-06)
+-------------------------
+ * Drop support for contact less sessions
+ * Add devcontainer config
+
+v0.196.2 (2023-10-02)
+-------------------------
+ * Don't treat ژ and ږ as equivalent in arabic variants collation
+
+v0.196.1 (2023-09-27)
+-------------------------
+ * Remove deprecated collation alias
+
+v0.196.0 (2023-09-26)
+-------------------------
+ * Update to go 1.21
+ * Add more mappings to arabic collation
+
+v0.195.4 (2023-09-23)
+-------------------------
+ * Fix inspectng optin refs
+
+v0.195.3 (2023-09-21)
+-------------------------
+ * Rename send_optin to request_optin and optin_created to optin_requested
+ * Add mores tests for arabic-farsi collation
+
+v0.195.2 (2023-09-18)
+-------------------------
+ * Rename optin_sent to optin_created for consistency with msg_created and add channel/URN properties
+
+v0.195.1 (2023-09-18)
+-------------------------
+ * Fix optin triggers marshaling with type ticket
+
+v0.195.0 (2023-09-14)
+-------------------------
+ * Add send_optin action and optin_sent event
+ * Add features to channel assets and define optins as a feature
+ * Add trigger type for optins
+ * Add OptIn as new asset type
+
+v0.194.0 (2023-09-11)
+-------------------------
+ * Update to latest gocommon
+ * Remove support for delegate channels
+
+v0.193.1 (2023-09-04)
+-------------------------
+ * Update to latest gocommon
+
+v0.193.0 (2023-09-04)
+-------------------------
+ * Simplify naming in po package to avoid stuttering
+ * Switch to i18n package from gocommon
+
+v0.192.1 (2023-08-31)
+-------------------------
+ * Update to latest gocommon
+ * Replace interface{} with any
+
+v0.192.0 (2023-08-18)
+-------------------------
+ * Replace input cleaning with input collation
+
+v0.191.0 (2023-08-17)
+-------------------------
+ * Add input cleaners
+
+v0.190.1 (2023-08-15)
+-------------------------
+ * Merge pull request #1176 from nyaruka/split_env_types
+ * Split flows.Environment into AssetsEnvironment and SessionEnvironment
+
+v0.190.0 (2023-08-15)
+-------------------------
+ * Replace max_value_length on env with new engine options for max field and result chars
+ * Simplify how we create a merged environment with properties from the contact
+
+v0.189.0 (2023-08-11)
+-------------------------
+ * Add filter expression function
+
+v0.188.0 (2023-08-09)
+-------------------------
+ * Update go to 1.20
+ * Make numerical router tests work with Eastern Arabic digits
+
+v0.187.0 (2023-07-20)
+-------------------------
+ * Update deps
+
+v0.186.1 (2023-07-10)
+-------------------------
+ * Fix has_ward argument ordering
+
+v0.186.0 (2023-05-24)
+-------------------------
+ * Add contains function
+
+v0.185.2 (2023-05-03)
+-------------------------
+ * Support hyphen in locations name as one word
+
+v0.185.1 (2023-05-02)
+-------------------------
+ * Fix matching location name with diacritics
+
+v0.185.0 (2023-04-26)
+-------------------------
+ * Contacts only have one (open) ticket
+ * Bump golang.org/x/net from 0.5.0 to 0.7.0
+
 v0.184.4 (2023-02-27)
 -------------------------
  * Sort should return error (instead of panic) if array has mixed types

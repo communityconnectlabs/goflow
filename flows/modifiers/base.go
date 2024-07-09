@@ -2,14 +2,14 @@ package modifiers
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
 // ErrNoModifier is the error instance returned when a modifier is read but due to missing assets can't be returned
@@ -39,8 +39,8 @@ func newBaseModifier(typeName string) baseModifier {
 func (m *baseModifier) Type() string { return m.Type_ }
 
 // Apply applies the given modifier to the given contact and re-evaluates query based groups if necessary
-func Apply(env envs.Environment, svcs flows.Services, sa flows.SessionAssets, c *flows.Contact, mod flows.Modifier, logEvent flows.EventCallback) bool {
-	modified := mod.Apply(env, svcs, sa, c, logEvent)
+func Apply(eng flows.Engine, env envs.Environment, sa flows.SessionAssets, c *flows.Contact, mod flows.Modifier, logEvent flows.EventCallback) bool {
+	modified := mod.Apply(eng, env, sa, c, logEvent)
 	if modified {
 		ReevaluateGroups(env, c, logEvent)
 	}
@@ -80,7 +80,7 @@ func ReadModifier(assets flows.SessionAssets, data json.RawMessage, missing asse
 
 	f := RegisteredTypes[typeName]
 	if f == nil {
-		return nil, errors.Errorf("unknown type: '%s'", typeName)
+		return nil, fmt.Errorf("unknown type: '%s'", typeName)
 	}
 	return f(assets, data, missing)
 }

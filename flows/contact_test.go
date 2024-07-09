@@ -2,11 +2,11 @@ package flows_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
@@ -36,13 +36,6 @@ func TestContact(t *testing.T) {
 				"country": "US"
 			}
 		],
-		"ticketers": [
-			{
-				"uuid": "d605bb96-258d-4097-ad0a-080937db2212",
-				"name": "Support Tickets",
-				"type": "mailgun"
-			}
-		],
 		"topics": [
 			{
 				"uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
@@ -69,7 +62,7 @@ func TestContact(t *testing.T) {
 		flows.ContactUUID(uuids.New()),
 		flows.ContactID(12345),
 		"Joe Bloggs",
-		envs.Language("eng"),
+		i18n.Language("eng"),
 		flows.ContactStatusActive,
 		tz,
 		time.Date(2017, 12, 15, 10, 0, 0, 0, time.UTC),
@@ -97,10 +90,10 @@ func TestContact(t *testing.T) {
 	assert.Equal(t, "Joe Bloggs", contact.Name())
 	assert.Equal(t, flows.ContactID(12345), contact.ID())
 	assert.Equal(t, tz, contact.Timezone())
-	assert.Equal(t, envs.Language("eng"), contact.Language())
+	assert.Equal(t, i18n.Language("eng"), contact.Language())
 	assert.Equal(t, android, contact.PreferredChannel())
-	assert.Equal(t, envs.Country("US"), contact.Country())
-	assert.Equal(t, "en-US", contact.Locale(env).ToBCP47())
+	assert.Equal(t, i18n.Country("US"), contact.Country())
+	assert.Equal(t, i18n.Locale("eng-US"), contact.Locale(env))
 
 	contact.SetStatus(flows.ContactStatusStopped)
 	assert.Equal(t, flows.ContactStatusStopped, contact.Status())
@@ -132,7 +125,6 @@ func TestContact(t *testing.T) {
 		"mailto":     nil,
 		"rocketchat": nil,
 		"slack":      nil,
-		"teams":      nil,
 		"tel":        flows.NewContactURN(urns.URN("tel:+12024561111?channel=294a14d4-c998-41e5-a314-5941b97b89d7"), nil).ToXValue(env),
 		"telegram":   nil,
 		"twitter":    flows.NewContactURN(urns.URN("twitter:joey"), nil).ToXValue(env),
@@ -144,27 +136,26 @@ func TestContact(t *testing.T) {
 		"whatsapp":   nil,
 	}), flows.ContextFunc(env, contact.URNs().MapContext))
 
-	assert.Equal(t, 0, contact.Tickets().Count())
+	assert.Nil(t, contact.Ticket())
 
-	mailgun := sa.Ticketers().Get("d605bb96-258d-4097-ad0a-080937db2212")
 	weather := sa.Topics().Get("472a7a73-96cb-4736-b567-056d987cc5b4")
-	ticket := flows.OpenTicket(mailgun, weather, "I have issues", nil)
-	contact.Tickets().Add(ticket)
+	ticket := flows.OpenTicket(weather, "I have issues", nil)
+	contact.SetTicket(ticket)
 
-	assert.Equal(t, 1, contact.Tickets().Count())
+	assert.NotNil(t, contact.Ticket())
 
 	clone := contact.Clone()
 	assert.Equal(t, "Joe Bloggs", clone.Name())
 	assert.Equal(t, flows.ContactID(12345), clone.ID())
 	assert.Equal(t, tz, clone.Timezone())
-	assert.Equal(t, envs.Language("eng"), clone.Language())
-	assert.Equal(t, envs.Country("US"), clone.Country())
+	assert.Equal(t, i18n.Language("eng"), clone.Language())
+	assert.Equal(t, i18n.Country("US"), clone.Country())
 	assert.Equal(t, android, clone.PreferredChannel())
-	assert.Equal(t, 1, clone.Tickets().Count())
+	assert.NotNil(t, contact.Ticket())
 
 	// country can be resolved from tel urns if there's no preferred channel
 	clone.UpdatePreferredChannel(nil)
-	assert.Equal(t, envs.Country("US"), clone.Country())
+	assert.Equal(t, i18n.Country("US"), clone.Country())
 
 	// can also clone a null contact!
 	mrNil := (*flows.Contact)(nil)
@@ -181,7 +172,7 @@ func TestContact(t *testing.T) {
 		"id":           types.NewXText("12345"),
 		"language":     types.NewXText("eng"),
 		"name":         types.NewXText("Joe Bloggs"),
-		"tickets":      contact.Tickets().ToXValue(env),
+		"tickets":      types.NewXArray(flows.Context(env, contact.Ticket())),
 		"timezone":     types.NewXText("America/Bogota"),
 		"status":       types.NewXText(string(contact.Status())),
 		"urn":          contact.URNs()[0].ToXValue(env),
@@ -195,8 +186,6 @@ func TestContact(t *testing.T) {
 
 	marshaled, err := jsonx.Marshal(contact)
 	require.NoError(t, err)
-
-	fmt.Println(string(marshaled))
 
 	unmarshaled, err := flows.ReadContact(sa, marshaled, assets.PanicOnMissing)
 	require.NoError(t, err)
@@ -229,7 +218,7 @@ func TestContactFormat(t *testing.T) {
 	sa, _ := engine.NewSessionAssets(env, static.NewEmptySource(), nil)
 
 	// name takes precedence if set
-	contact := flows.NewEmptyContact(sa, "Joe", envs.NilLanguage, nil)
+	contact := flows.NewEmptyContact(sa, "Joe", i18n.NilLanguage, nil)
 	contact.AddURN(urns.URN("twitter:joey"), nil)
 	assert.Equal(t, "Joe", contact.Format(env))
 
@@ -239,7 +228,7 @@ func TestContactFormat(t *testing.T) {
 		flows.ContactUUID(uuids.New()),
 		flows.ContactID(1234),
 		"",
-		envs.NilLanguage,
+		i18n.NilLanguage,
 		flows.ContactStatusActive,
 		nil,
 		time.Now(),
@@ -259,7 +248,7 @@ func TestContactFormat(t *testing.T) {
 	assert.Equal(t, "1234", contact.Format(anonEnv))
 
 	// if we don't have name or URNs, then empty string
-	contact = flows.NewEmptyContact(sa, "", envs.NilLanguage, nil)
+	contact = flows.NewEmptyContact(sa, "", i18n.NilLanguage, nil)
 	assert.Equal(t, "", contact.Format(env))
 }
 
@@ -274,7 +263,7 @@ func TestContactSetPreferredChannel(t *testing.T) {
 	twitter1 := test.NewChannel("Twitter", "nyaruka", []string{"twitter", "twitterid"}, roles, nil)
 	twitter2 := test.NewChannel("Twitter", "nyaruka", []string{"twitter", "twitterid"}, roles, nil)
 
-	contact := flows.NewEmptyContact(sa, "Joe", envs.NilLanguage, nil)
+	contact := flows.NewEmptyContact(sa, "Joe", i18n.NilLanguage, nil)
 	contact.AddURN(urns.URN("twitter:joey"), nil)
 	contact.AddURN(urns.URN("tel:+12345678999"), nil)
 	contact.AddURN(urns.URN("tel:+18005555777"), nil)
@@ -324,12 +313,11 @@ func TestReevaluateQueryBasedGroups(t *testing.T) {
 
 	testFile, err := os.ReadFile("testdata/smart_groups.json")
 	require.NoError(t, err)
-	err = jsonx.Unmarshal(testFile, &tests)
-	require.NoError(t, err)
+	jsonx.MustUnmarshal(testFile, &tests)
 
 	for _, tc := range tests {
 		envBuilder := envs.NewBuilder().
-			WithAllowedLanguages([]envs.Language{"eng", "spa"}).
+			WithAllowedLanguages("eng", "spa").
 			WithDefaultCountry("RW")
 
 		if tc.RedactURNs {
@@ -392,7 +380,7 @@ func TestContactEqual(t *testing.T) {
 
 	assert.True(t, contact1.Equal(contact2))
 
-	contact2.SetLanguage(envs.NilLanguage)
+	contact2.SetLanguage(i18n.NilLanguage)
 	assert.False(t, contact1.Equal(contact2))
 }
 
@@ -405,24 +393,19 @@ func TestContactQuery(t *testing.T) {
 		"name": "Ben Haggerty",
 		"fields": {
 			"gender": {"text": "Male"},
-			"age": {"text": "39!", "number": 39}
+			"age": {"text": "39!", "number": 39},
+			"language": {"text": "en"}
 		},
 		"groups": [
 			{"uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d", "name": "Testers"},
 			{"uuid": "4f1f98fc-27a7-4a69-bbdb-24744ba739a9", "name": "Males"}
 		],
-		"tickets": [
-			{
-				"uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52",
-				"ticketer": {
-					"uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
-					"name": "Support Tickets"
-				},
-				"subject": "Old ticket",
-				"body": "I have a problem",
-				"assignee": null
-			}
-		],
+		"ticket": {
+			"uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52",
+			"subject": "Old ticket",
+			"body": "I have a problem",
+			"assignee": null
+		},
 		"language": "eng",
 		"timezone": "America/Guayaquil",
 		"urns": [
@@ -523,6 +506,10 @@ func TestContactQuery(t *testing.T) {
 		{`age != 39`, envs.RedactionPolicyNone, false, ""},
 		{`age = 60`, envs.RedactionPolicyNone, false, ""},
 		{`age != 60`, envs.RedactionPolicyNone, true, ""},
+
+		// field with key that conflicts with attribute has to be prefixed
+		{`fields.language = EN`, envs.RedactionPolicyNone, true, ""},
+		{`fields.language = FR`, envs.RedactionPolicyNone, false, ""},
 
 		// check querying on a field that isn't set for this contact
 		{`activation_token = ""`, envs.RedactionPolicyNone, true, ""},

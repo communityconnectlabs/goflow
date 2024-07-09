@@ -17,7 +17,6 @@ import (
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows/definition/legacy/expressions"
 	"github.com/nyaruka/goflow/test"
-	"github.com/nyaruka/goflow/utils"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -249,8 +248,9 @@ func TestMigrateTemplate(t *testing.T) {
 
 		if migratedTemplate == tc.new && !tc.dontEval {
 			// check that the migrated template can be evaluated
-			_, err := session.Runs()[0].EvaluateTemplate(migratedTemplate)
-			require.NoError(t, err, "unable to evaluate migrated template '%s'", migratedTemplate)
+			log := test.NewEventLog()
+			session.Runs()[0].EvaluateTemplate(migratedTemplate, log.Log)
+			require.NoError(t, log.Error(), "unable to evaluate migrated template '%s'", migratedTemplate)
 		}
 	}
 }
@@ -264,7 +264,7 @@ func BenchmarkMigrateTemplate(b *testing.B) {
 	}
 }
 
-type legacyVariables map[string]interface{}
+type legacyVariables map[string]any
 
 func (v legacyVariables) Context(env envs.Environment) *types.XObject {
 	entries := make(map[string]types.XValue, len(v))
@@ -275,8 +275,8 @@ func (v legacyVariables) Context(env envs.Environment) *types.XObject {
 	return types.NewXObject(entries)
 }
 
-func toXType(env envs.Environment, val interface{}) types.XValue {
-	if utils.IsNil(val) {
+func toXType(env envs.Environment, val any) types.XValue {
+	if val == nil {
 		return nil
 	}
 
@@ -285,25 +285,25 @@ func toXType(env envs.Environment, val interface{}) types.XValue {
 		return types.NewXText(typed)
 	case json.Number:
 		return types.RequireXNumberFromString(string(typed))
-	case map[string]interface{}:
+	case map[string]any:
 		return legacyVariables(typed).Context(env)
 	}
 	panic(fmt.Sprintf("unsupported type: %s", reflect.TypeOf(val)))
 }
 
 func (v legacyVariables) Migrate() legacyVariables {
-	migrated := map[string]interface{}{
-		"fields":  map[string]interface{}{},
-		"results": map[string]interface{}{},
+	migrated := map[string]any{
+		"fields":  map[string]any{},
+		"results": map[string]any{},
 	}
 
 	for key, val := range v {
 		key = strings.ToLower(key)
 		switch key {
 		case "flow":
-			migrated["run"] = map[string]interface{}{"results": val}
+			migrated["run"] = map[string]any{"results": val}
 		case "contact":
-			asMap, isMap := val.(map[string]interface{})
+			asMap, isMap := val.(map[string]any)
 			if isMap {
 				migrated["contact"] = migrateContact(asMap)
 			} else {
@@ -316,9 +316,9 @@ func (v legacyVariables) Migrate() legacyVariables {
 	return migrated
 }
 
-func migrateContact(contact map[string]interface{}) map[string]interface{} {
-	fields := make(map[string]interface{})
-	migrated := map[string]interface{}{"fields": fields}
+func migrateContact(contact map[string]any) map[string]any {
+	fields := make(map[string]any)
+	migrated := map[string]any{"fields": fields}
 	for key, val := range contact {
 		key = strings.ToLower(key)
 		if key == "*" || key == "name" {
@@ -381,7 +381,8 @@ func TestLegacyTests(t *testing.T) {
 			migratedVars := tc.Context.Variables.Migrate().Context(env)
 			migratedVarsJSON := jsonx.MustMarshal(migratedVars)
 
-			_, err = excellent.EvaluateTemplate(env, migratedVars, migratedTemplate, nil)
+			eval := excellent.NewEvaluator()
+			_, _, err = eval.Template(env, migratedVars, migratedTemplate, nil)
 
 			if len(tc.Errors) > 0 {
 				assert.Error(t, err, "expecting error evaluating template '%s' (migrated from '%s') with context %s", migratedTemplate, tc.Template, migratedVarsJSON)

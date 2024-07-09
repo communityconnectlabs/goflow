@@ -8,8 +8,8 @@
             "decimal_symbol": ".",
             "digit_grouping_symbol": ","
         },
-        "redaction_policy": "none",
-        "max_value_length": 640
+        "input_collation": "default",
+        "redaction_policy": "none"
     },
     "flow": {
         "uuid": "7c37d7e5-6468-4b31-8109-ced2ef8b5ddc",
@@ -26,13 +26,6 @@
         ]
     },
     "call": {
-        "channel": {
-            "uuid": "3a05eaf5-cb1b-4246-bef1-f277419c83a7",
-            "name": "Nexmo"
-        },
-        "urn": "tel:+12065551212"
-    },
-    "connection": {
         "channel": {
             "uuid": "3a05eaf5-cb1b-4246-bef1-f277419c83a7",
             "name": "Nexmo"

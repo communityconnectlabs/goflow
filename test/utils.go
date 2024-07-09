@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -15,7 +16,7 @@ import (
 )
 
 // AssertXEqual is equivalent to assert.Equal for two XValue instances
-func AssertXEqual(t *testing.T, expected types.XValue, actual types.XValue, msgAndArgs ...interface{}) bool {
+func AssertXEqual(t *testing.T, expected types.XValue, actual types.XValue, msgAndArgs ...any) bool {
 	if !types.Equals(expected, actual) {
 		return assert.Fail(t, fmt.Sprintf("Not equal: \n"+
 			"expected: %s\n"+
@@ -26,7 +27,7 @@ func AssertXEqual(t *testing.T, expected types.XValue, actual types.XValue, msgA
 
 // NormalizeJSON re-formats the given JSON
 func NormalizeJSON(data json.RawMessage) ([]byte, error) {
-	var asGeneric interface{}
+	var asGeneric any
 	if err := jsonx.Unmarshal(data, &asGeneric); err != nil {
 		return nil, err
 	}
@@ -34,7 +35,7 @@ func NormalizeJSON(data json.RawMessage) ([]byte, error) {
 }
 
 // AssertEqualJSON checks two JSON strings for equality
-func AssertEqualJSON(t *testing.T, expected json.RawMessage, actual json.RawMessage, msgAndArgs ...interface{}) bool {
+func AssertEqualJSON(t *testing.T, expected json.RawMessage, actual json.RawMessage, msgAndArgs ...any) bool {
 	if expected == nil && actual == nil {
 		return true
 	}
@@ -71,7 +72,7 @@ func JSONDelete(data json.RawMessage, path []string) json.RawMessage {
 	return jsonparser.Delete(data, path...)
 }
 
-func fmtMsgAndArgs(msgAndArgs []interface{}) string {
+func fmtMsgAndArgs(msgAndArgs []any) string {
 	if len(msgAndArgs) == 0 {
 		return ""
 	}
@@ -86,4 +87,15 @@ func fmtMsgAndArgs(msgAndArgs []interface{}) string {
 		return fmt.Sprintf(msgAndArgs[0].(string), msgAndArgs[1:]...)
 	}
 	return ""
+}
+
+// RootError returns the root cause of an error by following the unwrap chain
+func RootError(err error) error {
+	for {
+		cause := errors.Unwrap(err)
+		if cause == nil {
+			return err
+		}
+		err = cause
+	}
 }

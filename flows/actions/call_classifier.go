@@ -57,12 +57,9 @@ func (a *CallClassifierAction) Execute(run flows.Run, step flows.Step, logModifi
 	classifier := classifiers.Get(a.Classifier.UUID)
 
 	// substitute any variables in our input
-	input, err := run.EvaluateTemplate(a.Input)
-	if err != nil {
-		logEvent(events.NewError(err))
-	}
+	input, _ := run.EvaluateTemplate(a.Input, logEvent)
 
-	classification, skipped := a.classify(run, step, input, classifier, logEvent)
+	classification, skipped := a.classify(run, input, classifier, logEvent)
 	if classification != nil {
 		a.saveSuccess(run, step, input, classification, logEvent)
 	} else if skipped {
@@ -74,7 +71,7 @@ func (a *CallClassifierAction) Execute(run flows.Run, step flows.Step, logModifi
 	return nil
 }
 
-func (a *CallClassifierAction) classify(run flows.Run, step flows.Step, input string, classifier *flows.Classifier, logEvent flows.EventCallback) (*flows.Classification, bool) {
+func (a *CallClassifierAction) classify(run flows.Run, input string, classifier *flows.Classifier, logEvent flows.EventCallback) (*flows.Classification, bool) {
 	if input == "" {
 		logEvent(events.NewErrorf("can't classify empty input, skipping classification"))
 		return nil, true
@@ -92,7 +89,7 @@ func (a *CallClassifierAction) classify(run flows.Run, step flows.Step, input st
 
 	httpLogger := &flows.HTTPLogger{}
 
-	classification, err := svc.Classify(run.Environment(), input, httpLogger.Log)
+	classification, err := svc.Classify(run.Session().MergedEnvironment(), input, httpLogger.Log)
 
 	if len(httpLogger.Logs) > 0 {
 		logEvent(events.NewClassifierCalled(classifier.Reference(), httpLogger.Logs))

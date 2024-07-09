@@ -1,45 +1,11 @@
 package utils
 
 import (
-	"reflect"
+	"slices"
 
 	"golang.org/x/exp/constraints"
 	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 )
-
-// IsNil returns whether the given object is nil or an interface to a nil
-func IsNil(v interface{}) bool {
-	// if v doesn't have a type or value then v == nil
-	if v == nil {
-		return true
-	}
-
-	val := reflect.ValueOf(v)
-
-	// if v is a typed nil pointer then v != nil but the value is nil
-	if val.Kind() == reflect.Ptr {
-		return val.IsNil()
-	}
-
-	return false
-}
-
-// Max returns the maximum of two values
-func Max[T constraints.Ordered](x, y T) T {
-	if x > y {
-		return x
-	}
-	return y
-}
-
-// Min returns the minimum of two values
-func Min[T constraints.Ordered](x, y T) T {
-	if x < y {
-		return x
-	}
-	return y
-}
 
 // Set converts a slice to a set (a K > bool map)
 func Set[K constraints.Ordered](s []K) map[K]bool {
@@ -51,7 +17,7 @@ func Set[K constraints.Ordered](s []K) map[K]bool {
 }
 
 // SortedKeys returns the keys of a set in lexical order
-func SortedKeys[K constraints.Ordered](m map[K]bool) []K {
+func SortedKeys[K constraints.Ordered, V any](m map[K]V) []K {
 	keys := maps.Keys(m)
 	slices.Sort(keys)
 	return keys

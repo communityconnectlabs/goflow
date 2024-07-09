@@ -3,14 +3,13 @@ package static
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
 // StaticSource is an asset source which loads assets from a static JSON file
@@ -24,9 +23,9 @@ type StaticSource struct {
 		Groups      []*Group                  `json:"groups" validate:"omitempty,dive"`
 		Labels      []*Label                  `json:"labels" validate:"omitempty,dive"`
 		Locations   []*envs.LocationHierarchy `json:"locations"`
+		OptIns      []*OptIn                  `json:"optins" validate:"omitempty,dive"`
 		Resthooks   []*Resthook               `json:"resthooks" validate:"omitempty,dive"`
 		Templates   []*Template               `json:"templates" validate:"omitempty,dive"`
-		Ticketers   []*Ticketer               `json:"ticketers" validate:"omitempty,dive"`
 		Topics      []*Topic                  `json:"topics" validate:"omitempty,dive"`
 		Users       []*User                   `json:"users" validate:"omitempty,dive"`
 	}
@@ -41,7 +40,7 @@ func NewEmptySource() *StaticSource {
 func NewSource(data json.RawMessage) (*StaticSource, error) {
 	s := &StaticSource{}
 	if err := utils.UnmarshalAndValidate(data, &s.s); err != nil {
-		return nil, errors.Wrap(err, "unable to read assets")
+		return nil, fmt.Errorf("unable to read assets: %w", err)
 	}
 	return s, nil
 }
@@ -50,7 +49,7 @@ func NewSource(data json.RawMessage) (*StaticSource, error) {
 func LoadSource(path string) (*StaticSource, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error reading file '%s'", path)
+		return nil, fmt.Errorf("error reading file '%s': %w", path, err)
 	}
 	return NewSource(data)
 }
@@ -89,7 +88,7 @@ func (s *StaticSource) FlowByUUID(uuid assets.FlowUUID) (assets.Flow, error) {
 			return flow, nil
 		}
 	}
-	return nil, errors.Errorf("no such flow with UUID '%s'", uuid)
+	return nil, fmt.Errorf("no such flow with UUID '%s'", uuid)
 }
 
 // Flow returns the flow asset with the given UUID
@@ -99,7 +98,7 @@ func (s *StaticSource) FlowByName(name string) (assets.Flow, error) {
 			return flow, nil
 		}
 	}
-	return nil, errors.Errorf("no such flow with name '%s'", name)
+	return nil, fmt.Errorf("no such flow with name '%s'", name)
 }
 
 // Globals returns all global assets
@@ -138,6 +137,15 @@ func (s *StaticSource) Locations() ([]assets.LocationHierarchy, error) {
 	return set, nil
 }
 
+// OptIns returns all optin assets
+func (s *StaticSource) OptIns() ([]assets.OptIn, error) {
+	set := make([]assets.OptIn, len(s.s.OptIns))
+	for i := range s.s.OptIns {
+		set[i] = s.s.OptIns[i]
+	}
+	return set, nil
+}
+
 // Resthooks returns all resthook assets
 func (s *StaticSource) Resthooks() ([]assets.Resthook, error) {
 	set := make([]assets.Resthook, len(s.s.Resthooks))
@@ -152,15 +160,6 @@ func (s *StaticSource) Templates() ([]assets.Template, error) {
 	set := make([]assets.Template, len(s.s.Templates))
 	for i := range s.s.Templates {
 		set[i] = s.s.Templates[i]
-	}
-	return set, nil
-}
-
-// Ticketers returns all ticketer assets
-func (s *StaticSource) Ticketers() ([]assets.Ticketer, error) {
-	set := make([]assets.Ticketer, len(s.s.Ticketers))
-	for i := range s.s.Ticketers {
-		set[i] = s.s.Ticketers[i]
 	}
 	return set, nil
 }

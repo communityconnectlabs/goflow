@@ -1,15 +1,13 @@
 package contactql
 
 import (
+	"errors"
 	"fmt"
-
-	"github.com/nyaruka/goflow/utils"
-	"github.com/pkg/errors"
 )
 
 // error codes with values included in extra
 const (
-	ErrUnexpectedToken       = "unexpected_token"       // `token` the unexpected token
+	ErrSyntax                = "syntax"
 	ErrInvalidNumber         = "invalid_number"         // `value` the value we tried to parse as a number
 	ErrInvalidDate           = "invalid_date"           // `value` the value we tried to parse as a date
 	ErrInvalidStatus         = "invalid_status"         // `value` the value we tried to parse as a contact status
@@ -21,6 +19,7 @@ const (
 	ErrUnsupportedContains   = "unsupported_contains"   // `property` the property key
 	ErrUnsupportedComparison = "unsupported_comparison" // `property` the property key, `operator` one of =>, <, >=, <=
 	ErrUnsupportedSetCheck   = "unsupported_setcheck"   // `property` the property key, `operator` one of =, !=
+	ErrUnknownPropertyType   = "unknown_property_type"  // `type` the property type
 	ErrUnknownProperty       = "unknown_property"       // `property` the property key
 	ErrRedactedURNs          = "redacted_urns"
 )
@@ -29,17 +28,17 @@ const (
 type QueryError struct {
 	msg   string
 	code  string
-	extra map[string]string
+	extra map[string]any
 }
 
 // NewQueryError creates a new query error
-func NewQueryError(code, err string, args ...interface{}) *QueryError {
+func NewQueryError(code, err string, args ...any) *QueryError {
 	return &QueryError{code: code, msg: fmt.Sprintf(err, args...)}
 }
 
-func (e *QueryError) withExtra(k, v string) *QueryError {
+func (e *QueryError) withExtra(k string, v any) *QueryError {
 	if e.extra == nil {
-		e.extra = make(map[string]string)
+		e.extra = make(map[string]any)
 	}
 	e.extra[k] = v
 	return e
@@ -56,18 +55,12 @@ func (e *QueryError) Code() string {
 }
 
 // Extra returns additional data about the error
-func (e *QueryError) Extra() map[string]string {
+func (e *QueryError) Extra() map[string]any {
 	return e.extra
 }
 
 // IsQueryError is a utility to determine if the cause of an error was a query error
 func IsQueryError(err error) (bool, error) {
-	switch cause := errors.Cause(err).(type) {
-	case *QueryError:
-		return true, cause
-	default:
-		return false, nil
-	}
+	var qErr *QueryError
+	return errors.As(err, &qErr), qErr
 }
-
-var _ utils.RichError = (*QueryError)(nil)

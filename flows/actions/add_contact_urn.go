@@ -47,20 +47,7 @@ func NewAddContactURN(uuid flows.ActionUUID, scheme string, path string) *AddCon
 
 // Execute runs the labeling action
 func (a *AddContactURNAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
-	// only generate event if run has a contact
-	contact := run.Contact()
-	if contact == nil {
-		logEvent(events.NewErrorf("can't execute action in session without a contact"))
-		return nil
-	}
-
-	evaluatedPath, err := run.EvaluateTemplate(a.Path)
-
-	// if we received an error, log it although it might just be a non-expression like foo@bar.com
-	if err != nil {
-		logEvent(events.NewError(err))
-	}
-
+	evaluatedPath, _ := run.EvaluateTemplate(a.Path, logEvent)
 	evaluatedPath = strings.TrimSpace(evaluatedPath)
 	if evaluatedPath == "" {
 		logEvent(events.NewErrorf("can't add URN with empty path"))

@@ -2,8 +2,10 @@ package flows
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
@@ -34,27 +36,17 @@ func (c *Channel) Reference() *assets.ChannelReference {
 
 // SupportsScheme returns whether this channel supports the given URN scheme
 func (c *Channel) SupportsScheme(scheme string) bool {
-	for _, s := range c.Schemes() {
-		if s == scheme {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(c.Schemes(), scheme)
 }
 
 // HasRole returns whether this channel has the given role
 func (c *Channel) HasRole(role assets.ChannelRole) bool {
-	for _, r := range c.Roles() {
-		if r == role {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(c.Roles(), role)
 }
 
-// HasParent returns whether this channel has a parent
-func (c *Channel) HasParent() bool {
-	return c.Parent() != nil
+// HasFeature returns whether this channel has the given feature
+func (c *Channel) HasFeature(feat assets.ChannelFeature) bool {
+	return slices.Contains(c.Features(), feat)
 }
 
 // Context returns the properties available in expressions
@@ -107,17 +99,17 @@ func (s *ChannelAssets) Get(uuid assets.ChannelUUID) *Channel {
 func (s *ChannelAssets) GetForURN(urn *ContactURN, role assets.ChannelRole) *Channel {
 	// if caller has told us which channel to use for this URN, use that
 	if urn.Channel() != nil && urn.Channel().HasRole(role) {
-		return s.getDelegate(urn.Channel(), role)
+		return urn.Channel()
 	}
 
 	// tel is a special case because we do number based matching
-	if urn.URN().Scheme() == urns.TelScheme {
-		countryCode := envs.DeriveCountryFromTel(urn.URN().Path())
+	if urn.URN().Scheme() == urns.Phone.Prefix {
+		countryCode := i18n.DeriveCountryFromTel(urn.URN().Path())
 		candidates := make([]*Channel, 0)
 
 		for _, ch := range s.all {
 			// skip if not tel and not sendable
-			if !ch.SupportsScheme(urns.TelScheme) || !ch.HasRole(role) {
+			if !ch.SupportsScheme(urns.Phone.Prefix) || !ch.HasRole(role) {
 				continue
 			}
 			// skip if international and channel doesn't allow that
@@ -154,7 +146,7 @@ func (s *ChannelAssets) GetForURN(urn *ContactURN, role assets.ChannelRole) *Cha
 		}
 
 		if channel != nil {
-			return s.getDelegate(channel, role)
+			return channel
 		}
 
 		return nil
@@ -166,18 +158,8 @@ func (s *ChannelAssets) GetForURN(urn *ContactURN, role assets.ChannelRole) *Cha
 func (s *ChannelAssets) getForSchemeAndRole(scheme string, role assets.ChannelRole) *Channel {
 	for _, ch := range s.all {
 		if ch.HasRole(role) && ch.SupportsScheme(scheme) {
-			return s.getDelegate(ch, role)
-		}
-	}
-	return nil
-}
-
-// looks for a delegate for the given channel and defaults to the channel itself
-func (s *ChannelAssets) getDelegate(channel *Channel, role assets.ChannelRole) *Channel {
-	for _, ch := range s.all {
-		if ch.HasParent() && ch.Parent().UUID == channel.UUID() && ch.HasRole(role) {
 			return ch
 		}
 	}
-	return channel
+	return nil
 }

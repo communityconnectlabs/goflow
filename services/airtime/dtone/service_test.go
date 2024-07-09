@@ -18,7 +18,7 @@ import (
 )
 
 func errorResp(code int, message string) []byte {
-	return jsonx.MustMarshal(map[string]interface{}{"errors": []map[string]interface{}{{"code": code, "message": message}}})
+	return jsonx.MustMarshal(map[string]any{"errors": []map[string]any{{"code": code, "message": message}}})
 }
 
 func TestServiceWithSuccessfulTranfer(t *testing.T) {
@@ -27,13 +27,13 @@ func TestServiceWithSuccessfulTranfer(t *testing.T) {
 	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
 	mocks := httpx.NewMockRequestor(map[string][]*httpx.MockResponse{
-		"https://dvs-api.dtone.com/v1/lookup/mobile-number/+593979123456": {
+		"https://dvs-api.dtone.com/v1/lookup/mobile-number": {
 			httpx.NewMockResponse(200, nil, []byte(lookupNumberResponse)), // successful mobile number lookup
 		},
 		"https://dvs-api.dtone.com/v1/products?type=FIXED_VALUE_RECHARGE&operator_id=1596&per_page=100": {
 			httpx.NewMockResponse(200, nil, []byte(productsResponse)),
 		},
-		"https://dvs-api.dtone.com/v1/sync/transactions": {
+		"https://dvs-api.dtone.com/v1/async/transactions": {
 			httpx.NewMockResponse(200, nil, []byte(transactionConfirmedResponse)),
 		},
 	})
@@ -58,7 +58,8 @@ func TestServiceWithSuccessfulTranfer(t *testing.T) {
 	)
 	assert.NoError(t, err)
 	assert.Equal(t, &flows.AirtimeTransfer{
-		UUID:          uuids.UUID("1ae96956-4b34-433e-8d1a-f05fe6923d6d"),
+		UUID:          "1ae96956-4b34-433e-8d1a-f05fe6923d6d",
+		ExternalID:    "2237512891",
 		Sender:        urns.URN("tel:+593979000000"),
 		Recipient:     urns.URN("tel:+593979123456"),
 		Currency:      "USD",
@@ -77,7 +78,7 @@ func TestServiceFailedTransfers(t *testing.T) {
 	defer httpx.SetRequestor(httpx.DefaultRequestor)
 
 	mocks := httpx.NewMockRequestor(map[string][]*httpx.MockResponse{
-		"https://dvs-api.dtone.com/v1/lookup/mobile-number/+593979123456": {
+		"https://dvs-api.dtone.com/v1/lookup/mobile-number": {
 			httpx.MockConnectionError, // timeout
 			httpx.NewMockResponse(400, nil, errorResp(1005003, "Credit party mobile number is invalid")),
 			httpx.NewMockResponse(200, nil, []byte(`[]`)), // no matches
@@ -92,7 +93,7 @@ func TestServiceFailedTransfers(t *testing.T) {
 			httpx.NewMockResponse(200, nil, []byte(productsResponse)),
 			httpx.NewMockResponse(200, nil, []byte(productsResponse)),
 		},
-		"https://dvs-api.dtone.com/v1/sync/transactions": {
+		"https://dvs-api.dtone.com/v1/async/transactions": {
 			httpx.NewMockResponse(400, nil, errorResp(1003001, "Something went wrong")),
 			httpx.NewMockResponse(200, nil, []byte(transactionRejectedResponse)),
 		},

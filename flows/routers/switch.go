@@ -1,25 +1,23 @@
 package routers
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/inspect"
 	"github.com/nyaruka/goflow/flows/routers/cases"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
-	registerType(TypeSwitch, readSwitchRouter)
+	registerType(TypeSwitch, func() flows.Router { return &SwitchRouter{} })
 }
 
 // TypeSwitch is the constant for our switch router
@@ -47,7 +45,7 @@ func NewCase(uuid uuids.UUID, type_ string, arguments []string, categoryUUID flo
 func (c *Case) LocalizationUUID() uuids.UUID { return uuids.UUID(c.UUID) }
 
 // Dependencies enumerates the dependencies on this case
-func (c *Case) Dependencies(localization flows.Localization, include func(envs.Language, assets.Reference)) {
+func (c *Case) Dependencies(localization flows.Localization, include func(i18n.Language, assets.Reference)) {
 	groupRef := func(args []string) assets.Reference {
 		// if we have two args, the second is name
 		name := ""
@@ -59,7 +57,7 @@ func (c *Case) Dependencies(localization flows.Localization, include func(envs.L
 
 	// currently only the HAS_GROUP router test can produce a dependency
 	if c.Type == "has_group" && len(c.Arguments) > 0 {
-		include(envs.NilLanguage, groupRef(c.Arguments))
+		include(i18n.NilLanguage, groupRef(c.Arguments))
 
 		// the group UUID might be different in different translations
 		for _, lang := range localization.Languages() {
@@ -98,18 +96,18 @@ func (r *SwitchRouter) Cases() []*Case { return r.cases }
 func (r *SwitchRouter) Validate(flow flows.Flow, exits []flows.Exit) error {
 	// check the default category is valid
 	if r.defaultCategoryUUID != "" && !r.isValidCategory(r.defaultCategoryUUID) {
-		return errors.Errorf("default category %s is not a valid category", r.defaultCategoryUUID)
+		return fmt.Errorf("default category %s is not a valid category", r.defaultCategoryUUID)
 	}
 
 	for _, c := range r.cases {
 		// check each case points to a valid category
 		if !r.isValidCategory(c.CategoryUUID) {
-			return errors.Errorf("case category %s is not a valid category", c.CategoryUUID)
+			return fmt.Errorf("case category %s is not a valid category", c.CategoryUUID)
 		}
 
 		// and each case test is valid
 		if _, exists := cases.XTESTS[c.Type]; !exists {
-			return errors.Errorf("case test %s is not a registered test function", c.Type)
+			return fmt.Errorf("case test %s is not a registered test function", c.Type)
 		}
 	}
 
@@ -117,14 +115,11 @@ func (r *SwitchRouter) Validate(flow flows.Flow, exits []flows.Exit) error {
 }
 
 // Route determines which exit to take from a node
-func (r *SwitchRouter) Route(run flows.Run, step flows.Step, logEvent flows.EventCallback) (flows.ExitUUID, string, error) {
-	env := run.Environment()
+func (r *SwitchRouter) Route(run flows.Run, step flows.Step, log flows.EventCallback) (flows.ExitUUID, string, error) {
+	env := run.Session().MergedEnvironment()
 
 	// first evaluate our operand
-	operand, err := run.EvaluateTemplateValue(r.operand)
-	if err != nil {
-		run.LogError(step, err)
-	}
+	operand, _ := run.EvaluateTemplateValue(r.operand, log)
 
 	var operandAsStr string
 
@@ -134,7 +129,7 @@ func (r *SwitchRouter) Route(run flows.Run, step flows.Step, logEvent flows.Even
 	}
 
 	// find first matching case
-	match, categoryUUID, extra, err := r.matchCase(run, step, operand)
+	match, categoryUUID, extra, err := r.matchCase(run, step, operand, log)
 	if err != nil {
 		return "", "", err
 	}
@@ -144,25 +139,25 @@ func (r *SwitchRouter) Route(run flows.Run, step flows.Step, logEvent flows.Even
 		// evaluate our operand as a string
 		value, xerr := types.ToXText(env, operand)
 		if xerr != nil {
-			run.LogError(step, xerr)
+			log(events.NewError(xerr))
 		}
 
 		match = value.Native()
 		categoryUUID = r.defaultCategoryUUID
 	}
 
-	exit, err := r.routeToCategory(run, step, categoryUUID, match, operandAsStr, extra, logEvent)
+	exit, err := r.routeToCategory(run, step, categoryUUID, match, operandAsStr, extra, log)
 	return exit, operandAsStr, err
 }
 
-func (r *SwitchRouter) matchCase(run flows.Run, step flows.Step, operand types.XValue) (string, flows.CategoryUUID, *types.XObject, error) {
+func (r *SwitchRouter) matchCase(run flows.Run, step flows.Step, operand types.XValue, log flows.EventCallback) (string, flows.CategoryUUID, *types.XObject, error) {
 	for _, c := range r.cases {
 		test := strings.ToLower(c.Type)
 
 		// try to look up our function
 		xtest := cases.XTESTS[test]
 		if xtest == nil {
-			return "", "", nil, errors.Errorf("unknown case test '%s'", c.Type)
+			return "", "", nil, fmt.Errorf("unknown case test '%s'", c.Type)
 		}
 
 		// build our argument list which starts with the operand
@@ -176,21 +171,18 @@ func (r *SwitchRouter) matchCase(run flows.Run, step flows.Step, operand types.X
 		}
 
 		for _, localizedArg := range localizedArgs {
-			arg, err := run.EvaluateTemplateValue(localizedArg)
-			if err != nil {
-				run.LogError(step, err)
-			}
+			arg, _ := run.EvaluateTemplateValue(localizedArg, log)
 			args = append(args, arg)
 		}
 
 		// call our function
-		result := xtest.Call(run.Environment(), args)
+		result := xtest.Call(run.Session().MergedEnvironment(), args)
 
 		// tests have to return either errors or test results
 		switch typed := result.(type) {
-		case types.XError:
+		case *types.XError:
 			// test functions can return an error
-			run.LogError(step, errors.Errorf("error calling test %s: %s", xtest.Describe(), typed.Error()))
+			log(events.NewErrorf("error calling test %s: %s", xtest.Describe(), typed.Error()))
 		case *types.XObject:
 			matched := typed.Truthy()
 			if !matched {
@@ -202,10 +194,10 @@ func (r *SwitchRouter) matchCase(run flows.Run, step flows.Step, operand types.X
 
 			extraAsObject, isObject := extra.(*types.XObject)
 			if extra != nil && !isObject {
-				run.LogError(step, errors.Errorf("test %s returned non-object extra", strings.ToUpper(test)))
+				log(events.NewErrorf("test %s returned non-object extra", strings.ToUpper(test)))
 			}
 
-			resultAsStr, xerr := types.ToXText(run.Environment(), match)
+			resultAsStr, xerr := types.ToXText(run.Session().MergedEnvironment(), match)
 			if xerr != nil {
 				return "", "", nil, xerr
 			}
@@ -219,14 +211,14 @@ func (r *SwitchRouter) matchCase(run flows.Run, step flows.Step, operand types.X
 }
 
 // EnumerateTemplates enumerates all expressions on this object and its children
-func (r *SwitchRouter) EnumerateTemplates(localization flows.Localization, include func(envs.Language, string)) {
-	include(envs.NilLanguage, r.operand)
+func (r *SwitchRouter) EnumerateTemplates(localization flows.Localization, include func(i18n.Language, string)) {
+	include(i18n.NilLanguage, r.operand)
 
 	inspect.Templates(r.cases, localization, include)
 }
 
 // EnumerateDependencies enumerates all dependencies on this object and its children
-func (r *SwitchRouter) EnumerateDependencies(localization flows.Localization, include func(envs.Language, assets.Reference)) {
+func (r *SwitchRouter) EnumerateDependencies(localization flows.Localization, include func(i18n.Language, assets.Reference)) {
 	inspect.Dependencies(r.cases, localization, include)
 }
 
@@ -249,26 +241,24 @@ type switchRouterEnvelope struct {
 	DefaultCategoryUUID flows.CategoryUUID `json:"default_category_uuid" validate:"omitempty,uuid4"`
 }
 
-func readSwitchRouter(data json.RawMessage) (flows.Router, error) {
+func (r *SwitchRouter) UnmarshalJSON(data []byte) error {
 	e := &switchRouterEnvelope{}
 	if err := utils.UnmarshalAndValidate(data, e); err != nil {
-		return nil, err
+		return err
 	}
 
-	r := &SwitchRouter{
-		operand:             e.Operand,
-		cases:               e.Cases,
-		defaultCategoryUUID: e.DefaultCategoryUUID,
-	}
+	r.operand = e.Operand
+	r.cases = e.Cases
+	r.defaultCategoryUUID = e.DefaultCategoryUUID
 
 	if err := r.unmarshal(&e.baseRouterEnvelope); err != nil {
-		return nil, err
+		return err
 	}
 
-	return r, nil
+	return nil
 }
 
-// MarshalJSON marshals this resume into JSON
+// MarshalJSON marshals this router into JSON
 func (r *SwitchRouter) MarshalJSON() ([]byte, error) {
 	e := &switchRouterEnvelope{
 		Operand:             r.operand,

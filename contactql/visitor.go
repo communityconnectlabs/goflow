@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
+	"github.com/antlr4-go/antlr/v4"
 	"github.com/nyaruka/gocommon/urns"
 	gen "github.com/nyaruka/goflow/antlr/gen/contactql"
 	"github.com/nyaruka/goflow/assets"
@@ -74,17 +74,17 @@ func newVisitor(env envs.Environment) *visitor {
 }
 
 // Visit the top level parse tree
-func (v *visitor) Visit(tree antlr.ParseTree) interface{} {
+func (v *visitor) Visit(tree antlr.ParseTree) any {
 	return tree.Accept(v)
 }
 
 // parse: expression
-func (v *visitor) VisitParse(ctx *gen.ParseContext) interface{} {
+func (v *visitor) VisitParse(ctx *gen.ParseContext) any {
 	return v.Visit(ctx.Expression())
 }
 
 // expression : TEXT
-func (v *visitor) VisitImplicitCondition(ctx *gen.ImplicitConditionContext) interface{} {
+func (v *visitor) VisitImplicitCondition(ctx *gen.ImplicitConditionContext) any {
 	value := v.Visit(ctx.Literal()).(string)
 
 	asURN, _ := urns.Parse(value)
@@ -92,17 +92,17 @@ func (v *visitor) VisitImplicitCondition(ctx *gen.ImplicitConditionContext) inte
 	if v.env.RedactionPolicy() == envs.RedactionPolicyURNs {
 		num, err := strconv.Atoi(value)
 		if err == nil {
-			return NewCondition(AttributeID, PropertyTypeAttribute, OpEqual, strconv.Itoa(num))
+			return NewCondition(PropertyTypeAttribute, AttributeID, OpEqual, strconv.Itoa(num))
 		}
 	} else if asURN != urns.NilURN {
 		scheme, path, _, _ := asURN.ToParts()
 
-		return NewCondition(scheme, PropertyTypeScheme, OpEqual, path)
+		return NewCondition(PropertyTypeURN, scheme, OpEqual, path)
 
 	} else if implicitIsPhoneNumberRegex.MatchString(value) {
 		value = cleanPhoneNumberRegex.ReplaceAllLiteralString(value, "")
 
-		return NewCondition(urns.TelScheme, PropertyTypeScheme, OpContains, value)
+		return NewCondition(PropertyTypeURN, urns.Phone.Prefix, OpContains, value)
 	}
 
 	// convert to contains condition only if we have the right tokens, otherwise make equals check
@@ -111,12 +111,12 @@ func (v *visitor) VisitImplicitCondition(ctx *gen.ImplicitConditionContext) inte
 		operator = OpEqual
 	}
 
-	return NewCondition(AttributeName, PropertyTypeAttribute, operator, value)
+	return NewCondition(PropertyTypeAttribute, AttributeName, operator, value)
 }
 
-// expression : TEXT COMPARATOR literal
-func (v *visitor) VisitCondition(ctx *gen.ConditionContext) interface{} {
-	propKey := strings.ToLower(ctx.TEXT().GetText())
+// expression : PROPERTY COMPARATOR literal
+func (v *visitor) VisitCondition(ctx *gen.ConditionContext) any {
+	propText := strings.ToLower(ctx.PROPERTY().GetText())
 	operatorText := strings.ToLower(ctx.COMPARATOR().GetText())
 	value := v.Visit(ctx.Literal()).(string)
 
@@ -126,63 +126,81 @@ func (v *visitor) VisitCondition(ctx *gen.ConditionContext) interface{} {
 	}
 
 	var propType PropertyType
+	var propKey string
 
-	// first try to match a fixed attribute
-	_, isAttribute := attributes[propKey]
-	if isAttribute {
-		propType = PropertyTypeAttribute
+	// check if property type is specified as prefix
+	if strings.Contains(propText, ".") {
+		parts := strings.SplitN(propText, ".", 2)
 
-		if propKey == AttributeURN && v.env.RedactionPolicy() == envs.RedactionPolicyURNs && value != "" {
-			v.addError(NewQueryError(ErrRedactedURNs, "cannot query on redacted URNs"))
-		}
-
-	} else if urns.IsValidScheme(propKey) {
-		// second try to match a URN scheme
-		propType = PropertyTypeScheme
-
-		if v.env.RedactionPolicy() == envs.RedactionPolicyURNs && value != "" {
-			v.addError(NewQueryError(ErrRedactedURNs, "cannot query on redacted URNs"))
+		if parts[0] == "fields" {
+			propType = PropertyTypeField
+			propKey = parts[1]
+		} else if parts[0] == "urns" {
+			propType = PropertyTypeURN
+			propKey = parts[1]
+		} else {
+			v.addError(NewQueryError(ErrUnknownPropertyType, "unknown property type '%s'", parts[0]).withExtra("type", parts[0]))
 		}
 	} else {
-		propType = PropertyTypeField
+		propKey = propText
+
+		// first try to match a fixed attribute
+		_, isAttribute := attributes[propKey]
+		if isAttribute {
+			propType = PropertyTypeAttribute
+
+			if propKey == AttributeURN && v.env.RedactionPolicy() == envs.RedactionPolicyURNs && value != "" {
+				v.addError(NewQueryError(ErrRedactedURNs, "cannot query on redacted URNs"))
+			}
+
+		} else if urns.IsValidScheme(propKey) {
+			// second try to match a URN scheme
+			propType = PropertyTypeURN
+
+			if v.env.RedactionPolicy() == envs.RedactionPolicyURNs && value != "" {
+				v.addError(NewQueryError(ErrRedactedURNs, "cannot query on redacted URNs"))
+			}
+		} else {
+			propType = PropertyTypeField
+		}
 	}
 
-	return NewCondition(propKey, propType, operator, value)
+	return NewCondition(propType, propKey, operator, value)
 }
 
 // expression : expression AND expression
-func (v *visitor) VisitCombinationAnd(ctx *gen.CombinationAndContext) interface{} {
+func (v *visitor) VisitCombinationAnd(ctx *gen.CombinationAndContext) any {
 	child1 := v.Visit(ctx.Expression(0)).(QueryNode)
 	child2 := v.Visit(ctx.Expression(1)).(QueryNode)
 	return NewBoolCombination(BoolOperatorAnd, child1, child2)
 }
 
 // expression : expression expression
-func (v *visitor) VisitCombinationImpicitAnd(ctx *gen.CombinationImpicitAndContext) interface{} {
+func (v *visitor) VisitCombinationImpicitAnd(ctx *gen.CombinationImpicitAndContext) any {
 	child1 := v.Visit(ctx.Expression(0)).(QueryNode)
 	child2 := v.Visit(ctx.Expression(1)).(QueryNode)
 	return NewBoolCombination(BoolOperatorAnd, child1, child2)
 }
 
 // expression : expression OR expression
-func (v *visitor) VisitCombinationOr(ctx *gen.CombinationOrContext) interface{} {
+func (v *visitor) VisitCombinationOr(ctx *gen.CombinationOrContext) any {
 	child1 := v.Visit(ctx.Expression(0)).(QueryNode)
 	child2 := v.Visit(ctx.Expression(1)).(QueryNode)
 	return NewBoolCombination(BoolOperatorOr, child1, child2)
 }
 
 // expression : LPAREN expression RPAREN
-func (v *visitor) VisitExpressionGrouping(ctx *gen.ExpressionGroupingContext) interface{} {
+func (v *visitor) VisitExpressionGrouping(ctx *gen.ExpressionGroupingContext) any {
 	return v.Visit(ctx.Expression())
 }
 
-// literal : TEXT
-func (v *visitor) VisitTextLiteral(ctx *gen.TextLiteralContext) interface{} {
+// literal : TEXT | NAME
+func (v *visitor) VisitTextLiteral(ctx *gen.TextLiteralContext) any {
 	return ctx.GetText()
 }
 
 // literal : STRING
-func (v *visitor) VisitStringLiteral(ctx *gen.StringLiteralContext) interface{} {
+func (v *visitor) VisitStringLiteral(ctx *gen.StringLiteralContext) any {
 	value := ctx.GetText()
 
 	// unquote, this takes care of escape sequences as well

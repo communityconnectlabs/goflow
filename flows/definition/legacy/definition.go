@@ -8,17 +8,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/buger/jsonparser"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/definition/legacy/expressions"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/buger/jsonparser"
-	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
@@ -28,7 +26,7 @@ import (
 
 // Flow is a flow in the legacy format
 type Flow struct {
-	BaseLanguage envs.Language `json:"base_language"`
+	BaseLanguage i18n.Language `json:"base_language"`
 	FlowType     string        `json:"flow_type"`
 	RuleSets     []RuleSet     `json:"rule_sets" validate:"dive"`
 	ActionSets   []ActionSet   `json:"action_sets" validate:"dive"`
@@ -205,7 +203,7 @@ type Action struct {
 	Label string `json:"label"`
 
 	// set language
-	Language envs.Language `json:"lang"`
+	Language i18n.Language `json:"lang"`
 
 	// add label action
 	Labels []LabelReference `json:"labels"`
@@ -309,7 +307,7 @@ var testTypeMappings = map[string]string{
 }
 
 // migrates the given legacy action to a new action
-func migrateAction(baseLanguage envs.Language, a Action, localization migratedLocalization, baseMediaURL string) (migratedAction, error) {
+func migrateAction(baseLanguage i18n.Language, a Action, localization migratedLocalization, baseMediaURL string) (migratedAction, error) {
 	switch a.Type {
 	case "add_label":
 		labels := make([]*assets.LabelReference, len(a.Labels))
@@ -372,7 +370,7 @@ func migrateAction(baseLanguage envs.Language, a Action, localization migratedLo
 		return newStartSessionAction(a.UUID, flowRef, []urns.URN{}, contacts, groups, variables, createContact), nil
 	case "reply", "send":
 		media := make(Translations)
-		var quickReplies map[envs.Language][]string
+		var quickReplies map[i18n.Language][]string
 
 		msg, err := ReadTranslations(a.Msg)
 		if err != nil {
@@ -507,12 +505,12 @@ func migrateAction(baseLanguage envs.Language, a Action, localization migratedLo
 
 		return newPlayAudioAction(a.UUID, migratedAudioURL), nil
 	default:
-		return nil, errors.Errorf("unable to migrate legacy action type: %s", a.Type)
+		return nil, fmt.Errorf("unable to migrate legacy action type: %s", a.Type)
 	}
 }
 
 // migrates the given legacy rulset to a node with a router
-func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]bool, localization migratedLocalization) (migratedNode, UINodeType, NodeUIConfig, error) {
+func migrateRuleSet(lang i18n.Language, r RuleSet, validDests map[uuids.UUID]bool, localization migratedLocalization) (migratedNode, UINodeType, NodeUIConfig, error) {
 	var newActions []migratedAction
 	var router migratedRouter
 	var wait migratedWait
@@ -706,7 +704,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 			// check if we already have a configuration for this currency
 			existingAmount, alreadyDefined := currencyAmounts[countryCfg.CurrencyCode]
 			if alreadyDefined && existingAmount != countryCfg.Amount {
-				return nil, "", nil, errors.Errorf("unable to migrate airtime ruleset with different amounts in same currency")
+				return nil, "", nil, fmt.Errorf("unable to migrate airtime ruleset with different amounts in same currency")
 			}
 
 			currencyAmounts[countryCfg.CurrencyCode] = countryCfg.Amount
@@ -721,7 +719,7 @@ func migrateRuleSet(lang envs.Language, r RuleSet, validDests map[uuids.UUID]boo
 		uiType = UINodeTypeSplitByAirtime
 
 	default:
-		return nil, "", nil, errors.Errorf("unrecognized ruleset type: %s", r.Type)
+		return nil, "", nil, fmt.Errorf("unrecognized ruleset type: %s", r.Type)
 	}
 
 	return newNode(r.UUID, newActions, router, exits), uiType, uiConfig, nil
@@ -753,7 +751,7 @@ type categoryAndExit struct {
 }
 
 // migrates a set of legacy rules to sets of categories, cases and exits
-func migrateRules(baseLanguage envs.Language, r RuleSet, validDests map[uuids.UUID]bool, localization migratedLocalization, uiConfig NodeUIConfig) ([]migratedCase, []migratedCategory, uuids.UUID, uuids.UUID, []migratedExit, error) {
+func migrateRules(baseLanguage i18n.Language, r RuleSet, validDests map[uuids.UUID]bool, localization migratedLocalization, uiConfig NodeUIConfig) ([]migratedCase, []migratedCategory, uuids.UUID, uuids.UUID, []migratedExit, error) {
 	cases := make([]migratedCase, 0, len(r.Rules))
 	categories := make([]migratedCategory, 0, len(r.Rules))
 	exits := make([]migratedExit, 0, len(r.Rules))
@@ -832,13 +830,13 @@ func migrateRules(baseLanguage envs.Language, r RuleSet, validDests map[uuids.UU
 }
 
 // migrates the given legacy rule to a router case
-func migrateRule(baseLanguage envs.Language, r Rule, category migratedCategory, localization migratedLocalization) (migratedCase, map[string]interface{}, error) {
+func migrateRule(baseLanguage i18n.Language, r Rule, category migratedCategory, localization migratedLocalization) (migratedCase, map[string]any, error) {
 	newType := testTypeMappings[r.Test.Type]
 	var arguments []string
 	var err error
 
 	caseUUID := uuids.New()
-	var caseUI map[string]interface{}
+	var caseUI map[string]any
 
 	switch r.Test.Type {
 
@@ -907,7 +905,7 @@ func migrateRule(baseLanguage envs.Language, r Rule, category migratedCategory, 
 
 		arguments = []string{migratedTest}
 
-		caseUI = map[string]interface{}{
+		caseUI = map[string]any{
 			"arguments": []string{strconv.Itoa(delta)},
 		}
 
@@ -967,21 +965,21 @@ func migrateRule(baseLanguage envs.Language, r Rule, category migratedCategory, 
 		arguments = []string{migratedDistrict, migratedState}
 
 	default:
-		return nil, nil, errors.Errorf("migration of '%s' tests not supported", r.Test.Type)
+		return nil, nil, fmt.Errorf("migration of '%s' tests not supported", r.Test.Type)
 	}
 
 	return newCase(caseUUID, newType, arguments, category.UUID()), caseUI, err
 }
 
 // migrates the given legacy actionset to a node with a set of migrated actions and a single exit
-func migrateActionSet(lang envs.Language, a ActionSet, validDests map[uuids.UUID]bool, localization migratedLocalization, baseMediaURL string) (migratedNode, error) {
+func migrateActionSet(lang i18n.Language, a ActionSet, validDests map[uuids.UUID]bool, localization migratedLocalization, baseMediaURL string) (migratedNode, error) {
 	actions := make([]migratedAction, len(a.Actions))
 
 	// migrate each action
 	for i := range a.Actions {
 		action, err := migrateAction(lang, a.Actions[i], localization, baseMediaURL)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error migrating action[type=%s]", a.Actions[i].Type)
+			return nil, fmt.Errorf("error migrating action[type=%s]: %w", a.Actions[i].Type, err)
 		}
 		actions[i] = action
 	}
@@ -1028,7 +1026,7 @@ func migrateNodes(f *Flow, baseMediaURL string) ([]migratedNode, map[uuids.UUID]
 	for i, actionSet := range f.ActionSets {
 		node, err := migrateActionSet(f.BaseLanguage, actionSet, validDestinations, localization, baseMediaURL)
 		if err != nil {
-			return nil, nil, nil, errors.Wrapf(err, "error migrating action_set[uuid=%s]", actionSet.UUID)
+			return nil, nil, nil, fmt.Errorf("error migrating action_set[uuid=%s]: %w", actionSet.UUID, err)
 		}
 		nodes[i] = node
 		nodeUIs[node.UUID()] = NewNodeUI(UINodeTypeActionSet, actionSet.X, actionSet.Y, nil)
@@ -1037,7 +1035,7 @@ func migrateNodes(f *Flow, baseMediaURL string) ([]migratedNode, map[uuids.UUID]
 	for i, ruleSet := range f.RuleSets {
 		node, uiType, uiNodeConfig, err := migrateRuleSet(f.BaseLanguage, ruleSet, validDestinations, localization)
 		if err != nil {
-			return nil, nil, nil, errors.Wrapf(err, "error migrating rule_set[uuid=%s]", ruleSet.UUID)
+			return nil, nil, nil, fmt.Errorf("error migrating rule_set[uuid=%s]: %w", ruleSet.UUID, err)
 		}
 		nodes[len(f.ActionSets)+i] = node
 		nodeUIs[node.UUID()] = NewNodeUI(uiType, ruleSet.X, ruleSet.Y, uiNodeConfig)
@@ -1103,7 +1101,7 @@ func (f *Flow) Migrate(baseMediaURL string) ([]byte, error) {
 		name = f.Name
 	}
 
-	migrated := map[string]interface{}{
+	migrated := map[string]any{
 		"uuid":                 uuid,
 		"name":                 name,
 		"spec_version":         "13.0.0",
@@ -1132,7 +1130,7 @@ func IsPossibleDefinition(data json.RawMessage) bool {
 func MigrateDefinition(data json.RawMessage, baseMediaURL string) (json.RawMessage, error) {
 	legacyFlow, err := readLegacyFlow(data)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to read legacy flow")
+		return nil, fmt.Errorf("unable to read legacy flow: %w", err)
 	}
 
 	return legacyFlow.Migrate(baseMediaURL)

@@ -1,20 +1,20 @@
 name: CI
 on: [push, pull_request]
 env:
-  go-version: "1.19.x"
+  go-version: "1.22.x"
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Install Linux packages
         run: sudo apt install -y --no-install-recommends pandoc gettext
 
       - name: Install Go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.go-version }}
 
@@ -23,7 +23,7 @@ jobs:
 
       - name: Upload coverage
         if: success()
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
@@ -35,13 +35,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Install Linux packages
         run: sudo apt install -y --no-install-recommends pandoc gettext
 
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.go-version }}
 
@@ -50,24 +50,12 @@ jobs:
           go install github.com/nyaruka/goflow/cmd/docgen
           docgen
           tar -zcf docs.tar.gz docs
+          git restore locale/
 
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Publish release
+        uses: goreleaser/goreleaser-action@v6
+        if: ${{ !contains(github.ref, '-') }}
+        with:
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Upload docs asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./docs.tar.gz
-          asset_name: docs.tar.gz
-          asset_content_type: application/gzip

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
@@ -51,8 +52,7 @@ func TestEvaluateTemplate(t *testing.T) {
 		Error      string          `json:"error,omitempty"`
 	}{}
 
-	err = jsonx.Unmarshal(testFile, &tests)
-	require.NoError(t, err)
+	jsonx.MustUnmarshal(testFile, &tests)
 
 	for i, tc := range tests {
 		var run flows.Run
@@ -62,7 +62,8 @@ func TestEvaluateTemplate(t *testing.T) {
 			run = sessionWithURNs.Runs()[0]
 		}
 
-		eval, err := run.EvaluateTemplate(tc.Template)
+		log := test.NewEventLog()
+		eval, ok := run.EvaluateTemplate(tc.Template, log.Log)
 
 		// clone test case and populate with actual values
 		actual := tc
@@ -71,8 +72,8 @@ func TestEvaluateTemplate(t *testing.T) {
 		} else {
 			actual.Output = eval
 		}
-		if err != nil {
-			actual.Error = err.Error()
+		if !ok {
+			actual.Error = log.Error().Error()
 		}
 
 		if !test.UpdateSnapshots {
@@ -112,12 +113,14 @@ func BenchmarkEvaluateTemplate(b *testing.B) {
 		Output string `json:"output,omitempty"`
 		Error  string `json:"error,omitempty"`
 	}{}
-	jsonx.Unmarshal(testFile, &tests)
-	require.NoError(b, err)
+
+	jsonx.MustUnmarshal(testFile, &tests)
+
+	logEvent := func(e flows.Event) {}
 
 	for n := 0; n < b.N; n++ {
 		for _, tc := range tests {
-			run.EvaluateTemplate(tc.Template)
+			run.EvaluateTemplate(tc.Template, logEvent)
 		}
 	}
 }
@@ -166,10 +169,6 @@ func TestReadWithMissingAssets(t *testing.T) {
 		"group[uuid=4f1f98fc-27a7-4a69-bbdb-24744ba739a9,name=Males]",
 		"group[uuid=b7cf0d83-f1c9-411c-96fd-c511a4cfa86d,name=Testers]",
 		"group[uuid=b7cf0d83-f1c9-411c-96fd-c511a4cfa86d,name=Testers]",
-		"ticketer[uuid=19dc6346-9623-4fe4-be80-538d493ecdf5,name=Support Tickets]",
-		"ticketer[uuid=19dc6346-9623-4fe4-be80-538d493ecdf5,name=Support Tickets]",
-		"ticketer[uuid=19dc6346-9623-4fe4-be80-538d493ecdf5,name=Support Tickets]",
-		"ticketer[uuid=19dc6346-9623-4fe4-be80-538d493ecdf5,name=Support Tickets]",
 		"topic[uuid=472a7a73-96cb-4736-b567-056d987cc5b4,name=Weather]",
 		"topic[uuid=472a7a73-96cb-4736-b567-056d987cc5b4,name=Weather]",
 		"user[email=bob@nyaruka.com,name=Bob]",
@@ -358,7 +357,7 @@ func TestSessionHistory(t *testing.T) {
 	require.NoError(t, err)
 
 	flow := assets.NewFlowReference("5472a1c3-63e1-484f-8485-cc8ecb16a058", "Inception")
-	contact := flows.NewEmptyContact(sa, "Bob", envs.Language("eng"), nil)
+	contact := flows.NewEmptyContact(sa, "Bob", i18n.Language("eng"), nil)
 
 	// trigger session manually which will have no history
 	eng := engine.NewBuilder().Build()

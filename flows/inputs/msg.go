@@ -32,11 +32,11 @@ type MsgInput struct {
 }
 
 // NewMsg creates a new user input based on a message
-func NewMsg(assets flows.SessionAssets, msg *flows.MsgIn, createdOn time.Time) *MsgInput {
+func NewMsg(s flows.Session, msg *flows.MsgIn, createdOn time.Time) *MsgInput {
 	// load the channel
 	var channel *flows.Channel
 	if msg.Channel() != nil {
-		channel = assets.Channels().Get(msg.Channel().UUID)
+		channel = s.Assets().Channels().Get(msg.Channel().UUID)
 	}
 
 	return &MsgInput{

@@ -32,15 +32,17 @@ func TestXNumber(t *testing.T) {
 	assert.Equal(t, `XNumber(123.45)`, types.RequireXNumberFromString("123.45").String())
 
 	// unmarshal with quotes
-	var num types.XNumber
-	err := jsonx.Unmarshal([]byte(`"23.45"`), &num)
+	foo := &struct {
+		Val *types.XNumber `json:"val"`
+	}{}
+	err := jsonx.Unmarshal([]byte(`{"val": "23.45"}`), foo)
 	assert.NoError(t, err)
-	assert.Equal(t, types.RequireXNumberFromString("23.45"), num)
+	assert.Equal(t, types.RequireXNumberFromString("23.45").Native(), foo.Val.Native())
 
 	// unmarshal without quotes
-	err = jsonx.Unmarshal([]byte(`34.56`), &num)
+	err = jsonx.Unmarshal([]byte(`{"val": 34.56}`), foo)
 	assert.NoError(t, err)
-	assert.Equal(t, types.RequireXNumberFromString("34.56"), num)
+	assert.Equal(t, types.RequireXNumberFromString("34.56").Native(), foo.Val.Native())
 
 	// marshal (doesn't use quotes)
 	data, err := jsonx.Marshal(types.RequireXNumberFromString("23.45"))
@@ -51,7 +53,7 @@ func TestXNumber(t *testing.T) {
 func TestToXNumberAndInteger(t *testing.T) {
 	var tests = []struct {
 		value     types.XValue
-		asNumber  types.XNumber
+		asNumber  *types.XNumber
 		asInteger int
 		hasError  bool
 	}{
@@ -67,6 +69,8 @@ func TestToXNumberAndInteger(t *testing.T) {
 		{types.NewXText("12345678901234567890"), types.RequireXNumberFromString("12345678901234567890"), 0, true}, // out of int range
 		{types.NewXText("1E100"), types.XNumberZero, 0, true},                                                     // scientific notation not allowed
 		{types.NewXText("1e100"), types.XNumberZero, 0, true},                                                     // scientific notation not allowed
+		{types.NewXText("234."), types.XNumberZero, 0, true},
+		{types.NewXText("+1800567890"), types.XNumberZero, 0, true},
 	}
 
 	env := envs.NewBuilder().Build()
@@ -76,9 +80,9 @@ func TestToXNumberAndInteger(t *testing.T) {
 		integer, err := types.ToInteger(env, test.value)
 
 		if test.hasError {
-			assert.Error(t, err, "expected error for input %T{%s}", test.value, test.value)
+			assert.Error(t, err.Native(), "expected error for input %T{%s}", test.value, test.value)
 		} else {
-			assert.NoError(t, err, "unexpected error for input %T{%s}", test.value, test.value)
+			assert.NoError(t, err.Native(), "unexpected error for input %T{%s}", test.value, test.value)
 			assert.Equal(t, test.asNumber.Native(), number.Native(), "number mismatch for input %T{%s}", test.value, test.value)
 			assert.Equal(t, test.asInteger, integer, "integer mismatch for input %T{%s}", test.value, test.value)
 		}
@@ -87,7 +91,7 @@ func TestToXNumberAndInteger(t *testing.T) {
 
 func TestFormatCustom(t *testing.T) {
 	fmtTests := []struct {
-		input       types.XNumber
+		input       *types.XNumber
 		format      *envs.NumberFormat
 		places      int
 		groupDigits bool

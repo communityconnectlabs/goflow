@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
@@ -186,11 +187,11 @@ func TestRunContext(t *testing.T) {
 		{`@resume.type`, "msg"},
 		{
 			`@(json(contact.fields))`,
-			`{"activation_token":"AACC55","age":23,"gender":"Male","join_date":"2017-12-02T00:00:00.000000-02:00","not_set":null,"state":null}`,
+			`{"activation_token":"AACC55","age":23,"gender":"Male","join_date":"2017-12-02T00:00:00.000000-02:00","language":null,"not_set":null,"state":null}`,
 		},
 		{
 			`@(json(fields))`,
-			`{"activation_token":"AACC55","age":23,"gender":"Male","join_date":"2017-12-02T00:00:00.000000-02:00","not_set":null,"state":null}`,
+			`{"activation_token":"AACC55","age":23,"gender":"Male","join_date":"2017-12-02T00:00:00.000000-02:00","language":null,"not_set":null,"state":null}`,
 		},
 		{
 			`@(json(contact.urns))`,
@@ -198,7 +199,7 @@ func TestRunContext(t *testing.T) {
 		},
 		{
 			`@(json(urns))`,
-			`{"discord":null,"ext":null,"facebook":null,"fcm":null,"freshchat":null,"instagram":null,"jiochat":null,"line":null,"mailto":"mailto:foo@bar.com","rocketchat":null,"slack":null,"teams":null,"tel":"tel:+12024561111","telegram":null,"twitter":null,"twitterid":"twitterid:54784326227#nyaruka","viber":null,"vk":null,"webchat":null,"wechat":null,"whatsapp":null}`,
+			`{"discord":null,"ext":null,"facebook":null,"fcm":null,"freshchat":null,"instagram":null,"jiochat":null,"line":null,"mailto":"mailto:foo@bar.com","rocketchat":null,"slack":null,"tel":"tel:+12024561111","telegram":null,"twitter":null,"twitterid":"twitterid:54784326227#nyaruka","viber":null,"vk":null,"webchat":null,"wechat":null,"whatsapp":null}`,
 		},
 		{
 			`@(json(results.favorite_color))`,
@@ -214,23 +215,25 @@ func TestRunContext(t *testing.T) {
 		},
 		{
 			`@(json(parent.urns))`,
-			`{"discord":null,"ext":null,"facebook":null,"fcm":null,"freshchat":null,"instagram":null,"jiochat":null,"line":null,"mailto":null,"rocketchat":null,"slack":null,"teams":null,"tel":"tel:+12024562222","telegram":null,"twitter":null,"twitterid":null,"viber":null,"vk":null,"webchat":null,"wechat":null,"whatsapp":null}`,
+			`{"discord":null,"ext":null,"facebook":null,"fcm":null,"freshchat":null,"instagram":null,"jiochat":null,"line":null,"mailto":null,"rocketchat":null,"slack":null,"tel":"tel:+12024562222","telegram":null,"twitter":null,"twitterid":null,"viber":null,"vk":null,"webchat":null,"wechat":null,"whatsapp":null}`,
 		},
 		{
 			`@(json(parent.fields))`,
-			`{"activation_token":null,"age":33,"gender":"Female","join_date":null,"not_set":null,"state":null}`,
+			`{"activation_token":null,"age":33,"gender":"Female","join_date":null,"language":null,"not_set":null,"state":null}`,
 		},
 	}
 
 	for _, tc := range testCases {
-		actual, err := run.EvaluateTemplate(tc.template)
-		assert.NoError(t, err)
+		log := test.NewEventLog()
+		actual, _ := run.EvaluateTemplate(tc.template, log.Log)
+		assert.NoError(t, log.Error())
 		assert.Equal(t, tc.expected, actual, "template mismatch for %s", tc.template)
 	}
 
 	// test with escaping
-	evaluated, err := run.EvaluateTemplateText(`gender = @("M\" OR")`, flows.ContactQueryEscaping, true)
-	assert.NoError(t, err)
+	log := test.NewEventLog()
+	evaluated, _ := run.EvaluateTemplateText(`gender = @("M\" OR")`, flows.ContactQueryEscaping, true, log.Log)
+	assert.NoError(t, log.Error())
 	assert.Equal(t, `gender = "M\" OR"`, evaluated)
 }
 
@@ -247,25 +250,26 @@ func TestMissingRelatedRunContext(t *testing.T) {
 	require.NoError(t, err)
 
 	run := session.Runs()[0]
+	log := test.NewEventLog()
 
 	// since we have no parent, check that it resolves to nil
-	val, err := run.EvaluateTemplateValue(`@parent`)
-	assert.NoError(t, err)
+	val, _ := run.EvaluateTemplateValue(`@parent`, log.Log)
+	assert.NoError(t, log.Error())
 	assert.Nil(t, val)
 
 	// check that trying to resolve a property of parent is an error
-	val, err = run.EvaluateTemplateValue(`@parent.contact`)
-	assert.NoError(t, err)
+	val, _ = run.EvaluateTemplateValue(`@parent.contact`, log.Log)
+	assert.NoError(t, log.Error())
 	assert.Equal(t, types.NewXErrorf("null doesn't support lookups"), val)
 
 	// we also have no child, check that it resolves to nil
-	val, err = run.EvaluateTemplateValue(`@child`)
-	assert.NoError(t, err)
+	val, _ = run.EvaluateTemplateValue(`@child`, log.Log)
+	assert.NoError(t, log.Error())
 	assert.Nil(t, val)
 
 	// check that trying to resolve a property of child is an error
-	val, err = run.EvaluateTemplateValue(`@child.contact`)
-	assert.NoError(t, err)
+	val, _ = run.EvaluateTemplateValue(`@child.contact`, log.Log)
+	assert.NoError(t, log.Error())
 	assert.Equal(t, types.NewXErrorf("null doesn't support lookups"), val)
 }
 
@@ -330,8 +334,8 @@ func TestTranslation(t *testing.T) {
 
 	tcs := []struct {
 		description          string
-		envLangs             []envs.Language
-		contactLang          envs.Language
+		envLangs             []i18n.Language
+		contactLang          i18n.Language
 		msgAction            []byte
 		expectedText         string
 		expectedAttachments  []utils.Attachment
@@ -339,7 +343,7 @@ func TestTranslation(t *testing.T) {
 	}{
 		{
 			description:  "contact language is valid and is flow base language, msg action has all fields",
-			envLangs:     []envs.Language{"eng", "spa"},
+			envLangs:     []i18n.Language{"eng", "spa"},
 			contactLang:  "eng",
 			msgAction:    msgAction1,
 			expectedText: "Hello",
@@ -351,7 +355,7 @@ func TestTranslation(t *testing.T) {
 		},
 		{
 			description:  "contact language is valid and translations exist, msg action has all fields",
-			envLangs:     []envs.Language{"eng", "spa"},
+			envLangs:     []i18n.Language{"eng", "spa"},
 			contactLang:  "spa",
 			msgAction:    msgAction1,
 			expectedText: "Hola",
@@ -362,7 +366,7 @@ func TestTranslation(t *testing.T) {
 		},
 		{
 			description:  "contact language is allowed but no translations exist, msg action has all fields",
-			envLangs:     []envs.Language{"eng", "spa", "kin"},
+			envLangs:     []i18n.Language{"eng", "spa", "kin"},
 			contactLang:  "kin",
 			msgAction:    msgAction1,
 			expectedText: "Hello",
@@ -374,7 +378,7 @@ func TestTranslation(t *testing.T) {
 		},
 		{
 			description:  "contact language is not allowed and translations exist, msg action has all fields",
-			envLangs:     []envs.Language{"eng"},
+			envLangs:     []i18n.Language{"eng"},
 			contactLang:  "spa",
 			msgAction:    msgAction1,
 			expectedText: "Hello",
@@ -386,7 +390,7 @@ func TestTranslation(t *testing.T) {
 		},
 		{
 			description:          "contact language is valid and is flow base language, msg action only has text",
-			envLangs:             []envs.Language{"eng", "spa"},
+			envLangs:             []i18n.Language{"eng", "spa"},
 			contactLang:          "eng",
 			msgAction:            msgAction2,
 			expectedText:         "Hello",
@@ -395,7 +399,7 @@ func TestTranslation(t *testing.T) {
 		},
 		{
 			description:  "contact language is valid and translations exist, msg action only has text",
-			envLangs:     []envs.Language{"eng", "spa"},
+			envLangs:     []i18n.Language{"eng", "spa"},
 			contactLang:  "spa",
 			msgAction:    msgAction2,
 			expectedText: "Hola",
@@ -406,7 +410,7 @@ func TestTranslation(t *testing.T) {
 		},
 		{
 			description:  "attachments and quick replies translations are single empty strings and should be ignored",
-			envLangs:     []envs.Language{"eng", "fra"},
+			envLangs:     []i18n.Language{"eng", "fra"},
 			contactLang:  "fra",
 			msgAction:    msgAction1,
 			expectedText: "Bonjour",
@@ -422,7 +426,7 @@ func TestTranslation(t *testing.T) {
 		assetsJSON, _ := os.ReadFile("testdata/translation_assets.json")
 		assetsJSON = test.JSONReplace(assetsJSON, []string{"flows", "[0]", "nodes", "[0]", "actions", "[0]"}, tc.msgAction)
 
-		env := envs.NewBuilder().WithAllowedLanguages(tc.envLangs).Build()
+		env := envs.NewBuilder().WithAllowedLanguages(tc.envLangs...).Build()
 		_, _, sp := test.NewSessionBuilder().
 			WithEnvironment(env).
 			WithContact("2efa1803-ae4d-4a58-ba54-b523e53e40f3", 123, "Bob", tc.contactLang, "tel+1234567890").

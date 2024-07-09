@@ -1,6 +1,7 @@
 package envs
 
 import (
+	"fmt"
 	"math"
 	"regexp"
 	"strconv"
@@ -10,7 +11,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/goflow/utils"
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -71,22 +71,13 @@ var isoFormats = []string{iso8601Format, iso8601NoSecondsFormat}
 var ZeroDateTime = time.Time{}
 
 func dateFromFormats(currentYear int, pattern *regexp.Regexp, d int, m int, y int, str string) (dates.Date, string, error) {
-
 	matches := pattern.FindAllStringSubmatchIndex(str, -1)
 	for _, match := range matches {
 		groups := utils.StringSlices(str, match)
 
-		// does our day look believable?
-		day, _ := strconv.Atoi(groups[d])
-		if day == 0 || day > 31 {
-			continue
-		}
-		month, _ := strconv.Atoi(groups[m])
-		if month == 0 || month > 12 {
-			continue
-		}
-
 		year, _ := strconv.Atoi(groups[y])
+		month, _ := strconv.Atoi(groups[m])
+		day, _ := strconv.Atoi(groups[d])
 
 		// convert to four digit year if necessary
 		if len(groups[y]) == 2 {
@@ -97,13 +88,27 @@ func dateFromFormats(currentYear int, pattern *regexp.Regexp, d int, m int, y in
 			}
 		}
 
+		// does our day and month look believable?
+		if day == 0 || day > 31 {
+			continue
+		}
+		if month == 0 || month > 12 {
+			continue
+		}
+
+		// lean time.Parse to check if the year, month and day values are valid together, i.e. no 30 of Feb
+		_, err := time.Parse("2006-1-2", fmt.Sprintf("%d-%d-%d", year, month, day))
+		if err != nil {
+			continue
+		}
+
 		remainder := str[match[1]:]
 
 		// looks believable, go for it
 		return dates.NewDate(year, month, day), remainder, nil
 	}
 
-	return dates.ZeroDate, str, errors.Errorf("string '%s' couldn't be parsed as a date", str)
+	return dates.ZeroDate, str, fmt.Errorf("string '%s' couldn't be parsed as a date", str)
 }
 
 // DateTimeFromString returns a datetime constructed from the passed in string, or an error if we
@@ -149,7 +154,7 @@ func DateFromString(env Environment, str string) (dates.Date, error) {
 func TimeFromString(str string) (dates.TimeOfDay, error) {
 	hasTime, timeOfDay := parseTime(str)
 	if !hasTime {
-		return dates.ZeroTimeOfDay, errors.Errorf("string '%s' couldn't be parsed as a time", str)
+		return dates.ZeroTimeOfDay, fmt.Errorf("string '%s' couldn't be parsed as a time", str)
 	}
 	return timeOfDay, nil
 }
@@ -158,7 +163,7 @@ func parseDate(env Environment, str string) (dates.Date, string, error) {
 	str = strings.Trim(str, " \n\r\t")
 
 	// try to parse as ISO date
-	asISO, err := time.ParseInLocation(iso8601DateOnlyFormat, str[0:utils.Min(len(iso8601DateOnlyFormat), len(str))], env.Timezone())
+	asISO, err := time.ParseInLocation(iso8601DateOnlyFormat, str[0:min(len(iso8601DateOnlyFormat), len(str))], env.Timezone())
 	if err == nil {
 		return dates.ExtractDate(asISO), str[len(iso8601DateOnlyFormat):], nil
 	}
@@ -175,7 +180,7 @@ func parseDate(env Environment, str string) (dates.Date, string, error) {
 		return dateFromFormats(currentYear, patternMonthDayYear, 2, 1, 3, str)
 	}
 
-	return dates.ZeroDate, "", errors.Errorf("unknown date format: %s", env.DateFormat())
+	return dates.ZeroDate, "", fmt.Errorf("unknown date format: %s", env.DateFormat())
 }
 
 func parseTime(str string) (bool, dates.TimeOfDay) {

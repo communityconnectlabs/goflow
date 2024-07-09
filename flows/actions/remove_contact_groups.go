@@ -1,12 +1,11 @@
 package actions
 
 import (
+	"fmt"
+
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/modifiers"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -50,19 +49,13 @@ func NewRemoveContactGroups(uuid flows.ActionUUID, groups []*assets.GroupReferen
 // Validate validates our action is valid
 func (a *RemoveContactGroupsAction) Validate() error {
 	if a.AllGroups && len(a.Groups) > 0 {
-		return errors.Errorf("can't specify specific groups when all_groups=true")
+		return fmt.Errorf("can't specify specific groups when all_groups=true")
 	}
 	return nil
 }
 
 // Execute runs the action
 func (a *RemoveContactGroupsAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
-	contact := run.Contact()
-	if contact == nil {
-		logEvent(events.NewErrorf("can't execute action in session without a contact"))
-		return nil
-	}
-
 	var groups []*flows.Group
 
 	if a.AllGroups {

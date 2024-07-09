@@ -10,8 +10,6 @@ import (
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/goflow/cmd/docgen/completion"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -90,7 +88,7 @@ func (g *editorSupportGenerator) buildContextCompletion(items map[string][]*Tagg
 		for i, propDesc := range item.examples {
 			prop := completion.ParseProperty(propDesc)
 			if prop == nil {
-				return nil, errors.Errorf("invalid format for property description \"%s\"", propDesc)
+				return nil, fmt.Errorf("invalid format for property description \"%s\"", propDesc)
 			}
 			prop.Help = gettext(prop.Help)
 			properties[i] = prop
@@ -156,11 +154,10 @@ func createContextPathListFile(outputDir string, c *completion.Completion) error
 }
 
 func createURNsType(gettext func(string) string) completion.Type {
-	properties := make([]*completion.Property, 0, len(urns.ValidSchemes))
-	for k := range urns.ValidSchemes {
-		name := strings.Title(k)
-		help := strings.ReplaceAll(gettext("{type} URN for the contact"), "{type}", name)
-		properties = append(properties, completion.NewProperty(k, help, "text"))
+	properties := make([]*completion.Property, 0, len(urns.Schemes))
+	for _, s := range urns.Schemes {
+		help := strings.ReplaceAll(gettext("{type} URN for the contact"), "{type}", s.Name)
+		properties = append(properties, completion.NewProperty(s.Prefix, help, "text"))
 	}
 	sort.SliceStable(properties, func(i, j int) bool { return properties[i].Key < properties[j].Key })
 

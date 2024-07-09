@@ -1,17 +1,16 @@
 package migrations
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
+	"github.com/Masterminds/semver"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/flows/definition/legacy"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/Masterminds/semver"
-	"github.com/pkg/errors"
 )
 
 // MigrationFunc is a function that can migrate a flow definition from one version to another
@@ -61,7 +60,7 @@ func MigrateToVersion(data []byte, to *semver.Version, cfg *Config) ([]byte, err
 			var err error
 			data, err = legacy.MigrateDefinition(data, cfg.BaseMediaURL)
 			if err != nil {
-				return nil, errors.Wrap(err, "error migrating what appears to be a legacy definition")
+				return nil, fmt.Errorf("error migrating what appears to be a legacy definition: %w", err)
 			}
 		}
 
@@ -70,7 +69,7 @@ func MigrateToVersion(data []byte, to *semver.Version, cfg *Config) ([]byte, err
 	}
 
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to read flow header")
+		return nil, fmt.Errorf("unable to read flow header: %w", err)
 	}
 
 	return migrate(data, header.SpecVersion, to, cfg)
@@ -93,28 +92,30 @@ func migrate(data []byte, from *semver.Version, to *semver.Version, cfg *Config)
 	// sorted by earliest first
 	sort.SliceStable(versions, func(i, j int) bool { return versions[i].LessThan(versions[j]) })
 
-	migrated, err := readFlow(data)
-	if err != nil {
-		return nil, err
-	}
-
 	for _, version := range versions {
-		migrated, err = registered[version](migrated, cfg)
+		// we read the flow each time to ensure what we pass to the migration function uses the types it expects
+		flow, err := ReadFlow(data)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to migrate to version %s", version.String())
+			return nil, err
 		}
 
-		migrated["spec_version"] = version.String()
+		flow, err = registered[version](flow, cfg)
+		if err != nil {
+			return nil, fmt.Errorf("unable to migrate to version %s: %w", version.String(), err)
+		}
+
+		flow["spec_version"] = version.String()
+
+		data = jsonx.MustMarshal(flow)
 	}
 
-	// finally marshal back to JSON
-	return jsonx.Marshal(migrated)
+	return data, nil
 }
 
 // Clone clones the given flow definition by replacing all UUIDs using the provided mapping and
 // generating new random UUIDs if they aren't in the mapping
 func Clone(data []byte, depMapping map[uuids.UUID]uuids.UUID) ([]byte, error) {
-	clone, err := readFlow(data)
+	clone, err := ReadFlow(data)
 	if err != nil {
 		return nil, err
 	}
@@ -125,23 +126,8 @@ func Clone(data []byte, depMapping map[uuids.UUID]uuids.UUID) ([]byte, error) {
 	return jsonx.Marshal(clone)
 }
 
-// reads a flow definition as a flow primitive
-func readFlow(data []byte) (Flow, error) {
-	g, err := jsonx.DecodeGeneric(data)
-	if err != nil {
-		return nil, err
-	}
-
-	d, _ := g.(map[string]interface{})
-	if d == nil {
-		return nil, errors.New("flow definition isn't an object")
-	}
-
-	return d, nil
-}
-
 // remap all UUIDs in the flow
-func remapUUIDs(data map[string]interface{}, depMapping map[uuids.UUID]uuids.UUID) {
+func remapUUIDs(data map[string]any, depMapping map[uuids.UUID]uuids.UUID) {
 	// copy in the dependency mappings into a master mapping of all UUIDs
 	mapping := make(map[uuids.UUID]uuids.UUID)
 	for k, v := range depMapping {
@@ -160,7 +146,7 @@ func remapUUIDs(data map[string]interface{}, depMapping map[uuids.UUID]uuids.UUI
 		return mapped
 	}
 
-	objectCallback := func(obj map[string]interface{}) {
+	objectCallback := func(path string, obj map[string]any) {
 		props := objectProperties(obj)
 
 		for _, p := range props {
@@ -179,7 +165,7 @@ func remapUUIDs(data map[string]interface{}, depMapping map[uuids.UUID]uuids.UUI
 		}
 	}
 
-	arrayCallback := func(arr []interface{}) {
+	arrayCallback := func(path string, arr []any) {
 		for i, v := range arr {
 			asString, isString := v.(string)
 			if isString && uuids.IsV4(asString) {
@@ -188,11 +174,11 @@ func remapUUIDs(data map[string]interface{}, depMapping map[uuids.UUID]uuids.UUI
 		}
 	}
 
-	walk(data, objectCallback, arrayCallback)
+	walk(data, objectCallback, arrayCallback, "")
 }
 
 // extract the property names from a generic JSON object, sorted A-Z
-func objectProperties(obj map[string]interface{}) []string {
+func objectProperties(obj map[string]any) []string {
 	props := make([]string, 0, len(obj))
 	for k := range obj {
 		props = append(props, k)
@@ -202,19 +188,19 @@ func objectProperties(obj map[string]interface{}) []string {
 }
 
 // walks the given generic JSON invoking the given callbacks for each thing found
-func walk(j interface{}, objectCallback func(map[string]interface{}), arrayCallback func([]interface{})) {
+func walk(j any, objectCallback func(string, map[string]any), arrayCallback func(string, []any), path string) {
 	switch typed := j.(type) {
-	case map[string]interface{}:
-		objectCallback(typed)
+	case map[string]any:
+		objectCallback(path, typed)
 
 		for _, p := range objectProperties(typed) {
-			walk(typed[p], objectCallback, arrayCallback)
+			walk(typed[p], objectCallback, arrayCallback, fmt.Sprintf("%s.%s", path, p))
 		}
-	case []interface{}:
-		arrayCallback(typed)
+	case []any:
+		arrayCallback(path, typed)
 
-		for _, v := range typed {
-			walk(v, objectCallback, arrayCallback)
+		for i, v := range typed {
+			walk(v, objectCallback, arrayCallback, fmt.Sprintf("%s[%d]", path, i))
 		}
 	}
 }

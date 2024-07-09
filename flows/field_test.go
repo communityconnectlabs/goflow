@@ -48,6 +48,7 @@ func TestFieldValues(t *testing.T) {
 		"join_date":        nil,
 		"state":            nil,
 		"not_set":          nil,
+		"language":         nil,
 	}), flows.Context(env, fieldVals))
 }
 
@@ -61,7 +62,7 @@ func TestFieldValueParse(t *testing.T) {
 	state := fields.Get("state")
 
 	xt := types.NewXText
-	xn := func(s string) *types.XNumber { xn := types.RequireXNumberFromString(s); return &xn }
+	xn := func(s string) *types.XNumber { xn := types.RequireXNumberFromString(s); return xn }
 	nilLocPath := envs.LocationPath("")
 
 	tcs := []struct {
@@ -81,7 +82,7 @@ func TestFieldValueParse(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		actual := session.Contact().Fields().Parse(session.Runs()[0].Environment(), fields, tc.field, tc.value)
+		actual := session.Contact().Fields().Parse(session.MergedEnvironment(), fields, tc.field, tc.value)
 
 		assert.Equal(t, tc.expected, actual, "parse mismatch for field %s and value '%s'", tc.field.Key(), tc.value)
 	}
@@ -94,9 +95,9 @@ func TestValues(t *testing.T) {
 
 	v1 := flows.NewValue(types.NewXText("Male"), nil, nil, envs.LocationPath(""), envs.LocationPath(""), envs.LocationPath(""))
 	v2 := flows.NewValue(types.NewXText("Male"), nil, nil, envs.LocationPath(""), envs.LocationPath(""), envs.LocationPath(""))
-	v3 := flows.NewValue(types.NewXText("23"), nil, &num1, envs.LocationPath(""), envs.LocationPath(""), envs.LocationPath(""))
-	v4 := flows.NewValue(types.NewXText("23x"), nil, &num2, envs.LocationPath(""), envs.LocationPath(""), envs.LocationPath(""))
-	v5 := flows.NewValue(types.NewXText("23x"), nil, &num3, envs.LocationPath(""), envs.LocationPath(""), envs.LocationPath(""))
+	v3 := flows.NewValue(types.NewXText("23"), nil, num1, envs.LocationPath(""), envs.LocationPath(""), envs.LocationPath(""))
+	v4 := flows.NewValue(types.NewXText("23x"), nil, num2, envs.LocationPath(""), envs.LocationPath(""), envs.LocationPath(""))
+	v5 := flows.NewValue(types.NewXText("23x"), nil, num3, envs.LocationPath(""), envs.LocationPath(""), envs.LocationPath(""))
 	v6 := (*flows.Value)(nil)
 
 	assert.True(t, v1.Equals(v1))

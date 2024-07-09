@@ -2,13 +2,12 @@ package inputs
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
 type readFunc func(flows.SessionAssets, json.RawMessage, assets.MissingCallback) (flows.Input, error)
@@ -52,7 +51,7 @@ func (i *baseInput) CreatedOn() time.Time    { return i.createdOn }
 type baseInputEnvelope struct {
 	Type      string                   `json:"type" validate:"required"`
 	UUID      flows.InputUUID          `json:"uuid"`
-	Channel   *assets.ChannelReference `json:"channel,omitempty" validate:"omitempty,dive"`
+	Channel   *assets.ChannelReference `json:"channel,omitempty" validate:"omitempty"`
 	CreatedOn time.Time                `json:"created_on" validate:"required"`
 }
 
@@ -65,7 +64,7 @@ func ReadInput(sessionAssets flows.SessionAssets, data json.RawMessage, missing 
 
 	f := registeredTypes[typeName]
 	if f == nil {
-		return nil, errors.Errorf("unknown type: '%s'", typeName)
+		return nil, fmt.Errorf("unknown type: '%s'", typeName)
 	}
 
 	return f(sessionAssets, data, missing)

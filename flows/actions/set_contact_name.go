@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/nyaruka/goflow/flows"
-	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/modifiers"
 )
 
@@ -43,17 +42,10 @@ func NewSetContactName(uuid flows.ActionUUID, name string) *SetContactNameAction
 
 // Execute runs this action
 func (a *SetContactNameAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
-	if run.Contact() == nil {
-		logEvent(events.NewErrorf("can't execute action in session without a contact"))
-		return nil
-	}
-
-	name, err := run.EvaluateTemplate(a.Name)
+	name, ok := run.EvaluateTemplate(a.Name, logEvent)
 	name = strings.TrimSpace(name)
 
-	// if we received an error, log it
-	if err != nil {
-		logEvent(events.NewError(err))
+	if !ok {
 		return nil
 	}
 

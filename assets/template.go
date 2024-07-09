@@ -3,8 +3,8 @@ package assets
 import (
 	"fmt"
 
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/envs"
 )
 
 // TemplateUUID is the UUID of a template
@@ -13,24 +13,40 @@ type TemplateUUID uuids.UUID
 // Template is a message template, currently only used by WhatsApp channels
 //
 //	{
-//	  "name": "revive-issue",
+//	  "name": "greeting",
 //	  "uuid": "14782905-81a6-4910-bc9f-93ad287b23c3",
 //	  "translations": [
 //	    {
 //	       "locale": "eng-US",
-//	       "content": "Hi {{1}}, are you still experiencing your issue?",
 //	       "channel": {
 //	         "uuid": "cf26be4c-875f-4094-9e08-162c3c9dcb5b",
 //	         "name": "Twilio Channel"
-//	       }
+//	       },
+//	       "components": [
+//	         {
+//	           "name": "body",
+//	           "type": "body/text",
+//	           "content": "Hello {{1}}",
+//	           "variables": {"1": 0}
+//	         }
+//	       ],
+//	       "variables": [{"type": "text"}]
 //	    },
 //	    {
 //	       "locale": "fra",
-//	       "content": "Bonjour {{1}}",
 //	       "channel": {
 //	         "uuid": "cf26be4c-875f-4094-9e08-162c3c9dcb5b",
 //	         "name": "Twilio Channel"
-//	       }
+//	       },
+//	       "components": [
+//	         {
+//	           "name": "body",
+//	           "type": "body/text",
+//	           "content": "Bonjour {{1}}",
+//	           "variables": {"1": 0}
+//	         }
+//	       ],
+//	       "variables": [{"type": "text"}]
 //	    }
 //	  ]
 //	}
@@ -42,13 +58,24 @@ type Template interface {
 	Translations() []TemplateTranslation
 }
 
+type TemplateVariable interface {
+	Type() string
+}
+
+type TemplateComponent interface {
+	Name() string
+	Type() string
+	Content() string
+	Display() string
+	Variables() map[string]int
+}
+
 // TemplateTranslation represents a single translation for a specific template and channel
 type TemplateTranslation interface {
-	Content() string
-	Locale() envs.Locale
-	Namespace() string
-	VariableCount() int
-	Channel() ChannelReference
+	Locale() i18n.Locale
+	Channel() *ChannelReference
+	Components() []TemplateComponent
+	Variables() []TemplateVariable
 }
 
 // TemplateReference is used to reference a Template

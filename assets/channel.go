@@ -3,8 +3,8 @@ package assets
 import (
 	"fmt"
 
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/uuids"
-	"github.com/nyaruka/goflow/envs"
 )
 
 // ChannelUUID is the UUID of a channel
@@ -20,6 +20,13 @@ const (
 	ChannelRoleCall    ChannelRole = "call"
 	ChannelRoleAnswer  ChannelRole = "answer"
 	ChannelRoleUSSD    ChannelRole = "ussd"
+)
+
+// ChannelFeature is a feature that a channel supports
+type ChannelFeature string
+
+const (
+	ChannelFeatureOptIns ChannelFeature = "optins"
 )
 
 // Channel is something that can send/receive messages.
@@ -40,8 +47,8 @@ type Channel interface {
 	Address() string
 	Schemes() []string
 	Roles() []ChannelRole
-	Parent() *ChannelReference
-	Country() envs.Country
+	Features() []ChannelFeature
+	Country() i18n.Country
 	MatchPrefixes() []string
 	AllowInternational() bool
 }

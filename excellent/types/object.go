@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -9,7 +10,6 @@ import (
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/utils"
-	"github.com/pkg/errors"
 )
 
 const serializeDefaultAs = "__default__"
@@ -24,13 +24,14 @@ const serializeDefaultAs = "__default__"
 //
 // @type object
 type XObject struct {
-	XValue
-	XCountable
+	baseValue
 
-	def            XValue
-	props          map[string]XValue
-	source         func() map[string]XValue
-	marshalDefault bool
+	def    XValue
+	props  map[string]XValue
+	source func() map[string]XValue
+
+	marshalDefault    bool
+	marshalDeprecated bool
 }
 
 // NewXObject returns a new object with the given properties
@@ -42,6 +43,9 @@ func NewXObject(properties map[string]XValue) *XObject {
 func NewXLazyObject(source func() map[string]XValue) *XObject {
 	return &XObject{
 		source: source,
+
+		marshalDefault:    false,
+		marshalDeprecated: true,
 	}
 }
 
@@ -95,9 +99,11 @@ func (x *XObject) Format(env envs.Environment) string {
 func (x *XObject) MarshalJSON() ([]byte, error) {
 	marshaled := make(map[string]json.RawMessage, x.Count())
 	for p, v := range x.properties() {
-		asJSON, err := ToXJSON(v)
-		if err == nil {
-			marshaled[p] = json.RawMessage(asJSON.Native())
+		if IsNil(v) || x.marshalDeprecated || v.Deprecated() == "" {
+			asJSON, err := ToXJSON(v)
+			if err == nil {
+				marshaled[p] = json.RawMessage(asJSON.Native())
+			}
 		}
 	}
 
@@ -117,7 +123,7 @@ func ReadXObject(data []byte) (*XObject, error) {
 	switch typed := v.(type) {
 	case *XObject:
 		return typed, nil
-	case XError:
+	case *XError:
 		return nil, typed
 	default:
 		return nil, errors.New("JSON doesn't contain an object")
@@ -206,8 +212,9 @@ func (x *XObject) Default() XValue {
 	return x.def
 }
 
-func (x *XObject) SetMarshalDefault(marshal bool) {
-	x.marshalDefault = marshal
+func (x *XObject) SetMarshalOptions(includeDefault, includeDeprecated bool) {
+	x.marshalDefault = includeDefault
+	x.marshalDeprecated = includeDeprecated
 }
 
 // Default returns the default value for this
@@ -237,12 +244,12 @@ var XObjectEmpty = NewXObject(map[string]XValue{})
 var _ json.Marshaler = (*XObject)(nil)
 
 // ToXObject converts the given value to an object
-func ToXObject(env envs.Environment, x XValue) (*XObject, XError) {
-	if utils.IsNil(x) {
+func ToXObject(env envs.Environment, x XValue) (*XObject, *XError) {
+	if IsNil(x) {
 		return XObjectEmpty, nil
 	}
 	if IsXError(x) {
-		return XObjectEmpty, x.(XError)
+		return XObjectEmpty, x.(*XError)
 	}
 
 	object, isObject := x.(*XObject)

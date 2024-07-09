@@ -9,12 +9,25 @@ import (
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/flows/engine"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 var assetsJSON = `{
+	"channels": [
+        {
+            "uuid": "58e9b092-fe42-4173-876c-ff45a14a24fe",
+            "name": "Facebook",
+            "address": "457547478475",
+            "schemes": [
+                "facebook"
+            ],
+            "roles": [
+                "send",
+                "receive"
+            ]
+        }
+    ],
 	"flows": [
 		{
             "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
@@ -41,6 +54,12 @@ var assetsJSON = `{
 			"name": "Spam"
 		}
 	],
+	"optins": [
+        {
+            "uuid": "248be71d-78e9-4d71-a6c4-9981d369e5cb",
+            "name": "Joke Of The Day"
+        }
+    ],
 	"resthooks": [
 		{
 			"slug": "new-registration",
@@ -73,6 +92,9 @@ func TestSessionAssets(t *testing.T) {
 	assert.Equal(t, "Survey Audience", group.Name())
 
 	assert.Nil(t, sa.Groups().Get("xyz"))
+
+	optIn := sa.OptIns().Get("248be71d-78e9-4d71-a6c4-9981d369e5cb")
+	assert.Equal(t, "Joke Of The Day", optIn.Name())
 
 	resthook := sa.Resthooks().FindBySlug("new-registration")
 	assert.Equal(t, "new-registration", resthook.Slug())
@@ -116,7 +138,7 @@ func TestSessionAssetsWithSourceErrors(t *testing.T) {
 	_, err = sa.Flows().FindByName("Catch All")
 	assert.EqualError(t, err, "unable to load flow assets")
 
-	for _, errType := range []string{"channels", "classifiers", "fields", "globals", "groups", "labels", "locations", "resthooks", "templates", "users"} {
+	for _, errType := range []string{"channels", "classifiers", "fields", "globals", "groups", "labels", "locations", "optins", "resthooks", "templates", "users"} {
 		source.currentErrType = errType
 		_, err = engine.NewSessionAssets(env, source, nil)
 		assert.EqualError(t, err, fmt.Sprintf("unable to load %s assets", errType), "error mismatch for type %s", errType)
@@ -130,7 +152,7 @@ type testSource struct {
 
 func (s *testSource) err(t string) error {
 	if t == s.currentErrType {
-		return errors.Errorf("unable to load %s assets", t)
+		return fmt.Errorf("unable to load %s assets", t)
 	}
 	return nil
 }
@@ -175,12 +197,12 @@ func (s *testSource) Resthooks() ([]assets.Resthook, error) {
 	return nil, s.err("resthooks")
 }
 
-func (s *testSource) Templates() ([]assets.Template, error) {
-	return nil, s.err("templates")
+func (s *testSource) OptIns() ([]assets.OptIn, error) {
+	return nil, s.err("optins")
 }
 
-func (s *testSource) Ticketers() ([]assets.Ticketer, error) {
-	return nil, s.err("ticketers")
+func (s *testSource) Templates() ([]assets.Template, error) {
+	return nil, s.err("templates")
 }
 
 func (s *testSource) Topics() ([]assets.Topic, error) {

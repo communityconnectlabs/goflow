@@ -3,7 +3,7 @@ package actions
 import (
 	"strings"
 
-	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/modifiers"
@@ -44,24 +44,18 @@ func NewSetContactLanguage(uuid flows.ActionUUID, language string) *SetContactLa
 
 // Execute runs this action
 func (a *SetContactLanguageAction) Execute(run flows.Run, step flows.Step, logModifier flows.ModifierCallback, logEvent flows.EventCallback) error {
-	if run.Contact() == nil {
-		logEvent(events.NewErrorf("can't execute action in session without a contact"))
-		return nil
-	}
-
-	language, err := run.EvaluateTemplate(a.Language)
+	language, ok := run.EvaluateTemplate(a.Language, logEvent)
 	language = strings.TrimSpace(language)
 
-	// if we received an error, log it
-	if err != nil {
-		logEvent(events.NewError(err))
+	if !ok {
 		return nil
 	}
 
 	// language must be empty or valid language code
-	lang := envs.NilLanguage
+	lang := i18n.NilLanguage
+	var err error
 	if language != "" {
-		lang, err = envs.ParseLanguage(language)
+		lang, err = i18n.ParseLanguage(language)
 		if err != nil {
 			logEvent(events.NewError(err))
 			return nil

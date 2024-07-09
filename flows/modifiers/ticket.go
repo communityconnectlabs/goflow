@@ -22,17 +22,15 @@ const TypeTicket string = "ticket"
 type TicketModifier struct {
 	baseModifier
 
-	ticketer *flows.Ticketer
 	topic    *flows.Topic
 	body     string
 	assignee *flows.User
 }
 
 // NewTicket creates a new ticket modifier
-func NewTicket(ticketer *flows.Ticketer, topic *flows.Topic, body string, assignee *flows.User) *TicketModifier {
+func NewTicket(topic *flows.Topic, body string, assignee *flows.User) *TicketModifier {
 	return &TicketModifier{
 		baseModifier: newBaseModifier(TypeTicket),
-		ticketer:     ticketer,
 		topic:        topic,
 		body:         body,
 		assignee:     assignee,
@@ -40,35 +38,17 @@ func NewTicket(ticketer *flows.Ticketer, topic *flows.Topic, body string, assign
 }
 
 // Apply applies this modification to the given contact
-func (m *TicketModifier) Apply(env envs.Environment, svcs flows.Services, sa flows.SessionAssets, contact *flows.Contact, log flows.EventCallback) bool {
-	httpLogger := &flows.HTTPLogger{}
-
-	// try to get a ticket service for this ticketer
-	svc, err := svcs.Ticket(m.ticketer)
-	if err != nil {
-		log(events.NewError(err))
+func (m *TicketModifier) Apply(eng flows.Engine, env envs.Environment, sa flows.SessionAssets, contact *flows.Contact, log flows.EventCallback) bool {
+	// if there's already an open ticket, nothing to do
+	if contact.Ticket() != nil {
 		return false
 	}
 
-	ticket, err := svc.Open(env, contact, m.topic, m.body, m.assignee, httpLogger.Log)
-	if err != nil {
-		log(events.NewError(err))
-	}
-	if len(httpLogger.Logs) > 0 {
-		log(events.NewTicketerCalled(m.ticketer.Reference(), httpLogger.Logs))
-	}
-	if ticket != nil {
-		log(events.NewTicketOpened(ticket))
+	ticket := flows.OpenTicket(m.topic, m.body, m.assignee)
+	log(events.NewTicketOpened(ticket))
 
-		contact.Tickets().Add(ticket)
-		return true
-	}
-
-	return false
-}
-
-func (m *TicketModifier) Ticketer() *flows.Ticketer {
-	return m.ticketer
+	contact.SetTicket(ticket)
+	return true
 }
 
 var _ flows.Modifier = (*TicketModifier)(nil)
@@ -80,22 +60,15 @@ var _ flows.Modifier = (*TicketModifier)(nil)
 type ticketModifierEnvelope struct {
 	utils.TypedEnvelope
 
-	Ticketer *assets.TicketerReference `json:"ticketer" validate:"required"`
-	Topic    *assets.TopicReference    `json:"topic" validate:"required"`
-	Body     string                    `json:"body"`
-	Assignee *assets.UserReference     `json:"assignee"`
+	Topic    *assets.TopicReference `json:"topic" validate:"required"`
+	Body     string                 `json:"body"`
+	Assignee *assets.UserReference  `json:"assignee"`
 }
 
 func readTicketModifier(assets flows.SessionAssets, data json.RawMessage, missing assets.MissingCallback) (flows.Modifier, error) {
 	e := &ticketModifierEnvelope{}
 	if err := utils.UnmarshalAndValidate(data, e); err != nil {
 		return nil, err
-	}
-
-	ticketer := assets.Ticketers().Get(e.Ticketer.UUID)
-	if ticketer == nil {
-		missing(e.Ticketer, nil)
-		return nil, ErrNoModifier // can't proceed without a ticketer
 	}
 
 	topic := assets.Topics().Get(e.Topic.UUID)
@@ -112,13 +85,12 @@ func readTicketModifier(assets flows.SessionAssets, data json.RawMessage, missin
 		}
 	}
 
-	return NewTicket(ticketer, topic, e.Body, assignee), nil
+	return NewTicket(topic, e.Body, assignee), nil
 }
 
 func (m *TicketModifier) MarshalJSON() ([]byte, error) {
 	return jsonx.Marshal(&ticketModifierEnvelope{
 		TypedEnvelope: utils.TypedEnvelope{Type: m.Type()},
-		Ticketer:      m.ticketer.Reference(),
 		Topic:         m.topic.Reference(),
 		Body:          m.body,
 		Assignee:      m.assignee.Reference(),

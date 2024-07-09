@@ -1,7 +1,9 @@
 package dtone
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/nyaruka/gocommon/httpx"
 	"github.com/nyaruka/gocommon/stringsx"
@@ -9,7 +11,6 @@ import (
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/flows"
 
-	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 )
 
@@ -28,19 +29,24 @@ func NewService(httpClient *http.Client, httpRetries *httpx.RetryConfig, key, se
 
 func (s *service) Transfer(sender urns.URN, recipient urns.URN, amounts map[string]decimal.Decimal, logHTTP flows.HTTPLogCallback) (*flows.AirtimeTransfer, error) {
 	transfer := &flows.AirtimeTransfer{
-		UUID:          uuids.New(),
+		UUID:          flows.AirtimeTransferUUID(uuids.New()),
 		Sender:        sender,
 		Recipient:     recipient,
+		Currency:      "",
 		DesiredAmount: decimal.Zero,
 		ActualAmount:  decimal.Zero,
 	}
+	recipientPhoneNumber := recipient.Path()
+	if !strings.HasPrefix(recipientPhoneNumber, "+") {
+		recipientPhoneNumber = "+" + recipientPhoneNumber
+	}
 
-	operators, trace, err := s.client.LookupMobileNumber(recipient.Path())
+	operators, trace, err := s.client.LookupMobileNumber(recipientPhoneNumber)
 	if trace != nil {
 		logHTTP(flows.NewHTTPLog(trace, flows.HTTPStatusFromCode, s.redactor))
 	}
 	if err != nil {
-		return transfer, errors.Wrap(err, "number lookup failed")
+		return transfer, fmt.Errorf("number lookup failed: %w", err)
 	}
 
 	// look for an exact match
@@ -52,7 +58,7 @@ func (s *service) Transfer(sender urns.URN, recipient urns.URN, amounts map[stri
 		}
 	}
 	if operator == nil {
-		return transfer, errors.Errorf("unable to find operator for number %s", recipient.Path())
+		return transfer, fmt.Errorf("unable to find operator for number %s", recipientPhoneNumber)
 	}
 
 	// fetch available products for this operator
@@ -61,7 +67,7 @@ func (s *service) Transfer(sender urns.URN, recipient urns.URN, amounts map[stri
 		logHTTP(flows.NewHTTPLog(trace, flows.HTTPStatusFromCode, s.redactor))
 	}
 	if err != nil {
-		return transfer, errors.Wrap(err, "product fetch failed")
+		return transfer, fmt.Errorf("product fetch failed: %w", err)
 	}
 
 	// closest product for each currency we have a desired amount for
@@ -80,7 +86,7 @@ func (s *service) Transfer(sender urns.URN, recipient urns.URN, amounts map[stri
 		}
 	}
 	if len(closestProducts) == 0 {
-		return transfer, errors.Errorf("unable to find a suitable product for operator '%s'", operator.Name)
+		return transfer, fmt.Errorf("unable to find a suitable product for operator '%s'", operator.Name)
 	}
 
 	// it's possible we have more than one supported currency/product.. use any
@@ -93,19 +99,20 @@ func (s *service) Transfer(sender urns.URN, recipient urns.URN, amounts map[stri
 	transfer.Currency = product.Destination.Unit
 	transfer.DesiredAmount = amounts[transfer.Currency]
 
-	// request synchronous confirmed transaction for this product
-	tx, trace, err := s.client.TransactionSync(string(transfer.UUID), product.ID, recipient.Path())
+	// request asynchronous confirmed transaction for this product
+	tx, trace, err := s.client.TransactionAsync(string(transfer.UUID), product.ID, recipientPhoneNumber)
 	if trace != nil {
 		logHTTP(flows.NewHTTPLog(trace, flows.HTTPStatusFromCode, s.redactor))
 	}
 	if err != nil {
-		return transfer, errors.Wrap(err, "transaction creation failed")
+		return transfer, fmt.Errorf("transaction creation failed: %w", err)
 	}
 
 	if tx.Status.Class.ID != StatusCIDConfirmed && tx.Status.Class.ID != StatusCIDSubmitted && tx.Status.Class.ID != StatusCIDCompleted {
-		return transfer, errors.Errorf("transaction to send product %d on operator %d ended with status %s", product.ID, operator.ID, tx.Status.Message)
+		return transfer, fmt.Errorf("transaction to send product %d on operator %d ended with status %s", product.ID, operator.ID, tx.Status.Message)
 	}
 
+	transfer.ExternalID = fmt.Sprintf("%d", tx.ID)
 	transfer.ActualAmount = product.Destination.Amount
 
 	return transfer, nil

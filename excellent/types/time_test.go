@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -8,7 +9,6 @@ import (
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -46,11 +46,11 @@ func TestXTime(t *testing.T) {
 func TestToXTime(t *testing.T) {
 	var tests = []struct {
 		value    types.XValue
-		expected types.XTime
+		expected *types.XTime
 		hasError bool
 	}{
 		{nil, types.XTimeZero, true},
-		{types.NewXError(errors.Errorf("Error")), types.XTimeZero, true},
+		{types.NewXError(fmt.Errorf("Error")), types.XTimeZero, true},
 		{types.NewXNumberFromInt(123), types.XTimeZero, true},
 		{types.NewXNumberFromInt(23), types.NewXTime(dates.NewTimeOfDay(23, 0, 0, 0)), false},
 		{types.NewXNumberFromInt(24), types.XTimeZero, false},
@@ -73,9 +73,9 @@ func TestToXTime(t *testing.T) {
 		result, err := types.ToXTime(env, test.value)
 
 		if test.hasError {
-			assert.Error(t, err, "expected error for input %T{%s}", test.value, test.value)
+			assert.Error(t, err.Native(), "expected error for input %T{%s}", test.value, test.value)
 		} else {
-			assert.NoError(t, err, "unexpected error for input %T{%s}", test.value, test.value)
+			assert.NoError(t, err.Native(), "unexpected error for input %T{%s}", test.value, test.value)
 			assert.Equal(t, test.expected.Native(), result.Native(), "result mismatch for input %T{%s}", test.value, test.value)
 		}
 	}

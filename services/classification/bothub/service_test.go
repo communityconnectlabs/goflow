@@ -12,7 +12,6 @@ import (
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/services/classification/bothub"
 	"github.com/nyaruka/goflow/test"
-
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
@@ -70,7 +69,7 @@ func TestService(t *testing.T) {
 		"f96abf2f-3b53-4766-8ea6-09a655222a02",
 	)
 
-	env := envs.NewBuilder().WithAllowedLanguages([]envs.Language{"spa"}).WithDefaultCountry("US").Build()
+	env := envs.NewBuilder().WithAllowedLanguages("spa").WithDefaultCountry("US").Build()
 	httpLogger := &flows.HTTPLogger{}
 
 	classification, err := svc.Classify(env, "book my flight to Quito", httpLogger.Log)

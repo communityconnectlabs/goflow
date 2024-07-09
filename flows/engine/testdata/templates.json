@@ -102,7 +102,7 @@
     },
     {
         "template": "@urns",
-        "output": "{discord: , ext: , facebook: , fcm: , freshchat: , instagram: , jiochat: , line: , mailto: mailto:foo@bar.com, rocketchat: , slack: , teams: , tel: tel:+12024561111, telegram: , twitter: , twitterid: twitterid:54784326227#nyaruka, viber: , vk: , webchat: , wechat: , whatsapp: }"
+        "output": "{discord: , ext: , facebook: , fcm: , freshchat: , instagram: , jiochat: , line: , mailto: mailto:foo@bar.com, rocketchat: , slack: , tel: tel:+12024561111, telegram: , twitter: , twitterid: twitterid:54784326227#nyaruka, viber: , vk: , webchat: , wechat: , whatsapp: }"
     },
     {
         "template": "@urns.tel",
@@ -170,7 +170,7 @@
     },
     {
         "template": "@(count(contact.fields))",
-        "output": "6"
+        "output": "7"
     },
     {
         "template": "@fields",
@@ -202,7 +202,7 @@
     },
     {
         "template": "@(count(fields))",
-        "output": "6"
+        "output": "7"
     },
     {
         "template": "@input",
@@ -313,19 +313,27 @@
         "output": "completed"
     },
     {
-        "template": "@webhook",
+        "template": "@webhook.headers",
+        "output": "{Content-Length: 43, Content-Type: text/plain; charset=utf-8, Date: Wed, 11 Apr 2018 18:24:30 GMT}"
+    },
+    {
+        "template": "@(webhook.headers[\"Content-Type\"])",
+        "output": "text/plain; charset=utf-8"
+    },
+    {
+        "template": "@webhook.json",
         "output": "{results: [{state: WA}, {state: IN}]}"
     },
     {
-        "template": "@webhook.results",
+        "template": "@webhook.json.results",
         "output": "[{state: WA}, {state: IN}]"
     },
     {
-        "template": "@(webhook.results[1])",
+        "template": "@(webhook.json.results[1])",
         "output": "{state: IN}"
     },
     {
-        "template": "@(webhook.results[1].state)",
+        "template": "@(webhook.json.results[1].state)",
         "output": "IN"
     },
     {
@@ -379,6 +387,7 @@
             "age": 23,
             "gender": "Male",
             "join_date": "2017-12-02T00:00:00.000000-02:00",
+            "language": null,
             "not_set": null,
             "state": null
         }
@@ -389,7 +398,7 @@
     },
     {
         "template": "@(json(contact.tickets))",
-        "output": "[{\"assignee\":null,\"body\":\"I have a problem\",\"topic\":null,\"uuid\":\"e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52\"},{\"assignee\":{\"email\":\"bob@nyaruka.com\",\"first_name\":\"Bob\",\"name\":\"Bob\"},\"body\":\"What day is it?\",\"topic\":{\"name\":\"Weather\",\"uuid\":\"472a7a73-96cb-4736-b567-056d987cc5b4\"},\"uuid\":\"78d1fe0d-7e39-461e-81c3-a6a25f15ed69\"}]"
+        "output": "[{\"assignee\":{\"email\":\"bob@nyaruka.com\",\"first_name\":\"Bob\",\"name\":\"Bob\"},\"body\":\"What day is it?\",\"topic\":{\"name\":\"Weather\",\"uuid\":\"472a7a73-96cb-4736-b567-056d987cc5b4\"},\"uuid\":\"78d1fe0d-7e39-461e-81c3-a6a25f15ed69\"}]"
     },
     {
         "template": "@ticket",
@@ -413,6 +422,7 @@
                 "age": 23,
                 "gender": "Male",
                 "join_date": "2017-12-02T00:00:00.000000-02:00",
+                "language": null,
                 "not_set": null,
                 "state": null
             },
@@ -433,12 +443,6 @@
             "name": "Ryan Lewis",
             "status": "active",
             "tickets": [
-                {
-                    "assignee": null,
-                    "body": "I have a problem",
-                    "topic": null,
-                    "uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52"
-                },
                 {
                     "assignee": {
                         "email": "bob@nyaruka.com",
@@ -498,6 +502,7 @@
                     "age": 23,
                     "gender": "Male",
                     "join_date": "2017-12-02T00:00:00.000000-02:00",
+                    "language": null,
                     "not_set": null,
                     "state": null
                 },
@@ -518,12 +523,6 @@
                 "name": "Ryan Lewis",
                 "status": "active",
                 "tickets": [
-                    {
-                        "assignee": null,
-                        "body": "I have a problem",
-                        "topic": null,
-                        "uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52"
-                    },
                     {
                         "assignee": {
                             "email": "bob@nyaruka.com",
@@ -724,6 +723,7 @@
                     "age": 23,
                     "gender": "Male",
                     "join_date": "2017-12-02T00:00:00.000000-02:00",
+                    "language": null,
                     "not_set": null,
                     "state": null
                 },
@@ -744,12 +744,6 @@
                 "name": "Ryan Lewis",
                 "status": "active",
                 "tickets": [
-                    {
-                        "assignee": null,
-                        "body": "I have a problem",
-                        "topic": null,
-                        "uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52"
-                    },
                     {
                         "assignee": {
                             "email": "bob@nyaruka.com",
@@ -778,6 +772,7 @@
                 "age": 23,
                 "gender": "Male",
                 "join_date": "2017-12-02T00:00:00.000000-02:00",
+                "language": null,
                 "not_set": null,
                 "state": null
             },
@@ -823,7 +818,6 @@
                 "mailto": "mailto:foo@bar.com",
                 "rocketchat": null,
                 "slack": null,
-                "teams": null,
                 "tel": "tel:+12024561111",
                 "telegram": null,
                 "twitter": null,
@@ -852,6 +846,7 @@
                     "age": 33,
                     "gender": "Female",
                     "join_date": null,
+                    "language": null,
                     "not_set": null,
                     "state": null
                 },
@@ -875,6 +870,7 @@
                 "age": 33,
                 "gender": "Female",
                 "join_date": null,
+                "language": null,
                 "not_set": null,
                 "state": null
             },
@@ -920,7 +916,6 @@
                 "mailto": null,
                 "rocketchat": null,
                 "slack": null,
-                "teams": null,
                 "tel": "tel:+12024562222",
                 "telegram": null,
                 "twitter": null,
@@ -939,6 +934,7 @@
         "output_json": {
             "campaign": null,
             "keyword": "",
+            "optin": null,
             "origin": "",
             "params": {
                 "address": {

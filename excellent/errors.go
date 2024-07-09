@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
-	"github.com/nyaruka/goflow/utils"
-	"github.com/pkg/errors"
+	"github.com/antlr4-go/antlr/v4"
 )
 
 // TemplateError is an error which occurs during evaluation of an expression
@@ -67,11 +65,11 @@ func (l *ErrorListener) Errors() []error {
 }
 
 // SyntaxError handles a new syntax error encountered by the recognizer
-func (l *ErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
+func (l *ErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol any, line, column int, msg string, e antlr.RecognitionException) {
 	// extract the part of the original expression where this error has occurred
 	lines := strings.Split(l.expression, "\n")
 	lineOfError := lines[line-1]
-	contextOfError := lineOfError[column:utils.Min(column+10, len(lineOfError))]
+	contextOfError := lineOfError[column:min(column+10, len(lineOfError))]
 
-	l.errors = append(l.errors, errors.Errorf("syntax error at %s", contextOfError))
+	l.errors = append(l.errors, fmt.Errorf("syntax error at %s", contextOfError))
 }

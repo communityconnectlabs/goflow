@@ -38,14 +38,14 @@ func NewField(field *flows.Field, value string) *FieldModifier {
 }
 
 // Apply applies this modification to the given contact
-func (m *FieldModifier) Apply(env envs.Environment, svcs flows.Services, sa flows.SessionAssets, contact *flows.Contact, log flows.EventCallback) bool {
+func (m *FieldModifier) Apply(eng flows.Engine, env envs.Environment, sa flows.SessionAssets, contact *flows.Contact, log flows.EventCallback) bool {
 	oldValue := contact.Fields().Get(m.field)
 
 	newValue := contact.Fields().Parse(env, sa.Fields(), m.field, m.value)
 
 	// truncate text value if necessary
 	if newValue != nil {
-		newValue.Text = types.NewXText(stringsx.Truncate(newValue.Text.Native(), env.MaxValueLength()))
+		newValue.Text = types.NewXText(stringsx.Truncate(newValue.Text.Native(), eng.Options().MaxFieldChars))
 	}
 
 	if !newValue.Equals(oldValue) {
@@ -91,12 +91,6 @@ func readFieldModifier(assets flows.SessionAssets, data json.RawMessage, missing
 
 	// try unmarshaling value as string
 	json.Unmarshal(e.Value, &value)
-
-	// then try as a value object (how this modifier used to be work)
-	valueAsObj := &flows.Value{}
-	if json.Unmarshal(e.Value, valueAsObj) == nil {
-		value = valueAsObj.Text.Native()
-	}
 
 	return NewField(field, value), nil
 }

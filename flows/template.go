@@ -2,11 +2,12 @@ package flows
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
+	"github.com/nyaruka/gocommon/i18n"
+	"github.com/nyaruka/gocommon/stringsx"
 	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/utils"
 )
 
 // Template represents messaging templates used by channels types such as WhatsApp
@@ -31,38 +32,49 @@ func (t *Template) Reference() *assets.TemplateReference {
 }
 
 // FindTranslation finds the matching translation for the passed in channel and languages (in priority order)
-func (t *Template) FindTranslation(channel assets.ChannelUUID, locales []envs.Locale) *TemplateTranslation {
-	// first iterate through and find all translations that are for this channel
-	candidatesByLocale := make(map[envs.Locale]*TemplateTranslation)
-	candidatesByLang := make(map[envs.Language]*TemplateTranslation)
+func (t *Template) FindTranslation(channel *Channel, locales []i18n.Locale) *TemplateTranslation {
+	// find all translations for this channel
+	candidates := make(map[string]*TemplateTranslation)
+	candidateLocales := make([]string, 0, 5)
 	for _, tr := range t.Template.Translations() {
-		if tr.Channel().UUID == channel {
-			tt := NewTemplateTranslation(tr)
-			lang, _ := tt.Locale().ToParts()
+		if tr.Channel().UUID == channel.UUID() {
+			candidates[string(tr.Locale())] = NewTemplateTranslation(tr)
+			candidateLocales = append(candidateLocales, string(tr.Locale()))
+		}
+	}
+	if len(candidates) == 0 {
+		return nil
+	}
 
-			candidatesByLocale[tt.Locale()] = tt
-			candidatesByLang[lang] = tt
+	match := i18n.NewBCP47Matcher(candidateLocales...).ForLocales(locales...)
+	return candidates[match]
+}
+
+// Templating generates a templating object for the passed in translation and variables
+func (t *Template) Templating(tt *TemplateTranslation, vars []string) *MsgTemplating {
+	// cross-reference with asset to get variable types and pad out any missing variables
+	variables := make([]*TemplatingVariable, len(tt.Variables()))
+	for i, v := range tt.Variables() {
+		value := ""
+		if i < len(vars) {
+			value = vars[i]
+		}
+		variables[i] = &TemplatingVariable{Type: v.Type(), Value: value}
+	}
+
+	// create a list of components that have variables
+	components := make([]*TemplatingComponent, 0, len(tt.Components()))
+	for _, comp := range tt.Components() {
+		if len(comp.Variables()) > 0 {
+			components = append(components, &TemplatingComponent{
+				Type:      comp.Type(),
+				Name:      comp.Name(),
+				Variables: comp.Variables(),
+			})
 		}
 	}
 
-	// first look for exact locale match
-	for _, locale := range locales {
-		tt := candidatesByLocale[locale]
-		if tt != nil {
-			return tt
-		}
-	}
-
-	// if that fails look for language match
-	for _, locale := range locales {
-		lang, _ := locale.ToParts()
-		tt := candidatesByLang[lang]
-		if tt != nil {
-			return tt
-		}
-	}
-
-	return nil
+	return NewMsgTemplating(t.Reference(), components, variables)
 }
 
 // TemplateTranslation represents a single translation for a template
@@ -78,19 +90,34 @@ func NewTemplateTranslation(t assets.TemplateTranslation) *TemplateTranslation {
 // Asset returns the underlying asset
 func (t *TemplateTranslation) Asset() assets.TemplateTranslation { return t.TemplateTranslation }
 
-var templateRegex = regexp.MustCompile(`({{\d+}})`)
+// Preview returns message content which will act as a preview of a message sent with this template
+func (t *TemplateTranslation) Preview(vars []*TemplatingVariable) *MsgContent {
+	var text []string
+	var attachments []utils.Attachment
+	var quickReplies []string
 
-// Substitute substitutes the passed in variables in our template
-func (t *TemplateTranslation) Substitute(vars []string) string {
-	s := string(t.Content())
-	for i, v := range vars {
-		s = strings.ReplaceAll(s, fmt.Sprintf("{{%d}}", i+1), v)
+	for _, comp := range t.Components() {
+		content := comp.Content()
+		for key, index := range comp.Variables() {
+			variable := vars[index]
+
+			if variable.Type == "text" {
+				content = strings.ReplaceAll(content, fmt.Sprintf("{{%s}}", key), variable.Value)
+			} else if variable.Type == "image" || variable.Type == "video" || variable.Type == "document" {
+				attachments = append(attachments, utils.Attachment(variable.Value))
+			}
+		}
+
+		if content != "" {
+			if comp.Type() == "header/text" || comp.Type() == "body/text" || comp.Type() == "footer/text" {
+				text = append(text, content)
+			} else if strings.HasPrefix(comp.Type(), "button/") {
+				quickReplies = append(quickReplies, stringsx.TruncateEllipsis(content, MaxQuickReplyLength))
+			}
+		}
 	}
 
-	// replace any remaining unmatched items
-	s = templateRegex.ReplaceAllString(s, "")
-
-	return s
+	return &MsgContent{Text: strings.Join(text, "\n\n"), Attachments: attachments, QuickReplies: quickReplies}
 }
 
 // TemplateAssets is our type for all the templates in an environment
@@ -118,23 +145,4 @@ func NewTemplateAssets(ts []assets.Template) *TemplateAssets {
 // Get returns the template with the passed in UUID if any
 func (a *TemplateAssets) Get(uuid assets.TemplateUUID) *Template {
 	return a.byUUID[uuid]
-}
-
-// FindTranslation looks through our list of templates to find the template matching the passed in uuid
-// If no template or translation is found then empty string is returned
-func (a *TemplateAssets) FindTranslation(uuid assets.TemplateUUID, channel *assets.ChannelReference, locales []envs.Locale) *TemplateTranslation {
-	// no channel, can't match to a template
-	if channel == nil {
-		return nil
-	}
-
-	template := a.byUUID[uuid]
-
-	// not found, no template
-	if template == nil {
-		return nil
-	}
-
-	// look through our translations looking for a match by both channel and translation
-	return template.FindTranslation(channel.UUID, locales)
 }

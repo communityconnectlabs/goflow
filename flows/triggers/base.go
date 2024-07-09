@@ -2,6 +2,8 @@ package triggers
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
@@ -11,8 +13,6 @@ import (
 	"github.com/nyaruka/goflow/excellent/types"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
 // ReadFunc is a function that can read a trigger from JSON
@@ -74,7 +74,7 @@ func (t *baseTrigger) Initialize(session flows.Session, logEvent flows.EventCall
 	// try to load the flow
 	flow, err := session.Assets().Flows().Get(t.Flow().UUID)
 	if err != nil {
-		return errors.Wrapf(err, "unable to load %s", t.Flow())
+		return fmt.Errorf("unable to load %s: %w", t.Flow(), err)
 	}
 
 	if flow.Type() == flows.FlowTypeVoice && t.call == nil {
@@ -86,13 +86,11 @@ func (t *baseTrigger) Initialize(session flows.Session, logEvent flows.EventCall
 
 	if t.environment != nil {
 		session.SetEnvironment(t.environment)
-	} else {
-		session.SetEnvironment(envs.NewBuilder().Build())
 	}
-
 	if t.contact != nil {
 		session.SetContact(t.contact.Clone())
 	}
+
 	return nil
 }
 
@@ -114,6 +112,7 @@ type Context struct {
 	origin   string
 	campaign types.XValue
 	ticket   types.XValue
+	optIn    types.XValue
 }
 
 func (c *Context) asMap() map[string]types.XValue {
@@ -125,6 +124,7 @@ func (c *Context) asMap() map[string]types.XValue {
 		"origin":   types.NewXText(c.origin),
 		"campaign": c.campaign,
 		"ticket":   c.ticket,
+		"optin":    c.optIn,
 	}
 }
 
@@ -176,16 +176,15 @@ func NewBuilder(env envs.Environment, flow *assets.FlowReference, contact *flows
 //------------------------------------------------------------------------------------------
 
 type baseTriggerEnvelope struct {
-	Type        string                `json:"type" validate:"required"`
+	Type        string                `json:"type"                  validate:"required"`
 	Environment json.RawMessage       `json:"environment,omitempty"`
-	Flow        *assets.FlowReference `json:"flow" validate:"required"`
-	Contact     json.RawMessage       `json:"contact,omitempty"`
+	Flow        *assets.FlowReference `json:"flow"                  validate:"required"`
+	Contact     json.RawMessage       `json:"contact"               validate:"required"`
 	Call        *flows.Call           `json:"call,omitempty"`
-	Connection  *flows.Call           `json:"connection,omitempty"` // backwards compatibility
 	Batch       bool                  `json:"batch,omitempty"`
 	Params      json.RawMessage       `json:"params,omitempty"`
 	History     *flows.SessionHistory `json:"history,omitempty"`
-	TriggeredOn time.Time             `json:"triggered_on" validate:"required"`
+	TriggeredOn time.Time             `json:"triggered_on"          validate:"required"`
 }
 
 // ReadTrigger reads a trigger from the given JSON
@@ -197,7 +196,7 @@ func ReadTrigger(sessionAssets flows.SessionAssets, data json.RawMessage, missin
 
 	f := registeredTypes[typeName]
 	if f == nil {
-		return nil, errors.Errorf("unknown type: '%s'", typeName)
+		return nil, fmt.Errorf("unknown type: '%s'", typeName)
 	}
 	return f(sessionAssets, data, missing)
 }
@@ -208,26 +207,23 @@ func (t *baseTrigger) unmarshal(sessionAssets flows.SessionAssets, e *baseTrigge
 	t.type_ = e.Type
 	t.flow = e.Flow
 	t.call = e.Call
-	if e.Connection != nil {
-		t.call = e.Connection
-	}
 	t.batch = e.Batch
 	t.history = e.History
 	t.triggeredOn = e.TriggeredOn
 
+	if t.contact, err = flows.ReadContact(sessionAssets, e.Contact, missing); err != nil {
+		return fmt.Errorf("unable to read contact: %w", err)
+	}
+
 	if e.Environment != nil {
 		if t.environment, err = envs.ReadEnvironment(e.Environment); err != nil {
-			return errors.Wrap(err, "unable to read environment")
+			return fmt.Errorf("unable to read environment: %w", err)
 		}
 	}
-	if e.Contact != nil {
-		if t.contact, err = flows.ReadContact(sessionAssets, e.Contact, missing); err != nil {
-			return errors.Wrap(err, "unable to read contact")
-		}
-	}
+
 	if e.Params != nil {
 		if t.params, err = types.ReadXObject(e.Params); err != nil {
-			return errors.Wrap(err, "unable to read params")
+			return fmt.Errorf("unable to read params: %w", err)
 		}
 	}
 
@@ -239,19 +235,17 @@ func (t *baseTrigger) marshal(e *baseTriggerEnvelope) error {
 	e.Type = t.type_
 	e.Flow = t.flow
 	e.Call = t.call
-	e.Connection = t.call
 	e.Batch = t.batch
 	e.History = t.history
 	e.TriggeredOn = t.triggeredOn
 
+	e.Contact, err = jsonx.Marshal(t.contact)
+	if err != nil {
+		return err
+	}
+
 	if t.environment != nil {
 		e.Environment, err = jsonx.Marshal(t.environment)
-		if err != nil {
-			return err
-		}
-	}
-	if t.contact != nil {
-		e.Contact, err = jsonx.Marshal(t.contact)
 		if err != nil {
 			return err
 		}

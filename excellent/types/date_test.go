@@ -1,19 +1,19 @@
 package types_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/excellent/types"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestXDate(t *testing.T) {
 	env := envs.NewBuilder().WithDateFormat(envs.DateFormatDayMonthYear).Build()
-	env2 := envs.NewBuilder().WithDateFormat(envs.DateFormatYearMonthDay).WithAllowedLanguages([]envs.Language{"spa"}).Build()
+	env2 := envs.NewBuilder().WithDateFormat(envs.DateFormatYearMonthDay).WithAllowedLanguages("spa").Build()
 
 	d1 := types.NewXDate(dates.NewDate(2019, 2, 20))
 	assert.Equal(t, `date`, d1.Describe())
@@ -50,11 +50,11 @@ func TestXDate(t *testing.T) {
 func TestToXDate(t *testing.T) {
 	var tests = []struct {
 		value    types.XValue
-		expected types.XDate
+		expected *types.XDate
 		hasError bool
 	}{
 		{nil, types.XDateZero, true},
-		{types.NewXError(errors.Errorf("Error")), types.XDateZero, true},
+		{types.NewXError(fmt.Errorf("Error")), types.XDateZero, true},
 		{types.NewXNumberFromInt(123), types.XDateZero, true},
 		{types.NewXText("2018-01-20"), types.NewXDate(dates.NewDate(2018, 1, 20)), false},
 		{types.NewXDate(dates.NewDate(2018, 4, 19)), types.NewXDate(dates.NewDate(2018, 4, 19)), false},
@@ -71,9 +71,9 @@ func TestToXDate(t *testing.T) {
 		result, err := types.ToXDate(env, test.value)
 
 		if test.hasError {
-			assert.Error(t, err, "expected error for input %T{%s}", test.value, test.value)
+			assert.Error(t, err.Native(), "expected error for input %T{%s}", test.value, test.value)
 		} else {
-			assert.NoError(t, err, "unexpected error for input %T{%s}", test.value, test.value)
+			assert.NoError(t, err.Native(), "unexpected error for input %T{%s}", test.value, test.value)
 			assert.Equal(t, test.expected.Native(), result.Native(), "result mismatch for input %T{%s}", test.value, test.value)
 		}
 	}

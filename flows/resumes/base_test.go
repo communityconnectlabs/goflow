@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
@@ -21,8 +22,6 @@ import (
 	"github.com/nyaruka/goflow/flows/resumes"
 	"github.com/nyaruka/goflow/flows/triggers"
 	"github.com/nyaruka/goflow/test"
-
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -60,8 +59,7 @@ func testResumeType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		SessionStatus flows.SessionStatus `json:"session_status,omitempty"`
 	}{}
 
-	err = jsonx.Unmarshal(testFile, &tests)
-	require.NoError(t, err)
+	jsonx.MustUnmarshal(testFile, &tests)
 
 	defer dates.SetNowSource(dates.DefaultNowSource)
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
@@ -84,7 +82,7 @@ func testResumeType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		resume, err := resumes.ReadResume(sa, tc.Resume, assets.PanicOnMissing)
 
 		if tc.ReadError != "" {
-			rootErr := errors.Cause(err)
+			rootErr := test.RootError(err)
 			assert.EqualError(t, rootErr, tc.ReadError, "read error mismatch in %s", testName)
 			continue
 		} else {
@@ -97,7 +95,7 @@ func testResumeType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		// start a waiting session
 		env := envs.NewBuilder().Build()
 		eng := engine.NewBuilder().Build()
-		contact := flows.NewEmptyContact(sa, "Bob", envs.Language("eng"), nil)
+		contact := flows.NewEmptyContact(sa, "Bob", i18n.Language("eng"), nil)
 		tb := triggers.NewBuilder(env, flow.Reference(false), contact).Manual()
 		if flow.Type() == flows.FlowTypeVoice {
 			channel := sa.Channels().Get("a78930fe-6a40-4aa8-99c3-e61b02f45ca1")

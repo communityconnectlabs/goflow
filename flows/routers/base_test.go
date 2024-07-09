@@ -17,8 +17,6 @@ import (
 	"github.com/nyaruka/goflow/flows/routers"
 	"github.com/nyaruka/goflow/flows/triggers"
 	"github.com/nyaruka/goflow/test"
-
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -41,7 +39,7 @@ func TestRouterTypes(t *testing.T) {
 	assetsJSON, err := os.ReadFile("testdata/_assets.json")
 	require.NoError(t, err)
 
-	for _, typeName := range routers.RegisteredTypes() {
+	for typeName := range routers.RegisteredTypes() {
 		testRouterType(t, assetsJSON, typeName)
 	}
 }
@@ -64,8 +62,7 @@ func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		Inspection        json.RawMessage `json:"inspection,omitempty"`
 	}{}
 
-	err = jsonx.Unmarshal(testFile, &tests)
-	require.NoError(t, err)
+	jsonx.MustUnmarshal(testFile, &tests)
 
 	defer dates.SetNowSource(dates.DefaultNowSource)
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
@@ -89,7 +86,7 @@ func testRouterType(t *testing.T, assetsJSON json.RawMessage, typeName string) {
 		// now try to read the flow, and if we expect a read error, check that
 		flow, err := sa.Flows().Get("16f6eee7-9843-4333-bad2-1d7fd636452c")
 		if tc.ReadError != "" {
-			rootErr := errors.Cause(err)
+			rootErr := test.RootError(err)
 			assert.EqualError(t, rootErr, tc.ReadError, "read error mismatch in %s", testName)
 			continue
 		} else {

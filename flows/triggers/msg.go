@@ -75,7 +75,7 @@ func NewKeywordMatch(typeName KeywordMatchType, keyword string) *KeywordMatch {
 // InitializeRun performs additional initialization when we visit our first node
 func (t *MsgTrigger) InitializeRun(run flows.Run, logEvent flows.EventCallback) error {
 	// update our input
-	input := inputs.NewMsg(run.Session().Assets(), t.msg, t.triggeredOn)
+	input := inputs.NewMsg(run.Session(), t.msg, t.triggeredOn)
 
 	run.Session().SetInput(input)
 	logEvent(events.NewMsgReceived(t.msg))
@@ -136,8 +136,8 @@ func (b *MsgBuilder) Build() *MsgTrigger {
 
 type msgTriggerEnvelope struct {
 	baseTriggerEnvelope
-	Msg   *flows.MsgIn  `json:"msg" validate:"required,dive"`
-	Match *KeywordMatch `json:"keyword_match,omitempty" validate:"omitempty,dive"`
+	Msg   *flows.MsgIn  `json:"msg" validate:"required"`
+	Match *KeywordMatch `json:"keyword_match,omitempty" validate:"omitempty"`
 }
 
 func readMsgTrigger(sessionAssets flows.SessionAssets, data json.RawMessage, missing assets.MissingCallback) (flows.Trigger, error) {

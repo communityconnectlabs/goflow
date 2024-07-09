@@ -1,8 +1,8 @@
 package static
 
 import (
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
 )
 
 // Template is a JSON serializable implementation of a template asset
@@ -38,35 +38,83 @@ func (t *Template) Translations() []assets.TemplateTranslation {
 
 // TemplateTranslation represents a single template translation
 type TemplateTranslation struct {
-	Channel_       assets.ChannelReference `json:"channel"         validate:"required"`
-	Content_       string                  `json:"content"         validate:"required"`
-	Locale_        envs.Locale             `json:"locale"          validate:"required"`
-	Namespace_     string                  `json:"namespace"`
-	VariableCount_ int                     `json:"variable_count"`
+	Channel_    *assets.ChannelReference `json:"channel"      validate:"required"`
+	Locale_     i18n.Locale              `json:"locale"       validate:"required"`
+	Components_ []*TemplateComponent     `json:"components"`
+	Variables_  []*TemplateVariable      `json:"variables"`
 }
 
 // NewTemplateTranslation creates a new template translation
-func NewTemplateTranslation(channel assets.ChannelReference, locale envs.Locale, content string, variableCount int, namespace string) *TemplateTranslation {
+func NewTemplateTranslation(channel *assets.ChannelReference, locale i18n.Locale, components []*TemplateComponent, variables []*TemplateVariable) *TemplateTranslation {
 	return &TemplateTranslation{
-		Channel_:       channel,
-		Content_:       content,
-		Namespace_:     namespace,
-		Locale_:        locale,
-		VariableCount_: variableCount,
+		Channel_:    channel,
+		Locale_:     locale,
+		Components_: components,
+		Variables_:  variables,
 	}
 }
 
-// Content returns the translated content for this template
-func (t *TemplateTranslation) Content() string { return t.Content_ }
+// Components returns the components for this template translation
+func (t *TemplateTranslation) Components() []assets.TemplateComponent {
+	cs := make([]assets.TemplateComponent, len(t.Components_))
+	for k, tc := range t.Components_ {
+		cs[k] = tc
+	}
+	return cs
+}
 
-// Namespace returns the namespace for this template
-func (t *TemplateTranslation) Namespace() string { return t.Namespace_ }
+// Variables returns the variables for this template translation
+func (t *TemplateTranslation) Variables() []assets.TemplateVariable {
+	vs := make([]assets.TemplateVariable, len(t.Variables_))
+	for i := range t.Variables_ {
+		vs[i] = t.Variables_[i]
+	}
+	return vs
+}
 
-// Language returns the locale this translation is in
-func (t *TemplateTranslation) Locale() envs.Locale { return t.Locale_ }
-
-// VariableCount returns the number of variables in this template
-func (t *TemplateTranslation) VariableCount() int { return t.VariableCount_ }
+// Locale returns the locale this translation is in
+func (t *TemplateTranslation) Locale() i18n.Locale { return t.Locale_ }
 
 // Channel returns the channel this template translation is for
-func (t *TemplateTranslation) Channel() assets.ChannelReference { return t.Channel_ }
+func (t *TemplateTranslation) Channel() *assets.ChannelReference { return t.Channel_ }
+
+type TemplateComponent struct {
+	Name_      string         `json:"name"`
+	Type_      string         `json:"type"`
+	Content_   string         `json:"content"`
+	Display_   string         `json:"display"`
+	Variables_ map[string]int `json:"variables"`
+}
+
+// Name returns the name for this template component
+func (t *TemplateComponent) Name() string { return t.Name_ }
+
+// Type returns the type for this template component
+func (t *TemplateComponent) Type() string { return t.Type_ }
+
+// Content returns the content for this template component
+func (t *TemplateComponent) Content() string { return t.Content_ }
+
+// Display returns the display for this template component
+func (t *TemplateComponent) Display() string { return t.Display_ }
+
+// Variables returns the variable mapping for this template component
+func (t *TemplateComponent) Variables() map[string]int { return t.Variables_ }
+
+// NewTemplateComponent creates a new template param
+func NewTemplateComponent(name, type_, content, display string, variables map[string]int) *TemplateComponent {
+	return &TemplateComponent{Type_: type_, Name_: name, Content_: content, Display_: display, Variables_: variables}
+}
+
+// TemplateVariable represents a single variable for a template translation
+type TemplateVariable struct {
+	Type_ string `json:"type"`
+}
+
+// Type returns the type for this parameter
+func (t *TemplateVariable) Type() string { return t.Type_ }
+
+// NewTemplateVariable creates a new template variable
+func NewTemplateVariable(paramType string) *TemplateVariable {
+	return &TemplateVariable{Type_: paramType}
+}

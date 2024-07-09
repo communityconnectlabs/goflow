@@ -5,21 +5,23 @@ import (
 
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
+	"github.com/nyaruka/goflow/envs"
+	"github.com/nyaruka/goflow/excellent"
 	"github.com/nyaruka/goflow/flows"
 )
 
 // an instance of the engine
 type engine struct {
-	services             *services
-	maxStepsPerSprint    int
-	maxResumesPerSession int
-	maxTemplateChars     int
+	evaluator *excellent.Evaluator
+	services  *services
+	options   *flows.EngineOptions
 }
 
 // NewSession creates a new session
 func (e *engine) NewSession(sa flows.SessionAssets, trigger flows.Trigger) (flows.Session, flows.Sprint, error) {
 	s := &session{
 		uuid:       flows.SessionUUID(uuids.New()),
+		env:        envs.NewBuilder().Build(),
 		engine:     e,
 		assets:     sa,
 		trigger:    trigger,
@@ -38,10 +40,9 @@ func (e *engine) ReadSession(sa flows.SessionAssets, data json.RawMessage, missi
 	return readSession(e, sa, data, missing)
 }
 
-func (e *engine) Services() flows.Services  { return e.services }
-func (e *engine) MaxStepsPerSprint() int    { return e.maxStepsPerSprint }
-func (e *engine) MaxResumesPerSession() int { return e.maxResumesPerSession }
-func (e *engine) MaxTemplateChars() int     { return e.maxTemplateChars }
+func (e *engine) Evaluator() *excellent.Evaluator { return e.evaluator }
+func (e *engine) Services() flows.Services        { return e.services }
+func (e *engine) Options() *flows.EngineOptions   { return e.options }
 
 var _ flows.Engine = (*engine)(nil)
 
@@ -58,10 +59,15 @@ type Builder struct {
 func NewBuilder() *Builder {
 	return &Builder{
 		eng: &engine{
-			services:             newEmptyServices(),
-			maxStepsPerSprint:    100,
-			maxResumesPerSession: 500,
-			maxTemplateChars:     10000,
+			evaluator: excellent.NewEvaluator(),
+			services:  newEmptyServices(),
+			options: &flows.EngineOptions{
+				MaxStepsPerSprint:    100,
+				MaxResumesPerSession: 500,
+				MaxTemplateChars:     10000,
+				MaxFieldChars:        640,
+				MaxResultChars:       640,
+			},
 		},
 	}
 }
@@ -84,12 +90,6 @@ func (b *Builder) WithClassificationServiceFactory(f ClassificationServiceFactor
 	return b
 }
 
-// WithTicketServiceFactory sets the ticket service factory
-func (b *Builder) WithTicketServiceFactory(f TicketServiceFactory) *Builder {
-	b.eng.services.ticket = f
-	return b
-}
-
 // WithAirtimeServiceFactory sets the airtime service factory
 func (b *Builder) WithAirtimeServiceFactory(f AirtimeServiceFactory) *Builder {
 	b.eng.services.airtime = f
@@ -98,19 +98,31 @@ func (b *Builder) WithAirtimeServiceFactory(f AirtimeServiceFactory) *Builder {
 
 // WithMaxStepsPerSprint sets the maximum number of steps allowed in a single sprint
 func (b *Builder) WithMaxStepsPerSprint(max int) *Builder {
-	b.eng.maxStepsPerSprint = max
+	b.eng.options.MaxStepsPerSprint = max
 	return b
 }
 
 // WithMaxResumesPerSession sets the maximum number of resumes allowed in a single session
 func (b *Builder) WithMaxResumesPerSession(max int) *Builder {
-	b.eng.maxResumesPerSession = max
+	b.eng.options.MaxResumesPerSession = max
 	return b
 }
 
 // WithMaxTemplateChars sets the maximum number of characters allowed from an evaluated template
 func (b *Builder) WithMaxTemplateChars(max int) *Builder {
-	b.eng.maxTemplateChars = max
+	b.eng.options.MaxTemplateChars = max
+	return b
+}
+
+// WithMaxFieldChars sets the maximum number of characters allowed in a contact field value
+func (b *Builder) WithMaxFieldChars(max int) *Builder {
+	b.eng.options.MaxFieldChars = max
+	return b
+}
+
+// WithMaxResultChars sets the maximum number of characters allowed in a result value
+func (b *Builder) WithMaxResultChars(max int) *Builder {
+	b.eng.options.MaxResultChars = max
 	return b
 }
 

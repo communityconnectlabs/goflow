@@ -1,13 +1,12 @@
 package legacy
 
 import (
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
-	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/definition/legacy/expressions"
-
 	"github.com/shopspring/decimal"
 )
 
@@ -42,10 +41,10 @@ const legacyWebhookPayload = `@(json(object(
   "channel", default(input.channel, null)
 )))`
 
-type migratedExit map[string]interface{}
+type migratedExit map[string]any
 
 func newExit(uuid uuids.UUID, destinationUUID uuids.UUID) migratedExit {
-	d := map[string]interface{}{"uuid": uuid}
+	d := map[string]any{"uuid": uuid}
 	if destinationUUID != "" {
 		d["destination_uuid"] = destinationUUID
 	}
@@ -57,10 +56,10 @@ func (e migratedExit) UUID() uuids.UUID {
 	return e["uuid"].(uuids.UUID)
 }
 
-type migratedNode map[string]interface{}
+type migratedNode map[string]any
 
 func newNode(uuid uuids.UUID, actions []migratedAction, router migratedRouter, exits []migratedExit) migratedNode {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid":  uuid,
 		"exits": exits,
 	}
@@ -78,9 +77,9 @@ func (n migratedNode) UUID() uuids.UUID {
 	return n["uuid"].(uuids.UUID)
 }
 
-type migratedLocalization map[envs.Language]map[uuids.UUID]map[string][]string
+type migratedLocalization map[i18n.Language]map[uuids.UUID]map[string][]string
 
-func (l migratedLocalization) addTranslation(lang envs.Language, itemUUID uuids.UUID, property string, translated []string) {
+func (l migratedLocalization) addTranslation(lang i18n.Language, itemUUID uuids.UUID, property string, translated []string) {
 	_, found := l[lang]
 	if !found {
 		l[lang] = make(map[uuids.UUID]map[string][]string)
@@ -95,7 +94,7 @@ func (l migratedLocalization) addTranslation(lang envs.Language, itemUUID uuids.
 	langTranslations[itemUUID][property] = translated
 }
 
-func (l migratedLocalization) addTranslationMap(baseLanguage envs.Language, mapped Translations, uuid uuids.UUID, property string) string {
+func (l migratedLocalization) addTranslationMap(baseLanguage i18n.Language, mapped Translations, uuid uuids.UUID, property string) string {
 	var inBaseLanguage string
 	for language, item := range mapped {
 		expression, _ := expressions.MigrateTemplate(item, nil)
@@ -109,7 +108,7 @@ func (l migratedLocalization) addTranslationMap(baseLanguage envs.Language, mapp
 	return inBaseLanguage
 }
 
-func (l migratedLocalization) addTranslationMultiMap(baseLanguage envs.Language, mapped map[envs.Language][]string, uuid uuids.UUID, property string) []string {
+func (l migratedLocalization) addTranslationMultiMap(baseLanguage i18n.Language, mapped map[i18n.Language][]string, uuid uuids.UUID, property string) []string {
 	var inBaseLanguage []string
 	for language, items := range mapped {
 		templates := make([]string, len(items))
@@ -126,10 +125,10 @@ func (l migratedLocalization) addTranslationMultiMap(baseLanguage envs.Language,
 	return inBaseLanguage
 }
 
-type migratedCategory map[string]interface{}
+type migratedCategory map[string]any
 
 func newCategory(uuid uuids.UUID, name string, exitUUID uuids.UUID) migratedCategory {
-	d := map[string]interface{}{"uuid": uuid}
+	d := map[string]any{"uuid": uuid}
 	if name != "" {
 		d["name"] = name
 	}
@@ -144,10 +143,10 @@ func (c migratedCategory) UUID() uuids.UUID {
 	return c["uuid"].(uuids.UUID)
 }
 
-type migratedCase map[string]interface{}
+type migratedCase map[string]any
 
 func newCase(uuid uuids.UUID, type_ string, arguments []string, categoryUUID uuids.UUID) migratedCase {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid":          uuid,
 		"type":          type_,
 		"category_uuid": categoryUUID,
@@ -163,42 +162,42 @@ func (c migratedCase) UUID() uuids.UUID {
 	return c["uuid"].(uuids.UUID)
 }
 
-type migratedTimeout map[string]interface{}
+type migratedTimeout map[string]any
 
 func newTimeout(seconds int, categoryUUID uuids.UUID) migratedTimeout {
-	return migratedTimeout(map[string]interface{}{"seconds": seconds, "category_uuid": categoryUUID})
+	return migratedTimeout(map[string]any{"seconds": seconds, "category_uuid": categoryUUID})
 }
 
-type migratedHint map[string]interface{}
+type migratedHint map[string]any
 
 func newAudioHint() migratedHint {
-	return migratedHint(map[string]interface{}{"type": "audio"})
+	return migratedHint(map[string]any{"type": "audio"})
 }
 
 func newImageHint() migratedHint {
-	return migratedHint(map[string]interface{}{"type": "image"})
+	return migratedHint(map[string]any{"type": "image"})
 }
 
 func newVideoHint() migratedHint {
-	return migratedHint(map[string]interface{}{"type": "video"})
+	return migratedHint(map[string]any{"type": "video"})
 }
 
 func newLocationHint() migratedHint {
-	return migratedHint(map[string]interface{}{"type": "location"})
+	return migratedHint(map[string]any{"type": "location"})
 }
 
 func newFixedDigitsHint(count int) migratedHint {
-	return migratedHint(map[string]interface{}{"type": "digits", "count": count})
+	return migratedHint(map[string]any{"type": "digits", "count": count})
 }
 
 func newTerminatedDigitsHint(terminatedBy string) migratedHint {
-	return migratedHint(map[string]interface{}{"type": "digits", "terminated_by": terminatedBy})
+	return migratedHint(map[string]any{"type": "digits", "terminated_by": terminatedBy})
 }
 
-type migratedWait map[string]interface{}
+type migratedWait map[string]any
 
 func newMsgWait(timeout migratedTimeout, hint migratedHint) migratedWait {
-	d := map[string]interface{}{"type": "msg"}
+	d := map[string]any{"type": "msg"}
 	if timeout != nil {
 		d["timeout"] = timeout
 	}
@@ -209,10 +208,10 @@ func newMsgWait(timeout migratedTimeout, hint migratedHint) migratedWait {
 	return migratedWait(d)
 }
 
-type migratedRouter map[string]interface{}
+type migratedRouter map[string]any
 
 func newSwitchRouter(wait migratedWait, resultName string, categories []migratedCategory, operand string, cases []migratedCase, defaultCategory uuids.UUID) migratedRouter {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"type":                  "switch",
 		"categories":            categories,
 		"operand":               operand,
@@ -230,7 +229,7 @@ func newSwitchRouter(wait migratedWait, resultName string, categories []migrated
 }
 
 func newRandomRouter(resultName string, categories []migratedCategory) migratedRouter {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"type":       "random",
 		"categories": categories,
 	}
@@ -241,14 +240,14 @@ func newRandomRouter(resultName string, categories []migratedCategory) migratedR
 	return migratedRouter(d)
 }
 
-type migratedAction map[string]interface{}
+type migratedAction map[string]any
 
 func (a migratedAction) UUID() uuids.UUID {
 	return a["uuid"].(uuids.UUID)
 }
 
 func newAddContactGroupsAction(uuid uuids.UUID, groups []*assets.GroupReference) migratedAction {
-	return migratedAction(map[string]interface{}{
+	return migratedAction(map[string]any{
 		"uuid":   uuid,
 		"type":   "add_contact_groups",
 		"groups": groups,
@@ -256,7 +255,7 @@ func newAddContactGroupsAction(uuid uuids.UUID, groups []*assets.GroupReference)
 }
 
 func newAddContactURNAction(uuid uuids.UUID, scheme string, path string) migratedAction {
-	return migratedAction(map[string]interface{}{
+	return migratedAction(map[string]any{
 		"uuid":   uuid,
 		"type":   "add_contact_urn",
 		"scheme": scheme,
@@ -265,7 +264,7 @@ func newAddContactURNAction(uuid uuids.UUID, scheme string, path string) migrate
 }
 
 func newAddInputLabelsAction(uuid uuids.UUID, labels []*assets.LabelReference) migratedAction {
-	return migratedAction(map[string]interface{}{
+	return migratedAction(map[string]any{
 		"uuid":   uuid,
 		"type":   "add_input_labels",
 		"labels": labels,
@@ -273,7 +272,7 @@ func newAddInputLabelsAction(uuid uuids.UUID, labels []*assets.LabelReference) m
 }
 
 func newCallResthookAction(uuid uuids.UUID, resthook string, resultName string) migratedAction {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid":     uuid,
 		"type":     "call_resthook",
 		"resthook": resthook,
@@ -286,7 +285,7 @@ func newCallResthookAction(uuid uuids.UUID, resthook string, resultName string) 
 }
 
 func newCallWebhookAction(uuid uuids.UUID, method string, url string, headers map[string]string, body string, resultName string) migratedAction {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid":   uuid,
 		"type":   "call_webhook",
 		"method": method,
@@ -306,7 +305,7 @@ func newCallWebhookAction(uuid uuids.UUID, method string, url string, headers ma
 }
 
 func newEnterFlowAction(uuid uuids.UUID, flow *assets.FlowReference, terminal bool) migratedAction {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid": uuid,
 		"type": "enter_flow",
 		"flow": flow,
@@ -319,7 +318,7 @@ func newEnterFlowAction(uuid uuids.UUID, flow *assets.FlowReference, terminal bo
 }
 
 func newPlayAudioAction(uuid uuids.UUID, audioURL string) migratedAction {
-	return migratedAction(map[string]interface{}{
+	return migratedAction(map[string]any{
 		"uuid":      uuid,
 		"type":      "play_audio",
 		"audio_url": audioURL,
@@ -327,7 +326,7 @@ func newPlayAudioAction(uuid uuids.UUID, audioURL string) migratedAction {
 }
 
 func newRemoveContactGroupsAction(uuid uuids.UUID, groups []*assets.GroupReference, allGroups bool) migratedAction {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid": uuid,
 		"type": "remove_contact_groups",
 	}
@@ -342,7 +341,7 @@ func newRemoveContactGroupsAction(uuid uuids.UUID, groups []*assets.GroupReferen
 }
 
 func newSayMsgAction(uuid uuids.UUID, text string, audioURL string) migratedAction {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid": uuid,
 		"type": "say_msg",
 		"text": text,
@@ -355,7 +354,7 @@ func newSayMsgAction(uuid uuids.UUID, text string, audioURL string) migratedActi
 }
 
 func newSendBroadcastAction(uuid uuids.UUID, text string, attachments []string, quickReplies []string, urns []urns.URN, contacts []*flows.ContactReference, groups []*assets.GroupReference, legacyVars []string) migratedAction {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid": uuid,
 		"type": "send_broadcast",
 		"text": text,
@@ -383,7 +382,7 @@ func newSendBroadcastAction(uuid uuids.UUID, text string, attachments []string, 
 }
 
 func newSendEmailAction(uuid uuids.UUID, addresses []string, subject string, body string) migratedAction {
-	return migratedAction(map[string]interface{}{
+	return migratedAction(map[string]any{
 		"uuid":      uuid,
 		"type":      "send_email",
 		"addresses": addresses,
@@ -393,7 +392,7 @@ func newSendEmailAction(uuid uuids.UUID, addresses []string, subject string, bod
 }
 
 func newSendMsgAction(uuid uuids.UUID, text string, attachments []string, quickReplies []string, allURNs bool) migratedAction {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid": uuid,
 		"type": "send_msg",
 		"text": text,
@@ -412,7 +411,7 @@ func newSendMsgAction(uuid uuids.UUID, text string, attachments []string, quickR
 }
 
 func newSetContactChannelAction(uuid uuids.UUID, channel *assets.ChannelReference) migratedAction {
-	return migratedAction(map[string]interface{}{
+	return migratedAction(map[string]any{
 		"uuid":    uuid,
 		"type":    "set_contact_channel",
 		"channel": channel,
@@ -420,7 +419,7 @@ func newSetContactChannelAction(uuid uuids.UUID, channel *assets.ChannelReferenc
 }
 
 func newSetContactFieldAction(uuid uuids.UUID, field *assets.FieldReference, value string) migratedAction {
-	return migratedAction(map[string]interface{}{
+	return migratedAction(map[string]any{
 		"uuid":  uuid,
 		"type":  "set_contact_field",
 		"field": field,
@@ -429,7 +428,7 @@ func newSetContactFieldAction(uuid uuids.UUID, field *assets.FieldReference, val
 }
 
 func newSetContactLanguageAction(uuid uuids.UUID, language string) migratedAction {
-	return migratedAction(map[string]interface{}{
+	return migratedAction(map[string]any{
 		"uuid":     uuid,
 		"type":     "set_contact_language",
 		"language": language,
@@ -437,7 +436,7 @@ func newSetContactLanguageAction(uuid uuids.UUID, language string) migratedActio
 }
 
 func newSetContactNameAction(uuid uuids.UUID, name string) migratedAction {
-	return migratedAction(map[string]interface{}{
+	return migratedAction(map[string]any{
 		"uuid": uuid,
 		"type": "set_contact_name",
 		"name": name,
@@ -445,7 +444,7 @@ func newSetContactNameAction(uuid uuids.UUID, name string) migratedAction {
 }
 
 func newStartSessionAction(uuid uuids.UUID, flow *assets.FlowReference, urns []urns.URN, contacts []*flows.ContactReference, groups []*assets.GroupReference, legacyVars []string, createContact bool) migratedAction {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid": uuid,
 		"type": "start_session",
 		"flow": flow,
@@ -470,7 +469,7 @@ func newStartSessionAction(uuid uuids.UUID, flow *assets.FlowReference, urns []u
 }
 
 func newTransferAirtimeAction(uuid uuids.UUID, amounts map[string]decimal.Decimal, resultName string) migratedAction {
-	d := map[string]interface{}{
+	d := map[string]any{
 		"uuid":    uuid,
 		"type":    "transfer_airtime",
 		"amounts": amounts,

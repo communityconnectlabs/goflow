@@ -46,7 +46,7 @@ func NewURNs(urnz []urns.URN, modification URNsModification) *URNsModifier {
 }
 
 // Apply applies this modification to the given contact
-func (m *URNsModifier) Apply(env envs.Environment, svcs flows.Services, sa flows.SessionAssets, contact *flows.Contact, log flows.EventCallback) bool {
+func (m *URNsModifier) Apply(eng flows.Engine, env envs.Environment, sa flows.SessionAssets, contact *flows.Contact, log flows.EventCallback) bool {
 	modified := false
 
 	if m.Modification == URNsSet {
@@ -54,8 +54,7 @@ func (m *URNsModifier) Apply(env envs.Environment, svcs flows.Services, sa flows
 	}
 
 	for _, urn := range m.URNs {
-		// normalize the URN
-		urn := urn.Normalize(string(env.DefaultCountry()))
+		urn := urn.Normalize()
 
 		if err := urn.Validate(); err != nil {
 			log(events.NewErrorf("'%s' is not valid URN", urn))

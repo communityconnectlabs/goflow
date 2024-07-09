@@ -1,0 +1,12 @@
+version: 2
+builds:
+- skip: true
+
+release:
+  extra_files: 
+    - glob: ./docs.tar.gz
+
+changelog:
+  filters:
+    exclude:
+      - "^Update CHANGELOG.md"

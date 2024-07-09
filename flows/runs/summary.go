@@ -48,9 +48,6 @@ type relatedRunContext struct {
 }
 
 func newRelatedRunContext(run flows.RunSummary) *relatedRunContext {
-	if utils.IsNil(run) {
-		return nil
-	}
 	return &relatedRunContext{run: run}
 }
 
@@ -73,6 +70,9 @@ func (c *relatedRunContext) Context(env envs.Environment) map[string]types.XValu
 		fields = flows.Context(env, c.run.Contact().Fields())
 	}
 
+	legacyStatus := types.NewXText(string(c.run.Status()))
+	legacyStatus.SetDeprecated("child.run.status: use child.status instead")
+
 	return map[string]types.XValue{
 		"__default__": types.NewXText(FormatRunSummary(env, c.run)),
 		"uuid":        types.NewXText(string(c.run.UUID())),
@@ -85,9 +85,7 @@ func (c *relatedRunContext) Context(env envs.Environment) map[string]types.XValu
 
 		// deprecated but used by a lot of flows for @child.run.status as that is what editor has
 		// been using for subflow splits
-		"run": types.NewXObject(map[string]types.XValue{
-			"status": types.NewXText(string(c.run.Status())),
-		}),
+		"run": types.NewXObject(map[string]types.XValue{"status": legacyStatus}),
 	}
 }
 
@@ -116,7 +114,7 @@ func FormatRunSummary(env envs.Environment, run flows.RunSummary) string {
 
 type runSummaryEnvelope struct {
 	UUID    flows.RunUUID         `json:"uuid" validate:"uuid4"`
-	Flow    *assets.FlowReference `json:"flow" validate:"required,dive"`
+	Flow    *assets.FlowReference `json:"flow" validate:"required"`
 	Contact json.RawMessage       `json:"contact"`
 	Status  flows.RunStatus       `json:"status" validate:"required"`
 	Results flows.Results         `json:"results"`

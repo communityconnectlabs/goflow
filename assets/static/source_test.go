@@ -9,6 +9,20 @@ import (
 )
 
 var assetsJSON = `{
+	"channels": [
+        {
+            "uuid": "58e9b092-fe42-4173-876c-ff45a14a24fe",
+            "name": "Facebook",
+            "address": "457547478475",
+            "schemes": [
+                "facebook"
+            ],
+            "roles": [
+                "send",
+                "receive"
+            ]
+        }
+    ],
 	"flows": [
 		{
             "uuid": "76f0a02f-3b75-4b86-9064-e9195e1b3a02",
@@ -35,6 +49,12 @@ var assetsJSON = `{
 			"name": "Spam"
 		}
 	],
+	"optins": [
+        {
+            "uuid": "248be71d-78e9-4d71-a6c4-9981d369e5cb",
+            "name": "Joke Of The Day"
+        }
+    ],
 	"resthooks": [
 		{
 			"slug": "new-registration",
@@ -59,7 +79,7 @@ func TestSource(t *testing.T) {
 
 	channels, err = src.Channels()
 	assert.NoError(t, err)
-	assert.Len(t, channels, 0)
+	assert.Len(t, channels, 1)
 
 	classifiers, err := src.Classifiers()
 	assert.NoError(t, err)
@@ -93,6 +113,10 @@ func TestSource(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, locations, 0)
 
+	optIns, err := src.OptIns()
+	assert.NoError(t, err)
+	assert.Len(t, optIns, 1)
+
 	resthooks, err := src.Resthooks()
 	assert.NoError(t, err)
 	assert.Len(t, resthooks, 1)
@@ -100,10 +124,6 @@ func TestSource(t *testing.T) {
 	templates, err := src.Templates()
 	assert.NoError(t, err)
 	assert.Len(t, templates, 0)
-
-	ticketers, err := src.Ticketers()
-	assert.NoError(t, err)
-	assert.Len(t, ticketers, 0)
 
 	topics, err := src.Topics()
 	assert.NoError(t, err)

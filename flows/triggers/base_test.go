@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
@@ -20,8 +21,6 @@ import (
 	"github.com/nyaruka/goflow/flows/engine"
 	"github.com/nyaruka/goflow/flows/triggers"
 	"github.com/nyaruka/goflow/test"
-
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -55,8 +54,7 @@ func testTriggerType(t *testing.T, assetsJSON json.RawMessage, typeName string) 
 		Context     json.RawMessage `json:"context,omitempty"`
 	}{}
 
-	err = jsonx.Unmarshal(testFile, &tests)
-	require.NoError(t, err)
+	jsonx.MustUnmarshal(testFile, &tests)
 
 	defer dates.SetNowSource(dates.DefaultNowSource)
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
@@ -74,7 +72,7 @@ func testTriggerType(t *testing.T, assetsJSON json.RawMessage, typeName string) 
 		trigger, err := triggers.ReadTrigger(sa, tc.Trigger, assets.PanicOnMissing)
 
 		if tc.ReadError != "" {
-			rootErr := errors.Cause(err)
+			rootErr := test.RootError(err)
 			assert.EqualError(t, rootErr, tc.ReadError, "read error mismatch in %s", testName)
 			continue
 		} else {
@@ -93,7 +91,8 @@ func testTriggerType(t *testing.T, assetsJSON json.RawMessage, typeName string) 
 		actual := tc
 		actual.Events, _ = jsonx.Marshal(sprint.Events())
 
-		actualContextJSON, err := session.Runs()[0].EvaluateTemplate(`@(json(trigger))`)
+		log := test.NewEventLog()
+		actualContextJSON, _ := session.Runs()[0].EvaluateTemplate(`@(json(trigger))`, log.Log)
 		assert.NoError(t, err)
 		actual.Context = []byte(actualContextJSON)
 
@@ -150,12 +149,11 @@ var assetsJSON = `{
             "schemes": ["tel"],
             "roles": ["send", "receive"]
         }
-	],
-    "ticketers": [
+    ],
+    "optins": [
         {
-            "uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
-            "name": "Support Tickets",
-            "type": "mailgun"
+            "uuid": "248be71d-78e9-4d71-a6c4-9981d369e5cb",
+            "name": "Joke Of The Day"
         }
     ],
     "users": [
@@ -183,12 +181,12 @@ func TestTriggerMarshaling(t *testing.T) {
 
 	flow := assets.NewFlowReference("7c37d7e5-6468-4b31-8109-ced2ef8b5ddc", "Registration")
 	channel := assets.NewChannelReference("3a05eaf5-cb1b-4246-bef1-f277419c83a7", "Nexmo")
-	ticketer := sa.Ticketers().Get("19dc6346-9623-4fe4-be80-538d493ecdf5")
+	jotd := sa.OptIns().Get("248be71d-78e9-4d71-a6c4-9981d369e5cb")
 	weather := sa.Topics().Get("472a7a73-96cb-4736-b567-056d987cc5b4")
 	user := sa.Users().Get("bob@nyaruka.com")
-	ticket := flows.NewTicket("276c2e43-d6f9-4c36-8e54-b5af5039acf6", ticketer, weather, "Where are my shoes?", "123456", user)
+	ticket := flows.NewTicket("276c2e43-d6f9-4c36-8e54-b5af5039acf6", weather, "Where are my shoes?", user)
 
-	contact := flows.NewEmptyContact(sa, "Bob", envs.Language("eng"), nil)
+	contact := flows.NewEmptyContact(sa, "Bob", i18n.Language("eng"), nil)
 	contact.AddURN(urns.URN("tel:+12065551212"), nil)
 
 	eng := engine.NewBuilder().Build()
@@ -278,6 +276,18 @@ func TestTriggerMarshaling(t *testing.T) {
 		},
 		{
 			triggers.NewBuilder(env, flow, contact).
+				OptIn(jotd, triggers.OptInEventTypeStarted).
+				Build(),
+			"optin_started",
+		},
+		{
+			triggers.NewBuilder(env, flow, contact).
+				OptIn(jotd, triggers.OptInEventTypeStopped).
+				Build(),
+			"optin_stopped",
+		},
+		{
+			triggers.NewBuilder(env, flow, contact).
 				Ticket(ticket, triggers.TicketEventTypeClosed).
 				Build(),
 			"ticket_closed",
@@ -324,8 +334,7 @@ func TestReadTrigger(t *testing.T) {
 				"decimal_symbol": ".",
 				"digit_grouping_symbol": ","
 			},
-			"redaction_policy": "none",
-			"max_value_length": 640
+			"redaction_policy": "none"
 		},
 		"flow": {
 			"uuid": "7c37d7e5-6468-4b31-8109-ced2ef8b5ddc",
@@ -341,7 +350,7 @@ func TestReadTrigger(t *testing.T) {
 				"tel:+12065551212"
 			]
 		},
-		"connection": {
+		"call": {
 			"channel": {
 				"uuid": "3a05eaf5-cb1b-4246-bef1-f277419c83a7",
 				"name": "Nexmo"
@@ -375,7 +384,7 @@ func TestTriggerSessionInitialization(t *testing.T) {
 
 	flow := assets.NewFlowReference(assets.FlowUUID("7c37d7e5-6468-4b31-8109-ced2ef8b5ddc"), "Registration")
 
-	contact := flows.NewEmptyContact(sa, "Bob", envs.Language("eng"), nil)
+	contact := flows.NewEmptyContact(sa, "Bob", i18n.Language("eng"), nil)
 	contact.AddURN(urns.URN("tel:+12065551212"), nil)
 
 	params := types.NewXObject(map[string]types.XValue{"foo": types.NewXText("bar")})
@@ -425,7 +434,7 @@ func TestTriggerContext(t *testing.T) {
 	flow := assets.NewFlowReference(assets.FlowUUID("7c37d7e5-6468-4b31-8109-ced2ef8b5ddc"), "Registration")
 	user := sa.Users().Get("bob@nyaruka.com")
 
-	contact := flows.NewEmptyContact(sa, "Jim", envs.Language("eng"), nil)
+	contact := flows.NewEmptyContact(sa, "Jim", i18n.Language("eng"), nil)
 	contact.AddURN(urns.URN("tel:+12065551212"), nil)
 
 	params := types.NewXObject(map[string]types.XValue{"foo": types.NewXText("bar")})
@@ -447,6 +456,7 @@ func TestTriggerContext(t *testing.T) {
 			"name":        types.NewXText("Bob McTickets"),
 			"first_name":  types.NewXText("Bob"),
 		}),
+		"optin":    nil,
 		"origin":   types.NewXText("api"),
 		"campaign": nil,
 		"ticket":   nil,

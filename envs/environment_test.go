@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/goflow/envs"
 
@@ -42,10 +43,9 @@ func TestEnvironmentMarshaling(t *testing.T) {
 	assert.Equal(t, envs.DateFormatYearMonthDay, env.DateFormat())
 	assert.Equal(t, envs.TimeFormatHourMinute, env.TimeFormat())
 	assert.Equal(t, envs.DefaultNumberFormat, env.NumberFormat())
-	assert.Equal(t, envs.NilLanguage, env.DefaultLanguage())
+	assert.Equal(t, i18n.NilLanguage, env.DefaultLanguage())
 	assert.Nil(t, env.AllowedLanguages())
-	assert.Equal(t, envs.NilCountry, env.DefaultCountry())
-	assert.Equal(t, 640, env.MaxValueLength())
+	assert.Equal(t, i18n.NilCountry, env.DefaultCountry())
 	assert.Nil(t, env.LocationResolver())
 
 	// can create with valid values
@@ -60,15 +60,17 @@ func TestEnvironmentMarshaling(t *testing.T) {
 	assert.Equal(t, envs.DateFormatDayMonthYear, env.DateFormat())
 	assert.Equal(t, envs.TimeFormatHourMinuteSecond, env.TimeFormat())
 	assert.Equal(t, kgl, env.Timezone())
-	assert.Equal(t, envs.Language("eng"), env.DefaultLanguage())
-	assert.Equal(t, []envs.Language{envs.Language("eng"), envs.Language("fra")}, env.AllowedLanguages())
-	assert.Equal(t, envs.Country("RW"), env.DefaultCountry())
-	assert.Equal(t, "en-RW", env.DefaultLocale().ToBCP47())
+	assert.Equal(t, i18n.Language("eng"), env.DefaultLanguage())
+	assert.Equal(t, []i18n.Language{i18n.Language("eng"), i18n.Language("fra")}, env.AllowedLanguages())
+	assert.Equal(t, i18n.Country("RW"), env.DefaultCountry())
+	assert.Equal(t, i18n.Locale("eng-RW"), env.DefaultLocale())
+	assert.Equal(t, envs.CollationDefault, env.InputCollation())
+	assert.Equal(t, envs.RedactionPolicyNone, env.RedactionPolicy())
 	assert.Nil(t, env.LocationResolver())
 
 	data, err := jsonx.Marshal(env)
 	require.NoError(t, err)
-	assert.Equal(t, string(data), `{"date_format":"DD-MM-YYYY","time_format":"tt:mm:ss","timezone":"Africa/Kigali","allowed_languages":["eng","fra"],"number_format":{"decimal_symbol":".","digit_grouping_symbol":","},"default_country":"RW","redaction_policy":"none","max_value_length":640}`)
+	assert.Equal(t, string(data), `{"date_format":"DD-MM-YYYY","time_format":"tt:mm:ss","timezone":"Africa/Kigali","allowed_languages":["eng","fra"],"number_format":{"decimal_symbol":".","digit_grouping_symbol":","},"default_country":"RW","input_collation":"default","redaction_policy":"none"}`)
 }
 
 func TestEnvironmentEqual(t *testing.T) {
@@ -102,20 +104,18 @@ func TestEnvironmentBuilder(t *testing.T) {
 		WithDateFormat(envs.DateFormatDayMonthYear).
 		WithTimeFormat(envs.TimeFormatHourMinuteSecond).
 		WithTimezone(kgl).
-		WithAllowedLanguages([]envs.Language{envs.Language("fra"), envs.Language("eng")}).
-		WithDefaultCountry(envs.Country("RW")).
+		WithAllowedLanguages("fra", "eng").
+		WithDefaultCountry(i18n.Country("RW")).
 		WithNumberFormat(&envs.NumberFormat{DecimalSymbol: "'"}).
 		WithRedactionPolicy(envs.RedactionPolicyURNs).
-		WithMaxValueLength(1024).
 		Build()
 
 	assert.Equal(t, envs.DateFormatDayMonthYear, env.DateFormat())
 	assert.Equal(t, envs.TimeFormatHourMinuteSecond, env.TimeFormat())
 	assert.Equal(t, kgl, env.Timezone())
-	assert.Equal(t, []envs.Language{envs.Language("fra"), envs.Language("eng")}, env.AllowedLanguages())
-	assert.Equal(t, envs.Country("RW"), env.DefaultCountry())
+	assert.Equal(t, []i18n.Language{i18n.Language("fra"), i18n.Language("eng")}, env.AllowedLanguages())
+	assert.Equal(t, i18n.Country("RW"), env.DefaultCountry())
 	assert.Equal(t, &envs.NumberFormat{DecimalSymbol: "'"}, env.NumberFormat())
 	assert.Equal(t, envs.RedactionPolicyURNs, env.RedactionPolicy())
-	assert.Equal(t, 1024, env.MaxValueLength())
 	assert.Nil(t, env.LocationResolver())
 }

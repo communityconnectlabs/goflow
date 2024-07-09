@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
@@ -31,11 +32,11 @@ func TestModifierTypes(t *testing.T) {
 	eng := test.NewEngine()
 
 	for typeName := range modifiers.RegisteredTypes {
-		testModifierType(t, eng.Services(), sa, typeName)
+		testModifierType(t, eng, env, sa, typeName)
 	}
 }
 
-func testModifierType(t *testing.T, svcs flows.Services, sa flows.SessionAssets, typeName string) {
+func testModifierType(t *testing.T, eng flows.Engine, env envs.Environment, sa flows.SessionAssets, typeName string) {
 	testPath := fmt.Sprintf("testdata/%s.json", typeName)
 	testFile, err := os.ReadFile(testPath)
 	require.NoError(t, err)
@@ -49,8 +50,7 @@ func testModifierType(t *testing.T, svcs flows.Services, sa flows.SessionAssets,
 		Events       json.RawMessage `json:"events"`
 	}{}
 
-	err = jsonx.Unmarshal(testFile, &tests)
-	require.NoError(t, err)
+	jsonx.MustUnmarshal(testFile, &tests)
 
 	defer dates.SetNowSource(dates.DefaultNowSource)
 	defer uuids.SetGenerator(uuids.DefaultGenerator)
@@ -71,9 +71,8 @@ func testModifierType(t *testing.T, svcs flows.Services, sa flows.SessionAssets,
 		require.NoError(t, err, "error loading contact_before in %s", testName)
 
 		// apply the modifier
-		env := envs.NewBuilder().WithMaxValueLength(256).Build()
 		eventLog := test.NewEventLog()
-		modifiers.Apply(env, svcs, sa, contact, modifier, eventLog.Log)
+		modifiers.Apply(eng, env, sa, contact, modifier, eventLog.Log)
 
 		// clone test case and populate with actual values
 		actual := tc
@@ -160,7 +159,7 @@ func TestConstructors(t *testing.T) {
 			}`,
 		},
 		{
-			modifiers.NewLanguage(envs.Language("fra")),
+			modifiers.NewLanguage(i18n.Language("fra")),
 			`{
 				"type": "language",
 				"language": "fra"
@@ -199,14 +198,6 @@ func TestConstructors(t *testing.T) {
 			`{
 				"type": "timezone",
 				"timezone": "America/Los_Angeles"
-			}`,
-		},
-		{
-			modifiers.NewURN(urns.URN("tel:+1234567890"), modifiers.URNAppend),
-			`{
-				"type": "urn",
-				"urn": "tel:+1234567890",
-				"modification": "append"
 			}`,
 		},
 		{
@@ -297,11 +288,6 @@ func TestFieldValueTypes(t *testing.T) {
 	mod, err = modifiers.ReadModifier(sessionAssets, []byte(`{"type": "field", "field": {"key": "age", "name": "Age"}, "value": null}`), assets.PanicOnMissing)
 	assert.NoError(t, err)
 	assert.Equal(t, "", mod.(*modifiers.FieldModifier).Value())
-
-	// or be a value object
-	mod, err = modifiers.ReadModifier(sessionAssets, []byte(`{"type": "field", "field": {"key": "age", "name": "Age"}, "value": {"text": "37 years", "number": 37}}`), assets.PanicOnMissing)
-	assert.NoError(t, err)
-	assert.Equal(t, "37 years", mod.(*modifiers.FieldModifier).Value())
 
 	// or be a string
 	mod, err = modifiers.ReadModifier(sessionAssets, []byte(`{"type": "field", "field": {"key": "age", "name": "Age"}, "value": "39 years"}`), assets.PanicOnMissing)

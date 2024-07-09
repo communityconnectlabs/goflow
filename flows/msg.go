@@ -1,18 +1,16 @@
 package flows
 
 import (
-	"database/sql/driver"
-	"encoding/json"
-	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/utils"
-	"golang.org/x/exp/slices"
 )
 
 func init() {
@@ -24,6 +22,12 @@ func init() {
 type UnsendableReason string
 
 const (
+	// max length of a message attachment (type:url)
+	MaxAttachmentLength = 2048
+
+	// max length of a quick reply
+	MaxQuickReplyLength = 64
+
 	NilUnsendableReason           UnsendableReason = ""
 	UnsendableReasonNoDestination UnsendableReason = "no_destination" // no sendable channel+URN pair
 	UnsendableReasonContactStatus UnsendableReason = "contact_status" // contact is blocked or stopped or archived
@@ -65,7 +69,7 @@ type MsgOut struct {
 	QuickReplies_     []string         `json:"quick_replies,omitempty"`
 	Templating_       *MsgTemplating   `json:"templating,omitempty"`
 	Topic_            MsgTopic         `json:"topic,omitempty"`
-	Locale_           envs.Locale      `json:"locale,omitempty"`
+	Locale_           i18n.Locale      `json:"locale,omitempty"`
 	UnsendableReason_ UnsendableReason `json:"unsendable_reason,omitempty"`
 }
 
@@ -83,16 +87,16 @@ func NewMsgIn(uuid MsgUUID, urn urns.URN, channel *assets.ChannelReference, text
 }
 
 // NewMsgOut creates a new outgoing message
-func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, attachments []utils.Attachment, quickReplies []string, templating *MsgTemplating, topic MsgTopic, locale envs.Locale, reason UnsendableReason) *MsgOut {
+func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, content *MsgContent, templating *MsgTemplating, topic MsgTopic, locale i18n.Locale, reason UnsendableReason) *MsgOut {
 	return &MsgOut{
 		BaseMsg: BaseMsg{
 			UUID_:        MsgUUID(uuids.New()),
 			URN_:         urn,
 			Channel_:     channel,
-			Text_:        text,
-			Attachments_: attachments,
+			Text_:        content.Text,
+			Attachments_: content.Attachments,
 		},
-		QuickReplies_:     quickReplies,
+		QuickReplies_:     content.QuickReplies,
 		Templating_:       templating,
 		Topic_:            topic,
 		Locale_:           locale,
@@ -101,7 +105,7 @@ func NewMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, atta
 }
 
 // NewIVRMsgOut creates a new outgoing message for IVR
-func NewIVRMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, audioURL string, locale envs.Locale) *MsgOut {
+func NewIVRMsgOut(urn urns.URN, channel *assets.ChannelReference, text string, audioURL string, locale i18n.Locale) *MsgOut {
 	var attachments []utils.Attachment
 	if audioURL != "" {
 		attachments = []utils.Attachment{utils.Attachment(fmt.Sprintf("audio:%s", audioURL))}
@@ -162,72 +166,82 @@ func (m *MsgOut) Templating() *MsgTemplating { return m.Templating_ }
 func (m *MsgOut) Topic() MsgTopic { return m.Topic_ }
 
 // Locale returns the locale of this message (if any)
-func (m *MsgOut) Locale() envs.Locale { return m.Locale_ }
+func (m *MsgOut) Locale() i18n.Locale { return m.Locale_ }
 
 // UnsendableReason returns the reason this message can't be sent (if any)
 func (m *MsgOut) UnsendableReason() UnsendableReason { return m.UnsendableReason_ }
 
+type TemplatingVariable struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
+type TemplatingComponent struct {
+	Name      string         `json:"name"`
+	Type      string         `json:"type"`
+	Variables map[string]int `json:"variables"`
+}
+
 // MsgTemplating represents any substituted message template that should be applied when sending this message
 type MsgTemplating struct {
-	Template_  *assets.TemplateReference `json:"template"`
-	Variables_ []string                  `json:"variables,omitempty"`
-	Namespace_ string                    `json:"namespace"`
+	Template   *assets.TemplateReference `json:"template"`
+	Components []*TemplatingComponent    `json:"components,omitempty"`
+	Variables  []*TemplatingVariable     `json:"variables,omitempty"`
 }
-
-// Template returns the template this msg template is for
-func (t MsgTemplating) Template() *assets.TemplateReference { return t.Template_ }
-
-// Variables returns the variables that should be substituted in the template
-func (t MsgTemplating) Variables() []string { return t.Variables_ }
-
-// Namespace returns the namespace that should be for the template
-func (t MsgTemplating) Namespace() string { return t.Namespace_ }
 
 // NewMsgTemplating creates and returns a new msg template
-func NewMsgTemplating(template *assets.TemplateReference, variables []string, namespace string) *MsgTemplating {
-	return &MsgTemplating{
-		Template_:  template,
-		Variables_: variables,
-		Namespace_: namespace,
-	}
+func NewMsgTemplating(template *assets.TemplateReference, components []*TemplatingComponent, variables []*TemplatingVariable) *MsgTemplating {
+	return &MsgTemplating{Template: template, Components: components, Variables: variables}
 }
 
-// BroadcastTranslation is the broadcast content in a particular language
-type BroadcastTranslation struct {
+// MsgContent is message content in a particular language
+type MsgContent struct {
 	Text         string             `json:"text"`
 	Attachments  []utils.Attachment `json:"attachments,omitempty"`
 	QuickReplies []string           `json:"quick_replies,omitempty"`
 }
 
-type BroadcastTranslations map[envs.Language]*BroadcastTranslation
+func (c *MsgContent) Empty() bool {
+	return c.Text == "" && len(c.Attachments) == 0 && len(c.QuickReplies) == 0
+}
 
-// ForContact is a utility to help callers select the translation for a contact
-func (b BroadcastTranslations) ForContact(e envs.Environment, c *Contact, baseLanguage envs.Language) (*BroadcastTranslation, envs.Language) {
-	// first try the contact language if it is valid
-	if c.Language() != envs.NilLanguage && slices.Contains(e.AllowedLanguages(), c.Language()) {
-		t := b[c.Language()]
-		if t != nil {
-			return t, c.Language()
+type BroadcastTranslations map[i18n.Language]*MsgContent
+
+// ForContact is a utility to help callers get the message content for a contact
+func (b BroadcastTranslations) ForContact(e envs.Environment, c *Contact, baseLanguage i18n.Language) (*MsgContent, i18n.Locale) {
+	// get the set of languages to merge translations from
+	languages := make([]i18n.Language, 0, 3)
+
+	// highest priority is the contact language if it is valid
+	if c.Language() != i18n.NilLanguage && slices.Contains(e.AllowedLanguages(), c.Language()) {
+		languages = append(languages, c.Language())
+	}
+
+	// then the default workspace language, then the base language
+	languages = append(languages, e.DefaultLanguage(), baseLanguage)
+
+	content := &MsgContent{}
+	language := i18n.NilLanguage
+	country := e.DefaultCountry()
+	if c.Country() != i18n.NilCountry {
+		country = c.Country()
+	}
+
+	for _, lang := range languages {
+		trans := b[lang]
+		if trans != nil {
+			if content.Text == "" && trans.Text != "" {
+				content.Text = trans.Text
+				language = lang
+			}
+			if len(content.Attachments) == 0 && len(trans.Attachments) > 0 {
+				content.Attachments = trans.Attachments
+			}
+			if len(content.QuickReplies) == 0 && len(trans.QuickReplies) > 0 {
+				content.QuickReplies = trans.QuickReplies
+			}
 		}
 	}
 
-	// second try the default flow language
-	t := b[e.DefaultLanguage()]
-	if t != nil {
-		return t, e.DefaultLanguage()
-	}
-
-	// finally return the base language
-	return b[baseLanguage], baseLanguage
+	return content, i18n.NewLocale(language, country)
 }
-
-// Scan supports reading translation values from JSON in database
-func (t *BroadcastTranslations) Scan(value any) error {
-	b, ok := value.([]byte)
-	if !ok {
-		return errors.New("failed type assertion to []byte")
-	}
-	return json.Unmarshal(b, &t)
-}
-
-func (t BroadcastTranslations) Value() (driver.Value, error) { return json.Marshal(t) }

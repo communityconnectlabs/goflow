@@ -4,10 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/nyaruka/goflow/utils"
-
-	"github.com/pkg/errors"
 )
 
 // migrates a parameter value in an legacy expression
@@ -35,10 +31,10 @@ func asTemplate(template string) callMigrator {
 	return func(funcName string, params []string) (string, error) {
 		numParamPlaceholders := strings.Count(template, "%s") + strings.Count(template, "%v")
 		if numParamPlaceholders > len(params) {
-			return "", errors.Errorf("expecting %d params whilst migrating call to %s but got %d", numParamPlaceholders, funcName, len(params))
+			return "", fmt.Errorf("expecting %d params whilst migrating call to %s but got %d", numParamPlaceholders, funcName, len(params))
 		}
 
-		paramsAsInterfaces := make([]interface{}, len(params))
+		paramsAsInterfaces := make([]any, len(params))
 		for i := range params {
 			paramsAsInterfaces[i] = params[i]
 		}
@@ -63,10 +59,10 @@ func asParamMigrators(newName string, paramMigrators ...paramMigrator) callMigra
 func asParamMigratorsWithDefaults(newName string, defaults []string, paramMigrators ...paramMigrator) callMigrator {
 	return func(funcName string, oldParams []string) (string, error) {
 		if len(oldParams) > len(paramMigrators) {
-			return "", errors.Errorf("don't know how to migrate call to %s with %d parameters", funcName, len(oldParams))
+			return "", fmt.Errorf("don't know how to migrate call to %s with %d parameters", funcName, len(oldParams))
 		}
 
-		newParams := make([]string, utils.Max(len(oldParams), len(defaults)))
+		newParams := make([]string, max(len(oldParams), len(defaults)))
 
 		for i := range newParams {
 			var param string

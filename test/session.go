@@ -2,11 +2,13 @@ package test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/nyaruka/gocommon/i18n"
 	"github.com/nyaruka/gocommon/jsonx"
 	"github.com/nyaruka/gocommon/urns"
 	"github.com/nyaruka/gocommon/uuids"
@@ -15,10 +17,9 @@ import (
 	"github.com/nyaruka/goflow/envs"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/engine"
+	"github.com/nyaruka/goflow/flows/events"
 	"github.com/nyaruka/goflow/flows/resumes"
 	"github.com/nyaruka/goflow/flows/triggers"
-
-	"github.com/pkg/errors"
 )
 
 var sessionAssets = `{
@@ -43,7 +44,8 @@ var sessionAssets = `{
             "name": "Facebook Channel",
             "address": "235326346322111",
             "schemes": ["facebook"],
-            "roles": ["send", "receive"]
+            "roles": ["send", "receive"],
+            "features": ["optins"]
         }
     ],
     "classifiers": [
@@ -54,11 +56,10 @@ var sessionAssets = `{
             "intents": ["book_flight", "book_hotel"]
         }
     ],
-    "ticketers": [
+    "optins": [
         {
-            "uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5",
-            "name": "Support Tickets",
-            "type": "mailgun"
+            "uuid": "248be71d-78e9-4d71-a6c4-9981d369e5cb",
+            "name": "Joke Of The Day"
         }
     ],
     "topics": [
@@ -237,7 +238,8 @@ var sessionAssets = `{
         {"uuid": "6c86d5ab-3fd9-4a5c-a5b6-48168b016747", "key": "join_date", "name": "Join Date", "type": "datetime"},
         {"uuid": "c88d2640-d124-438a-b666-5ec53a353dcd", "key": "activation_token", "name": "Activation Token", "type": "text"},
         {"uuid": "ab9c0631-d8cd-4e77-a5a2-66a8b077e385", "key": "state", "name": "State", "type": "state"},
-        {"uuid": "3bfc3908-a402-48ea-841c-b73b5ef3a254", "key": "not_set", "name": "Not set", "type": "text"}
+        {"uuid": "3bfc3908-a402-48ea-841c-b73b5ef3a254", "key": "not_set", "name": "Not set", "type": "text"},
+        {"uuid": "3bfc3908-a402-48ea-841c-b73b5ef3a254", "key": "language", "name": "Language (Conflicts)", "type": "text"}
     ],
     "groups": [
         {"uuid": "b7cf0d83-f1c9-411c-96fd-c511a4cfa86d", "name": "Testers"},
@@ -323,31 +325,16 @@ var sessionTrigger = `{
                 "text": "AACC55"
             }
         },
-        "tickets": [
-            {
-                "uuid": "e5f5a9b0-1c08-4e56-8f5c-92e00bc3cf52",
-                "subject": "Old ticket",
-                "body": "I have a problem",
-                "ticketer": {
-                    "name": "Support Tickets",
-                    "uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
-                }
+        "ticket": {
+            "uuid": "78d1fe0d-7e39-461e-81c3-a6a25f15ed69",
+            "subject": "Question",
+            "body": "What day is it?",
+            "topic": {
+                "uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
+                "name": "Weather"
             },
-            {
-                "uuid": "78d1fe0d-7e39-461e-81c3-a6a25f15ed69",
-                "subject": "Question",
-                "body": "What day is it?",
-                "ticketer": {
-                    "name": "Support Tickets",
-                    "uuid": "19dc6346-9623-4fe4-be80-538d493ecdf5"
-                },
-                "topic": {
-                    "uuid": "472a7a73-96cb-4736-b567-056d987cc5b4",
-                    "name": "Weather"
-                },
-                "assignee": {"email": "bob@nyaruka.com", "name": "Bob"}
-            }
-        ]
+            "assignee": {"email": "bob@nyaruka.com", "name": "Bob"}
+        }
     },
     "run_summary": {
         "uuid": "4213ac47-93fd-48c4-af12-7da8218ef09d",
@@ -471,7 +458,7 @@ var voiceSessionTrigger = `{
         "type": "incoming_call",
         "channel": {"uuid": "fd47a886-451b-46fb-bcb6-242a4046c0c0", "name": "Nexmo"}
     },
-    "connection": {
+    "call": {
         "channel": {"uuid": "fd47a886-451b-46fb-bcb6-242a4046c0c0", "name": "Nexmo"},
         "urn": "tel:+12065551212"
     },
@@ -514,7 +501,7 @@ func CreateTestSession(testServerURL string, redact envs.RedactionPolicy) (flows
 
 	sa, err := CreateSessionAssets(assetsJSON, testServerURL)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error creating test session")
+		return nil, nil, fmt.Errorf("error creating test session: %w", err)
 	}
 
 	// read our trigger
@@ -523,20 +510,20 @@ func CreateTestSession(testServerURL string, redact envs.RedactionPolicy) (flows
 
 	trigger, err := triggers.ReadTrigger(sa, triggerJSON, assets.PanicOnMissing)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error reading trigger")
+		return nil, nil, fmt.Errorf("error reading trigger: %w", err)
 	}
 
 	eng := NewEngine()
 
 	session, _, err := eng.NewSession(sa, trigger)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error starting test session")
+		return nil, nil, fmt.Errorf("error starting test session: %w", err)
 	}
 
 	// read our resume
 	resume, err := resumes.ReadResume(sa, json.RawMessage(sessionResume), assets.PanicOnMissing)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error reading resume")
+		return nil, nil, fmt.Errorf("error reading resume: %w", err)
 	}
 
 	sprint, err := session.Resume(resume)
@@ -549,19 +536,19 @@ func CreateTestVoiceSession(testServerURL string) (flows.Session, []flows.Event,
 
 	sa, err := CreateSessionAssets(assetsJSON, testServerURL)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error creating test voice session assets")
+		return nil, nil, fmt.Errorf("error creating test voice session assets: %w", err)
 	}
 
 	// read our trigger
 	trigger, err := triggers.ReadTrigger(sa, json.RawMessage(voiceSessionTrigger), assets.PanicOnMissing)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error reading trigger")
+		return nil, nil, fmt.Errorf("error reading trigger: %w", err)
 	}
 
 	eng := NewEngine()
 	session, sprint, err := eng.NewSession(sa, trigger)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error starting test voice session")
+		return nil, nil, fmt.Errorf("error starting test voice session: %w", err)
 	}
 
 	return session, sprint.Events(), err
@@ -571,21 +558,23 @@ func CreateTestVoiceSession(testServerURL string) (flows.Session, []flows.Event,
 func CreateSessionAssets(assetsJSON json.RawMessage, testServerURL string) (flows.SessionAssets, error) {
 	env := envs.NewBuilder().Build()
 
-	// different tests different ports for the test HTTP server
-	if testServerURL != "" {
-		assetsJSON = json.RawMessage(strings.Replace(string(assetsJSON), "http://localhost", testServerURL, -1))
+	// different tests different ports for the test HTTP server, or just let them fail to connect to port 65535
+	if testServerURL == "" {
+		testServerURL = "http://localhost:65535"
 	}
+
+	assetsJSON = json.RawMessage(strings.Replace(string(assetsJSON), "http://localhost", testServerURL, -1))
 
 	// read our assets into a source
 	source, err := static.NewSource(assetsJSON)
 	if err != nil {
-		return nil, errors.Wrap(err, "error loading test assets")
+		return nil, fmt.Errorf("error loading test assets: %w", err)
 	}
 
 	// create our engine session
 	sa, err := engine.NewSessionAssets(env, source, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating test session assets")
+		return nil, fmt.Errorf("error creating test session assets: %w", err)
 	}
 
 	return sa, nil
@@ -603,7 +592,7 @@ type SessionBuilder struct {
 	contactUUID flows.ContactUUID
 	contactID   flows.ContactID
 	contactName string
-	contactLang envs.Language
+	contactLang i18n.Language
 	contactURN  urns.URN
 	triggerMsg  string
 }
@@ -612,7 +601,8 @@ func NewSessionBuilder() *SessionBuilder {
 	env := envs.NewBuilder().
 		WithDateFormat(envs.DateFormatDayMonthYear).
 		WithDefaultCountry("US").
-		WithAllowedLanguages([]envs.Language{"eng", "spa"}).
+		WithAllowedLanguages("eng", "spa").
+		WithInputCollation(envs.CollationConfusables).
 		Build()
 
 	return &SessionBuilder{
@@ -653,7 +643,7 @@ func (b *SessionBuilder) WithFlow(flowUUID assets.FlowUUID) *SessionBuilder {
 	return b
 }
 
-func (b *SessionBuilder) WithContact(uuid flows.ContactUUID, id flows.ContactID, name string, lang envs.Language, urn urns.URN) *SessionBuilder {
+func (b *SessionBuilder) WithContact(uuid flows.ContactUUID, id flows.ContactID, name string, lang i18n.Language, urn urns.URN) *SessionBuilder {
 	b.contactUUID = uuid
 	b.contactID = id
 	b.contactName = name
@@ -675,20 +665,20 @@ func (b *SessionBuilder) Build() (flows.SessionAssets, flows.Session, flows.Spri
 		if b.assetsPath != "" {
 			b.assetsJSON, err = os.ReadFile(b.assetsPath)
 			if err != nil {
-				errors.Wrapf(err, "error reading assets from %s", b.assetsPath)
+				return nil, nil, nil, fmt.Errorf("error reading assets from %s: %w", b.assetsPath, err)
 			}
 		}
 		if b.assetsJSON != nil {
 			sa, err = CreateSessionAssets(b.assetsJSON, "")
 			if err != nil {
-				return nil, nil, nil, errors.Wrap(err, "error creating session assets")
+				return nil, nil, nil, fmt.Errorf("error creating session assets: %w", err)
 			}
 		}
 	}
 
 	flow, err := sa.Flows().Get(b.flowUUID)
 	if err != nil {
-		return nil, nil, nil, errors.Wrapf(err, "error getting flow %s from assets", b.flowUUID)
+		return nil, nil, nil, fmt.Errorf("error getting flow %s from assets: %w", b.flowUUID, err)
 	}
 
 	var urnz []urns.URN
@@ -712,7 +702,7 @@ func (b *SessionBuilder) Build() (flows.SessionAssets, flows.Session, flows.Spri
 		assets.PanicOnMissing,
 	)
 	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "error creating contact")
+		return nil, nil, nil, fmt.Errorf("error creating contact: %w", err)
 	}
 
 	var trigger flows.Trigger
@@ -770,4 +760,13 @@ func NewEventLog() *EventLog {
 
 func (l *EventLog) Log(e flows.Event) {
 	l.Events = append(l.Events, e)
+}
+
+func (l *EventLog) Error() error {
+	for _, e := range l.Events {
+		if e.Type() == events.TypeError {
+			return errors.New(e.(*events.ErrorEvent).Text)
+		}
+	}
+	return nil
 }
