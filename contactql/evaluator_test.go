@@ -140,6 +140,7 @@ func TestEvaluateQuery(t *testing.T) {
 		{query: `age = 36 OR gender = female`, result: true},
 		{query: `age = 35 OR gender = female`, result: false},
 		{query: `(age = 36 OR gender = female) AND age > 35`, result: true},
+		{query: `age = 36 OR gender = male AND age = 34`, result: true}, // AND has precedence
 	}
 
 	resolver := contactql.NewMockResolver(
@@ -153,11 +154,11 @@ func TestEvaluateQuery(t *testing.T) {
 			static.NewField("023f733d-ce00-4a61-96e4-b411987028ea", "empty", "Empty", assets.FieldTypeText),
 			static.NewField("81e25783-a1d8-42b9-85e4-68c7ab2df39d", "xyz", "XYZ", assets.FieldTypeText),
 		},
-		[]assets.Group{},
 		[]assets.Flow{
 			static.NewFlow("ea351bf8-3c49-46dd-935c-5b20e2a00b7a", "Registration", []byte(`{}`)),
 			static.NewFlow("1b73528f-6e4e-4c64-b393-78088449fb49", "Catch All", []byte(`{}`)),
 		},
+		[]assets.Group{},
 	)
 
 	for _, test := range tests {

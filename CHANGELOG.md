@@ -1,3 +1,81 @@
+v0.163.0
+----------
+ * Always truncate URLs in HTTP logs to 2048 chars
+
+v0.162.1
+----------
+ * Support simplifying of queries than can't be parsed but can be constructed
+
+v0.162.0
+----------
+ * Provide API for building contact queries programatically
+
+v0.161.2
+----------
+ * Update ANTLR
+ * Update to better maintained fork of go-mail
+
+v0.161.1
+----------
+ * Ensure that failing a session doesn't leave runs in active/waiting state
+
+v0.161.0
+----------
+ * Update to latest gocommon and phonenumbers
+
+v0.160.0
+----------
+ * Add option to exclude contacts in a flow on start session action
+
+v0.159.2
+----------
+ * Trim URLs in call_webhook actions
+
+v0.159.1
+----------
+ * Fix not equals conditions in contact queries on fields that aren't set
+
+v0.159.0
+----------
+ * Improve simplifying of contactql queries
+ * Update direct dependencies except ANTLR4
+ * Go 1.18
+
+v0.158.1
+----------
+ * send_msg action should fallback to template trans in env default language if no trans found for contact language
+
+v0.158.0
+----------
+ * Add status as a contact query attribute, disallowed for smart groups
+
+v0.157.0
+----------
+ * Update to latest gocommon
+ * Allow querying on whether group is set or not for consistency with other fields
+ * Support contact queries on flow history
+
+v0.156.1
+----------
+ * SessionAssets implementation of contactql.Resolver methods should return pure assets
+
+v0.156.0
+----------
+ * Give flows.Flow a reference to their asset if they have one
+
+v0.155.0
+----------
+ * Switch from flow to flow_id and groups to group_ids for ES queries
+
+v0.154.0
+----------
+ * Give errors returned from Session.Resume codes
+
+v0.153.0
+----------
+ * Add concat excellent function
+ * Updated translations from Transifex
+
 v0.152.0
 ----------
  * start_session actions should generate error event if flow asset missing

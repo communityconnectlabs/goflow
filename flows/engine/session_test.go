@@ -251,9 +251,9 @@ func TestResumeAfterWaitWithMissingFlowAssets(t *testing.T) {
 	session2, _, err := test.ResumeSession(session1, assetsWithoutChildFlow, "Hello")
 	require.NoError(t, err)
 
-	// should have a failed session
+	// should have a failed session (with no runs left was active/waiting)
 	assert.Equal(t, flows.SessionStatusFailed, session2.Status())
-	assert.Equal(t, flows.RunStatusActive, session2.Runs()[0].Status())
+	assert.Equal(t, flows.RunStatusFailed, session2.Runs()[0].Status())
 	assert.Equal(t, flows.RunStatusFailed, session2.Runs()[1].Status())
 
 	// change the UUID of the parent flow so it will effectively be missing
@@ -264,8 +264,8 @@ func TestResumeAfterWaitWithMissingFlowAssets(t *testing.T) {
 
 	// should have an failed session
 	assert.Equal(t, flows.SessionStatusFailed, session3.Status())
-	assert.Equal(t, flows.RunStatusActive, session3.Runs()[0].Status())
-	assert.Equal(t, flows.RunStatusFailed, session3.Runs()[1].Status())
+	assert.Equal(t, flows.RunStatusFailed, session3.Runs()[0].Status())
+	assert.Equal(t, flows.RunStatusCompleted, session3.Runs()[1].Status())
 }
 
 func TestWaitTimeout(t *testing.T) {
@@ -408,4 +408,22 @@ func TestFindStep(t *testing.T) {
 	run, step = session.FindStep(flows.StepUUID("4f33917a-d562-4c20-88bd-f1a4c6827848"))
 	assert.Nil(t, run)
 	assert.Nil(t, step)
+}
+
+func TestEngineErrors(t *testing.T) {
+	// create a completed session and try to resume it
+	session, _ := test.NewSessionBuilder().WithAssetsPath("../../test/testdata/runner/empty.json").WithFlow("76f0a02f-3b75-4b86-9064-e9195e1b3a02").MustBuild()
+	require.Equal(t, flows.SessionStatusCompleted, session.Status())
+
+	_, err := session.Resume(nil)
+	assert.EqualError(t, err, "only waiting sessions can be resumed")
+	assert.Equal(t, engine.ErrorResumeNonWaitingSession, err.(*engine.Error).Code())
+
+	// create a session which is waiting for a message and try to resume it with a dial
+	session, _ = test.NewSessionBuilder().MustBuild()
+	require.Equal(t, flows.SessionStatusWaiting, session.Status())
+
+	_, err = session.Resume(resumes.NewDial(nil, nil, flows.NewDial(flows.DialStatusAnswered, 10)))
+	assert.EqualError(t, err, "resume of type dial not accepted by wait of type msg")
+	assert.Equal(t, engine.ErrorResumeRejectedByWait, err.(*engine.Error).Code())
 }

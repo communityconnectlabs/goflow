@@ -3,13 +3,13 @@
 # Translators:
 # Nyaruka <info@textit.in>, 2021
 # Moy Moussan <moymoussan@gmail.com>, 2021
-# Rowan Seymour <rowanseymour@gmail.com>, 2021
-#
+# Rowan Seymour <rowanseymour@gmail.com>, 2022
+# 
 #, fuzzy
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-08-04 18:19-0300\n"
-"Last-Translator: Rowan Seymour <rowanseymour@gmail.com>, 2021\n"
+"POT-Creation-Date: 2022-03-08 11:09-0500\n"
+"Last-Translator: Rowan Seymour <rowanseymour@gmail.com>, 2022\n"
 "Language-Team: Spanish (https://www.transifex.com/rapidpro/teams/226/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -355,10 +355,10 @@ msgid "Returns `value` if is not empty or an error, otherwise it returns `defaul
 msgstr "Devuelve `value` si no está vacío o es un error; de lo contrario, devuelve `default`."
 
 msgid "Returns a new array with the values of `array` reversed."
-msgstr ""
+msgstr "Devuelve un nuevo array de los valores de `array` invertidos."
 
 msgid "Returns a new array with the values of `array` sorted."
-msgstr ""
+msgstr "Devuelve un nuevo array de los valores de `array` ordenados."
 
 msgid "Returns a new datetime with the time part replaced by the `time`."
 msgstr "Devuelve una nueva fecha y hora con la parte de la hora reemplazada por `hour`."
@@ -427,7 +427,7 @@ msgid "Returns the remainder of the division of `dividend` by `divisor`."
 msgstr "Devuelve el resto de la división de `dividend` por `divisor`."
 
 msgid "Returns the unique values in `array`."
-msgstr ""
+msgstr "Devuelve los valores únicos en `array`. "
 
 msgid "Returns the week number (1-54) of `date`."
 msgstr "Devuelve el número de semana (1-54) de `date`."
@@ -722,7 +722,7 @@ msgid "the UUID of the ticket"
 msgstr "el UUID del ticket"
 
 msgid "the UUID of the topic"
-msgstr ""
+msgstr "el UUID del tema"
 
 msgid "the address of the channel"
 msgstr "la dirección del canal"
@@ -860,7 +860,7 @@ msgid "the name of the result"
 msgstr "el nombre del resultado"
 
 msgid "the name of the topic"
-msgstr ""
+msgstr "el nombre del tema"
 
 msgid "the name of the user"
 msgstr "el nombre del usuario"
@@ -914,7 +914,7 @@ msgid "the text part of the input"
 msgstr "la parte de texto de la entrada"
 
 msgid "the ticket if this is a ticket trigger"
-msgstr ""
+msgstr "el ticket si es un activador de tickets"
 
 msgid "the trigger that started this session"
 msgstr "el activador que inició esta sesión"

@@ -131,6 +131,7 @@ func TestContact(t *testing.T) {
 		"line":       nil,
 		"mailto":     nil,
 		"rocketchat": nil,
+		"slack":      nil,
 		"tel":        flows.NewContactURN(urns.URN("tel:+12024561111?channel=294a14d4-c998-41e5-a314-5941b97b89d7"), nil).ToXValue(env),
 		"telegram":   nil,
 		"twitter":    flows.NewContactURN(urns.URN("twitter:joey"), nil).ToXValue(env),
@@ -515,6 +516,12 @@ func TestContactQuery(t *testing.T) {
 		{`age != 39`, envs.RedactionPolicyNone, false, ""},
 		{`age = 60`, envs.RedactionPolicyNone, false, ""},
 		{`age != 60`, envs.RedactionPolicyNone, true, ""},
+
+		// check querying on a field that isn't set for this contact
+		{`activation_token = ""`, envs.RedactionPolicyNone, true, ""},
+		{`activation_token != ""`, envs.RedactionPolicyNone, false, ""},
+		{`activation_token = "xx"`, envs.RedactionPolicyNone, false, ""},
+		{`activation_token != "xx"`, envs.RedactionPolicyNone, true, ""},
 	}
 
 	doQuery := func(q string, redaction envs.RedactionPolicy) (bool, error) {
