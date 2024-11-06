@@ -26,6 +26,10 @@ const TypeSayMsg string = "say_msg"
 //     "type": "say_msg",
 //     "audio_url": "http://uploads.temba.io/2353262.m4a",
 //     "text": "Hi @contact.name, are you ready to complete today's survey?"
+//     "transcript": {
+//       "audio_url": "http://uploads.temba.io/2353262.m4a",
+//       "transcription": "This is the test transcription of the audio."
+//     }
 //   }
 //
 // @action say_msg
@@ -33,8 +37,14 @@ type SayMsgAction struct {
 	baseAction
 	voiceAction
 
-	Text     string `json:"text" validate:"required" engine:"localized,evaluated"`
-	AudioURL string `json:"audio_url,omitempty"`
+	Text       string         `json:"text" validate:"required" engine:"localized,evaluated"`
+	AudioURL   string         `json:"audio_url,omitempty"`
+	Transcript TranscriptData `json:"transcript,omitempty"`
+}
+
+type TranscriptData struct {
+	AudioURL      string `json:"audio_url,omitempty"`
+	Transcription string `json:"transcription,omitempty"`
 }
 
 // NewSayMsg creates a new say message action
@@ -69,6 +79,10 @@ func (a *SayMsgAction) Execute(run flows.Run, step flows.Step, logModifier flows
 	connection := run.Session().Trigger().Connection()
 
 	msg := flows.NewIVRMsgOut(connection.URN(), connection.Channel(), evaluatedText, textLanguage, localizedAudioURL)
+	if a.Transcript.Transcription != "" {
+		msg.Transcription_ = a.Transcript.Transcription
+	}
+
 	logEvent(events.NewIVRCreated(msg))
 
 	return nil

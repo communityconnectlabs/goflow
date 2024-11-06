@@ -23,7 +23,11 @@ const TypePlayAudio string = "play_audio"
 //   {
 //     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
 //     "type": "play_audio",
-//     "audio_url": "http://uploads.temba.io/2353262.m4a"
+//     "audio_url": "http://uploads.temba.io/2353262.m4a",
+//     "transcript": {
+//       "audio_url": "http://uploads.temba.io/2353262.m4a",
+//       "transcription": "This is the test transcription of the audio."
+//     }
 //   }
 //
 // @action play_audio
@@ -31,7 +35,8 @@ type PlayAudioAction struct {
 	baseAction
 	voiceAction
 
-	AudioURL string `json:"audio_url" validate:"required" engine:"localized,evaluated"`
+	AudioURL   string         `json:"audio_url" validate:"required" engine:"localized,evaluated"`
+	Transcript TranscriptData `json:"transcript,omitempty"`
 }
 
 // NewPlayAudio creates a new play message action
@@ -63,6 +68,10 @@ func (a *PlayAudioAction) Execute(run flows.Run, step flows.Step, logModifier fl
 
 	// if we have an audio URL, turn it into a message
 	msg := flows.NewIVRMsgOut(connection.URN(), connection.Channel(), "", envs.NilLanguage, evaluatedAudioURL)
+	if a.Transcript.Transcription != "" {
+		msg.Transcription_ = a.Transcript.Transcription
+	}
+
 	logEvent(events.NewIVRCreated(msg))
 
 	return nil
