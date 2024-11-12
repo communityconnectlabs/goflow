@@ -25,7 +25,7 @@ const TypeSayMsg string = "say_msg"
 //     "uuid": "8eebd020-1af5-431c-b943-aa670fc74da9",
 //     "type": "say_msg",
 //     "audio_url": "http://uploads.temba.io/2353262.m4a",
-//     "text": "Hi @contact.name, are you ready to complete today's survey?"
+//     "text": "Hi @contact.name, are you ready to complete today's survey?",
 //     "transcript": {
 //       "audio_url": "http://uploads.temba.io/2353262.m4a",
 //       "transcription": "This is the test transcription of the audio."

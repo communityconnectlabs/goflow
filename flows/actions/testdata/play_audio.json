@@ -5,7 +5,8 @@
         "action": {
             "type": "play_audio",
             "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "audio_url": "@(1 / 0).mp3"
+            "audio_url": "@(1 / 0).mp3",
+            "transcript": {}
         },
         "in_flow_type": "voice",
         "events": [
@@ -36,7 +37,8 @@
         "action": {
             "type": "play_audio",
             "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "audio_url": "@(\"\")"
+            "audio_url": "@(\"\")",
+            "transcript": {}
         },
         "in_flow_type": "voice",
         "events": [
@@ -67,7 +69,8 @@
         "action": {
             "type": "play_audio",
             "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "audio_url": "http://uploads.temba.io/welcome/@(contact.uuid).m4a"
+            "audio_url": "http://uploads.temba.io/welcome/@(contact.uuid).m4a",
+            "transcript": {}
         },
         "in_flow_type": "voice",
         "events": [
@@ -107,7 +110,8 @@
         "action": {
             "type": "play_audio",
             "uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-            "audio_url": "http://uploads.temba.io/welcome/@(contact.uuid).m4a"
+            "audio_url": "http://uploads.temba.io/welcome/@(contact.uuid).m4a",
+            "transcript": {}
         },
         "localization": {
             "spa": {
