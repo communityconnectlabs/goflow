@@ -58,6 +58,7 @@ type MsgOut struct {
 	TextLanguage       envs.Language        `json:"text_language,omitempty"`
 	ReceiveAttachment_ string               `json:"receive_attachment,omitempty"`
 	SharingConfig_     ShareableIconsConfig `json:"sharing_config,omitempty"`
+	Transcription_     string               `json:"transcription,omitempty"`
 }
 
 type ShareableIconsConfig struct {

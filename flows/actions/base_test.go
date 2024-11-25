@@ -9,6 +9,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nyaruka/gocommon/dates"
+	"github.com/nyaruka/gocommon/httpx"
+	"github.com/nyaruka/gocommon/jsonx"
+	"github.com/nyaruka/gocommon/urns"
+	"github.com/nyaruka/gocommon/uuids"
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/assets/static"
 	"github.com/nyaruka/goflow/envs"
@@ -25,11 +30,6 @@ import (
 	"github.com/nyaruka/goflow/test"
 	"github.com/nyaruka/goflow/utils"
 	"github.com/nyaruka/goflow/utils/smtpx"
-	"github.com/nyaruka/gocommon/dates"
-	"github.com/nyaruka/gocommon/httpx"
-	"github.com/nyaruka/gocommon/jsonx"
-	"github.com/nyaruka/gocommon/urns"
-	"github.com/nyaruka/gocommon/uuids"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -471,7 +471,8 @@ func TestConstructors(t *testing.T) {
 			`{
 				"type": "play_audio",
 				"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
-				"audio_url": "http://uploads.temba.io/2353262.m4a"
+				"audio_url": "http://uploads.temba.io/2353262.m4a",
+				"transcript": {}
 			}`,
 		},
 		{
@@ -484,7 +485,8 @@ func TestConstructors(t *testing.T) {
 			"type": "say_msg",
 			"uuid": "ad154980-7bf7-4ab8-8728-545fd6378912",
 			"audio_url": "http://uploads.temba.io/2353262.m4a",
-			"text": "Hi @contact.name, are you ready to complete today's survey?"
+			"text": "Hi @contact.name, are you ready to complete today's survey?",
+			"transcript": {}
 		}`,
 		},
 		{
