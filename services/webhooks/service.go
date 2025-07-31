@@ -3,12 +3,12 @@ package webhooks
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
-
 	"github.com/nyaruka/gocommon/httpx"
 	"github.com/nyaruka/goflow/flows"
 	"github.com/nyaruka/goflow/flows/engine"
 	"github.com/nyaruka/goflow/utils"
+	"net/http"
+	"time"
 )
 
 type service struct {
@@ -50,6 +50,8 @@ func (s *service) Call(session flows.Session, request *http.Request) (*flows.Web
 	if request.Header.Get("Accept-Encoding") == "gzip" {
 		request.Header.Del("Accept-Encoding")
 	}
+
+	s.httpClient.Timeout = 120 * time.Second // set a default timeout for the request for 2 minutes
 
 	trace, err := httpx.DoTrace(s.httpClient, request, s.httpRetries, s.httpAccess, s.maxBodyBytes)
 	if trace != nil {
